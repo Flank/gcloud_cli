@@ -744,8 +744,10 @@ class HTTPAssertion(object):
     uri_assertion = assertions.Assertion.ForComplex(http_data.get('uri', ''))
     method_assertion = assertions.EqualsAssertion(
         http_data.get('method', 'GET'))
+    extract_references = [ReferenceExtraction.FromData(d) for d in
+                          http_data.get('extract_references', [])]
     return cls._ForCommon('expect_request', http_data, uri_assertion,
-                          method_assertion, {})
+                          method_assertion, extract_references)
 
   @classmethod
   def ForResponse(cls, http_data):

@@ -5,15 +5,12 @@ SYNOPSIS
     gcloud alpha tasks queues COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Commands for managing Google Cloud Tasks queues. If you have early
-    access to Cloud Tasks, refer to the following guide for more information
-    about the different queue target types:
-    https://cloud.google.com/cloud-tasks/docs/queue-types. For access, sign up
-    here: https://goo.gl/Ya0AZd
+    (ALPHA) Commands for managing Google Cloud Tasks queues.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -23,8 +20,11 @@ COMMANDS
      add-iam-policy-binding
         (ALPHA) Add IAM policy binding for a tasks queue.
 
+     create
+        (ALPHA) Create a Cloud Tasks queue.
+
      create-app-engine-queue
-        (ALPHA) Create an App Engine queue.
+        (ALPHA) (DEPRECATED) Create a Cloud Tasks queue.
 
      create-pull-queue
         (ALPHA) Create a pull queue.
@@ -56,8 +56,11 @@ COMMANDS
      set-iam-policy
         (ALPHA) Set the IAM policy for a queue.
 
+     update
+        (ALPHA) Update a Cloud Tasks queue.
+
      update-app-engine-queue
-        (ALPHA) Update an App Engine queue.
+        (ALPHA) (DEPRECATED) Update a Cloud Tasks queue.
 
      update-pull-queue
         (ALPHA) Update a pull queue.
@@ -67,7 +70,8 @@ NOTES
     command fails with API permission errors despite specifying the right
     project, you will have to apply for early access and have your projects
     registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    https://cloud.google.com/support/. These variants are also available:
 
+        $ gcloud tasks queues
         $ gcloud beta tasks queues
 

@@ -3,26 +3,7 @@ release_tracks: [GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
-  - command: compute disks create $$disk$$ --zone $$my-zone$$ --size 10 --format="text(name,zone,status)"
-  - stderr: |
-      WARNING: You have selected a disk size of under [200GB]. This may result in poor I/O performance. For more information, see: https://developers.google.com/compute/docs/disks#performance.
-      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$].
-  - stdout: |
-      ---
-      name:   $$disk$$
-      status: READY
-      zone:   https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$
-- execute:
-  - command: compute images create $$image$$ --source-disk $$disk$$ --source-disk-zone
-      $$my-zone$$ --format="text(name,status)"
-  - stderr: |
-      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$].
-  - stdout: |
-      ---
-      name:   $$image$$
-      status: READY
-- execute:
-  - command: compute images export --image $$image$$ --destination-uri gs://bucketthatdoesnotexistasdf1234567890/image.tar.gz
+  - command: compute images export --image image-not-exist --destination-uri gs://e2e-functions-do-not-delete/image.tar.gz
       --timeout 30s --quiet
   - stderr: |-
       .*Created.*
@@ -31,14 +12,6 @@ summary:
       .*\[Daisy\] Running workflow "image-export".*
       $
   - error: '1: .*completed with status "FAILURE".*$'
-- execute:
-  - command: compute images delete $$image$$ --quiet
-  - stderr: |
-      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$].
-- execute:
-  - command: compute disks delete $$disk$$ --zone $$my-zone$$ --quiet
-  - stderr: |
-      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$].
 actions:
 - define_reference:
     reference: api-version
@@ -51,43 +24,8 @@ actions:
     reference: my-zone
     value: us-central1-f
 
-- generate_resource_id:
-    reference: disk
-    prefix: gcloud-compute-images-test
-
-- generate_resource_id:
-    reference: image
-    prefix: gcloud-compute-images-test
-
 - execute_command:
-    command: compute disks create $$disk$$ --zone $$my-zone$$ --size 10 --format="text(name,zone,status)"
-    validation_only: true
-    events:
-    - expect_stderr: |
-        WARNING: You have selected a disk size of under [200GB]. This may result in poor I/O performance. For more information, see: https://developers.google.com/compute/docs/disks#performance.
-        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$].
-    - expect_stdout: |
-        ---
-        name:   $$disk$$
-        status: READY
-        zone:   https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$
-    - expect_exit:
-        code: 0
-- execute_command:
-    command: compute images create $$image$$ --source-disk $$disk$$ --source-disk-zone
-      $$my-zone$$ --format="text(name,status)"
-    validation_only: true
-    events:
-    - expect_stderr: |
-        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$].
-    - expect_stdout: |
-        ---
-        name:   $$image$$
-        status: READY
-    - expect_exit:
-        code: 0
-- execute_command:
-    command: compute images export --image $$image$$ --destination-uri gs://bucketthatdoesnotexistasdf1234567890/image.tar.gz
+    command: compute images export --image image-not-exist --destination-uri gs://e2e-functions-do-not-delete/image.tar.gz
       --timeout 30s --quiet
     validation_only: true
     events:
@@ -101,21 +39,3 @@ actions:
         code: 1
         message:
           matches: .*completed with status "FAILURE".*
-- execute_command:
-    command: compute images delete $$image$$ --quiet
-    cleanup_for: image
-    validation_only: true
-    events:
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$].
-    - expect_exit:
-        code: 0
-- execute_command:
-    command: compute disks delete $$disk$$ --zone $$my-zone$$ --quiet
-    cleanup_for: disk
-    validation_only: true
-    events:
-    - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$].
-    - expect_exit:
-        code: 0

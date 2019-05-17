@@ -37,6 +37,14 @@ OUTCOMES_FORMAT = """
           )
 """
 
+FLAKY_ATTEMPTS_OUTCOMES_FORMAT = """
+          table[box](
+            outcome.color(red=Fail, green=Pass, blue=Flaky, yellow=Inconclusive),
+            axis_value:label=TEST_AXIS_VALUE,
+            passed_executions:label=PASSED_EXECUTIONS
+          )
+"""
+
 
 def GetError(error):
   """Returns a ready-to-print string representation from the http response.
@@ -251,7 +259,7 @@ def ParseRoboDirectiveKey(key):
   else:
     # Format: '<type>:<resource_name>=<input_value>'
     action_type = parts[0]
-    supported_action_types = ['text', 'click']
+    supported_action_types = ['text', 'click', 'ignore']
     if action_type not in supported_action_types:
       raise exceptions.InvalidArgException(
           'robo_directives',

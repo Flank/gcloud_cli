@@ -208,18 +208,30 @@ class SubnetsCreateTest(test_base.BaseTest, parameterized.TestCase):
         --range 10.240.0.0/16 --region us-central1 {0}
         """.format(enable_flow_logs_flag))
 
-    self.CheckRequests(
-        [(self.compute.subnetworks, 'Insert',
-          self.messages.ComputeSubnetworksInsertRequest(
-              subnetwork=self.messages.Subnetwork(
-                  name='my-subnet',
-                  network=self.compute_uri +
-                  '/projects/my-project/global/networks/my-network',
-                  ipCidrRange='10.240.0.0/16',
-                  privateIpGoogleAccess=False,
-                  enableFlowLogs=enable_flow_logs),
-              region='us-central1',
-              project='my-project'))],)
+    if self.track == calliope_base.ReleaseTrack.GA:
+      subnetwork = self.messages.Subnetwork(
+          name='my-subnet',
+          network=self.compute_uri +
+          '/projects/my-project/global/networks/my-network',
+          ipCidrRange='10.240.0.0/16',
+          privateIpGoogleAccess=False,
+          enableFlowLogs=enable_flow_logs)
+    else:
+      log_config = self.messages.SubnetworkLogConfig(
+          enable=enable_flow_logs) if enable_flow_logs is not None else None
+      subnetwork = self.messages.Subnetwork(
+          name='my-subnet',
+          network=self.compute_uri +
+          '/projects/my-project/global/networks/my-network',
+          ipCidrRange='10.240.0.0/16',
+          privateIpGoogleAccess=False,
+          enableFlowLogs=enable_flow_logs,
+          logConfig=log_config)
+    self.CheckRequests([
+        (self.compute.subnetworks, 'Insert',
+         self.messages.ComputeSubnetworksInsertRequest(
+             subnetwork=subnetwork, region='us-central1', project='my-project'))
+    ],)
 
 
 class SubnetsCreateTestBeta(SubnetsCreateTest):
@@ -227,6 +239,37 @@ class SubnetsCreateTestBeta(SubnetsCreateTest):
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
     self.SelectApi('beta')
+
+  def testCreateWithFlowLogsAggregationAndSampling(self):
+    """Test creating a subnet with enableFlowLogs in various states."""
+    self.Run("""
+        compute networks subnets create my-subnet --network my-network
+        --range 10.240.0.0/16 --region us-central1 --enable-flow-logs
+        --logging-aggregation-interval interval-10-min
+        --logging-flow-sampling 0.7 --logging-metadata exclude-all
+        """)
+
+    self.CheckRequests([
+        (self.compute.subnetworks, 'Insert',
+         self.messages.ComputeSubnetworksInsertRequest(
+             subnetwork=self.messages.Subnetwork(
+                 name='my-subnet',
+                 network=self.compute_uri +
+                 '/projects/my-project/global/networks/my-network',
+                 ipCidrRange='10.240.0.0/16',
+                 privateIpGoogleAccess=False,
+                 enableFlowLogs=True,
+                 logConfig=self.messages.SubnetworkLogConfig(
+                     enable=True,
+                     aggregationInterval=(
+                         self.messages.SubnetworkLogConfig
+                         .AggregationIntervalValueValuesEnum.INTERVAL_10_MIN),
+                     flowSampling=0.7,
+                     metadata=(self.messages.SubnetworkLogConfig
+                               .MetadataValueValuesEnum.EXCLUDE_ALL_METADATA))),
+             region='us-central1',
+             project='my-project'))
+    ],)
 
 
 class SubnetsCreateTestAlpha(SubnetsCreateTest):
@@ -240,28 +283,31 @@ class SubnetsCreateTestAlpha(SubnetsCreateTest):
     self.Run("""
         compute networks subnets create my-subnet --network my-network
         --range 10.240.0.0/16 --region us-central1 --enable-flow-logs
-        --aggregation-interval interval-10-min --flow-sampling 0.7
-        --metadata exclude-all-metadata
+        --aggregation-interval interval-10-min
+        --flow-sampling 0.7 --metadata exclude-all-metadata
         """)
 
-    self.CheckRequests(
-        [(self.compute.subnetworks, 'Insert',
-          self.messages.ComputeSubnetworksInsertRequest(
-              subnetwork=self.messages.Subnetwork(
-                  name='my-subnet',
-                  network=self.compute_uri +
-                  '/projects/my-project/global/networks/my-network',
-                  ipCidrRange='10.240.0.0/16',
-                  privateIpGoogleAccess=False,
-                  enableFlowLogs=True,
-                  aggregationInterval=(
-                      self.messages.Subnetwork.
-                      AggregationIntervalValueValuesEnum.INTERVAL_10_MIN),
-                  flowSampling=0.7,
-                  metadata=(self.messages.Subnetwork.MetadataValueValuesEnum.
-                            EXCLUDE_ALL_METADATA)),
-              region='us-central1',
-              project='my-project'))],)
+    self.CheckRequests([
+        (self.compute.subnetworks, 'Insert',
+         self.messages.ComputeSubnetworksInsertRequest(
+             subnetwork=self.messages.Subnetwork(
+                 name='my-subnet',
+                 network=self.compute_uri +
+                 '/projects/my-project/global/networks/my-network',
+                 ipCidrRange='10.240.0.0/16',
+                 privateIpGoogleAccess=False,
+                 enableFlowLogs=True,
+                 logConfig=self.messages.SubnetworkLogConfig(
+                     enable=True,
+                     aggregationInterval=(
+                         self.messages.SubnetworkLogConfig
+                         .AggregationIntervalValueValuesEnum.INTERVAL_10_MIN),
+                     flowSampling=0.7,
+                     metadata=(self.messages.SubnetworkLogConfig
+                               .MetadataValueValuesEnum.EXCLUDE_ALL_METADATA))),
+             region='us-central1',
+             project='my-project'))
+    ],)
 
   def testCreateWithPrivateV6AccessEnabled(self):
     """Test creating a subnet with --enable-private-v6-access."""
@@ -300,6 +346,77 @@ class SubnetsCreateTestAlpha(SubnetsCreateTest):
                   ipCidrRange='10.240.0.0/16',
                   privateIpGoogleAccess=False,
                   enablePrivateV6Access=False),
+              region='us-central1',
+              project='my-project'))],)
+
+  def testCreateWithPrivateIpv6GoogleAccessDisable(self):
+    """Test creating a subnet with DISABLE_GOOGLE_ACCESS private ipv6 access."""
+    self.Run("""
+        compute networks subnets create my-subnet --network my-network
+        --range 10.240.0.0/16 --region us-central1
+        --private-ipv6-google-access-type disable
+        """)
+
+    self.CheckRequests([
+        (self.compute.subnetworks, 'Insert',
+         self.messages.ComputeSubnetworksInsertRequest(
+             subnetwork=self.messages.Subnetwork(
+                 name='my-subnet',
+                 network=self.compute_uri +
+                 '/projects/my-project/global/networks/my-network',
+                 ipCidrRange='10.240.0.0/16',
+                 privateIpGoogleAccess=False,
+                 privateIpv6GoogleAccess=(self.messages.Subnetwork.
+                                          PrivateIpv6GoogleAccessValueValuesEnum
+                                          .DISABLE_GOOGLE_ACCESS)),
+             region='us-central1',
+             project='my-project'))
+    ],)
+
+  def testCreateWithPrivateIpv6GoogleAccessEnableOutbound(self):
+    """Test creating a subnet with ENABLE_OUTBOUND_VM_ACCESS_TO_GOOGLE private ipv6 access."""
+    self.Run("""
+        compute networks subnets create my-subnet --network my-network
+        --range 10.240.0.0/16 --region us-central1
+        --private-ipv6-google-access-type enable-outbound-vm-access
+        """)
+
+    self.CheckRequests([(
+        self.compute.subnetworks, 'Insert',
+        self.messages.ComputeSubnetworksInsertRequest(
+            subnetwork=self.messages.Subnetwork(
+                name='my-subnet',
+                network=self.compute_uri +
+                '/projects/my-project/global/networks/my-network',
+                ipCidrRange='10.240.0.0/16',
+                privateIpGoogleAccess=False,
+                privateIpv6GoogleAccess=(self.messages.Subnetwork
+                                         .PrivateIpv6GoogleAccessValueValuesEnum
+                                         .ENABLE_OUTBOUND_VM_ACCESS_TO_GOOGLE)),
+            region='us-central1',
+            project='my-project'))],)
+
+  def testCreateWithPrivateIpv6GoogleAccessEnableBidirectional(self):
+    """Test creating a subnet with ENABLE_BIDIRECTIONAL_ACCESS_TO_GOOGLE private ipv6 access."""
+    self.Run("""
+        compute networks subnets create my-subnet --network my-network
+        --range 10.240.0.0/16 --region us-central1
+        --private-ipv6-google-access-type enable-bidirectional-access
+        """)
+
+    self.CheckRequests(
+        [(self.compute.subnetworks, 'Insert',
+          self.messages.ComputeSubnetworksInsertRequest(
+              subnetwork=self.messages.Subnetwork(
+                  name='my-subnet',
+                  network=self.compute_uri +
+                  '/projects/my-project/global/networks/my-network',
+                  ipCidrRange='10.240.0.0/16',
+                  privateIpGoogleAccess=False,
+                  privateIpv6GoogleAccess=(
+                      self.messages.Subnetwork
+                      .PrivateIpv6GoogleAccessValueValuesEnum
+                      .ENABLE_BIDIRECTIONAL_ACCESS_TO_GOOGLE)),
               region='us-central1',
               project='my-project'))],)
 

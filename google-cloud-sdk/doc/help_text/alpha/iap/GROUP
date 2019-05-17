@@ -1,0 +1,36 @@
+NAME
+    gcloud alpha iap - manage IAP policies
+
+SYNOPSIS
+    gcloud alpha iap GROUP [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Cloud Identity-Aware Proxy (Cloud IAP) controls access to your
+    cloud applications running on Google Cloud Platform. Cloud IAP works by
+    verifying user identity and context of the request to determine if a user
+    should be allowed to access the application.
+
+    More information on Cloud IAP can be found here:
+    https://cloud.google.com/iap and detailed documentation can be found here:
+    https://cloud.google.com/iap/docs/
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+GROUPS
+    GROUP is one of the following:
+
+     web
+        (ALPHA) Manage IAP web policies.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/.
+

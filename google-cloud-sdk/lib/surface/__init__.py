@@ -50,8 +50,7 @@ class Gcloud(base.Group):
     parser.add_argument(
         '--impersonate-service-account',
         metavar='SERVICE_ACCOUNT_EMAIL',
-        hidden=True,
-        help='(ALPHA) For this gcloud invocation, all API requests will be '
+        help='For this gcloud invocation, all API requests will be '
              'made as the given service account instead of the currently '
              'selected account. This is done without needing to create, '
              'download, and activate a key for the account. In order to '
@@ -62,6 +61,21 @@ class Gcloud(base.Group):
              'this permission or you may create a custom role.',
         action=actions.StoreProperty(
             properties.VALUES.auth.impersonate_service_account))
+
+    parser.add_argument(
+        '--billing-project',
+        metavar='BILLING_PROJECT',
+        category=base.COMMONLY_USED_FLAGS,
+        help='The Google Cloud Platform project that will be charged quota for '
+             'operations performed in gcloud. If you need to operate on one '
+             'project, but need quota against a different project, you can use '
+             'this flag to specify the billing project. If both '
+             '`billing/quota_project` and `--billing-project` are specified, '
+             '`--billing-project` takes precedence. '
+             'Run `$ gcloud config set --help` to see more information about '
+             '`billing/quota_project`.',
+        action=actions.StoreProperty(
+            properties.VALUES.billing.quota_project))
 
     parser.add_argument(
         '--project',

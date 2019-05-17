@@ -1,0 +1,82 @@
+
+.TH "GCLOUD_ALPHA_DATAPROC_CLUSTERS_EXPORT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha dataproc clusters export \- export a cluster
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha dataproc clusters export\fR \fINAME\fR [\fB\-\-destination\fR=\fIDESTINATION\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Exports an existing cluster's configuration to a file. This
+configuration can then be used to create new clusters using the import command.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+The name of the cluster to export.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-destination\fR=\fIDESTINATION\fR
+Path to a YAML file where the cluster configuration will be exported. The
+exported data will not contain any output\-only fields. Alternatively, you may
+omit this flag to write to standard output. A schema describing the
+export/import format can be found in:
+$CLOUDSDKROOT/lib/googlecloudsdk/schemas/dataproc/v1/Cluster.yaml.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
+independent resource namespace constrained to deploying instances into Compute
+Engine zones inside the region. The default value of \f5global\fR is a special
+multi\-region namespace which is capable of deploying instances into all Compute
+Engine zones globally, and is disjoint from other Cloud Dataproc regions.
+Overrides the default \fBdataproc/region\fR property value for this command
+invocation.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. This variant is also available:
+
+.RS 2m
+$ gcloud beta dataproc clusters export
+.RE
+

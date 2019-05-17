@@ -38,14 +38,18 @@ are pretty-printed on the standard output. The
 *--filter=*_EXPRESSION_ flags along with projections can be used to format and
 change the default output to a more meaningful result.
 
-To change the default output format of a command, use the --format flag.   Resource formats are described in detail below.
+Use the `--format` flag to change the default output format of a command.   Resource formats are described in detail below.
 
-To select resources to be listed, use the --filter flag. For details run $ gcloud topic filters.
+Use the `--filter` flag to select resources to be listed. For details run $ gcloud topic filters.
 
-To reach resource items through a unique path of names from the root,
-use resource-keys. For details run $ gcloud topic resource-keys.
+Use resource-keys to reach resource items through a unique path of names from the root. For details run $ gcloud topic resource-keys.
 
-To list a subset of resource keys in a resource, use projections.   For details run $ gcloud topic projections.
+Use projections to list a subset of resource keys in a resource.   For details run $ gcloud topic projections.
+
+Note: To refer to a list of fields you can sort, filter, and format by for
+each resource, you can run a list command with the format set to `text` or
+`json`. For
+example, $ gcloud compute instances list --limit=1 --format=text.
 
 To work through an interactive tutorial about using the filter and format
 flags instead, see: https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/cloud-shell-tutorials&page=editor&tutorial=cloudsdk/tutorial.md
@@ -61,14 +65,18 @@ are pretty-printed on the standard output. The
 *--filter=*_EXPRESSION_ flags along with projections can be used to format and
 change the default output to a more meaningful result.
 
-To change the default output format of a command, use the --format flag.   For details run $ gcloud topic formats.
+Use the `--format` flag to change the default output format of a command.   For details run $ gcloud topic formats.
 
-To select resources to be listed, use the --filter flag. For details run $ gcloud topic filters.
+Use the `--filter` flag to select resources to be listed. For details run $ gcloud topic filters.
 
-To reach resource items through a unique path of names from the root,
-use resource-keys. Resource keys are described in detail below.
+Use resource-keys to reach resource items through a unique path of names from the root. Resource keys are described in detail below.
 
-To list a subset of resource keys in a resource, use projections.   For details run $ gcloud topic projections.
+Use projections to list a subset of resource keys in a resource.   For details run $ gcloud topic projections.
+
+Note: To refer to a list of fields you can sort, filter, and format by for
+each resource, you can run a list command with the format set to `text` or
+`json`. For
+example, $ gcloud compute instances list --limit=1 --format=text.
 
 To work through an interactive tutorial about using the filter and format
 flags instead, see: https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/cloud-shell-tutorials&page=editor&tutorial=cloudsdk/tutorial.md
@@ -84,14 +92,18 @@ are pretty-printed on the standard output. The
 *--filter=*_EXPRESSION_ flags along with projections can be used to format and
 change the default output to a more meaningful result.
 
-To change the default output format of a command, use the --format flag.   For details run $ gcloud topic formats.
+Use the `--format` flag to change the default output format of a command.   For details run $ gcloud topic formats.
 
-To select resources to be listed, use the --filter flag. For details run $ gcloud topic filters.
+Use the `--filter` flag to select resources to be listed. For details run $ gcloud topic filters.
 
-To reach resource items through a unique path of names from the root,
-use resource-keys. For details run $ gcloud topic resource-keys.
+Use resource-keys to reach resource items through a unique path of names from the root. For details run $ gcloud topic resource-keys.
 
-To list a subset of resource keys in a resource, use projections.   Resource projections are described in detail below.
+Use projections to list a subset of resource keys in a resource.   Resource projections are described in detail below.
+
+Note: To refer to a list of fields you can sort, filter, and format by for
+each resource, you can run a list command with the format set to `text` or
+`json`. For
+example, $ gcloud compute instances list --limit=1 --format=text.
 
 To work through an interactive tutorial about using the filter and format
 flags instead, see: https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/cloud-shell-tutorials&page=editor&tutorial=cloudsdk/tutorial.md

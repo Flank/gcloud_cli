@@ -23,18 +23,25 @@ from apitools.base.py import list_pager
 from googlecloudsdk.api_lib.compute import utils
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.api_lib.util import waiter
+from googlecloudsdk.command_lib.filestore import locations_util
+from googlecloudsdk.command_lib.filestore.snapshots import util as snapshot_util
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import log
+from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
 
 
-FILESTORE_API_NAME = 'file'
-FILESTORE_ALPHA_API_VERSION = 'v1alpha1'
-FILESTORE_API_VERSION = 'v1beta1'
+API_NAME = 'file'
+V1_API_VERSION = 'v1'
+ALPHA_API_VERSION = 'v1p1alpha1'
+BETA_API_VERSION = 'v1beta1'
+
+INSTANCES_COLLECTION = 'file.projects.locations.instances'
+LOCATIONS_COLLECTION = 'file.projects.locations'
 OPERATIONS_COLLECTION = 'file.projects.locations.operations'
 
 
-def GetClient(version=FILESTORE_API_VERSION):
+def GetClient(version=V1_API_VERSION):
   """Import and return the appropriate Cloud Filestore client.
 
   Args:
@@ -43,12 +50,12 @@ def GetClient(version=FILESTORE_API_VERSION):
   Returns:
     Cloud Filestore client for the appropriate release track.
   """
-  return apis.GetClientInstance(FILESTORE_API_NAME, version)
+  return apis.GetClientInstance(API_NAME, version)
 
 
-def GetMessages(version=FILESTORE_API_VERSION):
+def GetMessages(version=V1_API_VERSION):
   """Import and return the appropriate Filestore messages module."""
-  return apis.GetMessagesModule(FILESTORE_API_NAME, version)
+  return apis.GetMessagesModule(API_NAME, version)
 
 
 class Error(exceptions.Error):
@@ -66,11 +73,13 @@ class InvalidNameError(Error):
 class FilestoreClient(object):
   """Wrapper for working with the file API."""
 
-  def __init__(self, version=FILESTORE_API_VERSION):
-    if version == FILESTORE_ALPHA_API_VERSION:
+  def __init__(self, version=V1_API_VERSION):
+    if version == ALPHA_API_VERSION:
       self._adapter = AlphaFilestoreAdapter()
-    elif version == FILESTORE_API_VERSION:
+    elif version == BETA_API_VERSION:
       self._adapter = BetaFilestoreAdapter()
+    elif version == V1_API_VERSION:
+      self._adapter = FilestoreAdapter()
     else:
       raise ValueError('[{}] is not a valid API version.'.format(version))
 
@@ -94,7 +103,7 @@ class FilestoreClient(object):
       Generator that yields the Cloud Filestore instances.
     """
     request = self.messages.FileProjectsLocationsInstancesListRequest(
-        parent=location_ref.RelativeName())
+        parent=location_ref)
     # Check for unreachable locations.
     response = self.client.projects_locations_instances.List(request)
     for location in response.unreachable:
@@ -168,7 +177,7 @@ class FilestoreClient(object):
 
   def GetLocation(self, location_ref):
     request = self.messages.FileProjectsLocationsGetRequest(
-        name=location_ref.RelativeName())
+        name=location_ref)
     return self.client.projects_locations.Get(request)
 
   def ListLocations(self, project_ref, limit=None):
@@ -193,7 +202,7 @@ class FilestoreClient(object):
       Generator that yields the Cloud Filestore instances.
     """
     request = self.messages.FileProjectsLocationsOperationsListRequest(
-        name=operation_ref.RelativeName())
+        name=operation_ref)
     return list_pager.YieldFromList(
         self.client.projects_locations_operations,
         request,
@@ -215,12 +224,12 @@ class FilestoreClient(object):
 
   def ValidateFileShares(self, instance):
     """Validate the file share configs on the instance."""
-    for volume in self._adapter.FileSharesFromInstance(instance):
-      if volume.capacityGb:
-        self._ValidateFileShare(instance.tier, volume.capacityGb)
+    for file_share in self._adapter.FileSharesFromInstance(instance):
+      if file_share.capacityGb:
+        self._ValidateFileShare(instance.tier, file_share.capacityGb)
 
   def ParseFilestoreConfig(self, tier=None, description=None, file_share=None,
-                           network=None, labels=None):
+                           network=None, labels=None, zone=None):
     """Parses the command line arguments for Create into a config.
 
     Args:
@@ -229,6 +238,7 @@ class FilestoreClient(object):
       file_share: the config for the file share.
       network: The network for the instance.
       labels: The parsed labels value.
+      zone: The parsed zone of the instance.
 
     Returns:
       the configuration that will be used as the request body for creating a
@@ -242,7 +252,7 @@ class FilestoreClient(object):
     if description:
       instance.description = description
 
-    self._adapter.ParseFileShareIntoInstance(instance, file_share)
+    self._adapter.ParseFileShareIntoInstance(instance, file_share, zone)
 
     if network:
       instance.networks = []
@@ -300,22 +310,31 @@ class AlphaFilestoreAdapter(object):
   """Adapter for the alpha filestore API."""
 
   def __init__(self):
-    self.client = GetClient(version=FILESTORE_ALPHA_API_VERSION)
-    self.messages = GetMessages(version=FILESTORE_ALPHA_API_VERSION)
+    self.client = GetClient(version=ALPHA_API_VERSION)
+    self.messages = GetMessages(version=ALPHA_API_VERSION)
 
-  def ParseFileShareIntoInstance(self, instance, file_share):
+  def ParseFileShareIntoInstance(self, instance, file_share,
+                                 instance_zone=None):
     """Parse specified file share configs into an instance message."""
-    if instance.volumes is None:
-      instance.volumes = []
+    if instance.fileShares is None:
+      instance.fileShares = []
     if file_share:
-      file_share_config = self.messages.VolumeConfig(
+      source_snapshot = None
+      if 'source-snapshot' in file_share:
+        project = properties.VALUES.core.project.Get(required=True)
+        location = (file_share.get('source-snapshot-region') or
+                    locations_util.GetRegionFromZone(instance_zone))
+        source_snapshot = snapshot_util.SNAPSHOT_NAME_TEMPLATE.format(
+            project, location, file_share.get('source-snapshot'))
+      file_share_config = self.messages.FileShareConfig(
           name=file_share.get('name'),
-          capacityGb=utils.BytesToGb(file_share.get('capacity')))
-      instance.volumes.append(file_share_config)
+          capacityGb=utils.BytesToGb(file_share.get('capacity')),
+          sourceSnapshot=source_snapshot)
+      instance.fileShares.append(file_share_config)
 
   def FileSharesFromInstance(self, instance):
     """Get file share configs from instance message."""
-    return instance.volumes
+    return instance.fileShares
 
   def UpdateInstance(self, instance_ref, instance_config, update_mask):
     # Not supported by alpha API.
@@ -331,14 +350,19 @@ class BetaFilestoreAdapter(object):
   """Adapter for the beta filestore API."""
 
   def __init__(self):
-    self.client = GetClient(version=FILESTORE_API_VERSION)
-    self.messages = GetMessages(version=FILESTORE_API_VERSION)
+    self.client = GetClient(version=BETA_API_VERSION)
+    self.messages = GetMessages(version=BETA_API_VERSION)
 
-  def ParseFileShareIntoInstance(self, instance, file_share):
+  def ParseFileShareIntoInstance(self, instance, file_share,
+                                 instance_zone=None):
     """Parse specified file share configs into an instance message."""
+    del instance_zone  # Unused.
     if instance.fileShares is None:
       instance.fileShares = []
     if file_share:
+      # Deduplicate file shares with the same name.
+      instance.fileShares = [fs for fs in instance.fileShares
+                             if fs.name != file_share.get('name')]
       file_share_config = self.messages.FileShareConfig(
           name=file_share.get('name'),
           capacityGb=utils.BytesToGb(file_share.get('capacity')))
@@ -400,3 +424,19 @@ class BetaFilestoreAdapter(object):
           'Must resize the file share to a larger capacity. Existing capacity: '
           '[{}]. New capacity requested: [{}].'.format(
               existing_file_share.capacityGb, new_capacity))
+
+
+class FilestoreAdapter(BetaFilestoreAdapter):
+  """Adapter for the filestore v1 API."""
+
+  def __init__(self):
+    super(FilestoreAdapter, self).__init__()
+    self.client = GetClient(version=V1_API_VERSION)
+    self.messages = GetMessages(version=V1_API_VERSION)
+
+
+def GetFilestoreRegistry(api_version=V1_API_VERSION):
+  registry = resources.REGISTRY.Clone()
+  registry.RegisterApiByName(API_NAME, api_version=api_version)
+
+  return registry

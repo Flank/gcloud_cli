@@ -11,7 +11,7 @@ gcloud beta compute networks peerings create \- create a Google Compute Engine n
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute networks peerings create\fR \fINAME\fR \fB\-\-network\fR=\fINETWORK\fR \fB\-\-peer\-network\fR=\fIPEER_NETWORK\fR [\fB\-\-async\fR] [\fB\-\-auto\-create\-routes\fR] [\fB\-\-peer\-project\fR=\fIPEER_PROJECT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute networks peerings create\fR \fINAME\fR \fB\-\-network\fR=\fINETWORK\fR \fB\-\-peer\-network\fR=\fIPEER_NETWORK\fR [\fB\-\-async\fR] [\fB\-\-auto\-create\-routes\fR] [\fB\-\-export\-custom\-routes\fR] [\fB\-\-import\-custom\-routes\fR] [\fB\-\-peer\-project\fR=\fIPEER_PROJECT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -58,8 +58,22 @@ operation to complete.
 
 .TP 2m
 \fB\-\-auto\-create\-routes\fR
-If set, will automatically create routes for the network peering. Note that a
-backend error will be returned if this is not set.
+(DEPRECATED) If set, will automatically create routes for the network peering.
+Flag auto\-create\-routes is deprecated. Peer network subnet routes are always
+created in a network when peered.
+
+Flag \-\-auto\-create\-routes is deprecated and will be removed in a future
+release.
+
+.TP 2m
+\fB\-\-export\-custom\-routes\fR
+If set, the network will export custom routes to peer network. Use
+\-\-no\-export\-custom\-routes to disable it.
+
+.TP 2m
+\fB\-\-import\-custom\-routes\fR
+If set, the network will import custom routes from peer network. Use
+\-\-no\-import\-custom\-routes to disable it.
 
 .TP 2m
 \fB\-\-peer\-project\fR=\fIPEER_PROJECT\fR
@@ -72,10 +86,11 @@ current project.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

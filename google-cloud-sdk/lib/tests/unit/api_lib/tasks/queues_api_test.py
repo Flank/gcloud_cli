@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.tasks import queues as queues_api
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from tests.lib import test_case
 from tests.lib.api_lib.util import list_slicer
@@ -83,6 +84,150 @@ class PushQueuesTest(test_base.CloudTasksTestBase):
         self.location_ref, limit=limit, page_size=page_size))
     # Verify that only `limit` items were returned
     self.assertEqual(actual_queue_list, expected_queue_list[:limit])
+
+  def _TestQueueCreation(self, retry_config=None, rate_limits=None,
+                         app_engine_routing_override=None):
+    expected_queue = self.messages.Queue(
+        name=self.queue_name, retryConfig=retry_config,
+        rateLimits=rate_limits,
+        appEngineRoutingOverride=app_engine_routing_override)
+    self.queues_service.Create.Expect(
+        self.messages.CloudtasksProjectsLocationsQueuesCreateRequest(
+            parent=self.location_ref.RelativeName(), queue=expected_queue),
+        expected_queue)
+    actual_queue = self.queues_client.Create(
+        self.location_ref, self.queue_ref, retry_config=retry_config,
+        rate_limits=rate_limits,
+        app_engine_routing_override=app_engine_routing_override)
+    self.assertEqual(actual_queue, expected_queue)
+
+  def testCreate_NoOptions(self):
+    self._TestQueueCreation()
+
+  def testCreate_AllOptions_AppEngineQueue(self):
+    retry_config = self.messages.RetryConfig(
+        maxAttempts=100, maxRetryDuration='0s',
+        maxDoublings=16, minBackoff='0.1s', maxBackoff='3600s')
+    rate_limits = self.messages.RateLimits(
+        maxConcurrentDispatches=10, maxDispatchesPerSecond=1, maxBurstSize=10)
+    app_engine_routing_override = self.messages.AppEngineRouting(service='abc')
+    self._TestQueueCreation(retry_config=retry_config,
+                            rate_limits=rate_limits,
+                            app_engine_routing_override=(
+                                app_engine_routing_override))
+
+  def _TestQueueUpdate(self, retry_config=None, rate_limits=None,
+                       app_engine_routing_override=None, update_mask=''):
+    expected_queue = self.messages.Queue(
+        name=self.queue_name, retryConfig=retry_config,
+        rateLimits=rate_limits,
+        appEngineRoutingOverride=app_engine_routing_override)
+    self.queues_service.Patch.Expect(
+        self.messages.CloudtasksProjectsLocationsQueuesPatchRequest(
+            name=self.queue_name, queue=expected_queue, updateMask=update_mask),
+        expected_queue)
+    actual_queue = self.queues_client.Patch(
+        self.queue_ref, retry_config=retry_config, rate_limits=rate_limits,
+        app_engine_routing_override=app_engine_routing_override)
+    self.assertEqual(actual_queue, expected_queue)
+
+  def testPatch_NoOptions(self):
+    with self.assertRaises(queues_api.NoFieldsSpecifiedError):
+      self.queues_client.Patch(self.queue_ref)
+
+  def testPatch_SomeOptions(self):
+    rate_limits = self.messages.RateLimits(
+        maxConcurrentDispatches=10, maxDispatchesPerSecond=1, maxBurstSize=10)
+    self._TestQueueUpdate(rate_limits=rate_limits, update_mask='rateLimits')
+
+  def testPatch_AllOptions_AppEngineQueue(self):
+    retry_config = self.messages.RetryConfig(
+        maxAttempts=100, maxRetryDuration='0s',
+        maxDoublings=16, minBackoff='0.1s', maxBackoff='3600s')
+    rate_limits = self.messages.RateLimits(
+        maxConcurrentDispatches=10, maxDispatchesPerSecond=1, maxBurstSize=10)
+    app_engine_routing_override = self.messages.AppEngineRouting(service='abc')
+    self._TestQueueUpdate(
+        retry_config=retry_config, rate_limits=rate_limits,
+        app_engine_routing_override=app_engine_routing_override,
+        update_mask='retryConfig,rateLimits,appEngineRoutingOverride')
+
+  def testDelete(self):
+    expected_queue = self.messages.Queue(name=self.queue_name)
+    self.queues_service.Delete.Expect(
+        self.messages.CloudtasksProjectsLocationsQueuesDeleteRequest(
+            name=expected_queue.name),
+        self.messages.Empty())
+    actual_queue = self.queues_client.Delete(self.queue_ref)
+    self.assertEqual(actual_queue, self.messages.Empty())
+
+  def testPurge(self):
+    expected_queue = self.messages.Queue(name=self.queue_name)
+    self.queues_service.Purge.Expect(
+        self.messages.CloudtasksProjectsLocationsQueuesPurgeRequest(
+            name=expected_queue.name),
+        expected_queue)
+    actual_queue = self.queues_client.Purge(self.queue_ref)
+    self.assertEqual(actual_queue, expected_queue)
+
+  def testPause(self):
+    expected_queue = self.messages.Queue(name=self.queue_name)
+    self.queues_service.Pause.Expect(
+        self.messages.CloudtasksProjectsLocationsQueuesPauseRequest(
+            name=expected_queue.name),
+        expected_queue)
+    actual_queue = self.queues_client.Pause(self.queue_ref)
+    self.assertEqual(actual_queue, expected_queue)
+
+  def testResume(self):
+    expected_queue = self.messages.Queue(name=self.queue_name)
+    self.queues_service.Resume.Expect(
+        self.messages.CloudtasksProjectsLocationsQueuesResumeRequest(
+            name=expected_queue.name),
+        expected_queue)
+    actual_queue = self.queues_client.Resume(self.queue_ref)
+    self.assertEqual(actual_queue, expected_queue)
+
+  def testGetIamPolicy(self):
+    expected_policy = self.messages.Policy()
+    expected_request = (
+        self.messages.CloudtasksProjectsLocationsQueuesGetIamPolicyRequest(
+            resource=self.queue_ref.RelativeName()))
+    self.queues_service.GetIamPolicy.Expect(expected_request, expected_policy)
+    actual_policy = self.queues_client.GetIamPolicy(self.queue_ref)
+    self.assertEqual(actual_policy, expected_policy)
+
+  def testSetIamPolicy(self):
+    expected_policy = self.messages.Policy()
+    expected_request = (
+        self.messages.CloudtasksProjectsLocationsQueuesSetIamPolicyRequest(
+            resource=self.queue_ref.RelativeName(),
+            setIamPolicyRequest=self.messages.SetIamPolicyRequest(
+                policy=expected_policy)))
+    self.queues_service.SetIamPolicy.Expect(expected_request, expected_policy)
+    actual_policy = self.queues_client.SetIamPolicy(self.queue_ref,
+                                                    expected_policy)
+    self.assertEqual(actual_policy, expected_policy)
+
+
+class BetaPushQueuesTest(test_base.CloudTasksTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def SetUp(self):
+    self.location_ref = resources.REGISTRY.Parse(
+        'us-central1', params={'projectsId': self.Project()},
+        collection='cloudtasks.projects.locations')
+    self.queue_ref = resources.REGISTRY.Parse(
+        'my-queue', params={'projectsId': self.Project(),
+                            'locationsId': 'us-central1'},
+        collection='cloudtasks.projects.locations.queues')
+
+    # Define separately from queue_ref because we know that this is what the API
+    # expects
+    self.queue_name = ('projects/{}/locations/us-central1/queues'
+                       '/my-queue'.format(self.Project()))
 
   def _TestQueueCreation(self, retry_config=None, rate_limits=None,
                          app_engine_http_queue=None):
@@ -154,63 +299,6 @@ class PushQueuesTest(test_base.CloudTasksTestBase):
         app_engine_routing_override=app_engine_routing_override,
         update_mask=('retryConfig,rateLimits,'
                      'appEngineHttpQueue.appEngineRoutingOverride'))
-
-  def testDelete(self):
-    expected_queue = self.messages.Queue(name=self.queue_name)
-    self.queues_service.Delete.Expect(
-        self.messages.CloudtasksProjectsLocationsQueuesDeleteRequest(
-            name=expected_queue.name),
-        self.messages.Empty())
-    actual_queue = self.queues_client.Delete(self.queue_ref)
-    self.assertEqual(actual_queue, self.messages.Empty())
-
-  def testPurge(self):
-    expected_queue = self.messages.Queue(name=self.queue_name)
-    self.queues_service.Purge.Expect(
-        self.messages.CloudtasksProjectsLocationsQueuesPurgeRequest(
-            name=expected_queue.name),
-        expected_queue)
-    actual_queue = self.queues_client.Purge(self.queue_ref)
-    self.assertEqual(actual_queue, expected_queue)
-
-  def testPause(self):
-    expected_queue = self.messages.Queue(name=self.queue_name)
-    self.queues_service.Pause.Expect(
-        self.messages.CloudtasksProjectsLocationsQueuesPauseRequest(
-            name=expected_queue.name),
-        expected_queue)
-    actual_queue = self.queues_client.Pause(self.queue_ref)
-    self.assertEqual(actual_queue, expected_queue)
-
-  def testResume(self):
-    expected_queue = self.messages.Queue(name=self.queue_name)
-    self.queues_service.Resume.Expect(
-        self.messages.CloudtasksProjectsLocationsQueuesResumeRequest(
-            name=expected_queue.name),
-        expected_queue)
-    actual_queue = self.queues_client.Resume(self.queue_ref)
-    self.assertEqual(actual_queue, expected_queue)
-
-  def testGetIamPolicy(self):
-    expected_policy = self.messages.Policy()
-    expected_request = (
-        self.messages.CloudtasksProjectsLocationsQueuesGetIamPolicyRequest(
-            resource=self.queue_ref.RelativeName()))
-    self.queues_service.GetIamPolicy.Expect(expected_request, expected_policy)
-    actual_policy = self.queues_client.GetIamPolicy(self.queue_ref)
-    self.assertEqual(actual_policy, expected_policy)
-
-  def testSetIamPolicy(self):
-    expected_policy = self.messages.Policy()
-    expected_request = (
-        self.messages.CloudtasksProjectsLocationsQueuesSetIamPolicyRequest(
-            resource=self.queue_ref.RelativeName(),
-            setIamPolicyRequest=self.messages.SetIamPolicyRequest(
-                policy=expected_policy)))
-    self.queues_service.SetIamPolicy.Expect(expected_request, expected_policy)
-    actual_policy = self.queues_client.SetIamPolicy(self.queue_ref,
-                                                    expected_policy)
-    self.assertEqual(actual_policy, expected_policy)
 
 
 class PullQueuesTest(test_base.CloudTasksAlphaTestBase):

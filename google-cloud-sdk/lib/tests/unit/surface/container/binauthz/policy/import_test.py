@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 
 import textwrap
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.container.binauthz import encoding
 from googlecloudsdk.command_lib.container.binauthz import parsing
 from googlecloudsdk.core.console import console_io
@@ -30,8 +31,14 @@ from tests.lib import test_case
 from tests.lib.surface.container.binauthz import base
 
 
-class ImportTest(sdk_test_base.WithTempCWD,
-                 base.BinauthzMockedBetaPolicyClientUnitTest):
+class ImportTest(
+    sdk_test_base.WithTempCWD,
+    base.WithMockBetaBinauthz,
+    base.BinauthzTestBase,
+):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testSuccessYaml(self):
     policy_fname = self.Touch(
@@ -88,7 +95,7 @@ class ImportTest(sdk_test_base.WithTempCWD,
         ),
 
     )
-    self.client.projects.UpdatePolicy.Expect(
+    self.mock_client.projects.UpdatePolicy.Expect(
         policy_proto, response=policy_proto)
 
     response = self.RunBinauthz('policy import ' + policy_fname)
@@ -159,7 +166,7 @@ class ImportTest(sdk_test_base.WithTempCWD,
         ),
 
     )
-    self.client.projects.UpdatePolicy.Expect(
+    self.mock_client.projects.UpdatePolicy.Expect(
         policy_proto, response=policy_proto)
 
     response = self.RunBinauthz('policy import ' + policy_fname)
@@ -177,7 +184,7 @@ class ImportTest(sdk_test_base.WithTempCWD,
         name='projects/{}/policy'.format(self.Project()),
     )
 
-    self.client.projects.UpdatePolicy.Expect(
+    self.mock_client.projects.UpdatePolicy.Expect(
         policy_proto, response=policy_proto)
 
     self.WriteInput('Y\n')
@@ -232,6 +239,12 @@ class ImportTest(sdk_test_base.WithTempCWD,
   def testNoPolicyFile(self):
     with self.assertRaises(cli_test_base.MockArgumentError):
       self.RunBinauthz('policy import')
+
+
+class ImportAlphaTest(base.WithMockAlphaBinauthz, ImportTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

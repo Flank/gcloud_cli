@@ -1,0 +1,133 @@
+title: compute commitments update-reservations test scenario
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      compute commitments update-reservations my-commitment --region=us-central1 --reservations-from-file=reservations.yaml
+- execute:
+  - command: |
+      compute commitments update-reservations my-commitment --region=us-central1 --reservation=my-reservation
+      --reservation-zone=res-zone --require-specific-reservation --vm-count=1 --min-cpu-platform="Intel Haswell"
+      --machine-type=n1-standard-1 --accelerator count=1,type=nvidia-tesla-k80 --local-ssd interface=scsi,size=375
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: alpha
+      BETA: beta
+- write_file:
+    path: reservations.yaml
+    contents: |-
+      -  reservation: my-reservation
+         reservation_zone: fake-zone
+         require_specific_reservation: true
+         vm_count: 1
+         machine_type: n1-standard-1
+         min_cpu_platform: "Intel Haswell"
+         accelerator:
+         - count: 1
+           type: nvidia-tesla-k80
+         local_ssd:
+         - interface: scsi
+           size: 375
+         - interface: nvme
+           size: 375
+      -  reservation: another-reservation
+         reservation_zone: fake-zone
+         require_specific_reservation: true
+         vm_count: 1
+         machine_type: n1-standard-1
+         min_cpu_platform: "Intel Haswell"
+         accelerator:
+         - count: 1
+           type: nvidia-tesla-k80
+         local_ssd:
+         - interface: scsi
+           size: 375
+         - interface: nvme
+           size: 375
+- execute_command:
+    command: |
+      compute commitments update-reservations my-commitment --region=us-central1 --reservations-from-file=reservations.yaml
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/commitments/my-commitment/updateReservations?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              reservations:
+              - name: my-reservation
+                specificReservation:
+                  count: '1'
+                  instanceProperties:
+                    guestAccelerators:
+                    - acceleratorCount: 1
+                      acceleratorType: nvidia-tesla-k80
+                    localSsds:
+                    - diskSizeGb: '375'
+                      interface: SCSI
+                    - diskSizeGb: '375'
+                      interface: NVME
+                    machineType: n1-standard-1
+                    minCpuPlatform: Intel Haswell
+                specificReservationRequired: true
+                zone: fake-zone
+              - name: another-reservation
+                specificReservation:
+                  count: '1'
+                  instanceProperties:
+                    guestAccelerators:
+                    - acceleratorCount: 1
+                      acceleratorType: nvidia-tesla-k80
+                    localSsds:
+                    - diskSizeGb: '375'
+                      interface: SCSI
+                    - diskSizeGb: '375'
+                      interface: NVME
+                    machineType: n1-standard-1
+                    minCpuPlatform: Intel Haswell
+                specificReservationRequired: true
+                zone: fake-zone
+        return_response:
+          headers:
+            status: '200'
+          body: {}
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute commitments update-reservations my-commitment --region=us-central1 --reservation=my-reservation
+      --reservation-zone=res-zone --require-specific-reservation --vm-count=1 --min-cpu-platform="Intel Haswell"
+      --machine-type=n1-standard-1 --accelerator count=1,type=nvidia-tesla-k80 --local-ssd interface=scsi,size=375
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/commitments/my-commitment/updateReservations?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              reservations:
+              - name: my-reservation
+                specificReservation:
+                  count: '1'
+                  instanceProperties:
+                    guestAccelerators:
+                    - acceleratorCount: 1
+                      acceleratorType: nvidia-tesla-k80
+                    localSsds:
+                    - diskSizeGb: '375'
+                      interface: SCSI
+                    machineType: n1-standard-1
+                    minCpuPlatform: Intel Haswell
+                specificReservationRequired: true
+                zone: res-zone
+        return_response:
+          headers:
+            status: '200'
+          body: {}
+    - expect_exit:
+        code: 0

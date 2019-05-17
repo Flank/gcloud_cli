@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ from ruamel import yaml
 import six
 
 
-class _LvString(yaml.scalarstring.ScalarString):  # pytype: disable=bad-slots
+class _LvString(yaml.scalarstring.ScalarString):
   """Location/value string type."""
 
   __slots__ = ('lc', 'value')
@@ -51,19 +51,19 @@ class _LvString(yaml.scalarstring.ScalarString):  # pytype: disable=bad-slots
     return yaml.scalarstring.ScalarString.__new__(cls, value)
 
 
-class _LvPreservedScalarString(yaml.scalarstring.PreservedScalarString):  # pytype: disable=bad-slots
+class _LvPreservedScalarString(yaml.scalarstring.PreservedScalarString):
   """Location/value preserved scalar string type."""
 
   __slots__ = ('lc', 'value')
 
 
-class _LvDoubleQuotedScalarString(yaml.scalarstring.DoubleQuotedScalarString):  # pytype: disable=bad-slots
+class _LvDoubleQuotedScalarString(yaml.scalarstring.DoubleQuotedScalarString):
   """Location/value double quoted scalar string type."""
 
   __slots__ = ('lc', 'value')
 
 
-class _LvSingleQuotedScalarString(yaml.scalarstring.SingleQuotedScalarString):  # pytype: disable=bad-slots
+class _LvSingleQuotedScalarString(yaml.scalarstring.SingleQuotedScalarString):
   """Location/value single quoted scalar string type."""
 
   __slots__ = ('lc', 'value')

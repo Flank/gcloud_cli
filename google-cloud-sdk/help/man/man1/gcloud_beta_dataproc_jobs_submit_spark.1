@@ -111,8 +111,6 @@ Expressed as a per\-hour rate. Default is 0 (no failure retries).
 List of key value pairs to configure Spark. For a list of available properties,
 see:
 https://spark.apache.org/docs/latest/configuration.html#available\-properties.
-Alternatively, to see examples of how to use the properties flag, see:
-https://cloud.google.com/dataproc/docs/concepts/configuring\-clusters/cluster\-properties#how_the_properties_flag_works
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
@@ -130,10 +128,11 @@ invocation.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -167,10 +166,11 @@ $ gcloud beta dataproc jobs submit spark \-\-cluster my_cluster \e
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
 $ gcloud dataproc jobs submit spark
+$ gcloud alpha dataproc jobs submit spark
 .RE
 

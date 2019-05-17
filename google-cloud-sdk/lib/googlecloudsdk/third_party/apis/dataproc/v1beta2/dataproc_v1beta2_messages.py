@@ -21,59 +21,122 @@ class AcceleratorConfig(_messages.Message):
       to this instance.
     acceleratorTypeUri: Full URL, partial URI, or short name of the
       accelerator type resource to expose to this instance. See Compute Engine
-      AcceleratorTypes( /compute/docs/reference/beta/acceleratorTypes)Examples
-      * https://www.googleapis.com/compute/beta/projects/[project_id]/zones
-      /us-east1-a/acceleratorTypes/nvidia-tesla-k80 *
-      projects/[project_id]/zones/us-east1-a/acceleratorTypes/nvidia-tesla-k80
-      * nvidia-tesla-k80Auto Zone Exception: If you are using the Cloud
-      Dataproc Auto Zone Placement feature, you must use the short name of the
-      accelerator type resource, for example, nvidia-tesla-k80.
+      AcceleratorTypesExamples *
+      https://www.googleapis.com/compute/beta/projects/[project_id]/zones/us-
+      east1-a/acceleratorTypes/nvidia-tesla-k80 * projects/[project_id]/zones
+      /us-east1-a/acceleratorTypes/nvidia-tesla-k80 * nvidia-tesla-k80Auto
+      Zone Exception: If you are using the Cloud Dataproc Auto Zone Placement
+      feature, you must use the short name of the accelerator type resource,
+      for example, nvidia-tesla-k80.
   """
 
   acceleratorCount = _messages.IntegerField(1, variant=_messages.Variant.INT32)
   acceleratorTypeUri = _messages.StringField(2)
 
 
-class AllocationAffinity(_messages.Message):
-  r"""Allocation Affinity for consuming Zonal allocation.
-
-  Enums:
-    ConsumeAllocationTypeValueValuesEnum:
+class AutoscalingConfig(_messages.Message):
+  r"""Autoscaling Policy config associated with the cluster.
 
   Fields:
-    consumeAllocationType: A ConsumeAllocationTypeValueValuesEnum attribute.
-    key: Corresponds to the label key of Allocation resource.
-    values: Corresponds to the label values of allocation resource.
+    policyUri: Optional. The autoscaling policy used by the cluster.Only
+      resource names including projectid and location (region) are valid.
+      Examples: https://www.googleapis.com/compute/v1/projects/[project_id]/lo
+      cations/[dataproc_region]/autoscalingPolicies/[policy_id] projects/[proj
+      ect_id]/locations/[dataproc_region]/autoscalingPolicies/[policy_id]Note
+      that the policy must be in the same project and Cloud Dataproc region.
   """
 
-  class ConsumeAllocationTypeValueValuesEnum(_messages.Enum):
-    r"""ConsumeAllocationTypeValueValuesEnum enum type.
+  policyUri = _messages.StringField(1)
 
-    Values:
-      TYPE_UNSPECIFIED: <no description>
-      NO_ALLOCATION: Do not consume from any allocated capacity.
-      ANY_ALLOCATION: Consume any allocation available.
-      SPECIFIC_ALLOCATION: Must consume from a specific allocation. Must
-        specify key value fields for specifying the allocations.
-    """
-    TYPE_UNSPECIFIED = 0
-    NO_ALLOCATION = 1
-    ANY_ALLOCATION = 2
-    SPECIFIC_ALLOCATION = 3
 
-  consumeAllocationType = _messages.EnumField('ConsumeAllocationTypeValueValuesEnum', 1)
-  key = _messages.StringField(2)
-  values = _messages.StringField(3, repeated=True)
+class AutoscalingPolicy(_messages.Message):
+  r"""Describes an autoscaling policy for Dataproc cluster autoscaler.
+
+  Fields:
+    basicAlgorithm: A BasicAutoscalingAlgorithm attribute.
+    id: Required. The policy id.The id must contain only letters (a-z, A-Z),
+      numbers (0-9), underscores (_), and hyphens (-). Cannot begin or end
+      with underscore or hyphen. Must consist of between 3 and 50 characters.
+    name: Output only. The "resource name" of the policy, as described in
+      https://cloud.google.com/apis/design/resource_names of the form
+      projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id}.
+    secondaryWorkerConfig: Optional. Describes how the autoscaler will operate
+      for secondary workers.
+    workerConfig: Required. Describes how the autoscaler will operate for
+      primary workers.
+  """
+
+  basicAlgorithm = _messages.MessageField('BasicAutoscalingAlgorithm', 1)
+  id = _messages.StringField(2)
+  name = _messages.StringField(3)
+  secondaryWorkerConfig = _messages.MessageField('InstanceGroupAutoscalingPolicyConfig', 4)
+  workerConfig = _messages.MessageField('InstanceGroupAutoscalingPolicyConfig', 5)
+
+
+class BasicAutoscalingAlgorithm(_messages.Message):
+  r"""Basic algorithm for autoscaling.
+
+  Fields:
+    cooldownPeriod: Optional. Duration between scaling events. A scaling
+      period starts after the update operation from the previous event has
+      completed.Bounds: 2m, 1d. Default: 2m.
+    yarnConfig: Required. YARN autoscaling configuration.
+  """
+
+  cooldownPeriod = _messages.StringField(1)
+  yarnConfig = _messages.MessageField('BasicYarnAutoscalingConfig', 2)
+
+
+class BasicYarnAutoscalingConfig(_messages.Message):
+  r"""Basic autoscaling configurations for YARN.
+
+  Fields:
+    gracefulDecommissionTimeout: Required. Timeout for YARN graceful
+      decommissioning of Node Managers. Specifies the duration to wait for
+      jobs to complete before forcefully removing workers (and potentially
+      interrupting jobs). Only applicable to downscaling operations.Bounds:
+      0s, 1d.
+    scaleDownFactor: Required. Fraction of average pending memory in the last
+      cooldown period for which to remove workers. A scale-down factor of 1
+      will result in scaling down so that there is no available memory
+      remaining after the update (more aggressive scaling). A scale-down
+      factor of 0 disables removing workers, which can be beneficial for
+      autoscaling a single job.Bounds: 0.0, 1.0.
+    scaleDownMinWorkerFraction: Optional. Minimum scale-down threshold as a
+      fraction of total cluster size before scaling occurs. For example, in a
+      20-worker cluster, a threshold of 0.1 means the autoscaler must
+      recommend at least a 2 worker scale-down for the cluster to scale. A
+      threshold of 0 means the autoscaler will scale down on any recommended
+      change.Bounds: 0.0, 1.0. Default: 0.0.
+    scaleUpFactor: Required. Fraction of average pending memory in the last
+      cooldown period for which to add workers. A scale-up factor of 1.0 will
+      result in scaling up so that there is no pending memory remaining after
+      the update (more aggressive scaling). A scale-up factor closer to 0 will
+      result in a smaller magnitude of scaling up (less aggressive
+      scaling).Bounds: 0.0, 1.0.
+    scaleUpMinWorkerFraction: Optional. Minimum scale-up threshold as a
+      fraction of total cluster size before scaling occurs. For example, in a
+      20-worker cluster, a threshold of 0.1 means the autoscaler must
+      recommend at least a 2-worker scale-up for the cluster to scale. A
+      threshold of 0 means the autoscaler will scale up on any recommended
+      change.Bounds: 0.0, 1.0. Default: 0.0.
+  """
+
+  gracefulDecommissionTimeout = _messages.StringField(1)
+  scaleDownFactor = _messages.FloatField(2)
+  scaleDownMinWorkerFraction = _messages.FloatField(3)
+  scaleUpFactor = _messages.FloatField(4)
+  scaleUpMinWorkerFraction = _messages.FloatField(5)
 
 
 class Binding(_messages.Message):
   r"""Associates members with a role.
 
   Fields:
-    condition: Unimplemented. The condition that is associated with this
-      binding. NOTE: an unsatisfied condition will not allow user access via
-      current binding. Different bindings, including their conditions, are
-      examined independently.
+    condition: The condition that is associated with this binding. NOTE: An
+      unsatisfied condition will not allow user access via current binding.
+      Different bindings, including their conditions, are examined
+      independently.
     members: Specifies the identities requesting access for a Cloud Platform
       resource. members can have the following values: allUsers: A special
       identifier that represents anyone who is  on the internet; with or
@@ -84,9 +147,9 @@ class Binding(_messages.Message):
       serviceAccount:{emailid}: An email address that represents a service
       account. For example, my-other-app@appspot.gserviceaccount.com.
       group:{emailid}: An email address that represents a Google group.  For
-      example, admins@example.com. domain:{domain}: A Google Apps domain name
-      that represents all the  users of that domain. For example, google.com
-      or example.com.
+      example, admins@example.com. domain:{domain}: The G Suite domain
+      (primary) that represents all the  users of that domain. For example,
+      google.com or example.com.
     role: Role that is assigned to members. For example, roles/viewer,
       roles/editor, or roles/owner.
   """
@@ -177,14 +240,18 @@ class ClusterConfig(_messages.Message):
   r"""The cluster config.
 
   Fields:
-    configBucket: Optional. A Cloud Storage staging bucket used for sharing
-      generated SSH keys and config. If you do not specify a staging bucket,
-      Cloud Dataproc will determine an appropriate Cloud Storage location (US,
-      ASIA, or EU) for your cluster's staging bucket according to the Google
-      Compute Engine zone where your cluster is deployed, and then it will
-      create and manage this project-level, per-location bucket for you.
+    autoscalingConfig: Optional. Autoscaling config for the policy associated
+      with the cluster. Cluster does not autoscale if this field is unset.
+    configBucket: Optional. A Google Cloud Storage bucket used to stage job
+      dependencies, config files, and job driver console output. If you do not
+      specify a staging bucket, Cloud Dataproc will determine a Cloud Storage
+      location (US, ASIA, or EU) for your cluster's staging bucket according
+      to the Google Compute Engine zone where your cluster is deployed, and
+      then create and manage this project-level, per-location bucket (see
+      Cloud Dataproc staging bucket).
     encryptionConfig: Optional. Encryption settings for the cluster.
-    gceClusterConfig: Required. The shared Compute Engine config settings for
+    endpointConfig: Optional. Port/endpoint configuration for this cluster
+    gceClusterConfig: Optional. The shared Compute Engine config settings for
       all instances in a cluster.
     initializationActions: Optional. Commands to execute on each node after
       config is completed. By default, executables are run on master and all
@@ -200,21 +267,25 @@ class ClusterConfig(_messages.Message):
       instance in a cluster.
     secondaryWorkerConfig: Optional. The Compute Engine config settings for
       additional worker instances in a cluster.
+    securityConfig: Optional. Security related configuration.
     softwareConfig: Optional. The config settings for software inside the
       cluster.
     workerConfig: Optional. The Compute Engine config settings for worker
       instances in a cluster.
   """
 
-  configBucket = _messages.StringField(1)
-  encryptionConfig = _messages.MessageField('EncryptionConfig', 2)
-  gceClusterConfig = _messages.MessageField('GceClusterConfig', 3)
-  initializationActions = _messages.MessageField('NodeInitializationAction', 4, repeated=True)
-  lifecycleConfig = _messages.MessageField('LifecycleConfig', 5)
-  masterConfig = _messages.MessageField('InstanceGroupConfig', 6)
-  secondaryWorkerConfig = _messages.MessageField('InstanceGroupConfig', 7)
-  softwareConfig = _messages.MessageField('SoftwareConfig', 8)
-  workerConfig = _messages.MessageField('InstanceGroupConfig', 9)
+  autoscalingConfig = _messages.MessageField('AutoscalingConfig', 1)
+  configBucket = _messages.StringField(2)
+  encryptionConfig = _messages.MessageField('EncryptionConfig', 3)
+  endpointConfig = _messages.MessageField('EndpointConfig', 4)
+  gceClusterConfig = _messages.MessageField('GceClusterConfig', 5)
+  initializationActions = _messages.MessageField('NodeInitializationAction', 6, repeated=True)
+  lifecycleConfig = _messages.MessageField('LifecycleConfig', 7)
+  masterConfig = _messages.MessageField('InstanceGroupConfig', 8)
+  secondaryWorkerConfig = _messages.MessageField('InstanceGroupConfig', 9)
+  securityConfig = _messages.MessageField('SecurityConfig', 10)
+  softwareConfig = _messages.MessageField('SoftwareConfig', 11)
+  workerConfig = _messages.MessageField('InstanceGroupConfig', 12)
 
 
 class ClusterMetrics(_messages.Message):
@@ -489,6 +560,110 @@ class ClusterStatus(_messages.Message):
   substate = _messages.EnumField('SubstateValueValuesEnum', 4)
 
 
+class DataprocProjectsLocationsAutoscalingPoliciesCreateRequest(_messages.Message):
+  r"""A DataprocProjectsLocationsAutoscalingPoliciesCreateRequest object.
+
+  Fields:
+    autoscalingPolicy: A AutoscalingPolicy resource to be passed as the
+      request body.
+    parent: Required. The "resource name" of the region, as described in
+      https://cloud.google.com/apis/design/resource_names of the form
+      projects/{project_id}/regions/{region}.
+  """
+
+  autoscalingPolicy = _messages.MessageField('AutoscalingPolicy', 1)
+  parent = _messages.StringField(2, required=True)
+
+
+class DataprocProjectsLocationsAutoscalingPoliciesDeleteRequest(_messages.Message):
+  r"""A DataprocProjectsLocationsAutoscalingPoliciesDeleteRequest object.
+
+  Fields:
+    name: Required. The "resource name" of the autoscaling policy, as
+      described in https://cloud.google.com/apis/design/resource_names of the
+      form
+      projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id}.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class DataprocProjectsLocationsAutoscalingPoliciesGetIamPolicyRequest(_messages.Message):
+  r"""A DataprocProjectsLocationsAutoscalingPoliciesGetIamPolicyRequest
+  object.
+
+  Fields:
+    resource: REQUIRED: The resource for which the policy is being requested.
+      See the operation documentation for the appropriate value for this
+      field.
+  """
+
+  resource = _messages.StringField(1, required=True)
+
+
+class DataprocProjectsLocationsAutoscalingPoliciesGetRequest(_messages.Message):
+  r"""A DataprocProjectsLocationsAutoscalingPoliciesGetRequest object.
+
+  Fields:
+    name: Required. The "resource name" of the autoscaling policy, as
+      described in https://cloud.google.com/apis/design/resource_names of the
+      form
+      projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id}.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class DataprocProjectsLocationsAutoscalingPoliciesListRequest(_messages.Message):
+  r"""A DataprocProjectsLocationsAutoscalingPoliciesListRequest object.
+
+  Fields:
+    pageSize: Optional. The maximum number of results to return in each
+      response.
+    pageToken: Optional. The page token, returned by a previous call, to
+      request the next page of results.
+    parent: Required. The "resource name" of the region, as described in
+      https://cloud.google.com/apis/design/resource_names of the form
+      projects/{project_id}/regions/{region}
+  """
+
+  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(2)
+  parent = _messages.StringField(3, required=True)
+
+
+class DataprocProjectsLocationsAutoscalingPoliciesSetIamPolicyRequest(_messages.Message):
+  r"""A DataprocProjectsLocationsAutoscalingPoliciesSetIamPolicyRequest
+  object.
+
+  Fields:
+    resource: REQUIRED: The resource for which the policy is being specified.
+      See the operation documentation for the appropriate value for this
+      field.
+    setIamPolicyRequest: A SetIamPolicyRequest resource to be passed as the
+      request body.
+  """
+
+  resource = _messages.StringField(1, required=True)
+  setIamPolicyRequest = _messages.MessageField('SetIamPolicyRequest', 2)
+
+
+class DataprocProjectsLocationsAutoscalingPoliciesTestIamPermissionsRequest(_messages.Message):
+  r"""A DataprocProjectsLocationsAutoscalingPoliciesTestIamPermissionsRequest
+  object.
+
+  Fields:
+    resource: REQUIRED: The resource for which the policy detail is being
+      requested. See the operation documentation for the appropriate value for
+      this field.
+    testIamPermissionsRequest: A TestIamPermissionsRequest resource to be
+      passed as the request body.
+  """
+
+  resource = _messages.StringField(1, required=True)
+  testIamPermissionsRequest = _messages.MessageField('TestIamPermissionsRequest', 2)
+
+
 class DataprocProjectsLocationsWorkflowTemplatesCreateRequest(_messages.Message):
   r"""A DataprocProjectsLocationsWorkflowTemplatesCreateRequest object.
 
@@ -624,6 +799,111 @@ class DataprocProjectsLocationsWorkflowTemplatesSetIamPolicyRequest(_messages.Me
 
 class DataprocProjectsLocationsWorkflowTemplatesTestIamPermissionsRequest(_messages.Message):
   r"""A DataprocProjectsLocationsWorkflowTemplatesTestIamPermissionsRequest
+  object.
+
+  Fields:
+    resource: REQUIRED: The resource for which the policy detail is being
+      requested. See the operation documentation for the appropriate value for
+      this field.
+    testIamPermissionsRequest: A TestIamPermissionsRequest resource to be
+      passed as the request body.
+  """
+
+  resource = _messages.StringField(1, required=True)
+  testIamPermissionsRequest = _messages.MessageField('TestIamPermissionsRequest', 2)
+
+
+class DataprocProjectsRegionsAutoscalingPoliciesCreateRequest(_messages.Message):
+  r"""A DataprocProjectsRegionsAutoscalingPoliciesCreateRequest object.
+
+  Fields:
+    autoscalingPolicy: A AutoscalingPolicy resource to be passed as the
+      request body.
+    parent: Required. The "resource name" of the region, as described in
+      https://cloud.google.com/apis/design/resource_names of the form
+      projects/{project_id}/regions/{region}.
+  """
+
+  autoscalingPolicy = _messages.MessageField('AutoscalingPolicy', 1)
+  parent = _messages.StringField(2, required=True)
+
+
+class DataprocProjectsRegionsAutoscalingPoliciesDeleteRequest(_messages.Message):
+  r"""A DataprocProjectsRegionsAutoscalingPoliciesDeleteRequest object.
+
+  Fields:
+    name: Required. The "resource name" of the autoscaling policy, as
+      described in https://cloud.google.com/apis/design/resource_names of the
+      form
+      projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id}.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class DataprocProjectsRegionsAutoscalingPoliciesGetIamPolicyRequest(_messages.Message):
+  r"""A DataprocProjectsRegionsAutoscalingPoliciesGetIamPolicyRequest object.
+
+  Fields:
+    getIamPolicyRequest: A GetIamPolicyRequest resource to be passed as the
+      request body.
+    resource: REQUIRED: The resource for which the policy is being requested.
+      See the operation documentation for the appropriate value for this
+      field.
+  """
+
+  getIamPolicyRequest = _messages.MessageField('GetIamPolicyRequest', 1)
+  resource = _messages.StringField(2, required=True)
+
+
+class DataprocProjectsRegionsAutoscalingPoliciesGetRequest(_messages.Message):
+  r"""A DataprocProjectsRegionsAutoscalingPoliciesGetRequest object.
+
+  Fields:
+    name: Required. The "resource name" of the autoscaling policy, as
+      described in https://cloud.google.com/apis/design/resource_names of the
+      form
+      projects/{project_id}/regions/{region}/autoscalingPolicies/{policy_id}.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class DataprocProjectsRegionsAutoscalingPoliciesListRequest(_messages.Message):
+  r"""A DataprocProjectsRegionsAutoscalingPoliciesListRequest object.
+
+  Fields:
+    pageSize: Optional. The maximum number of results to return in each
+      response.
+    pageToken: Optional. The page token, returned by a previous call, to
+      request the next page of results.
+    parent: Required. The "resource name" of the region, as described in
+      https://cloud.google.com/apis/design/resource_names of the form
+      projects/{project_id}/regions/{region}
+  """
+
+  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(2)
+  parent = _messages.StringField(3, required=True)
+
+
+class DataprocProjectsRegionsAutoscalingPoliciesSetIamPolicyRequest(_messages.Message):
+  r"""A DataprocProjectsRegionsAutoscalingPoliciesSetIamPolicyRequest object.
+
+  Fields:
+    resource: REQUIRED: The resource for which the policy is being specified.
+      See the operation documentation for the appropriate value for this
+      field.
+    setIamPolicyRequest: A SetIamPolicyRequest resource to be passed as the
+      request body.
+  """
+
+  resource = _messages.StringField(1, required=True)
+  setIamPolicyRequest = _messages.MessageField('SetIamPolicyRequest', 2)
+
+
+class DataprocProjectsRegionsAutoscalingPoliciesTestIamPermissionsRequest(_messages.Message):
+  r"""A DataprocProjectsRegionsAutoscalingPoliciesTestIamPermissionsRequest
   object.
 
   Fields:
@@ -818,7 +1098,9 @@ class DataprocProjectsRegionsClustersPatchRequest(_messages.Message):
       <td>config.lifecycle_config.auto_delete_time</td><td>Update MAX TTL
       deletion timestamp</td> </tr> <tr>
       <td>config.lifecycle_config.idle_delete_ttl</td><td>Update Idle TTL
-      duration</td> </tr> </table>
+      duration</td> </tr> <tr>
+      <td>config.autoscaling_config.policy_uri</td><td>Use, stop using, or
+      change autoscaling policies</td> </tr> </table>
   """
 
   cluster = _messages.MessageField('Cluster', 1)
@@ -1344,6 +1626,49 @@ class EncryptionConfig(_messages.Message):
   gcePdKmsKeyName = _messages.StringField(1)
 
 
+class EndpointConfig(_messages.Message):
+  r"""Endpoint config for this cluster
+
+  Messages:
+    HttpPortsValue: Output only. The map of port descriptions to URLs. Will
+      only be populated if enable_http_port_access is true.
+
+  Fields:
+    enableHttpPortAccess: Optional. If true, enable http access to specific
+      ports on the cluster from external sources. Defaults to false.
+    httpPorts: Output only. The map of port descriptions to URLs. Will only be
+      populated if enable_http_port_access is true.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class HttpPortsValue(_messages.Message):
+    r"""Output only. The map of port descriptions to URLs. Will only be
+    populated if enable_http_port_access is true.
+
+    Messages:
+      AdditionalProperty: An additional property for a HttpPortsValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type HttpPortsValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a HttpPortsValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  enableHttpPortAccess = _messages.BooleanField(1)
+  httpPorts = _messages.MessageField('HttpPortsValue', 2)
+
+
 class Expr(_messages.Message):
   r"""Represents an expression text. Example: title: "User account presence"
   description: "Determines whether the request has a user account" expression:
@@ -1379,7 +1704,6 @@ class GceClusterConfig(_messages.Message):
       metadata#project_and_instance_metadata)).
 
   Fields:
-    allocationAffinity: Allocation Affinity for consuming Zonal allocation.
     internalIpOnly: Optional. If true, all instances in the cluster will only
       have internal IP addresses. By default, clusters are not restricted to
       internal IP addresses, and will have ephemeral external IP addresses
@@ -1398,6 +1722,8 @@ class GceClusterConfig(_messages.Message):
       short name are valid. Examples: https://www.googleapis.com/compute/v1/pr
       ojects/[project_id]/regions/global/default
       projects/[project_id]/regions/global/default default
+    reservationAffinity: Optional. Reservation Affinity for consuming Zonal
+      reservation.
     serviceAccount: Optional. The service account of the instances. Defaults
       to the default Compute Engine service account. Custom service accounts
       need permissions equivalent to the following IAM roles:
@@ -1420,7 +1746,8 @@ class GceClusterConfig(_messages.Message):
       machine communications. Cannot be specified with network_uri.A full URL,
       partial URI, or short name are valid. Examples:
       https://www.googleapis.com/compute/v1/projects/[project_id]/regions/us-
-      east1/sub0 projects/[project_id]/regions/us-east1/sub0 sub0
+      east1/subnetworks/sub0 projects/[project_id]/regions/us-
+      east1/subnetworks/sub0 sub0
     tags: The Compute Engine tags to add to all instances (see Tagging
       instances).
     zoneUri: Optional. The zone where the Compute Engine cluster will be
@@ -1459,10 +1786,10 @@ class GceClusterConfig(_messages.Message):
 
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
-  allocationAffinity = _messages.MessageField('AllocationAffinity', 1)
-  internalIpOnly = _messages.BooleanField(2)
-  metadata = _messages.MessageField('MetadataValue', 3)
-  networkUri = _messages.StringField(4)
+  internalIpOnly = _messages.BooleanField(1)
+  metadata = _messages.MessageField('MetadataValue', 2)
+  networkUri = _messages.StringField(3)
+  reservationAffinity = _messages.MessageField('ReservationAffinity', 4)
   serviceAccount = _messages.StringField(5)
   serviceAccountScopes = _messages.StringField(6, repeated=True)
   subnetworkUri = _messages.StringField(7)
@@ -1644,6 +1971,41 @@ class HiveJob(_messages.Message):
   scriptVariables = _messages.MessageField('ScriptVariablesValue', 6)
 
 
+class InstanceGroupAutoscalingPolicyConfig(_messages.Message):
+  r"""Configuration for the size bounds of an instance group, including its
+  proportional size to other groups.
+
+  Fields:
+    maxInstances: Optional. Maximum number of instances for this group.
+      Required for primary workers. Note that by default, clusters will not
+      use secondary workers. Required for secondary workers if the minimum
+      secondary instances is set.Primary workers - Bounds: [min_instances, ).
+      Required. Secondary workers - Bounds: [min_instances, ). Default: 0.
+    minInstances: Optional. Minimum number of instances for this group.Primary
+      workers - Bounds: 2, max_instances. Default: 2. Secondary workers -
+      Bounds: 0, max_instances. Default: 0.
+    weight: Optional. Weight for the instance group, which is used to
+      determine the fraction of total workers in the cluster from this
+      instance group. For example, if primary workers have weight 2, and
+      secondary workers have weight 1, the cluster will have approximately 2
+      primary workers for each secondary worker.The cluster may not reach the
+      specified balance if constrained by min/max bounds or other autoscaling
+      settings. For example, if max_instances for secondary workers is 0, then
+      only primary workers will be added. The cluster can also be out of
+      balance when created.If weight is not set on any instance group, the
+      cluster will default to equal weight for all groups: the cluster will
+      attempt to maintain an equal number of workers in each group within the
+      configured size bounds for each group. If weight is set for one group
+      only, the cluster will default to zero weight on the unset group. For
+      example if weight is set only on primary workers, the cluster will use
+      primary workers only and no secondary workers.
+  """
+
+  maxInstances = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  minInstances = _messages.IntegerField(2, variant=_messages.Variant.INT32)
+  weight = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+
+
 class InstanceGroupConfig(_messages.Message):
   r"""Optional. The config settings for Compute Engine resources in an
   instance group, such as a master or worker group.
@@ -1776,6 +2138,7 @@ class Job(_messages.Message):
     pigJob: Job is a Pig job.
     placement: Required. Job information, including how, when, and where to
       run the job.
+    prestoJob: Job is a Presto job
     pysparkJob: Job is a Pyspark job.
     reference: Optional. The fully qualified reference to the job, which can
       be used to obtain the equivalent REST path of the job resource. If this
@@ -1834,16 +2197,17 @@ class Job(_messages.Message):
   labels = _messages.MessageField('LabelsValue', 6)
   pigJob = _messages.MessageField('PigJob', 7)
   placement = _messages.MessageField('JobPlacement', 8)
-  pysparkJob = _messages.MessageField('PySparkJob', 9)
-  reference = _messages.MessageField('JobReference', 10)
-  scheduling = _messages.MessageField('JobScheduling', 11)
-  sparkJob = _messages.MessageField('SparkJob', 12)
-  sparkRJob = _messages.MessageField('SparkRJob', 13)
-  sparkSqlJob = _messages.MessageField('SparkSqlJob', 14)
-  status = _messages.MessageField('JobStatus', 15)
-  statusHistory = _messages.MessageField('JobStatus', 16, repeated=True)
-  submittedBy = _messages.StringField(17)
-  yarnApplications = _messages.MessageField('YarnApplication', 18, repeated=True)
+  prestoJob = _messages.MessageField('PrestoJob', 9)
+  pysparkJob = _messages.MessageField('PySparkJob', 10)
+  reference = _messages.MessageField('JobReference', 11)
+  scheduling = _messages.MessageField('JobScheduling', 12)
+  sparkJob = _messages.MessageField('SparkJob', 13)
+  sparkRJob = _messages.MessageField('SparkRJob', 14)
+  sparkSqlJob = _messages.MessageField('SparkSqlJob', 15)
+  status = _messages.MessageField('JobStatus', 16)
+  statusHistory = _messages.MessageField('JobStatus', 17, repeated=True)
+  submittedBy = _messages.StringField(18)
+  yarnApplications = _messages.MessageField('YarnApplication', 19, repeated=True)
 
 
 class JobPlacement(_messages.Message):
@@ -1864,11 +2228,10 @@ class JobReference(_messages.Message):
   r"""Encapsulates the full scoping used to reference a job.
 
   Fields:
-    jobId: Optional. The job ID, which must be unique within the project. The
-      job ID is generated by the server upon job submission or provided by the
-      user as a means to perform retries without creating duplicate jobs. The
+    jobId: Optional. The job ID, which must be unique within the project.The
       ID must contain only letters (a-z, A-Z), numbers (0-9), underscores (_),
-      or hyphens (-). The maximum length is 100 characters.
+      or hyphens (-). The maximum length is 100 characters.If not specified by
+      the caller, the job ID will be provided by the server.
     projectId: Required. The ID of the Google Cloud Platform project that the
       job belongs to.
   """
@@ -1965,6 +2328,64 @@ class JobStatus(_messages.Message):
   substate = _messages.EnumField('SubstateValueValuesEnum', 4)
 
 
+class KerberosConfig(_messages.Message):
+  r"""Specifies Kerberos related configuration.
+
+  Fields:
+    crossRealmTrustAdminServer: Optional. The admin server (IP or hostname)
+      for the remote trusted realm in a cross realm trust relationship.
+    crossRealmTrustKdc: Optional. The KDC (IP or hostname) for the remote
+      trusted realm in a cross realm trust relationship.
+    crossRealmTrustRealm: Optional. The remote realm the Dataproc on-cluster
+      KDC will trust, should the user enable cross realm trust.
+    crossRealmTrustSharedPasswordUri: Optional. The Cloud Storage URI of a KMS
+      encrypted file containing the shared password between the on-cluster
+      Kerberos realm and the remote trusted realm, in a cross realm trust
+      relationship.
+    enableKerberos: Optional. Flag to indicate whether to Kerberize the
+      cluster.
+    kdcDbKeyUri: Optional. The Cloud Storage URI of a KMS encrypted file
+      containing the master key of the KDC database.
+    keyPasswordUri: Optional. The Cloud Storage URI of a KMS encrypted file
+      containing the password to the user provided key. For the self-signed
+      certificate, this password is generated by Dataproc.
+    keystorePasswordUri: Optional. The Cloud Storage URI of a KMS encrypted
+      file containing the password to the user provided keystore. For the
+      self-signed certificate, this password is generated by Dataproc.
+    keystoreUri: Optional. The Cloud Storage URI of the keystore file used for
+      SSL encryption. If not provided, Dataproc will provide a self-signed
+      certificate.
+    kmsKeyUri: Required. The uri of the KMS key used to encrypt various
+      sensitive files.
+    rootPrincipalPasswordUri: Required. The Cloud Storage URI of a KMS
+      encrypted file containing the root principal password.
+    tgtLifetimeHours: Optional. The lifetime of the ticket granting ticket, in
+      hours. If not specified, or user specifies 0, then default value 10 will
+      be used.
+    truststorePasswordUri: Optional. The Cloud Storage URI of a KMS encrypted
+      file containing the password to the user provided truststore. For the
+      self-signed certificate, this password is generated by Dataproc.
+    truststoreUri: Optional. The Cloud Storage URI of the truststore file used
+      for SSL encryption. If not provided, Dataproc will provide a self-signed
+      certificate.
+  """
+
+  crossRealmTrustAdminServer = _messages.StringField(1)
+  crossRealmTrustKdc = _messages.StringField(2)
+  crossRealmTrustRealm = _messages.StringField(3)
+  crossRealmTrustSharedPasswordUri = _messages.StringField(4)
+  enableKerberos = _messages.BooleanField(5)
+  kdcDbKeyUri = _messages.StringField(6)
+  keyPasswordUri = _messages.StringField(7)
+  keystorePasswordUri = _messages.StringField(8)
+  keystoreUri = _messages.StringField(9)
+  kmsKeyUri = _messages.StringField(10)
+  rootPrincipalPasswordUri = _messages.StringField(11)
+  tgtLifetimeHours = _messages.IntegerField(12, variant=_messages.Variant.INT32)
+  truststorePasswordUri = _messages.StringField(13)
+  truststoreUri = _messages.StringField(14)
+
+
 class LifecycleConfig(_messages.Message):
   r"""Specifies the cluster auto-delete schedule configuration.
 
@@ -1985,6 +2406,19 @@ class LifecycleConfig(_messages.Message):
   autoDeleteTtl = _messages.StringField(2)
   idleDeleteTtl = _messages.StringField(3)
   idleStartTime = _messages.StringField(4)
+
+
+class ListAutoscalingPoliciesResponse(_messages.Message):
+  r"""A response to a request to list autoscaling policies in a project.
+
+  Fields:
+    nextPageToken: Output only. This token is included in the response if
+      there are more results to fetch.
+    policies: Output only. Autoscaling policies list.
+  """
+
+  nextPageToken = _messages.StringField(1)
+  policies = _messages.MessageField('AutoscalingPolicy', 2, repeated=True)
 
 
 class ListClustersResponse(_messages.Message):
@@ -2337,6 +2771,7 @@ class OrderedJob(_messages.Message):
     prerequisiteStepIds: Optional. The optional list of prerequisite job
       step_ids. If not specified, the job will start at the beginning of
       workflow.
+    prestoJob: Job is a Presto job.
     pysparkJob: Job is a Pyspark job.
     scheduling: Optional. Job scheduling configuration.
     sparkJob: Job is a Spark job.
@@ -2384,12 +2819,13 @@ class OrderedJob(_messages.Message):
   labels = _messages.MessageField('LabelsValue', 3)
   pigJob = _messages.MessageField('PigJob', 4)
   prerequisiteStepIds = _messages.StringField(5, repeated=True)
-  pysparkJob = _messages.MessageField('PySparkJob', 6)
-  scheduling = _messages.MessageField('JobScheduling', 7)
-  sparkJob = _messages.MessageField('SparkJob', 8)
-  sparkRJob = _messages.MessageField('SparkRJob', 9)
-  sparkSqlJob = _messages.MessageField('SparkSqlJob', 10)
-  stepId = _messages.StringField(11)
+  prestoJob = _messages.MessageField('PrestoJob', 6)
+  pysparkJob = _messages.MessageField('PySparkJob', 7)
+  scheduling = _messages.MessageField('JobScheduling', 8)
+  sparkJob = _messages.MessageField('SparkJob', 9)
+  sparkRJob = _messages.MessageField('SparkRJob', 10)
+  sparkSqlJob = _messages.MessageField('SparkSqlJob', 11)
+  stepId = _messages.StringField(12)
 
 
 class ParameterValidation(_messages.Message):
@@ -2535,6 +2971,64 @@ class Policy(_messages.Message):
   version = _messages.IntegerField(3, variant=_messages.Variant.INT32)
 
 
+class PrestoJob(_messages.Message):
+  r"""A Cloud Dataproc job for running Presto (https://prestosql.io/) queries
+
+  Messages:
+    PropertiesValue: Optional. A mapping of property names to values. Used to
+      set Presto session properties (https://prestodb.io/docs/current/sql/set-
+      session.html) Equivalent to using the --session flag in the Presto CLI
+
+  Fields:
+    clientTags: Optional. Presto client tags to attach to this query
+    continueOnFailure: Optional. Whether to continue executing queries if a
+      query fails. The default value is false. Setting to true can be useful
+      when executing independent parallel queries.
+    loggingConfig: Optional. The runtime log config for job execution.
+    outputFormat: Optional. The format in which query output will be
+      displayed. See the Presto documentation for supported output formats
+    properties: Optional. A mapping of property names to values. Used to set
+      Presto session properties (https://prestodb.io/docs/current/sql/set-
+      session.html) Equivalent to using the --session flag in the Presto CLI
+    queryFileUri: The HCFS URI of the script that contains SQL queries.
+    queryList: A list of queries.
+  """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class PropertiesValue(_messages.Message):
+    r"""Optional. A mapping of property names to values. Used to set Presto
+    session properties (https://prestodb.io/docs/current/sql/set-session.html)
+    Equivalent to using the --session flag in the Presto CLI
+
+    Messages:
+      AdditionalProperty: An additional property for a PropertiesValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type PropertiesValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a PropertiesValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  clientTags = _messages.StringField(1, repeated=True)
+  continueOnFailure = _messages.BooleanField(2)
+  loggingConfig = _messages.MessageField('LoggingConfig', 3)
+  outputFormat = _messages.StringField(4)
+  properties = _messages.MessageField('PropertiesValue', 5)
+  queryFileUri = _messages.StringField(6)
+  queryList = _messages.MessageField('QueryList', 7)
+
+
 class PySparkJob(_messages.Message):
   r"""A Cloud Dataproc job for running Apache PySpark
   (https://spark.apache.org/docs/0.9.0/python-programming-guide.html)
@@ -2632,6 +3126,49 @@ class RegexValidation(_messages.Message):
   regexes = _messages.StringField(1, repeated=True)
 
 
+class ReservationAffinity(_messages.Message):
+  r"""Reservation Affinity for consuming Zonal reservation.
+
+  Enums:
+    ConsumeReservationTypeValueValuesEnum: Optional. Type of reservation to
+      consume
+
+  Fields:
+    consumeReservationType: Optional. Type of reservation to consume
+    key: Optional. Corresponds to the label key of reservation resource.
+    values: Optional. Corresponds to the label values of reservation resource.
+  """
+
+  class ConsumeReservationTypeValueValuesEnum(_messages.Enum):
+    r"""Optional. Type of reservation to consume
+
+    Values:
+      TYPE_UNSPECIFIED: <no description>
+      NO_RESERVATION: Do not consume from any allocated capacity.
+      ANY_RESERVATION: Consume any reservation available.
+      SPECIFIC_RESERVATION: Must consume from a specific reservation. Must
+        specify key value fields for specifying the reservations.
+    """
+    TYPE_UNSPECIFIED = 0
+    NO_RESERVATION = 1
+    ANY_RESERVATION = 2
+    SPECIFIC_RESERVATION = 3
+
+  consumeReservationType = _messages.EnumField('ConsumeReservationTypeValueValuesEnum', 1)
+  key = _messages.StringField(2)
+  values = _messages.StringField(3, repeated=True)
+
+
+class SecurityConfig(_messages.Message):
+  r"""Security related configuration, including encryption, Kerberos, etc.
+
+  Fields:
+    kerberosConfig: Kerberos related configuration.
+  """
+
+  kerberosConfig = _messages.MessageField('KerberosConfig', 1)
+
+
 class SetIamPolicyRequest(_messages.Message):
   r"""Request message for SetIamPolicy method.
 
@@ -2653,8 +3190,8 @@ class SoftwareConfig(_messages.Message):
 
   Messages:
     PropertiesValue: Optional. The properties to set on daemon config
-      files.Property keys are specified in prefix:property format, such as
-      core:fs.defaultFS. The following are supported prefixes and their
+      files.Property keys are specified in prefix:property format, for example
+      core:hadoop.tmp.dir. The following are supported prefixes and their
       mappings: capacity-scheduler: capacity-scheduler.xml core: core-site.xml
       distcp: distcp-default.xml hdfs: hdfs-site.xml hive: hive-site.xml
       mapred: mapred-site.xml pig: pig.properties spark: spark-defaults.conf
@@ -2664,12 +3201,12 @@ class SoftwareConfig(_messages.Message):
     imageVersion: Optional. The version of software inside the cluster. It
       must be one of the supported Cloud Dataproc Versions, such as "1.2"
       (including a subminor version, such as "1.2.29"), or the "preview"
-      version. If unspecified, it defaults to the latest version.
+      version. If unspecified, it defaults to the latest Debian version.
     optionalComponents: The set of optional components to activate on the
       cluster.
     properties: Optional. The properties to set on daemon config
-      files.Property keys are specified in prefix:property format, such as
-      core:fs.defaultFS. The following are supported prefixes and their
+      files.Property keys are specified in prefix:property format, for example
+      core:hadoop.tmp.dir. The following are supported prefixes and their
       mappings: capacity-scheduler: capacity-scheduler.xml core: core-site.xml
       distcp: distcp-default.xml hdfs: hdfs-site.xml hive: hive-site.xml
       mapred: mapred-site.xml pig: pig.properties spark: spark-defaults.conf
@@ -2681,30 +3218,34 @@ class SoftwareConfig(_messages.Message):
 
     Values:
       COMPONENT_UNSPECIFIED: <no description>
-      JUPYTER: <no description>
-      HIVE_WEBHCAT: <no description>
-      ZEPPELIN: <no description>
       ANACONDA: <no description>
-      PRESTO: <no description>
+      DRUID: <no description>
+      HIVE_WEBHCAT: <no description>
+      JUPYTER: <no description>
       KERBEROS: <no description>
+      PRESTO: <no description>
+      ZEPPELIN: <no description>
+      ZOOKEEPER: <no description>
     """
     COMPONENT_UNSPECIFIED = 0
-    JUPYTER = 1
-    HIVE_WEBHCAT = 2
-    ZEPPELIN = 3
-    ANACONDA = 4
-    PRESTO = 5
-    KERBEROS = 6
+    ANACONDA = 1
+    DRUID = 2
+    HIVE_WEBHCAT = 3
+    JUPYTER = 4
+    KERBEROS = 5
+    PRESTO = 6
+    ZEPPELIN = 7
+    ZOOKEEPER = 8
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class PropertiesValue(_messages.Message):
     r"""Optional. The properties to set on daemon config files.Property keys
-    are specified in prefix:property format, such as core:fs.defaultFS. The
-    following are supported prefixes and their mappings: capacity-scheduler:
-    capacity-scheduler.xml core: core-site.xml distcp: distcp-default.xml
-    hdfs: hdfs-site.xml hive: hive-site.xml mapred: mapred-site.xml pig:
-    pig.properties spark: spark-defaults.conf yarn: yarn-site.xmlFor more
-    information, see Cluster properties.
+    are specified in prefix:property format, for example core:hadoop.tmp.dir.
+    The following are supported prefixes and their mappings: capacity-
+    scheduler: capacity-scheduler.xml core: core-site.xml distcp: distcp-
+    default.xml hdfs: hdfs-site.xml hive: hive-site.xml mapred: mapred-
+    site.xml pig: pig.properties spark: spark-defaults.conf yarn: yarn-
+    site.xmlFor more information, see Cluster properties.
 
     Messages:
       AdditionalProperty: An additional property for a PropertiesValue object.

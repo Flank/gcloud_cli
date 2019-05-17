@@ -78,7 +78,7 @@ class MlAlphaPlatformTestBase(_MlPlatformTestBase):
   """Base class for ML Platform command unit tests, alpha track."""
   API_VERSION = 'v1'
 
-  def SetUp(self):
+  def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
 
 
@@ -86,7 +86,7 @@ class MlBetaPlatformTestBase(_MlPlatformTestBase):
   """Base class for ML Platform command unit tests, beta track."""
   API_VERSION = 'v1'
 
-  def SetUp(self):
+  def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
 
   def GetBetaModel(self, name):
@@ -97,7 +97,7 @@ class MlGaPlatformTestBase(_MlPlatformTestBase):
   """Base class for ML Platform command unit tests, GA track."""
   API_VERSION = 'v1'
 
-  def SetUp(self):
+  def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
 
   def GetGaModel(self, name):

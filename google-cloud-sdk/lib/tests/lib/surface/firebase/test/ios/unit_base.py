@@ -38,19 +38,22 @@ IOS_CATALOG_GET = (
         environmentType=IOS_ENV,
         projectId=unit_base.TestUnitTestBase.PROJECT_ID))
 
-ALL_BETA_TEST_RUN_ARGS = [
-    'async', 'device', 'network_profile', 'record_video', 'results_bucket',
-    'results_dir', 'results_history_name', 'test', 'timeout', 'type',
-    'xcode_version', 'xctestrun_file'
+ALL_GA_TEST_RUN_ARGS = [
+    'async', 'device', 'network_profile', 'num_flaky_test_attempts',
+    'record_video', 'results_bucket', 'results_dir', 'results_history_name',
+    'test', 'timeout', 'type', 'xcode_version', 'xctestrun_file'
 ]
 
-ALL_TEST_RUN_ARGS = {'ga': [], 'beta': ALL_BETA_TEST_RUN_ARGS}
+ALL_TEST_RUN_ARGS = {
+    calliope_base.ReleaseTrack.GA: ALL_GA_TEST_RUN_ARGS,
+    calliope_base.ReleaseTrack.BETA: ALL_GA_TEST_RUN_ARGS + []
+}
 
 
 class IosUnitTestBase(unit_base.TestUnitTestBase):
   """Base class for all 'gcloud firebase test ios' unit tests."""
 
-  def NewTestArgs(self, release_track='beta', **kwargs):
+  def NewTestArgs(self, **kwargs):
     """Create a Namespace containing attributes for all `test ios run` args.
 
     All args, for the specified release track, except those appearing in
@@ -58,12 +61,11 @@ class IosUnitTestBase(unit_base.TestUnitTestBase):
     attribute errors.
 
     Args:
-      release_track: a map of release track (ga or beta) to all `test run` args.
       **kwargs: a map of any args which should have values other than None.
     Returns:
       The created argparse.Namespace instance.
     """
-    return test_utils.NewNameSpace(ALL_TEST_RUN_ARGS[release_track], **kwargs)
+    return test_utils.NewNameSpace(ALL_TEST_RUN_ARGS[self.track], **kwargs)
 
 
 class IosMockClientTest(unit_base.TestMockClientTest):
@@ -94,8 +96,8 @@ class IosMockClientTest(unit_base.TestMockClientTest):
         results_bucket='oak',
         results_dir='dir')
 
-  def NewTestArgs(self, release_track='beta', **kwargs):
-    return test_utils.NewNameSpace(ALL_TEST_RUN_ARGS[release_track], **kwargs)
+  def NewTestArgs(self, **kwargs):
+    return test_utils.NewNameSpace(ALL_TEST_RUN_ARGS[self.track], **kwargs)
 
   def CreateMatrixCreator(self,
                           args,

@@ -11,7 +11,7 @@ gcloud alpha remote\-build\-execution worker\-pools create \- create a worker po
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha remote\-build\-execution worker\-pools create\fR (\fIWORKERPOOL\fR\ :\ \fB\-\-instance\fR=\fIINSTANCE\fR) \fB\-\-worker\-count\fR=\fIWORKER_COUNT\fR [\fB\-\-async\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR;\ default=200] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR;\ default="n1\-standard\-2"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha remote\-build\-execution worker\-pools create\fR (\fIWORKERPOOL\fR\ :\ \fB\-\-instance\fR=\fIINSTANCE\fR) \fB\-\-worker\-count\fR=\fIWORKER_COUNT\fR [\fB\-\-async\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR;\ default=200] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR;\ default="n1\-standard\-2"] [\fB\-\-min\-cpu\-platform\fR=\fIMIN_CPU_PLATFORM\fR] [\fB\-\-reserved\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -80,16 +80,27 @@ following command:
 
 $ gcloud compute machine\-types list
 
+.TP 2m
+\fB\-\-min\-cpu\-platform\fR=\fIMIN_CPU_PLATFORM\fR
+Minimum CPU platform for the workers. For more information see
+https://cloud.google.com/compute/docs/cpu\-platforms.
+
+.TP 2m
+\fB\-\-reserved\fR
+Determines the type of VM to use. If set then reserved VMs are used, otherwise
+preemptable VMs are used.
+
 
 .RE
 .sp
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

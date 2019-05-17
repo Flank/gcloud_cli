@@ -30,22 +30,6 @@ class WaitInfoTest(test_case.TestCase):
     return test_resources.MakeInstanceGroupManagersWithActions(
         api_version, current_operations)
 
-  def testV1IsGroupStableTrue(self):
-    igm = self._CreateInstanceGroupManager('v1')
-    self.assertTrue(wait_info.IsGroupStable(igm))
-
-  def testV1IsGroupStableWithCurrentActions(self):
-    igm = self._CreateInstanceGroupManager('v1', current_operations=1)
-    self.assertFalse(wait_info.IsGroupStable(igm))
-
-  def testBetaIsGroupStableTrue(self):
-    igm = self._CreateInstanceGroupManager('beta')
-    self.assertTrue(wait_info.IsGroupStable(igm))
-
-  def testBetaIsGroupStableWithCurrentActions(self):
-    igm = self._CreateInstanceGroupManager('beta', current_operations=1)
-    self.assertFalse(wait_info.IsGroupStable(igm))
-
   def testV1CreateWaitText(self):
     igm = self._CreateInstanceGroupManager('v1')
     self.assertEqual(

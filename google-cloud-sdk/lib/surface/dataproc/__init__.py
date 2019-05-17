@@ -53,11 +53,12 @@ DETAILED_HELP = {
 }
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA,
+                    base.ReleaseTrack.GA)
 class Dataproc(base.Group):
   """Create and manage Google Cloud Dataproc clusters and jobs."""
 
-  category = 'Data Analytics'
+  category = base.DATA_ANALYTICS_CATEGORY
 
   detailed_help = DETAILED_HELP
 

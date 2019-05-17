@@ -674,6 +674,7 @@ class Results(_messages.Message):
   Fields:
     artifactManifest: Path to the artifact manifest. Only populated when
       artifacts are uploaded.
+    artifactTiming: Time to push all non-container artifacts.
     buildStepImages: List of build step digests, in the order corresponding to
       build step indices.
     buildStepOutputs: List of build step outputs, produced by builder images,
@@ -687,10 +688,11 @@ class Results(_messages.Message):
   """
 
   artifactManifest = _messages.StringField(1)
-  buildStepImages = _messages.StringField(2, repeated=True)
-  buildStepOutputs = _messages.BytesField(3, repeated=True)
-  images = _messages.MessageField('BuiltImage', 4, repeated=True)
-  numArtifacts = _messages.IntegerField(5)
+  artifactTiming = _messages.MessageField('TimeSpan', 2)
+  buildStepImages = _messages.StringField(3, repeated=True)
+  buildStepOutputs = _messages.BytesField(4, repeated=True)
+  images = _messages.MessageField('BuiltImage', 5, repeated=True)
+  numArtifacts = _messages.IntegerField(6)
 
 
 class Secret(_messages.Message):
@@ -765,8 +767,8 @@ class SourceProvenance(_messages.Message):
 
   Messages:
     FileHashesValue: Output only. Hash(es) of the build source, which can be
-      used to verify that the originalsource integrity was maintained in the
-      build. Note that `FileHashes` willonly be populated if `BuildOptions`
+      used to verify that the original source integrity was maintained in the
+      build. Note that `FileHashes` will only be populated if `BuildOptions`
       has requested a `SourceProvenanceHash`.  The keys to this map are file
       paths used as build source and the values contain the hash values for
       those files.  If the build source came in a single package such as a
@@ -775,13 +777,13 @@ class SourceProvenance(_messages.Message):
 
   Fields:
     fileHashes: Output only. Hash(es) of the build source, which can be used
-      to verify that the originalsource integrity was maintained in the build.
-      Note that `FileHashes` willonly be populated if `BuildOptions` has
-      requested a `SourceProvenanceHash`.  The keys to this map are file paths
-      used as build source and the values contain the hash values for those
-      files.  If the build source came in a single package such as a gzipped
-      tarfile (`.tar.gz`), the `FileHash` will be for the single path to that
-      file.
+      to verify that the original source integrity was maintained in the
+      build. Note that `FileHashes` will only be populated if `BuildOptions`
+      has requested a `SourceProvenanceHash`.  The keys to this map are file
+      paths used as build source and the values contain the hash values for
+      those files.  If the build source came in a single package such as a
+      gzipped tarfile (`.tar.gz`), the `FileHash` will be for the single path
+      to that file.
     resolvedRepoSource: A copy of the build's `source.repo_source`, if exists,
       with any revisions resolved.
     resolvedStorageSource: A copy of the build's `source.storage_source`, if
@@ -791,8 +793,8 @@ class SourceProvenance(_messages.Message):
   @encoding.MapUnrecognizedFields('additionalProperties')
   class FileHashesValue(_messages.Message):
     r"""Output only. Hash(es) of the build source, which can be used to verify
-    that the originalsource integrity was maintained in the build. Note that
-    `FileHashes` willonly be populated if `BuildOptions` has requested a
+    that the original source integrity was maintained in the build. Note that
+    `FileHashes` will only be populated if `BuildOptions` has requested a
     `SourceProvenanceHash`.  The keys to this map are file paths used as build
     source and the values contain the hash values for those files.  If the
     build source came in a single package such as a gzipped tarfile
@@ -985,7 +987,7 @@ class WorkerPool(_messages.Message):
     deleteTime: Output only. Time at which the request to delete the
       `WorkerPool` was received.
     name: User-defined name of the `WorkerPool`.
-    projectId: The project ID of the GCP project in which the `WorkerPool` is
+    projectId: The project ID of the GCP project for which the `WorkerPool` is
       created.
     regions: List of regions to create the `WorkerPool`. Regions can't be
       empty. If Cloud Build adds a new GCP region in the future, the existing

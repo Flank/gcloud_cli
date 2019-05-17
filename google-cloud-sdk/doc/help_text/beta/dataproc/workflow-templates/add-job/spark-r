@@ -56,9 +56,6 @@ OPTIONAL FLAGS
         List of key value pairs to configure SparkR. For a list of available
         properties, see:
         https://spark.apache.org/docs/latest/configuration.html#available-properties.
-        Alternatively, to see examples of how to use the --properties flag,
-        see:
-        https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/cluster-properties#how_the_properties_flag_works
 
      --region=REGION
         Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
@@ -73,11 +70,15 @@ OPTIONAL FLAGS
         (Optional) List of step IDs to start this job after.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha dataproc workflow-templates add-job spark-r
 

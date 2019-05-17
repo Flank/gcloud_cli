@@ -39,7 +39,10 @@ class SpeechV1p1beta1(base_api.BaseApiClient):
     self.projects_locations_datasets = self.ProjectsLocationsDatasetsService(self)
     self.projects_locations_log_data_stats = self.ProjectsLocationsLogDataStatsService(self)
     self.projects_locations_models = self.ProjectsLocationsModelsService(self)
+    self.projects_locations_operations = self.ProjectsLocationsOperationsService(self)
     self.projects_locations = self.ProjectsLocationsService(self)
+    self.projects_operations_manualRecognitionTasks = self.ProjectsOperationsManualRecognitionTasksService(self)
+    self.projects_operations = self.ProjectsOperationsService(self)
     self.projects = self.ProjectsService(self)
     self.speech = self.SpeechService(self)
 
@@ -156,6 +159,33 @@ is SpeechOperationMetadata. Response type is Empty.
         supports_download=False,
     )
 
+    def Delete(self, request, global_params=None):
+      r"""Deletes the named automl dataset. Returns an Empty response.
+
+      Args:
+        request: (SpeechProjectsLocationsDatasetsDeleteRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Delete')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Delete.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1p1beta1/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}',
+        http_method=u'DELETE',
+        method_id=u'speech.projects.locations.datasets.delete',
+        ordered_params=[u'name'],
+        path_params=[u'name'],
+        query_params=[],
+        relative_path=u'v1p1beta1/{+name}',
+        request_field='',
+        request_type_name=u'SpeechProjectsLocationsDatasetsDeleteRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
     def Get(self, request, global_params=None):
       r"""Get the dataset associated with the dataset resource.
 
@@ -248,7 +278,7 @@ is SpeechOperationMetadata. Response type is Empty.
           }
 
     def List(self, request, global_params=None):
-      r"""List all log data stats associated with this consumer project.
+      r"""Lists all log data stats associated with requested project.
 
       Args:
         request: (SpeechProjectsLocationsLogDataStatsListRequest) input message
@@ -308,6 +338,33 @@ Response type is Model.
         relative_path=u'v1p1beta1/{+parent}/models',
         request_field=u'model',
         request_type_name=u'SpeechProjectsLocationsModelsCreateRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def Delete(self, request, global_params=None):
+      r"""Deletes the named automl model. Returns an Empty response.
+
+      Args:
+        request: (SpeechProjectsLocationsModelsDeleteRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Delete')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Delete.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1p1beta1/projects/{projectsId}/locations/{locationsId}/models/{modelsId}',
+        http_method=u'DELETE',
+        method_id=u'speech.projects.locations.models.delete',
+        ordered_params=[u'name'],
+        path_params=[u'name'],
+        query_params=[],
+        relative_path=u'v1p1beta1/{+name}',
+        request_field='',
+        request_type_name=u'SpeechProjectsLocationsModelsDeleteRequest',
         response_type_name=u'Operation',
         supports_download=False,
     )
@@ -399,6 +456,81 @@ a `EvaluateModelResponse` with the evaluation results.
         supports_download=False,
     )
 
+  class ProjectsLocationsOperationsService(base_api.BaseApiService):
+    """Service class for the projects_locations_operations resource."""
+
+    _NAME = u'projects_locations_operations'
+
+    def __init__(self, client):
+      super(SpeechV1p1beta1.ProjectsLocationsOperationsService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def Get(self, request, global_params=None):
+      r"""Gets the latest state of a long-running operation.  Clients can use this.
+method to poll the operation result at intervals as recommended by the API
+service.
+
+      Args:
+        request: (SpeechProjectsLocationsOperationsGetRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Get')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1p1beta1/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}',
+        http_method=u'GET',
+        method_id=u'speech.projects.locations.operations.get',
+        ordered_params=[u'name'],
+        path_params=[u'name'],
+        query_params=[],
+        relative_path=u'v1p1beta1/{+name}',
+        request_field='',
+        request_type_name=u'SpeechProjectsLocationsOperationsGetRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def List(self, request, global_params=None):
+      r"""Lists operations that match the specified filter in the request. If the.
+server doesn't support this method, it returns `UNIMPLEMENTED`.
+
+NOTE: the `name` binding allows API services to override the binding
+to use different resource name schemes, such as `users/*/operations`. To
+override the binding, API services can add a binding such as
+`"/v1/{name=users/*}/operations"` to their service configuration.
+For backwards compatibility, the default name includes the operations
+collection id, however overriding users must ensure the name binding
+is the parent resource, without the operations collection id.
+
+      Args:
+        request: (SpeechProjectsLocationsOperationsListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (ListOperationsResponse) The response message.
+      """
+      config = self.GetMethodConfig('List')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    List.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1p1beta1/projects/{projectsId}/locations/{locationsId}/operations',
+        http_method=u'GET',
+        method_id=u'speech.projects.locations.operations.list',
+        ordered_params=[u'name'],
+        path_params=[u'name'],
+        query_params=[u'filter', u'pageSize', u'pageToken'],
+        relative_path=u'v1p1beta1/{+name}/operations',
+        request_field='',
+        request_type_name=u'SpeechProjectsLocationsOperationsListRequest',
+        response_type_name=u'ListOperationsResponse',
+        supports_download=False,
+    )
+
   class ProjectsLocationsService(base_api.BaseApiService):
     """Service class for the projects_locations resource."""
 
@@ -406,6 +538,87 @@ a `EvaluateModelResponse` with the evaluation results.
 
     def __init__(self, client):
       super(SpeechV1p1beta1.ProjectsLocationsService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def LogData(self, request, global_params=None):
+      r"""Purges all log data associated with requested project. Operation response.
+type is google.protobuf.Empty.
+
+Since logs are stored by asynchronous writer process, buffered log data
+might still end up in storage, even after this call. To ensure all data is
+purged, call this method 3 days after last recognition call.
+
+      Args:
+        request: (SpeechProjectsLocationsLogDataRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('LogData')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    LogData.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1p1beta1/projects/{projectsId}/locations/{locationsId}/log_data',
+        http_method=u'DELETE',
+        method_id=u'speech.projects.locations.log_data',
+        ordered_params=[u'parent'],
+        path_params=[u'parent'],
+        query_params=[u'bucketName'],
+        relative_path=u'v1p1beta1/{+parent}/log_data',
+        request_field='',
+        request_type_name=u'SpeechProjectsLocationsLogDataRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+  class ProjectsOperationsManualRecognitionTasksService(base_api.BaseApiService):
+    """Service class for the projects_operations_manualRecognitionTasks resource."""
+
+    _NAME = u'projects_operations_manualRecognitionTasks'
+
+    def __init__(self, client):
+      super(SpeechV1p1beta1.ProjectsOperationsManualRecognitionTasksService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def Get(self, request, global_params=None):
+      r"""Gets the latest state of a long-running operation.  Clients can use this.
+method to poll the operation result at intervals as recommended by the API
+service.
+
+      Args:
+        request: (SpeechProjectsOperationsManualRecognitionTasksGetRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Get')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1p1beta1/projects/{projectsId}/operations/manualRecognitionTasks/{manualRecognitionTasksId}',
+        http_method=u'GET',
+        method_id=u'speech.projects.operations.manualRecognitionTasks.get',
+        ordered_params=[u'name'],
+        path_params=[u'name'],
+        query_params=[],
+        relative_path=u'v1p1beta1/{+name}',
+        request_field='',
+        request_type_name=u'SpeechProjectsOperationsManualRecognitionTasksGetRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+  class ProjectsOperationsService(base_api.BaseApiService):
+    """Service class for the projects_operations resource."""
+
+    _NAME = u'projects_operations'
+
+    def __init__(self, client):
+      super(SpeechV1p1beta1.ProjectsOperationsService, self).__init__(client)
       self._upload_configs = {
           }
 
@@ -434,6 +647,8 @@ a `EvaluateModelResponse` with the evaluation results.
 google.longrunning.Operations interface. Returns either an
 `Operation.error` or an `Operation.response` which contains
 a `LongRunningRecognizeResponse` message.
+For more information on asynchronous speech recognition, see the
+[how-to](https://cloud.google.com/speech-to-text/docs/async-recognize).
 
       Args:
         request: (LongRunningRecognizeRequest) input message

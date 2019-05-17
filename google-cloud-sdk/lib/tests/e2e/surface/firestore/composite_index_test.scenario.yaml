@@ -82,6 +82,12 @@ actions:
             reference: my-index
             modifiers:
               basename: true
+          - field: name
+            reference: operation
+          - field: name
+            reference: operation-basename
+            modifiers:
+              basename: true
           body:
             json:
               metadata:
@@ -99,9 +105,50 @@ actions:
               startTime: '2018-12-06T09:58:35.759Z'
               index: projects/das-fs-us-c-gcloud/databases/(default)/collectionGroups/$$my-collection-group$$/indexes/CICAgLjIspYK
               state: INITIALIZING
-        poll_operation: true
+        # This is necessary to return the final index object in the `response` field of the final
+        # operation response (as seen below).
+        # TODO(b/128831010) Use `poll_operation: true` once bug is fixed.
+        poll_operation: false
     - expect_stderr: |
         Create request issued
+    - api_call:
+        expect_request:
+          uri: https://firestore.googleapis.com/v1/$$operation$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '1203'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/das-fs-us-c-gcloud/databases/(default)/operations/S1lwc0lqTGdBQ0lDDCoDIGQ0OTk1MTNmN2VlOC1lNDZhLTY0NzQtOTY1ZC02N2IwMTA0NSQadGx1YWZlZAcSMXJoLXJleGVkbmktbmltZGERClIS
+            metadata:
+              '@type': type.googleapis.com/google.firestore.admin.v1beta2.IndexOperationMetadata
+              startTime: '2019-03-18T15:03:48Z'
+              endTime: '2019-03-18T15:03:51.596919Z'
+              index: projects/das-fs-us-c-gcloud/databases/(default)/collectionGroups/$$my-collection-group$$/indexes/CICAgLjIspYK
+              state: SUCCESSFUL
+              progressDocuments: {}
+            done: true
+            response:
+              '@type': type.googleapis.com/google.firestore.admin.v1beta2.Index
+              name: projects/das-fs-us-c-gcloud/databases/(default)/collectionGroups/$$my-collection-group$$/indexes/CICAgLjIspYK
+              queryScope: COLLECTION
+              fields:
+              - fieldPath: tags
+                arrayConfig: CONTAINS
+              - fieldPath: user_id
+                order: DESCENDING
+              - fieldPath: timestamp
+                order: DESCENDING
+              - fieldPath: __name__
+                order: DESCENDING
+              state: READY
+        poll_operation: false
+        repeatable: true
     - expect_progress_tracker:
         message: Waiting for operation [$$operation-basename$$] to complete
         status: SUCCESS

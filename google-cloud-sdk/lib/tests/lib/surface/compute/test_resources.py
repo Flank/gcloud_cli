@@ -1024,6 +1024,14 @@ IMAGES = [
         selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
                   'global/images/image-3'),
         status=messages.Image.StatusValueValuesEnum.READY),
+
+    messages.Image(
+        name='image-4',
+        deprecated=messages.DeprecationStatus(
+            deprecated='2019-04-01T15:00:00'),
+        selfLink=('https://www.googleapis.com/compute/v1/projects/my-project/'
+                  'global/images/image-4'),
+        status=messages.Image.StatusValueValuesEnum.READY),
 ]
 
 
@@ -1208,26 +1216,36 @@ def MakeInstancesInManagedInstanceGroup(msgs, api):
           instanceStatus=(msgs.ManagedInstance
                           .InstanceStatusValueValuesEnum.RUNNING),
           currentAction=(msgs.ManagedInstance
-                         .CurrentActionValueValuesEnum.NONE)),
+                         .CurrentActionValueValuesEnum.NONE),
+          version=msgs.ManagedInstanceVersion(
+              instanceTemplate='template-1',
+              name='xxx')),
       msgs.ManagedInstance(
           instance=(prefix +
                     'projects/my-project/zones/central2-a/instances/inst-2'),
           instanceStatus=(msgs.ManagedInstance
                           .InstanceStatusValueValuesEnum.STOPPED),
           currentAction=(msgs.ManagedInstance
-                         .CurrentActionValueValuesEnum.RECREATING)),
+                         .CurrentActionValueValuesEnum.RECREATING),
+          version=msgs.ManagedInstanceVersion(
+              instanceTemplate='template-1')),
       msgs.ManagedInstance(
           instance=(prefix +
                     'projects/my-project/zones/central2-a/instances/inst-3'),
           instanceStatus=(msgs.ManagedInstance
                           .InstanceStatusValueValuesEnum.RUNNING),
           currentAction=(msgs.ManagedInstance
-                         .CurrentActionValueValuesEnum.DELETING)),
+                         .CurrentActionValueValuesEnum.DELETING),
+          version=msgs.ManagedInstanceVersion(
+              instanceTemplate='template-2',
+              name='yyy')),
       msgs.ManagedInstance(
           instance=(prefix +
                     'projects/my-project/zones/central2-a/instances/inst-4'),
           currentAction=(msgs.ManagedInstance
                          .CurrentActionValueValuesEnum.CREATING),
+          version=msgs.ManagedInstanceVersion(
+              instanceTemplate='template-3'),
           lastAttempt=MakeLastAttemptErrors(
               msgs, [('CONDITION_NOT_MET', 'True is not False'),
                      ('QUOTA_EXCEEDED', 'Limit is 5')])),
@@ -1273,6 +1291,68 @@ def MakeInstancesInManagedInstanceGroupBeta(msgs, api):
                          .CurrentActionValueValuesEnum.CREATING),
           version=msgs.ManagedInstanceVersion(
               instanceTemplate='template-3'),
+          lastAttempt=MakeLastAttemptErrors(
+              msgs, [('CONDITION_NOT_MET', 'True is not False'),
+                     ('QUOTA_EXCEEDED', 'Limit is 5')])),
+  ]
+
+
+def MakeInstancesInManagedInstanceGroupAlpha(msgs, api):
+  prefix = '{0}/{1}/'.format(_COMPUTE_PATH, api)
+  return [
+      msgs.ManagedInstance(
+          instance=(
+              prefix + 'projects/my-project/zones/central2-a/instances/inst-1'),
+          instanceStatus=(
+              msgs.ManagedInstance.InstanceStatusValueValuesEnum.RUNNING),
+          instanceHealth=[
+              msgs.ManagedInstanceInstanceHealth(
+                  healthState=msgs.ManagedInstanceInstanceHealth
+                  .HealthStateValueValuesEnum.HEALTHY,
+                  detailedHealthState=msgs.ManagedInstanceInstanceHealth
+                  .DetailedHealthStateValueValuesEnum.HEALTHY)
+          ],
+          currentAction=(
+              msgs.ManagedInstance.CurrentActionValueValuesEnum.NONE),
+          version=msgs.ManagedInstanceVersion(
+              instanceTemplate='template-1', name='xxx')),
+      msgs.ManagedInstance(
+          instance=(
+              prefix + 'projects/my-project/zones/central2-a/instances/inst-2'),
+          instanceHealth=[
+              msgs.ManagedInstanceInstanceHealth(
+                  healthState=msgs.ManagedInstanceInstanceHealth
+                  .HealthStateValueValuesEnum.UNHEALTHY,
+                  detailedHealthState=msgs.ManagedInstanceInstanceHealth
+                  .DetailedHealthStateValueValuesEnum.UNHEALTHY)
+          ],
+          instanceStatus=(
+              msgs.ManagedInstance.InstanceStatusValueValuesEnum.STOPPED),
+          currentAction=(
+              msgs.ManagedInstance.CurrentActionValueValuesEnum.RECREATING),
+          version=msgs.ManagedInstanceVersion(instanceTemplate='template-1')),
+      msgs.ManagedInstance(
+          instance=(
+              prefix + 'projects/my-project/zones/central2-a/instances/inst-3'),
+          instanceHealth=[
+              msgs.ManagedInstanceInstanceHealth(
+                  healthState=msgs.ManagedInstanceInstanceHealth
+                  .HealthStateValueValuesEnum.UNHEALTHY,
+                  detailedHealthState=msgs.ManagedInstanceInstanceHealth
+                  .DetailedHealthStateValueValuesEnum.TIMEOUT)
+          ],
+          instanceStatus=(
+              msgs.ManagedInstance.InstanceStatusValueValuesEnum.RUNNING),
+          currentAction=(
+              msgs.ManagedInstance.CurrentActionValueValuesEnum.DELETING),
+          version=msgs.ManagedInstanceVersion(
+              instanceTemplate='template-2', name='yyy')),
+      msgs.ManagedInstance(
+          instance=(
+              prefix + 'projects/my-project/zones/central2-a/instances/inst-4'),
+          currentAction=(
+              msgs.ManagedInstance.CurrentActionValueValuesEnum.CREATING),
+          version=msgs.ManagedInstanceVersion(instanceTemplate='template-3'),
           lastAttempt=MakeLastAttemptErrors(
               msgs, [('CONDITION_NOT_MET', 'True is not False'),
                      ('QUOTA_EXCEEDED', 'Limit is 5')])),
@@ -1408,8 +1488,12 @@ def MakeInstanceGroupManagersWithActions(api,
                                          scope_name='zone-1',
                                          actions_state='creating',
                                          pending_actions_count=None,
-                                         is_stable=None):
+                                         is_stable=False,
+                                         version_target_reached=None):
   """Creates instance group manages with current actions tests resources."""
+  if (current_actions_count or pending_actions_count) and is_stable:
+    raise Exception('Cannot create stable IGM with pending or current actions.')
+
   used_messages = _GetMessagesForApi(api)
   igm = used_messages.InstanceGroupManager(
       name='group-1',
@@ -1439,8 +1523,11 @@ def MakeInstanceGroupManagersWithActions(api,
         **{actions_state: pending_actions_count})
     igm.pendingActions = pending_actions
 
-  if is_stable is not None:
-    igm.status = used_messages.InstanceGroupManagerStatus(isStable=is_stable)
+  igm.status = used_messages.InstanceGroupManagerStatus(isStable=is_stable)
+  if version_target_reached is not None:
+    igm.status.versionTarget = (
+        used_messages.InstanceGroupManagerStatusVersionTarget(
+            isReached=version_target_reached))
 
   setattr(igm, scope_type,
           'https://www.googleapis.com/compute/{0}/projects/my-project/{1}/{2}'
@@ -1518,7 +1605,7 @@ def MakeInstanceGroupManagers(api, scope_name='zone-1', scope_type='zone'):
 
 def MakeInstanceGroupManagersWithVersions(api, scope_name='zone-1',
                                           scope_type='zone'):
-  """Creates instance group manages tests resources."""
+  """Creates instance group manager test resources."""
 
   used_messages = _GetMessagesForApi(api)
   group_managers = [
@@ -1630,6 +1717,45 @@ def MakeInstanceGroupManagersWithVersions(api, scope_name='zone-1',
             'projects/my-project/{1}/{2}'
             .format(api, scope_type + 's', scope_name))
   return group_managers
+
+
+def MakeStatefulInstanceGroupManager(api, scope_name='zone-1',
+                                     scope_type='zone'):
+  """Creates sample stateful IGM test resource."""
+
+  used_messages = _GetMessagesForApi(api)
+  return used_messages.InstanceGroupManager(
+      name='group-stateful-1',
+      selfLink=('https://www.googleapis.com/compute/{0}/projects/'
+                'my-project/{1}/{2}/instanceGroupManagers/group-stateful-1'
+                .format(api, scope_type + 's', scope_name)),
+      creationTimestamp='2019-05-10T17:54:10.636-07:00',
+      baseInstanceName='test-instance-name-1',
+      description='Test description.',
+      fingerprint=b'1234',
+      instanceGroup=('https://www.googleapis.com/compute/{0}/projects/'
+                     'my-project/{1}/{2}/instanceGroups/group-stateful-1'
+                     .format(api, scope_type + 's', scope_name)),
+      instanceTemplate=('https://www.googleapis.com/compute/{0}/projects/'
+                        'my-project/global/instanceTemplates/template-1'
+                        .format(api)),
+      statefulPolicy=used_messages.StatefulPolicy(
+          preservedResources=(
+              used_messages.StatefulPolicyPreservedResources(
+                  disks=[
+                      used_messages.StatefulPolicyPreservedDisk(
+                          deviceName='disk-1'),
+                  ]))),
+      targetPools=[],
+      targetSize=1,
+      versions=[
+          used_messages.InstanceGroupManagerVersion(
+              instanceTemplate=('https://www.googleapis.com/compute/{0}/'
+                                'projects/my-project/global/'
+                                'instanceTemplates/template-1'.format(api)),
+          ),
+      ],
+  )
 
 
 def MakeMachineImages(msgs, api):
@@ -1955,10 +2081,9 @@ def MakeNetworkEndpointGroups(msgs, api):
       msgs.NetworkEndpointGroup(
           description='My NEG 1',
           kind='compute#networkEndpointGroup',
-          loadBalancer=msgs.NetworkEndpointGroupLbNetworkEndpointGroup(
-              network=('https://www.googleapis.com/compute/v1/projects/'
-                       'my-project/global/networks/network-1'),
-              zone='zone-1'),
+          network=('https://www.googleapis.com/compute/v1/projects/'
+                   'my-project/global/networks/network-1'),
+          zone='zone-1',
           name='my-neg1',
           networkEndpointType=neg_type_enum.GCE_VM_IP_PORT,
           selfLink=(prefix + '/projects/my-project/zones/zone-1/'
@@ -1967,10 +2092,9 @@ def MakeNetworkEndpointGroups(msgs, api):
       msgs.NetworkEndpointGroup(
           description='My NEG Too',
           kind='compute#networkEndpointGroup',
-          loadBalancer=msgs.NetworkEndpointGroupLbNetworkEndpointGroup(
-              network=('https://www.googleapis.com/compute/v1/projects/'
-                       'my-project/global/networks/network-2'),
-              zone='zone-2'),
+          network=('https://www.googleapis.com/compute/v1/projects/'
+                   'my-project/global/networks/network-2'),
+          zone='zone-2',
           name='my-neg2',
           networkEndpointType=neg_type_enum.GCE_VM_IP_PORT,
           selfLink=(prefix + '/projects/my-project/zones/zone-2/'
@@ -1979,8 +2103,7 @@ def MakeNetworkEndpointGroups(msgs, api):
   ]
 
 
-NETWORK_ENDPOINT_GROUPS_BETA = MakeNetworkEndpointGroups(beta_messages, 'beta')
-NETWORK_ENDPOINT_GROUPS = NETWORK_ENDPOINT_GROUPS_BETA
+NETWORK_ENDPOINT_GROUPS = MakeNetworkEndpointGroups(messages, 'v1')
 
 
 def MakeOsloginClient(version, use_extended_profile=False):

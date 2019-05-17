@@ -44,8 +44,10 @@ class InstanceGroupManagersWaitUntilStableZonalTest(test_base.BaseTest):
         Waiting for group to become stable, current operations: creating: 10
         Waiting for group to become stable, current operations: creating: 5
         Waiting for group to become stable, current operations: creating: 1
+        Waiting for group to become stable
         Group is stable
-        """), normalize_space=True)
+        """),
+        normalize_space=True)
 
   def testWaitForCreationWithoutRetries(self):
     self._SetRequestsSideEffects(pending_state='creatingWithoutRetries')
@@ -59,13 +61,15 @@ class InstanceGroupManagersWaitUntilStableZonalTest(test_base.BaseTest):
         Waiting for group to become stable, current operations: creatingWithoutRetries: 10
         Waiting for group to become stable, current operations: creatingWithoutRetries: 5
         Waiting for group to become stable, current operations: creatingWithoutRetries: 1
+        Waiting for group to become stable
         Group is stable
-        """), normalize_space=True)
+        """),
+        normalize_space=True)
 
   def testAlreadyStable(self):
     self._SetRequestsSideEffects()
     self.make_requests.side_effect = iter([
-        self._MakeInstanceGroupManager(0),
+        self._MakeInstanceGroupManager(0, is_stable=True),
     ])
 
     self.Run("""compute instance-groups managed wait-until-stable group-1
@@ -97,10 +101,15 @@ class InstanceGroupManagersWaitUntilStableZonalTest(test_base.BaseTest):
         --zone central2-a""")
 
   @staticmethod
-  def _MakeInstanceGroupManager(current_operations, current_state='creating'):
+  def _MakeInstanceGroupManager(current_operations,
+                                current_state='creating',
+                                is_stable=False):
     return [
         test_resources.MakeInstanceGroupManagersWithActions(
-            API_VERSION, current_operations, actions_state=current_state)
+            API_VERSION,
+            current_operations,
+            actions_state=current_state,
+            is_stable=is_stable)
     ]
 
   def _SetRequestsSideEffects(self, pending_state='creating'):
@@ -111,6 +120,7 @@ class InstanceGroupManagersWaitUntilStableZonalTest(test_base.BaseTest):
         self._MakeInstanceGroupManager(5, pending_state),
         self._MakeInstanceGroupManager(1, pending_state),
         self._MakeInstanceGroupManager(0, pending_state),
+        self._MakeInstanceGroupManager(0, pending_state, is_stable=True),
     ])
 
 
@@ -124,6 +134,7 @@ class InstanceGroupManagersWaitUntilStableRegionalTest(test_base.BaseTest):
         self._MakeInstanceGroupManager(5),
         self._MakeInstanceGroupManager(1),
         self._MakeInstanceGroupManager(0),
+        self._MakeInstanceGroupManager(0, is_stable=True),
     ])
 
   def testWait(self):
@@ -137,12 +148,14 @@ class InstanceGroupManagersWaitUntilStableRegionalTest(test_base.BaseTest):
         Waiting for group to become stable, current operations: creating: 10
         Waiting for group to become stable, current operations: creating: 5
         Waiting for group to become stable, current operations: creating: 1
+        Waiting for group to become stable
         Group is stable
-        """), normalize_space=True)
+        """),
+        normalize_space=True)
 
   def testAlreadyStable(self):
     self.make_requests.side_effect = iter([
-        self._MakeInstanceGroupManager(0),
+        self._MakeInstanceGroupManager(0, is_stable=True),
     ])
 
     self.Run("""
@@ -167,11 +180,12 @@ class InstanceGroupManagersWaitUntilStableRegionalTest(test_base.BaseTest):
           """)
 
   @staticmethod
-  def _MakeInstanceGroupManager(current_operations):
+  def _MakeInstanceGroupManager(current_operations, is_stable=False):
     return [
         test_resources.MakeInstanceGroupManagersWithActions(
             api=API_VERSION,
             current_actions_count=current_operations,
+            is_stable=is_stable,
             scope_type='region',
             scope_name='central2')
     ]

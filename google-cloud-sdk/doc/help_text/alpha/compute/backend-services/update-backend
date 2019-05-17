@@ -157,7 +157,8 @@ OPTIONAL FLAGS
         Setting this value to 0.0 (0%) drains the backend service. Note that
         draining a backend service only prevents new connections to instances
         in the group. All existing connections are allowed to continue until
-        they close by normal means.
+        they close by normal means. This cannot be used for internal load
+        balancing.
 
      --description=DESCRIPTION
         An optional, textual description for the backend.
@@ -216,61 +217,57 @@ OPTIONAL FLAGS
 
      At most one of these may be specified:
 
-       At most one of these may be specified:
+       --max-connections=MAX_CONNECTIONS
+          Maximum concurrent connections that the backend can handle. Valid for
+          instance group and network endpoint group backends.
 
-         --max-connections=MAX_CONNECTIONS
-            Maximum concurrent connections that the backend can handle. Valid
-            for instance group and network endpoint group backends.
+       --max-connections-per-endpoint=MAX_CONNECTIONS_PER_ENDPOINT
+          Only valid for network endpoint group backends. Defines a maximum
+          number of connections per endpoint if all endpoints are healthy. When
+          one or more endpoints are unhealthy, an effective maximum number of
+          connections per healthy endpoint is calculated by multiplying
+          MAX_CONNECTIONS_PER_ENDPOINT by the number of endpoints in the
+          network endpoint group, then dividing by the number of healthy
+          endpoints.
 
-         --max-connections-per-endpoint=MAX_CONNECTIONS_PER_ENDPOINT
-            Only valid for network endpoint group backends. Defines a maximum
-            number of connections per endpoint if all endpoints are healthy.
-            When one or more endpoints are unhealthy, an effective maximum
-            number of connections per healthy endpoint is calculated by
-            multiplying MAX_CONNECTIONS_PER_ENDPOINT by the number of endpoints
-            in the network endpoint group, then dividing by the number of
-            healthy endpoints.
+       --max-connections-per-instance=MAX_CONNECTIONS_PER_INSTANCE
+          Only valid for instance group backends. Defines a maximum number of
+          concurrent connections per instance if all instances in the instance
+          group are healthy. When one or more instances are unhealthy, an
+          effective maximum number of connections per healthy instance is
+          calculated by multiplying MAX_CONNECTIONS_PER_INSTANCE by the number
+          of instances in the instance group, then dividing by the number of
+          healthy instances.
 
-         --max-connections-per-instance=MAX_CONNECTIONS_PER_INSTANCE
-            Only valid for instance group backends. Defines a maximum number of
-            concurrent connections per instance if all instances in the
-            instance group are healthy. When one or more instances are
-            unhealthy, an effective maximum number of connections per healthy
-            instance is calculated by multiplying MAX_CONNECTIONS_PER_INSTANCE
-            by the number of instances in the instance group, then dividing by
-            the number of healthy instances.
+       --max-rate=MAX_RATE
+          Maximum number of HTTP requests per second (RPS) that the backend can
+          handle. Valid for instance group and network endpoint group backends.
+          Must not be defined if the backend is a managed instance group using
+          autoscaling based on load balancing.
 
-       At most one of these may be specified:
+       --max-rate-per-endpoint=MAX_RATE_PER_ENDPOINT
+          Only valid for network endpoint group backends. Defines a maximum
+          number of HTTP requests per second (RPS) per endpoint if all
+          endpoints are healthy. When one or more endpoints are unhealthy, an
+          effective maximum rate per healthy endpoint is calculated by
+          multiplying MAX_RATE_PER_ENDPOINT by the number of endpoints in the
+          network endpoint group, then dividing by the number of healthy
+          endpoints.
 
-         --max-rate=MAX_RATE
-            Maximum number of HTTP requests per second (RPS) that the backend
-            can handle. Valid for instance group and network endpoint group
-            backends. Must not be defined if the backend is a managed instance
-            group using autoscaling based on load balancing.
-
-         --max-rate-per-endpoint=MAX_RATE_PER_ENDPOINT
-            Only valid for network endpoint group backends. Defines a maximum
-            number of HTTP requests per second (RPS) per endpoint if all
-            endpoints are healthy. When one or more endpoints are unhealthy, an
-            effective maximum rate per healthy endpoint is calculated by
-            multiplying MAX_RATE_PER_ENDPOINT by the number of endpoints in the
-            network endpoint group, then dividing by the number of healthy
-            endpoints.
-
-         --max-rate-per-instance=MAX_RATE_PER_INSTANCE
-            Only valid for instance group backends. Defines a maximum number of
-            HTTP requests per second (RPS) per instance if all instances in the
-            instance group are healthy. When one or more instances are
-            unhealthy, an effective maximum RPS per healthy instance is
-            calculated by multiplying MAX_RATE_PER_INSTANCE by the number of
-            instances in the instance group, then dividing by the number of
-            healthy instances. This parameter is compatible with managed
-            instance group backends that use autoscaling based on load
-            balancing.
+       --max-rate-per-instance=MAX_RATE_PER_INSTANCE
+          Only valid for instance group backends. Defines a maximum number of
+          HTTP requests per second (RPS) per instance if all instances in the
+          instance group are healthy. When one or more instances are unhealthy,
+          an effective maximum RPS per healthy instance is calculated by
+          multiplying MAX_RATE_PER_INSTANCE by the number of instances in the
+          instance group, then dividing by the number of healthy instances.
+          This parameter is compatible with managed instance group backends
+          that use autoscaling based on load balancing.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

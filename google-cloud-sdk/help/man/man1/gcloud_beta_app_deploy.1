@@ -73,9 +73,15 @@ Promote the deployed version to receive all traffic. Overrides the default
 .TP 2m
 \fB\-\-stop\-previous\-version\fR
 Stop the previously running version when deploying a new version that receives
-all traffic. Overrides the default \fBapp/stop_previous_version\fR property
-value for this command invocation. Use \fB\-\-no\-stop\-previous\-version\fR to
-disable.
+all traffic.
+
+Note that if the version is running on an instance of an auto\-scaled service in
+the App Engine Standard environment, using \f5\-\-stop\-previous\-version\fR
+will not work and the previous version will continue to run because auto\-scaled
+service instances are always running.
+
+Overrides the default \fBapp/stop_previous_version\fR property value for this
+command invocation. Use \fB\-\-no\-stop\-previous\-version\fR to disable.
 
 .TP 2m
 \fB\-\-version\fR=\fIVERSION\fR, \fB\-v\fR \fIVERSION\fR
@@ -88,10 +94,11 @@ you do not specify a version, one will be generated for you.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

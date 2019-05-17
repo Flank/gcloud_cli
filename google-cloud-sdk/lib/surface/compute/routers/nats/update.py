@@ -30,10 +30,11 @@ from googlecloudsdk.core import log
 from googlecloudsdk.core import resources
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
+@base.ReleaseTracks(base.ReleaseTrack.GA)
 class Update(base.UpdateCommand):
   """Update a NAT on a Google Compute Engine router."""
   with_logging = False
+  with_drain_ips = False
 
   @classmethod
   def Args(cls, parser):
@@ -46,7 +47,10 @@ class Update(base.UpdateCommand):
 
     nats_flags.AddNatNameArg(parser, operation_type='create')
     nats_flags.AddCommonNatArgs(
-        parser, for_create=False, with_logging=cls.with_logging)
+        parser,
+        for_create=False,
+        with_logging=cls.with_logging,
+        with_drain_ips=cls.with_drain_ips)
 
   def Run(self, args):
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
@@ -61,7 +65,8 @@ class Update(base.UpdateCommand):
     # Retrieve specified NAT and update base fields.
     existing_nat = nats_utils.FindNatOrRaise(replacement, args.name)
     nat = nats_utils.UpdateNatMessage(
-        existing_nat, args, holder, with_logging=self.with_logging)
+        existing_nat, args, holder,
+        with_logging=self.with_logging, with_drain_ips=self.with_drain_ips)
 
     cleared_fields = []
     if args.clear_min_ports_per_vm:
@@ -117,7 +122,15 @@ class Update(base.UpdateCommand):
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class AlphaUpdate(Update):
+class UpdateAlpha(Update):
+  """Update a NAT on a Google Compute Engine router."""
+
+  with_logging = True
+  with_drain_ips = True
+
+
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class UpdateBeta(Update):
   """Update a NAT on a Google Compute Engine router."""
 
   with_logging = True

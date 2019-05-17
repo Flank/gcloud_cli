@@ -26,15 +26,15 @@ from googlecloudsdk.api_lib.compute import utils
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute import flags as compute_flags
-from googlecloudsdk.command_lib.compute.commitments import allocation_helper
 from googlecloudsdk.command_lib.compute.commitments import flags
+from googlecloudsdk.command_lib.compute.commitments import reservation_helper
 from googlecloudsdk.core import properties
 
 
 _MISSING_COMMITMENTS_QUOTA_REGEX = r'Quota .COMMITMENTS. exceeded.+'
 
 
-@base.ReleaseTracks(base.ReleaseTrack.GA, base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.GA)
 class Create(base.Command):
   """Create Google Compute Engine commitments."""
 
@@ -42,9 +42,6 @@ class Create(base.Command):
   def Args(cls, parser):
     flags.MakeCommitmentArg(False).AddArgument(parser, operation_type='create')
     flags.AddCreateFlags(parser)
-
-  def _ValidateArgs(self, args):
-    flags.ValidateResourcesArg(args.resources)
 
   def _MakeCreateRequest(
       self, args, messages, project, region, commitment_ref, unused_holder):
@@ -60,8 +57,6 @@ class Create(base.Command):
     )
 
   def Run(self, args):
-    self._ValidateArgs(args)
-
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
     resources = holder.resources
     commitment_ref = flags.MakeCommitmentArg(False).ResolveAsResource(
@@ -96,6 +91,31 @@ class Create(base.Command):
     return result
 
 
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class CreateBeta(Create):
+  """Create Google Compute Engine commitments."""
+
+  @classmethod
+  def Args(cls, parser):
+    flags.MakeCommitmentArg(False).AddArgument(parser, operation_type='create')
+    flags.AddCreateFlags(parser, enable_ssd_and_accelerator_support=True)
+    flags.AddReservationArgGroup(parser)
+
+  def _MakeCreateRequest(self, args, messages, project, region, commitment_ref,
+                         holder):
+    commitment = messages.Commitment(
+        reservations=reservation_helper.MakeReservations(
+            args, messages, holder),
+        name=commitment_ref.Name(),
+        plan=flags.TranslatePlanArg(messages, args.plan),
+        resources=flags.TranslateResourcesArgGroup(messages, args))
+    return messages.ComputeRegionCommitmentsInsertRequest(
+        commitment=commitment,
+        project=project,
+        region=commitment_ref.region,
+    )
+
+
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class CreateAlpha(Create):
   """Create Google Compute Engine commitments."""
@@ -103,8 +123,8 @@ class CreateAlpha(Create):
   @classmethod
   def Args(cls, parser):
     flags.MakeCommitmentArg(False).AddArgument(parser, operation_type='create')
-    flags.AddCreateFlags(parser)
-    flags.AddAllocationArgGroup(parser)
+    flags.AddCreateFlags(parser, enable_ssd_and_accelerator_support=True)
+    flags.AddReservationArgGroup(parser)
     messages = apis.GetMessagesModule('compute', 'alpha')
     flags.GetTypeMapperFlag(messages).choice_arg.AddToParser(parser)
 
@@ -113,10 +133,11 @@ class CreateAlpha(Create):
     commitment_type_flag = flags.GetTypeMapperFlag(messages)
     commitment_type = commitment_type_flag.GetEnumForChoice(args.type)
     commitment = messages.Commitment(
-        allocations=allocation_helper.MakeAllocations(args, messages, holder),
+        reservations=reservation_helper.MakeReservations(
+            args, messages, holder),
         name=commitment_ref.Name(),
         plan=flags.TranslatePlanArg(messages, args.plan),
-        resources=flags.TranslateResourcesArg(messages, args.resources),
+        resources=flags.TranslateResourcesArgGroup(messages, args),
         type=commitment_type)
     return messages.ComputeRegionCommitmentsInsertRequest(
         commitment=commitment,

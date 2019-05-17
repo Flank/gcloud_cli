@@ -91,7 +91,7 @@ class CommandType(Enum):
   @classmethod
   def ForName(cls, name):
     try:
-      return CommandType[name.upper()]  # pytype: disable=not-indexable
+      return CommandType[name.upper()]
     except KeyError:
       return CommandType.GENERIC
 
@@ -101,6 +101,8 @@ class Request(object):
 
   def __init__(self, command_type, data):
     self.collection = data['collection']
+    self.disable_resource_check = data.get('disable_resource_check')
+    self.display_resource_type = data.get('display_resource_type')
     self.api_version = data.get('api_version')
     self.method = data.get('method', command_type.default_method)
     if not self.method:
@@ -114,6 +116,7 @@ class Request(object):
     self.modify_request_hooks = [
         util.Hook.FromPath(p) for p in data.get('modify_request_hooks', [])]
     self.create_request_hook = util.Hook.FromData(data, 'create_request_hook')
+    self.modify_method_hook = util.Hook.FromData(data, 'modify_method_hook')
     self.issue_request_hook = util.Hook.FromData(data, 'issue_request_hook')
     self.use_relative_name = data.get('use_relative_name', True)
 
@@ -157,6 +160,8 @@ class Async(object):
     self.result_attribute = data.get('result_attribute')
     self.state = AsyncStateField(data.get('state', {}))
     self.error = AsyncErrorField(data.get('error', {}))
+    self.modify_request_hooks = [
+        util.Hook.FromPath(p) for p in data.get('modify_request_hooks', [])]
 
 
 class IamData(object):
@@ -429,3 +434,4 @@ class UpdateData(object):
   def __init__(self, data):
     self.mask_field = data.get('mask_field', None)
     self.read_modify_update = data.get('read_modify_update', False)
+    self.disable_auto_field_mask = data.get('disable_auto_field_mask', False)

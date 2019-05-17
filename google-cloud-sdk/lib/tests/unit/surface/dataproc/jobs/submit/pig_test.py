@@ -156,5 +156,10 @@ class JobsSubmitPigUnitTestBeta(JobsSubmitPigUnitTest,
     self.assertEqual(self.track, calliope_base.ReleaseTrack.BETA)
 
 
+class JobsSubmitPigUnitTestAlpha(
+    JobsSubmitPigUnitTestBeta, base.DataprocTestBaseAlpha):
+  pass
+
+
 if __name__ == '__main__':
   sdk_test_base.main()

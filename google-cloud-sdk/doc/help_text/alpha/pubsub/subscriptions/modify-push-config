@@ -4,7 +4,10 @@ NAME
 
 SYNOPSIS
     gcloud alpha pubsub subscriptions modify-push-config SUBSCRIPTION
-        --push-endpoint=PUSH_ENDPOINT [GCLOUD_WIDE_FLAG ...]
+        --push-endpoint=PUSH_ENDPOINT
+        [--push-auth-service-account=SERVICE_ACCOUNT_EMAIL]
+        [--push-auth-token-audience=OPTIONAL_AUDIENCE_OVERRIDE]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Modifies the push configuration of a Cloud Pub/Sub subscription.
@@ -26,9 +29,19 @@ REQUIRED FLAGS
         A URL to use as the endpoint for this subscription. This will also
         automatically set the subscription type to PUSH.
 
+OPTIONAL FLAGS
+     --push-auth-service-account=SERVICE_ACCOUNT_EMAIL
+        Service account email used as the identity for the generated Open ID
+        Connect token for authenticated push.
+
+     --push-auth-token-audience=OPTIONAL_AUDIENCE_OVERRIDE
+        Audience used in the generated Open ID Connect token for authenticated
+        push. If not specified, it will be set to the push-endpoint.
+
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

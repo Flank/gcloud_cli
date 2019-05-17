@@ -1,0 +1,119 @@
+title: scc asset update-marks test scenario
+release_tracks: [ALPHA]
+summary:
+- execute:
+  - command: |
+      scc assets update-marks 595423472147994486 --organization 345840165995 --security-marks "probermark=proberTestValue,testA=valueA,testB=valueB"
+  - stdout: |
+      marks:
+        probermark: proberTestValue
+        testA: valueA
+        testB: valueB
+      name: organizations/345840165995/assets/595423472147994486/securityMarks
+actions:
+- execute_command:
+    # Update all marks (skip update-mask)
+    command: |
+      scc assets update-marks 595423472147994486 --organization 345840165995 --security-marks "probermark=proberTestValue,testA=valueA,testB=valueB"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/assets/595423472147994486/securityMarks?alt=json
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              marks:
+                probermark: proberTestValue
+                testA: valueA
+                testB: valueB
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "organizations/345840165995/assets/595423472147994486/securityMarks",
+              "marks": {
+                "probermark": "proberTestValue",
+                "testA": "valueA",
+                "testB": "valueB"
+              }
+            }
+    - expect_stdout: |
+        marks:
+          probermark: proberTestValue
+          testA: valueA
+          testB: valueB
+        name: organizations/345840165995/assets/595423472147994486/securityMarks
+    - expect_exit:
+        code: 0
+- execute_command:
+    # Update all marks (empty update-mask)
+    command: |
+      scc assets update-marks 595423472147994486 --organization 345840165995 --security-marks "probermark=proberTestValue,testA=valueA,testB=valueB" --update-mask ""
+    events:
+    - api_call:
+        expect_request:
+          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/assets/595423472147994486/securityMarks?alt=json
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              marks:
+                probermark: proberTestValue
+                testA: valueA
+                testB: valueB
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "organizations/345840165995/assets/595423472147994486/securityMarks",
+              "marks": {
+                "probermark": "proberTestValue",
+                "testA": "valueA",
+                "testB": "valueB"
+              }
+            }
+    - expect_stdout: |
+        marks:
+          probermark: proberTestValue
+          testA: valueA
+          testB: valueB
+        name: organizations/345840165995/assets/595423472147994486/securityMarks
+    - expect_exit:
+        code: 0
+- execute_command:
+    # Update single mark using update-mask
+    command: |
+      scc assets update-marks 595423472147994486 --organization 345840165995 --security-marks "testA=valueA" --update-mask "marks.testA"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/assets/595423472147994486/securityMarks?alt=json&updateMask=marks.testA
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              marks:
+                testA: valueA
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "organizations/345840165995/assets/595423472147994486/securityMarks",
+              "marks": {
+                "probermark": "proberTestValue",
+                "testA": "valueA",
+                "testB": "valueB"
+              }
+            }
+    - expect_stdout: |
+        marks:
+          probermark: proberTestValue
+          testA: valueA
+          testB: valueB
+        name: organizations/345840165995/assets/595423472147994486/securityMarks
+    - expect_exit:
+        code: 0

@@ -22,12 +22,16 @@ from __future__ import unicode_literals
 import copy
 import datetime
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core.util import times
 from tests.lib import test_case
 from tests.lib.surface.container.binauthz import base
 
 
-class CreateTest(base.BinauthzMockedBetaPolicyClientUnitTest):
+class CreateTest(base.WithMockBetaBinauthz, base.BinauthzTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     self.name = 'bar'
@@ -53,7 +57,7 @@ class CreateTest(base.BinauthzMockedBetaPolicyClientUnitTest):
         datetime.datetime.utcnow())
 
   def testSuccess(self):
-    self.client.projects_attestors.Create.Expect(
+    self.mock_client.projects_attestors.Create.Expect(
         self.req, response=self.updated_attestor)
 
     response = self.RunBinauthz(
@@ -66,7 +70,7 @@ class CreateTest(base.BinauthzMockedBetaPolicyClientUnitTest):
     self.assertEqual(response, self.updated_attestor)
 
   def testSuccess_DestructuredNote(self):
-    self.client.projects_attestors.Create.Expect(
+    self.mock_client.projects_attestors.Create.Expect(
         self.req, response=self.updated_attestor)
 
     response = self.RunBinauthz(
@@ -79,6 +83,12 @@ class CreateTest(base.BinauthzMockedBetaPolicyClientUnitTest):
             name=self.name))
 
     self.assertEqual(response, self.updated_attestor)
+
+
+class CreateAlphaTest(base.WithMockAlphaBinauthz, CreateTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

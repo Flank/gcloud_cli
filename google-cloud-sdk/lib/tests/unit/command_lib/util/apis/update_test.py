@@ -22,6 +22,7 @@ from __future__ import unicode_literals
 from googlecloudsdk.calliope import parser_extensions
 from googlecloudsdk.command_lib.util.apis import registry
 from googlecloudsdk.command_lib.util.apis import update
+from googlecloudsdk.command_lib.util.apis import yaml_command_schema
 from tests.lib import parameterized
 from tests.lib import sdk_test_base
 
@@ -50,6 +51,20 @@ class GetMaskStringTest(sdk_test_base.WithOutputCapture,
         ['nodes', 'instance.nodeCount']], 'fieldMask', 'displayName,nodeCount'),
   )
   def testGet(self, param_arr, mask_path, expected_string):
+    args = parser_extensions.Namespace(_specified_args={
+        'nodes': '--nodes',
+        'description': '--description'
+    })
+    self._MakeSpec(param_arr)
+    mask_string = update.GetMaskString(args, self.spec, mask_path)
+    self.assertEqual(expected_string, mask_string)
+
+  @parameterized.parameters(
+      ([['description', None]], 'fieldMask', ''),
+      ([['description', None], ['nodes', 'instance.nodeCount']],
+       'fieldMask', 'nodeCount')
+  )
+  def testGetNoApiField(self, param_arr, mask_path, expected_string):
     args = parser_extensions.Namespace(_specified_args={
         'nodes': '--nodes',
         'description': '--description'
@@ -108,6 +123,35 @@ class GetMaskStringTest(sdk_test_base.WithOutputCapture,
     self._MakeSpec(param_arr)
     mask_string = update.GetMaskString(args, self.spec, mask_path)
     self.assertEqual(expected_string, mask_string)
+
+  @parameterized.parameters(
+      ([['enable-feature', 'updateInstanceRequest.instance.enableFeature']],
+       'updateInstanceRequest.fieldMask',
+       'enableFeature'),)
+  def testGetNegativeBooleanArgs(self, param_arr, mask_path, expected_string):
+    args = parser_extensions.Namespace(_specified_args={
+        'enable-feature': '--no-enable-feature',
+    })
+    self._MakeSpec(param_arr)
+    mask_string = update.GetMaskString(args, self.spec, mask_path)
+    self.assertEqual(expected_string, mask_string)
+
+  def testGetArgGroup(self):
+    arg1 = mock.MagicMock(arg_name='arg1', api_field='updateRequest.field1')
+    arg2 = mock.MagicMock(arg_name='arg2', api_field='updateRequest.field2')
+    arg3 = mock.MagicMock(arg_name='arg3', api_field='updateRequest.field3')
+    group1 = mock.MagicMock(
+        spec=yaml_command_schema.ArgumentGroup,
+        arguments=[arg2, arg3])
+    self.spec.arguments.params = [arg1, group1]
+
+    args = parser_extensions.Namespace(_specified_args={
+        'arg1': '--arg1',
+        'arg2': '--arg2',
+        'arg3': '--arg3'
+    })
+    mask_string = update.GetMaskString(args, self.spec, 'fieldMask')
+    self.assertEqual('field1,field2,field3', mask_string)
 
 
 class GetMaskFieldPathTest(sdk_test_base.WithOutputCapture,

@@ -111,18 +111,16 @@ class DatalabIntegrationTest(sdk_test_base.BundledBase,
     self.AssertNewOutputContains('datalab-notebooks')
     return
 
-  @test_case.Filters.skip('Failing', 'b/120486647')
   @sdk_test_base.Filters.RunOnlyInBundle  # Requires datalab component
   def testCreateAndDelete(self):
     self._TestInstanceCreationOnly()
     self._TestDelete()
     return
 
-  @test_case.Filters.skip('Failing', 'b/120486647')
+  # Never run this because the way it fails (killed after timeout) prevents it
+  # from being silenced properly.
+  @test_case.Filters.skipAlways('Failing', 'b/120486647')
   @sdk_test_base.Filters.RunOnlyInBundle  # Requires datalab component
-  @sdk_test_base.Filters.SkipOnWindows(
-      'DatalabIntegrationTest.testCreateConnectDelete frequently timing out on '
-      'windows', 'b/76138853')
   def testCreateConnectDelete(self):
     self._TestInstanceCreation(machine_type='n1-highmem-2')
     try:

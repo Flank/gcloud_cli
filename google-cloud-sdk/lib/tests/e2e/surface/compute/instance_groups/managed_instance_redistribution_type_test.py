@@ -30,7 +30,7 @@ class ManagedInstanceGroupsInstanceRedistributionTypeTest(
   def SetUp(self):
     self.prefix = 'mig-instance-redistribution-type'
     self.scope = e2e_test_base.REGIONAL
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testCreateManagedInstanceGroupWithInstanceRedistributionType(self):
     instance_template_name = self.CreateInstanceTemplate()

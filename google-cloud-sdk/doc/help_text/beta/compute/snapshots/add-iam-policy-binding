@@ -30,17 +30,18 @@ REQUIRED FLAGS
         domain:example.domain.com.
 
         Can also be one of the following special values:
-        * allUsers - anyone who is on the internet, with or without a Google
-          account.
-        * allAuthenticatedUsers - anyone who is authenticated with a Google
-          account or a service account.
+        * allUsers - Special identifier that represents anyone who is on the
+          internet, with or without a Google account.
+        * allAuthenticatedUsers - Special identifier that represents anyone
+          who is authenticated with a Google account or a service account.
 
      --role=ROLE
         Define the role of the member.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -61,8 +62,9 @@ EXAMPLES
     policy role and member types.
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud compute snapshots add-iam-policy-binding
         $ gcloud alpha compute snapshots add-iam-policy-binding
 

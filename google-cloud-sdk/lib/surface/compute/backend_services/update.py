@@ -98,6 +98,7 @@ class UpdateGA(base.UpdateCommand):
     signed_url_flags.AddSignedUrlCacheMaxAge(
         parser, required=False, unspecified_help='')
     AddIapFlag(parser)
+    flags.AddCustomRequestHeaders(parser, remove_all_flag=True, default=None)
 
   def _GetSetSecurityPolicyRequest(self, client, backend_service_ref,
                                    security_policy_ref):
@@ -154,6 +155,10 @@ class UpdateGA(base.UpdateCommand):
     if args.connection_draining_timeout is not None:
       replacement.connectionDraining = client.messages.ConnectionDraining(
           drainingTimeoutSec=args.connection_draining_timeout)
+    if args.no_custom_request_headers is not None:
+      replacement.customRequestHeaders = []
+    if args.custom_request_header is not None:
+      replacement.customRequestHeaders = args.custom_request_header
 
     if args.IsSpecified('description'):
       replacement.description = args.description
@@ -193,6 +198,9 @@ class UpdateGA(base.UpdateCommand):
     self._ApplyIapArgs(client, args.iap, existing, replacement)
 
     cleared_fields = []
+    if not replacement.customRequestHeaders:
+      cleared_fields.append('customRequestHeaders')
+
     return replacement, cleared_fields
 
   def ValidateArgs(self, args):
@@ -200,6 +208,8 @@ class UpdateGA(base.UpdateCommand):
     if not any([
         args.affinity_cookie_ttl is not None,
         args.connection_draining_timeout is not None,
+        args.no_custom_request_headers is not None,
+        args.custom_request_header is not None,
         args.description is not None,
         args.enable_cdn is not None,
         args.cache_key_include_protocol is not None,
@@ -334,6 +344,8 @@ class UpdateAlpha(UpdateGA):
     flags.AddConnectionDrainOnFailover(parser, default=None)
     flags.AddDropTrafficIfUnhealthy(parser, default=None)
     flags.AddFailoverRatio(parser)
+    flags.AddEnableLogging(parser, default=None)
+    flags.AddLoggingSampleRate(parser)
     AddIapFlag(parser)
     flags.AddCustomRequestHeaders(parser, remove_all_flag=True, default=None)
 
@@ -345,10 +357,6 @@ class UpdateAlpha(UpdateGA):
     if args.connection_draining_timeout is not None:
       replacement.connectionDraining = client.messages.ConnectionDraining(
           drainingTimeoutSec=args.connection_draining_timeout)
-    if args.no_custom_request_headers is not None:
-      replacement.customRequestHeaders = []
-    if args.custom_request_header is not None:
-      replacement.customRequestHeaders = args.custom_request_header
 
     backend_services_utils.ApplyCdnPolicyArgs(
         client,
@@ -360,8 +368,9 @@ class UpdateAlpha(UpdateGA):
     backend_services_utils.ApplyFailoverPolicyArgs(client.messages, args,
                                                    replacement)
 
-    if not replacement.customRequestHeaders:
-      cleared_fields.append('customRequestHeaders')
+    backend_services_utils.ApplyLogConfigArgs(client.messages, args,
+                                              replacement)
+
     return replacement, cleared_fields
 
   def ValidateArgs(self, args):
@@ -388,7 +397,9 @@ class UpdateAlpha(UpdateGA):
         args.timeout is not None,
         args.connection_drain_on_failover is not None,
         args.drop_traffic_if_unhealthy is not None,
-        args.failover_ratio,
+        args.failover_ratio is not None,
+        args.enable_logging is not None,
+        args.logging_sample_rate is not None,
         getattr(args, 'health_checks', None),
         getattr(args, 'https_health_checks', None),
     ]):
@@ -400,6 +411,11 @@ class UpdateAlpha(UpdateGA):
       raise exceptions.InvalidArgumentException(
           '--global',
           'cannot specify failover policies for global backend services.')
+    if (backend_service_ref.Collection() == 'compute.regionBackendServices'
+       ) and replacement.logConfig is not None:
+      raise exceptions.InvalidArgumentException(
+          '--region',
+          'cannot specify logging options for regional backend services.')
     return super(UpdateAlpha, self).GetSetRequest(client, backend_service_ref,
                                                   replacement)
 
@@ -449,6 +465,11 @@ class UpdateBeta(UpdateGA):
     flags.AddCacheKeyIncludeQueryString(parser, default=None)
     flags.AddCacheKeyQueryStringList(parser)
     flags.AddCustomRequestHeaders(parser, remove_all_flag=True, default=None)
+    flags.AddConnectionDrainOnFailover(parser, default=None)
+    flags.AddDropTrafficIfUnhealthy(parser, default=None)
+    flags.AddFailoverRatio(parser)
+    flags.AddEnableLogging(parser, default=None)
+    flags.AddLoggingSampleRate(parser)
     signed_url_flags.AddSignedUrlCacheMaxAge(
         parser, required=False, unspecified_help='')
 
@@ -460,10 +481,6 @@ class UpdateBeta(UpdateGA):
     if args.connection_draining_timeout is not None:
       replacement.connectionDraining = client.messages.ConnectionDraining(
           drainingTimeoutSec=args.connection_draining_timeout)
-    if args.no_custom_request_headers is not None:
-      replacement.customRequestHeaders = []
-    if args.custom_request_header is not None:
-      replacement.customRequestHeaders = args.custom_request_header
 
     backend_services_utils.ApplyCdnPolicyArgs(
         client,
@@ -472,8 +489,12 @@ class UpdateBeta(UpdateGA):
         is_update=True,
         apply_signed_url_cache_max_age=True)
 
-    if not replacement.customRequestHeaders:
-      cleared_fields.append('customRequestHeaders')
+    backend_services_utils.ApplyFailoverPolicyArgs(client.messages, args,
+                                                   replacement)
+
+    backend_services_utils.ApplyLogConfigArgs(client.messages, args,
+                                              replacement)
+
     return replacement, cleared_fields
 
   def ValidateArgs(self, args):
@@ -500,5 +521,24 @@ class UpdateBeta(UpdateGA):
         args.session_affinity is not None,
         args.IsSpecified('signed_url_cache_max_age'),
         args.timeout is not None,
+        args.connection_drain_on_failover is not None,
+        args.drop_traffic_if_unhealthy is not None,
+        args.failover_ratio is not None,
+        args.enable_logging is not None,
+        args.logging_sample_rate is not None,
     ]):
       raise exceptions.ToolException('At least one property must be modified.')
+
+  def GetSetRequest(self, client, backend_service_ref, replacement):
+    if (backend_service_ref.Collection() == 'compute.backendServices') and (
+        replacement.failoverPolicy):
+      raise exceptions.InvalidArgumentException(
+          '--global',
+          'cannot specify failover policies for global backend services.')
+    if (backend_service_ref.Collection() == 'compute.regionBackendServices'
+       ) and replacement.logConfig is not None:
+      raise exceptions.InvalidArgumentException(
+          '--region',
+          'cannot specify logging options for regional backend services.')
+    return super(UpdateBeta, self).GetSetRequest(client, backend_service_ref,
+                                                 replacement)

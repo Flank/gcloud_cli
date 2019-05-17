@@ -31,8 +31,10 @@ from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.core.credentials import devshell_test_base
 import httplib2
+import mock
 
 from oauth2client import client
+from oauth2client import crypt
 from oauth2client import service_account
 from oauth2client.contrib import gce as oauth2client_gce
 
@@ -48,6 +50,7 @@ class StoreTests(sdk_test_base.WithLogCapture):
         'access-token', 'client_id', 'client_secret',
         'fake-token', None, 'token_uri', 'user_agent',
         scopes=config.CLOUDSDK_SCOPES)
+    self.crypt_mock = self.StartObjectPatch(crypt, 'make_signed_jwt')
     self.refresh_mock = self.StartObjectPatch(client.OAuth2Credentials,
                                               'refresh')
     self.request_mock = self.StartObjectPatch(httplib2.Http, 'request',
@@ -276,6 +279,38 @@ gs_oauth2_refresh_token = fake-token
     self.assertIn(store.GOOGLE_OAUTH2_PROVIDER_REVOKE_URI, call_url)
     with self.assertRaises(store.NoCredentialsForAccountException):
       store.Load()
+
+  def testRevokeServiceAccountToken(self):
+    self.accounts_mock = ''
+    self.response_mock.status = 400
+    fake_content = '{"error":"invalid_request"}'
+    self.request_mock.return_value = self.response_mock, fake_content
+    credentials = store.AcquireFromToken(self.fake_cred.refresh_token)
+    store.Store(credentials, self.fake_account)
+    result = store.Revoke()
+    self.assertFalse(result)
+    self.refresh_mock.assert_not_called()
+    # check that we made an HTTP request to the correct revoke URL
+    self.assertIsNotNone(self.request_mock.call_args)
+    call_args, unused_kwargs = self.request_mock.call_args
+    call_url = call_args[1]
+    self.assertIn(store.GOOGLE_OAUTH2_PROVIDER_REVOKE_URI, call_url)
+    with self.assertRaises(store.NoCredentialsForAccountException):
+      store.Load()
+
+  def testRefreshServiceAccountId(self):
+    """Test that store.Refresh refreshes a service account's id_token."""
+    properties.VALUES.auth.credential_file_override.Set(self.json_file)
+    loaded = store.Load()
+    loaded.token_response = {'id_token': 'old-id-token'}
+    self.assertIsInstance(loaded, service_account.ServiceAccountCredentials)
+    http_mock = mock.Mock()
+    http_mock.request.return_value = (
+        mock.Mock(status=200),
+        json.dumps({'id_token': 'fresh-id-token'}))
+    store.Refresh(loaded, http_client=http_mock)
+    self.assertEqual(loaded.id_tokenb64, 'fresh-id-token')
+    self.assertEqual(loaded.token_response['id_token'], 'fresh-id-token')
 
   def testRefreshError(self):
     self.refresh_mock.side_effect = client.AccessTokenRefreshError

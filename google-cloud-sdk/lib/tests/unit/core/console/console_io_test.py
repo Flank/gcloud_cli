@@ -801,6 +801,17 @@ class ProgressBarAsciiArtTests(sdk_test_base.WithOutputCapture):
         '#= Installing                           =#\n'
         '#========================================#\n')
 
+  def testProgressBarScreenReader(self):
+    pb = console_io.ProgressBar('Test Action', screen_reader=True)
+    pb.Start()
+    self.AssertErrEquals('Test Action\n')
+    pb.SetProgress(0.02)
+    self.AssertErrEquals('Test Action\n')
+    pb.SetProgress(0.33)
+    self.AssertErrEquals('Test Action\n33%\n')
+    pb.Finish()
+    self.AssertErrEquals('Test Action\n33%\n100%\n')
+
 
 class TickableProgressBarTests(sdk_test_base.WithOutputCapture):
 

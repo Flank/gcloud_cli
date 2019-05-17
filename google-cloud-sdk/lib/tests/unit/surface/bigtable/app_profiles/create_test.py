@@ -26,11 +26,11 @@ from tests.lib import test_case
 from tests.lib.surface.bigtable import base
 
 
-class AppProfileCreateTestsBeta(base.BigtableV2TestBase,
-                                cli_test_base.CliTestBase):
+class AppProfileCreateTestsGA(base.BigtableV2TestBase,
+                              cli_test_base.CliTestBase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.clusters_list_mock = self.client.projects_instances_clusters.List
@@ -82,8 +82,6 @@ class AppProfileCreateTestsBeta(base.BigtableV2TestBase,
                '--route-any --transactional-writes')
       self.app_profile_create_mock.assert_not_called()
 
-  @test_case.Filters.SkipOnWindows('Completion unsupported on Windows',
-                                   'b/24905560')
   def testRouteToCompletion(self):
     self.clusters_list_mock.Expect(
         request=self.msgs.BigtableadminProjectsInstancesClustersListRequest(
@@ -100,6 +98,12 @@ class AppProfileCreateTestsBeta(base.BigtableV2TestBase,
     self.RunCompletion(
         'bigtable app-profiles create myprofile '
         '--instance theinstance --route-to c', ['cluster0', 'cluster1'])
+
+
+class AppProfileCreateTestsBeta(AppProfileCreateTestsGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class AppProfileCreateTestsAlpha(AppProfileCreateTestsBeta):

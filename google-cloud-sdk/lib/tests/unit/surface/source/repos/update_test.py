@@ -21,15 +21,14 @@ from __future__ import unicode_literals
 import re
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.source import util
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.source import base
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA)
-class TopicsAddTest(base.SourceTestBase):
+class TopicsAddTestGA(base.SourceTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.repo_name = 'projects/{}/repos/my-repo'.format(self.Project())
@@ -59,8 +58,7 @@ class TopicsAddTest(base.SourceTestBase):
                     key=new_topic_name, value=new_pubsub_config)
             ]))
 
-  def testAdd(self, track):
-    self.track = track
+  def testAdd(self):
     topic_name_1 = 'projects/{}/topics/foo'.format(self.Project())
     topic_name_2 = 'projects/{}/topics/foo2'.format(self.Project())
     initial_repo = self._InitialRepo(topic_name_1)
@@ -71,8 +69,7 @@ class TopicsAddTest(base.SourceTestBase):
     self.Run('source repos update my-repo --add-topic foo2 '
              '--message-format=protobuf --service-account=b@gmail.com')
 
-  def testAdd_TopicProject(self, track):
-    self.track = track
+  def testAdd_TopicProject(self):
     topic_name_1 = 'projects/{}/topics/foo'.format(self.Project())
     topic_name_2 = 'projects/another-project/topics/foo2'
     initial_repo = self._InitialRepo(topic_name_1)
@@ -85,10 +82,22 @@ class TopicsAddTest(base.SourceTestBase):
              '--message-format=protobuf --service-account=b@gmail.com')
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA)
-class TopicsRemoveTest(base.SourceTestBase):
+class TopicsAddTestBeta(TopicsAddTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class TopicsAddTestAlpha(TopicsAddTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class TopicsRemoveTestGA(base.SourceTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.repo_ref = self._GetRepoRef()
@@ -118,8 +127,7 @@ class TopicsRemoveTest(base.SourceTestBase):
                     key=topic_name, value=pubsub_config)
             ]))
 
-  def testRemove(self, track):
-    self.track = track
+  def testRemove(self):
     topic_name_1 = 'projects/{}/topics/foo'.format(self.Project())
     topic_name_2 = 'projects/{}/topics/foo2'.format(self.Project())
     initial_repo = self._InitialRepo(topic_name_1, topic_name_2)
@@ -129,8 +137,7 @@ class TopicsRemoveTest(base.SourceTestBase):
 
     self.Run('source repos update my-repo --remove-topic=foo2')
 
-  def testRemove_TopicProject(self, track):
-    self.track = track
+  def testRemove_TopicProject(self):
     topic_name_1 = 'projects/{}/topics/foo'.format(self.Project())
     topic_name_2 = 'projects/another-project/topics/foo2'
     initial_repo = self._InitialRepo(topic_name_1, topic_name_2)
@@ -141,8 +148,7 @@ class TopicsRemoveTest(base.SourceTestBase):
     self.Run('source repos update my-repo '
              '--remove-topic=foo2 --topic-project=another-project')
 
-  def testRemove_InvalidTopic(self, track):
-    self.track = track
+  def testRemove_InvalidTopic(self):
     topic_name_1 = 'projects/{}/topics/foo'.format(self.Project())
     topic_name_2 = 'projects/another-project/topics/foo2'
     initial_repo = self._InitialRepo(topic_name_1, topic_name_2)
@@ -154,8 +160,7 @@ class TopicsRemoveTest(base.SourceTestBase):
     with self.assertRaisesRegex(util.InvalidTopicError, error_message):
       self.Run('source repos update my-repo --remove-topic=foo3')
 
-  def testRemove_Empty(self, track):
-    self.track = track
+  def testRemove_Empty(self):
     initial_repo = self.messages.Repo(name=self.repo_name)
     self._ExpectGetRepo(self.repo_ref, initial_repo)
     error_message = re.escape(
@@ -166,10 +171,22 @@ class TopicsRemoveTest(base.SourceTestBase):
       self.Run('source repos update my-repo --remove-topic=foo')
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA)
-class TopicsUpdateTest(base.SourceTestBase):
+class TopicsRemoveTestBeta(TopicsRemoveTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class TopicsRemoveTestAlpha(TopicsRemoveTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class TopicsUpdateTestGA(base.SourceTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.repo_ref = self._GetRepoRef()
@@ -197,8 +214,7 @@ class TopicsUpdateTest(base.SourceTestBase):
                     key=topic_name, value=pubsub_config)
             ]))
 
-  def testUpdate(self, track):
-    self.track = track
+  def testUpdate(self):
     topic_name = 'projects/{}/topics/foo'.format(self.Project())
     initial_repo = self._InitialRepo(topic_name)
     updated_repo = self._UpdatedRepo(topic_name, 'protobuf')
@@ -208,8 +224,7 @@ class TopicsUpdateTest(base.SourceTestBase):
     self.Run('source repos update my-repo --update-topic=foo '
              '--message-format=protobuf --service-account=b@gmail.com')
 
-  def testUpdate_TopicProject(self, track):
-    self.track = track
+  def testUpdate_TopicProject(self):
     topic_name = 'projects/another-project/topics/foo'
     initial_repo = self._InitialRepo(topic_name)
     updated_repo = self._UpdatedRepo(topic_name, 'protobuf')
@@ -220,8 +235,7 @@ class TopicsUpdateTest(base.SourceTestBase):
              '--topic-project=another-project '
              '--message-format=protobuf --service-account=b@gmail.com')
 
-  def testUpdate_InvalidTopic(self, track):
-    self.track = track
+  def testUpdate_InvalidTopic(self):
     topic_name = 'projects/{}/topics/foo'.format(self.Project())
     initial_repo = self._InitialRepo(topic_name)
     self._ExpectGetRepo(self.repo_ref, initial_repo)
@@ -232,8 +246,7 @@ class TopicsUpdateTest(base.SourceTestBase):
     with self.assertRaisesRegex(util.InvalidTopicError, error_message):
       self.Run('source repos update my-repo --update-topic=foo3')
 
-  def testUpdate_Empty(self, track):
-    self.track = track
+  def testUpdate_Empty(self):
     initial_repo = self.messages.Repo(name=self.repo_name)
     self._ExpectGetRepo(self.repo_ref, initial_repo)
     error_message = re.escape(
@@ -243,8 +256,7 @@ class TopicsUpdateTest(base.SourceTestBase):
     with self.assertRaisesRegex(util.InvalidTopicError, error_message):
       self.Run('source repos update my-repo --update-topic=foo')
 
-  def testUpdate_WithUnchangedMessageFormat(self, track):
-    self.track = track
+  def testUpdate_WithUnchangedMessageFormat(self):
     topic_name = 'projects/{}/topics/foo'.format(self.Project())
     initial_repo = self._InitialRepo(topic_name, 'protobuf')
     updated_repo = self._UpdatedRepo(topic_name, 'protobuf')
@@ -254,14 +266,25 @@ class TopicsUpdateTest(base.SourceTestBase):
     self.Run('source repos update my-repo --update-topic=foo '
              '--service-account=b@gmail.com')
 
-  def testUpdate_WithUnchangedData(self, track):
-    self.track = track
+  def testUpdate_WithUnchangedData(self):
     topic_name = 'projects/{}/topics/foo'.format(self.Project())
     initial_repo = self._InitialRepo(topic_name, 'protobuf')
     self._ExpectGetRepo(self.repo_ref, initial_repo)
     self._ExpectPatchRepo(initial_repo)
 
     self.Run('source repos update my-repo --update-topic=foo ')
+
+
+class TopicsUpdateTestBeta(TopicsUpdateTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class TopicsUpdateTestAlpha(TopicsUpdateTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

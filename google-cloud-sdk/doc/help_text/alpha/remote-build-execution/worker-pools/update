@@ -5,8 +5,8 @@ NAME
 SYNOPSIS
     gcloud alpha remote-build-execution worker-pools update
         (WORKERPOOL : --instance=INSTANCE) [--async] [--disk-size=DISK_SIZE]
-        [--machine-type=MACHINE_TYPE] [--worker-count=WORKER_COUNT]
-        [GCLOUD_WIDE_FLAG ...]
+        [--machine-type=MACHINE_TYPE] [--min-cpu-platform=MIN_CPU_PLATFORM]
+        [--reserved] [--worker-count=WORKER_COUNT] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Updates the configuration of a Remote Build Execution worker pool.
@@ -44,12 +44,21 @@ FLAGS
 
         $ gcloud compute machine-types list
 
+     --min-cpu-platform=MIN_CPU_PLATFORM
+        Minimum CPU platform for the workers. For more information see
+        https://cloud.google.com/compute/docs/cpu-platforms.
+
+     --reserved
+        Determines the type of VM to use. If set then reserved VMs are used,
+        otherwise preemptable VMs are used.
+
      --worker-count=WORKER_COUNT
         Number of workers that should be in the worker pool.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

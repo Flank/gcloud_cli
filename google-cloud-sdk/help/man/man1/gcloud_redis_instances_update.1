@@ -97,7 +97,8 @@ numbers.
 A list of Redis config KEY=VALUE pairs to update according to
 http://redis.io/topics/config. If a config parameter is already set, its value
 is modified; otherwise a new Redis config parameter is added. Currently, the
-only supported parameters are: maxmemory\-policy, notify\-keyspace\-events.
+only supported parameters are: maxmemory\-policy, notify\-keyspace\-events,
+activedefrag, lfu\-log\-factor, lfu\-decay\-time.
 
 .TP 2m
 
@@ -133,10 +134,11 @@ List of label keys to remove. If a label does not exist it is silently ignored.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

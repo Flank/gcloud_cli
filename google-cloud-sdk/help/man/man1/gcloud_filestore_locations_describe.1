@@ -1,0 +1,77 @@
+
+.TH "GCLOUD_FILESTORE_LOCATIONS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud filestore locations describe \- describe a Cloud Filestore location
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud filestore locations describe\fR \fIZONE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(DEPRECATED)\fR \f5gcloud filestore locations\fR is deprecated. Use \f5gcloud
+filestore zones\fR or \f5gcloud filestore regions\fR instead.
+
+Describe a Cloud Filestore location.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Zone resource \- The location to describe. This represents a Cloud resource.
+(NOTE) Some attributes are not given arguments in this group but can be set in
+other ways. To set the [project] attribute: provide the argument [zone] on the
+command line with a fully specified name; provide the argument [\-\-project] on
+the command line; set the property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIZONE\fR
+ID of the zone or fully qualified identifier for the zone.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+The following command shows the details for the Cloud Filestore location named
+NAME.
+
+.RS 2m
+$ gcloud filestore locations describe NAME
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha filestore locations describe
+$ gcloud beta filestore locations describe
+.RE
+

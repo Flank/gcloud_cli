@@ -9,6 +9,7 @@ SYNOPSIS
         [--labels=[KEY=VALUE,...]] [--networks=[NETWORK,...]]
         [--visibility=VISIBILITY; default="public"]
         [--zsk-algorithm=ZSK_ALGORITHM] [--zsk-key-length=ZSK_KEY_LENGTH]
+        [--target-network=TARGET_NETWORK --target-project=TARGET_PROJECT]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -42,7 +43,7 @@ OPTIONAL FLAGS
 
      --forwarding-targets=[IP_ADDRESSES,...]
         List of IPv4 addresses of target name servers that the zone will
-        forward queries to. Ignored for private visibility.
+        forward queries to. Ignored for public visibility.
 
      --ksk-algorithm=KSK_ALGORITHM
         String mnemonic specifying the DNSSEC algorithm of the key-signing key.
@@ -78,9 +79,18 @@ OPTIONAL FLAGS
      --zsk-key-length=ZSK_KEY_LENGTH
         Length of the zone-signing key in bits. Requires DNSSEC enabled.
 
+     --target-network=TARGET_NETWORK
+        The network id of the Google Compute Engine private network to forward
+        queries to.
+
+     --target-project=TARGET_PROJECT
+        The project id of the Google Compute Engine private network to forward
+        queries to.
+
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

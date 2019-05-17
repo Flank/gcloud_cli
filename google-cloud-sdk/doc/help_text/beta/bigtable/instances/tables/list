@@ -3,14 +3,14 @@ NAME
         instance tables
 
 SYNOPSIS
-    gcloud beta bigtable instances tables list [--instances=[INSTANCE,...]]
+    gcloud beta bigtable instances tables list --instances=[INSTANCE,...]
         [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
         [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) List existing Bigtable instance tables.
 
-FLAGS
+REQUIRED FLAGS
      --instances=[INSTANCE,...]
         ID of the instances.
 
@@ -44,8 +44,9 @@ LIST COMMAND FLAGS
         Print a list of resource URIs instead of the default output.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

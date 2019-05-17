@@ -98,6 +98,63 @@ class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
     self.assertEqual(m.repeated_message[0].string1, 'e')
     self.assertEqual(m.repeated_message[0].string2, 'f')
 
+  @parameterized.named_parameters(
+      ('InnerMessageInt',
+       {'int1': 1},
+       'message1',
+       fm.FakeMessage(message1=fm.FakeMessage.InnerMessage(int1=1))),
+      ('RepeatedMessage',
+       [{'enum1': 'THING_ONE'}, {'enum1': 'THING_TWO'}],
+       'repeated_message',
+       fm.FakeMessage(repeated_message=[
+           fm.FakeMessage.InnerMessage(enum1=fm.FakeMessage.FakeEnum.THING_ONE),
+           fm.FakeMessage.InnerMessage(enum1=fm.FakeMessage.FakeEnum.THING_TWO)
+       ])),
+      ('InnerMessageEnum',
+       {'enum1': 'THING_ONE'},
+       'message1',
+       fm.FakeMessage(message1=fm.FakeMessage.InnerMessage(
+           enum1=fm.FakeMessage.FakeEnum.THING_ONE))),
+      ('DeeperMessage',
+       {'deeper_message': {'deep_string': 's'}},
+       'message2',
+       fm.FakeMessage(
+           message2=fm.FakeMessage.InnerMessage2(
+               deeper_message=fm.FakeMessage.InnerMessage2.DeeperMessage(
+                   deep_string='s'))))
+  )
+  def testSetObjectFieldInMessage(self, obj, field, expected):
+    m = fm.FakeMessage()
+    arg_utils.SetFieldInMessage(m, field, obj)
+    self.assertEqual(m, expected)
+
+  @parameterized.named_parameters(
+      ('Same level',
+       fm.FakeMessage(int1=1),
+       '',
+       fm.FakeMessage(int1=1)),
+      ('Field in top level message',
+       fm.FakeMessage.InnerMessage(int1=1),
+       'message1',
+       fm.FakeMessage(message1=fm.FakeMessage.InnerMessage(int1=1))),
+      ('Field in nested message',
+       fm.FakeMessage.InnerMessage2.DeeperMessage(deep_string='s'),
+       'message2',
+       fm.FakeMessage(
+           message2=fm.FakeMessage.InnerMessage2(
+               deeper_message=fm.FakeMessage.InnerMessage2.DeeperMessage(
+                   deep_string='s')))),
+  )
+  def testParseExistingMessageIntoMessage(self,
+                                          existing_message,
+                                          method_request_field,
+                                          expected_message):
+    message = fm.FakeMessage()
+    method = mock.MagicMock(request_field=method_request_field)
+    parsed_message = arg_utils.ParseExistingMessageIntoMessage(
+        message, existing_message, method)
+    self.assertEqual(parsed_message, expected_message)
+
   @parameterized.parameters(
       ('THING_ONE', 'thing-one'),
       ('THING-ONE', 'thing-one'),
@@ -129,6 +186,14 @@ class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
         arg_parsers.ArgumentTypeError,
         r'Invalid choice: badchoice. Valid choices are: \[a, b\].'):
       arg_utils.ChoiceToEnum('badchoice', fm.FakeMessage.FakeEnum,
+                             valid_choices=['a', 'b'])
+
+    # With valid choices specified, and custom item type
+    with self.assertRaisesRegex(
+        arg_parsers.ArgumentTypeError,
+        r'Invalid sproket: badchoice. Valid choices are: \[a, b\].'):
+      arg_utils.ChoiceToEnum('badchoice', fm.FakeMessage.FakeEnum,
+                             item_type='sproket',
                              valid_choices=['a', 'b'])
 
     # With no valid choices specified, validate against the enum
@@ -639,6 +704,7 @@ class ArgUtilTests(base.Base, sdk_test_base.SdkBase, parameterized.TestCase):
     self.MockCRUDMethods(('foo.projects.locations.instances', True))
     method = registry.GetMethod('foo.projects.locations.instances', 'create')
     message = method.GetRequestType()()
+    message.field_by_name = mock.MagicMock()
     ref = resources.REGISTRY.Parse(
         'projects/p/locations/l/instances/i',
         collection=method.resource_argument_collection.full_name)

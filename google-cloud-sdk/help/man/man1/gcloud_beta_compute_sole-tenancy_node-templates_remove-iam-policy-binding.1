@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta compute sole\-tenancy node\-templates remove\-iam\-policy\-binding \- remove IAM policy binding of a Google Compute Engine node template
+gcloud beta compute sole\-tenancy node\-templates remove\-iam\-policy\-binding \- remove IAM policy binding from a Google Compute Engine node template
 
 
 
@@ -17,7 +17,7 @@ gcloud beta compute sole\-tenancy node\-templates remove\-iam\-policy\-binding \
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Remove an IAM policy binding of a Google Compute Engine node
+\fB(BETA)\fR Remove an IAM policy binding from a Google Compute Engine node
 template.
 
 
@@ -66,11 +66,11 @@ Examples: \f5user:test\-user@gmail.com\fR, \f5group:admins@example.com\fR,
 Can also be one of the following special values:
 .RS 2m
 .IP "\(em" 2m
-\f5allUsers\fR \- anyone who is on the internet, with or without a Google
-account.
+\f5allUsers\fR \- Special identifier that represents anyone who is on the
+internet, with or without a Google account.
 .IP "\(em" 2m
-\f5allAuthenticatedUsers\fR \- anyone who is authenticated with a Google account
-or a service account.
+\f5allAuthenticatedUsers\fR \- Special identifier that represents anyone who is
+authenticated with a Google account or a service account.
 .RE
 .RE
 .sp
@@ -86,10 +86,11 @@ The role to remove the member from.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -105,13 +106,12 @@ https://developers.google.com/compute/docs/reference/latest/
 
 To remove an IAM policy binding for the role of 'roles/compute.admin' for the
 user 'test\-user@gmail.com' with node template 'my\-node\-template' and region
-\'us\-central1', run:
+\'REGION', run:
 
 .RS 2m
 $ gcloud beta compute sole\-tenancy node\-templates \e
-    remove\-iam\-policy\-binding my\-node\-template \e
-    \-\-region='us\-central1' \-\-member='user:test\-user@gmail.com' \e
-    \-\-role='roles/compute.admin'
+    remove\-iam\-policy\-binding my\-node\-template \-\-region=REGION \e
+    \-\-member='user:test\-user@gmail.com' \-\-role='roles/compute.admin'
 .RE
 
 See https://cloud.google.com/iam/docs/managing\-policies for details of policy
@@ -121,10 +121,12 @@ role and member types.
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
+$ gcloud compute sole\-tenancy node\-templates \e
+    remove\-iam\-policy\-binding
 $ gcloud alpha compute sole\-tenancy node\-templates \e
     remove\-iam\-policy\-binding
 .RE

@@ -283,7 +283,8 @@ class DeployTestBase(base.FunctionsTestBase):
                          source_upload_url=None,
                          timeout=None,
                          labels=None,
-                         env_vars=None):
+                         env_vars=None,
+                         runtime=None):
     if labels is None:
       labels = self.GetLabelsMessage()
     if source_repository_url:
@@ -303,7 +304,8 @@ class DeployTestBase(base.FunctionsTestBase):
         timeout=timeout,
         labels=labels,
         availableMemoryMb=memory,
-        environmentVariables=env_vars)
+        environmentVariables=env_vars,
+        runtime=runtime)
 
   def ExpectFunctionPatch(
       self, function_name, original_function, updated_function,
@@ -349,7 +351,7 @@ class PackagingTest(DeployTestBase):
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
         https_trigger=self.messages.HttpsTrigger(),
-        source_upload_url='foo')
+        source_upload_url='foo', runtime='nodejs6')
     create_request = self.GetFunctionsCreateRequest(function, location)
     operation = self._GenerateActiveOperation('operations/operation')
     self.mock_client.projects_locations_functions.Create.Expect(
@@ -360,7 +362,7 @@ class PackagingTest(DeployTestBase):
     self.MockGetExistingFunction(response=function)
 
     result = self.Run('functions deploy my-test --trigger-http '
-                      '--source {} --quiet'.format(path))
+                      '--source {} --quiet --runtime=nodejs6'.format(path))
     self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESSFUL_DEPLOY_STDERR)
 
@@ -376,7 +378,7 @@ class PackagingTest(DeployTestBase):
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
         https_trigger=self.messages.HttpsTrigger(),
-        source_upload_url='foo')
+        source_upload_url='foo', runtime='nodejs6')
     create_request = self.GetFunctionsCreateRequest(function, location)
     operation = self._GenerateActiveOperation('operations/operation')
     self.mock_client.projects_locations_functions.Create.Expect(
@@ -386,7 +388,7 @@ class PackagingTest(DeployTestBase):
     self.MockGetExistingFunction(response=function)
 
     result = self.Run('functions deploy my-test --trigger-http '
-                      '--source {} --quiet'.format(path))
+                      '--source {} --quiet --runtime=nodejs6'.format(path))
     self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESSFUL_DEPLOY_STDERR)
 
@@ -401,7 +403,7 @@ class PackagingTest(DeployTestBase):
         (r'Uncompressed deployment is \d+B, bigger than maximum allowed '
          r'size of \d+B')):
       self.Run('functions deploy my-test --trigger-http '
-               '--source {} --quiet'.format(path))
+               '--source {} --quiet --runtime=nodejs6'.format(path))
 
     self.AssertErrNotContains(_SUCCESSFUL_DEPLOY_STDERR)
 
@@ -416,7 +418,7 @@ class PackagingTest(DeployTestBase):
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
         https_trigger=self.messages.HttpsTrigger(),
-        source_upload_url='foo')
+        source_upload_url='foo', runtime='nodejs6')
     create_request = self.GetFunctionsCreateRequest(function, location)
     operation = self._GenerateActiveOperation('operations/operation')
     self.mock_client.projects_locations_functions.Create.Expect(
@@ -427,7 +429,7 @@ class PackagingTest(DeployTestBase):
     self.MockGetExistingFunction(response=function)
 
     result = self.Run('functions deploy my-test --trigger-http '
-                      '--source {} --quiet'.format(path))
+                      '--source {} --quiet --runtime=nodejs6'.format(path))
     self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESSFUL_DEPLOY_STDERR)
 
@@ -441,7 +443,7 @@ class PackagingTest(DeployTestBase):
         exceptions.FunctionsError,
         (r'Could not validate source files: '
          r'\[No such file or directory: foo\]')):
-      self.Run('functions deploy my-test --trigger-http '
+      self.Run('functions deploy my-test --trigger-http --runtime=nodejs6 '
                '--source {} --quiet'.format(path))
 
     self.AssertErrNotContains(_SUCCESSFUL_DEPLOY_STDERR)
@@ -470,7 +472,8 @@ class CoreTest(DeployTestBase):
         _DEFAULT_FUNCTION_NAME,
         https_trigger=self.messages.HttpsTrigger(),
         source_upload_url=None if staging_bucket_flag else 'foo',
-        source_archive=_TEST_GS_BUCKET if staging_bucket_flag else None)
+        source_archive=_TEST_GS_BUCKET if staging_bucket_flag else None,
+        runtime='nodejs6')
     create_request = self.GetFunctionsCreateRequest(function, location)
     operation = self._GenerateActiveOperation('operations/operation')
     self.mock_client.projects_locations_functions.Create.Expect(
@@ -480,8 +483,8 @@ class CoreTest(DeployTestBase):
     self.MockGetExistingFunction(response=function)
 
     result = self.Run('functions deploy my-test --trigger-http '
-                      '--source {source} {bucket} --quiet'.format(
-                          source=path, bucket=staging_bucket_flag))
+                      '--source {source} {bucket} --quiet --runtime=nodejs6'
+                      .format(source=path, bucket=staging_bucket_flag))
     self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESSFUL_DEPLOY_STDERR)
 
@@ -496,7 +499,8 @@ class CoreTest(DeployTestBase):
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
         https_trigger=self.messages.HttpsTrigger(),
-        source_upload_url='foo')
+        source_upload_url='foo',
+        runtime='nodejs6')
     create_request = self.GetFunctionsCreateRequest(function, location)
     operation = self._GenerateActiveOperation('operations/operation')
     self.mock_client.projects_locations_functions.Create.Expect(
@@ -506,7 +510,8 @@ class CoreTest(DeployTestBase):
     self.MockGetExistingFunction(response=function)
 
     with files.ChDir(path):
-      result = self.Run('functions deploy my-test --trigger-http --quiet')
+      result = self.Run(
+          'functions deploy my-test --trigger-http --quiet --runtime=nodejs6')
       self.assertEqual(result, function)
       self.AssertErrContains(_SUCCESSFUL_DEPLOY_STDERR)
 
@@ -517,7 +522,8 @@ class CoreTest(DeployTestBase):
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
         https_trigger=self.messages.HttpsTrigger(),
-        source_archive='gs://my-bucket/function.zip')
+        source_archive='gs://my-bucket/function.zip',
+        runtime='nodejs6')
     create_request = self.GetFunctionsCreateRequest(function, location)
     operation = self._GenerateActiveOperation('operations/operation')
     self.mock_client.projects_locations_functions.Create.Expect(
@@ -527,7 +533,8 @@ class CoreTest(DeployTestBase):
     self.MockGetExistingFunction(response=function)
 
     result = self.Run('functions deploy my-test --trigger-http '
-                      '--source gs://my-bucket/function.zip --quiet')
+                      '--source gs://my-bucket/function.zip --quiet '
+                      '--runtime=nodejs6')
     self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESSFUL_DEPLOY_STDERR)
 
@@ -538,7 +545,8 @@ class CoreTest(DeployTestBase):
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
         https_trigger=self.messages.HttpsTrigger(),
-        source_archive='gs://my-bucket/')
+        source_archive='gs://my-bucket/',
+        runtime='nodejs6')
     create_request = self.GetFunctionsCreateRequest(function, location)
     operation = self._GenerateActiveOperation('operations/operation')
     self.mock_client.projects_locations_functions.Create.Expect(
@@ -548,7 +556,7 @@ class CoreTest(DeployTestBase):
     self.MockGetExistingFunction(response=function)
 
     result = self.Run('functions deploy my-test --trigger-http '
-                      '--source gs://my-bucket/ --quiet')
+                      '--source gs://my-bucket/ --quiet --runtime=nodejs6')
     self.assertEqual(result, function)
     self.AssertErrContains(
         '[gs://my-bucket/] does not end with extension `.zip`')
@@ -565,7 +573,8 @@ class CoreTest(DeployTestBase):
         https_trigger=self.messages.HttpsTrigger(),
         source_repository_url=('https://source.developers.google.com/'
                                'projects/my-project/repos/my-repo/'
-                               'fixed-aliases/rc0.0.9'))
+                               'fixed-aliases/rc0.0.9'),
+        runtime='nodejs6')
     create_request = self.GetFunctionsCreateRequest(function, location)
     operation = self._GenerateActiveOperation('operations/operation')
     self.mock_client.projects_locations_functions.Create.Expect(
@@ -578,7 +587,7 @@ class CoreTest(DeployTestBase):
         'functions deploy my-test --trigger-http '
         '--source https://source.developers.google.com/projects/my-project/'
         'repos/my-repo/fixed-aliases/rc0.0.9 '
-        '--quiet')
+        '--quiet --runtime=nodejs6')
     self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESSFUL_DEPLOY_STDERR)
 
@@ -589,7 +598,7 @@ class CoreTest(DeployTestBase):
         'argument --source: Provided directory does not exist.'):
       self.Run(
           'functions deploy my-test --trigger-topic topic --stage-bucket buck '
-          '--source my/functions/directory --quiet')
+          '--source my/functions/directory --quiet --runtime=nodejs6')
 
   def testWithAllValidOptionalArgs(self):  # Including Retry and Labels
     self.MockGetExistingFunction(response=None)
@@ -601,7 +610,8 @@ class CoreTest(DeployTestBase):
         event_trigger=trigger,
         memory=512,
         entry_point='foo',
-        source_archive='gs://my-bucket/function.zip')
+        source_archive='gs://my-bucket/function.zip',
+        runtime='nodejs6')
     create_request = self.GetFunctionsCreateRequest(function, location)
     operation = self._GenerateActiveOperation('operations/operation')
     self.mock_client.projects_locations_functions.Create.Expect(
@@ -610,7 +620,7 @@ class CoreTest(DeployTestBase):
     self.MockLongRunningOpResult('operations/operation')
     self.MockGetExistingFunction(response=function)
     result = self.Run(
-        'functions deploy my-test --trigger-topic topic '
+        'functions deploy my-test --trigger-topic topic --runtime=nodejs6 '
         '--entry-point foo --region {} --memory 512MB  --retry '
         '--source gs://my-bucket/function.zip --quiet'.format(_DEFAULT_REGION))
     self.assertEqual(result, function)
@@ -626,7 +636,8 @@ class CoreTest(DeployTestBase):
         _DEFAULT_FUNCTION_NAME,
         labels=labels,
         event_trigger=trigger,
-        source_archive='gs://my-bucket/function.zip')
+        source_archive='gs://my-bucket/function.zip',
+        runtime='nodejs6')
     create_request = self.GetFunctionsCreateRequest(function, location)
     operation = self._GenerateActiveOperation('operations/operation')
     self.mock_client.projects_locations_functions.Create.Expect(
@@ -636,7 +647,8 @@ class CoreTest(DeployTestBase):
     self.MockGetExistingFunction(response=function)
     result = self.Run('functions deploy my-test --trigger-topic topic '
                       '--update-labels=foo=bar,fizz=buzz '
-                      '--source gs://my-bucket/function.zip --quiet')
+                      '--source gs://my-bucket/function.zip --quiet '
+                      '--runtime=nodejs6')
     self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESSFUL_DEPLOY_STDERR)
 
@@ -648,6 +660,7 @@ class CoreTest(DeployTestBase):
         r'`deployment` are reserved for use by deployment tools and cannot '
         r'be specified manually.'):
       self.Run('functions deploy my-test --trigger-topic topic '
+               '--runtime=nodejs6 '
                "--update-labels='{}' "
                '--source gs://my-bucket/function.zip --quiet'.format(labels))
     self.AssertErrNotContains(_SUCCESSFUL_DEPLOY_STDERR)
@@ -662,7 +675,7 @@ class CoreTest(DeployTestBase):
         exceptions.FunctionsError,
         r'Failed to upload the function source code to signed url: '
         r'foo. Status: \[400:\]'):
-      self.Run('functions deploy my-test --trigger-http '
+      self.Run('functions deploy my-test --trigger-http --runtime=nodejs6 '
                '--source {source} --quiet'.format(source=path))
     self.AssertErrNotContains(_SUCCESSFUL_DEPLOY_STDERR)
 
@@ -679,7 +692,8 @@ class TriggerTests(DeployTestBase):
       self.Run('functions deploy my-test '
                '--stage-bucket buck '
                '--retry '
-               '--quiet')
+               '--quiet '
+               '--runtime=nodejs6')
 
   @parameterized.parameters([
       '--trigger-http --trigger-topic topic',
@@ -694,7 +708,8 @@ class TriggerTests(DeployTestBase):
       self.Run('functions deploy my-test {} '
                '--stage-bucket buck '
                '--retry '
-               '--quiet'.format(triggers))
+               '--quiet '
+               '--runtime=nodejs6'.format(triggers))
 
   def testWithHttpTriggerAndRetryFails(self):
     with self.assertRaisesRegex(
@@ -704,7 +719,8 @@ class TriggerTests(DeployTestBase):
                '--trigger-http '
                '--stage-bucket buck '
                '--retry '
-               '--quiet')
+               '--quiet '
+               '--runtime=nodejs6')
 
   @parameterized.parameters(
       {'trigger_event': 'providers/cloud.pubsub/eventTypes/topic.publish',
@@ -731,7 +747,8 @@ class TriggerTests(DeployTestBase):
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
         event_trigger=trigger,
-        source_archive='gs://my-bucket/function.zip')
+        source_archive='gs://my-bucket/function.zip',
+        runtime='nodejs6')
     create_request = self.GetFunctionsCreateRequest(function, location)
     operation = self._GenerateActiveOperation('operations/operation')
     self.mock_client.projects_locations_functions.Create.Expect(
@@ -740,7 +757,7 @@ class TriggerTests(DeployTestBase):
     self.MockLongRunningOpResult('operations/operation')
     self.MockGetExistingFunction(response=function)
     result = self.Run(
-        'functions deploy my-test '
+        'functions deploy my-test --runtime=nodejs6 '
         '--trigger-event {event} '
         '--trigger-resource {resource} '
         '--source gs://my-bucket/function.zip --quiet'.format(
@@ -756,7 +773,8 @@ class TriggerTests(DeployTestBase):
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
         event_trigger=trigger,
-        source_archive='gs://my-bucket/function.zip')
+        source_archive='gs://my-bucket/function.zip',
+        runtime='nodejs6')
     create_request = self.GetFunctionsCreateRequest(function, location)
     operation = self._GenerateActiveOperation('operations/operation')
     self.mock_client.projects_locations_functions.Create.Expect(
@@ -766,7 +784,8 @@ class TriggerTests(DeployTestBase):
     self.MockGetExistingFunction(response=function)
 
     result = self.Run('functions deploy my-test --trigger-topic topic --retry '
-                      '--source gs://my-bucket/function.zip --quiet')
+                      '--source gs://my-bucket/function.zip --quiet '
+                      '--runtime=nodejs6')
     self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESSFUL_DEPLOY_STDERR)
 
@@ -778,7 +797,8 @@ class TriggerTests(DeployTestBase):
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
         event_trigger=trigger,
-        source_archive='gs://my-bucket/function.zip')
+        source_archive='gs://my-bucket/function.zip',
+        runtime='nodejs6')
     create_request = self.GetFunctionsCreateRequest(function, location)
     operation = self._GenerateActiveOperation('operations/operation')
     self.mock_client.projects_locations_functions.Create.Expect(
@@ -788,7 +808,7 @@ class TriggerTests(DeployTestBase):
     self.MockGetExistingFunction(response=function)
 
     result = self.Run(
-        'functions deploy my-test --trigger-bucket {} '
+        'functions deploy my-test --trigger-bucket {} --runtime=nodejs6 '
         '--source gs://my-bucket/function.zip --quiet'.format(_TEST_GS_BUCKET))
     self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESSFUL_DEPLOY_STDERR)
@@ -801,7 +821,8 @@ class TriggerTests(DeployTestBase):
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
         event_trigger=trigger,
-        source_archive='gs://my-bucket/function.zip')
+        source_archive='gs://my-bucket/function.zip',
+        runtime='nodejs6')
     create_request = self.GetFunctionsCreateRequest(function, location)
     operation = self._GenerateActiveOperation('operations/operation')
     self.mock_client.projects_locations_functions.Create.Expect(
@@ -811,7 +832,7 @@ class TriggerTests(DeployTestBase):
     self.MockGetExistingFunction(response=function)
 
     result = self.Run(
-        'functions deploy my-test --trigger-bucket {} '
+        'functions deploy my-test --trigger-bucket {} --runtime=nodejs6 '
         '--source gs://my-bucket/function.zip --quiet'.format(
             'projects/_/buckets/full-images'))
     self.assertEqual(result, function)
@@ -824,7 +845,8 @@ class TriggerTests(DeployTestBase):
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
         https_trigger=self.messages.HttpsTrigger(),
-        source_archive='gs://my-bucket/function.zip')
+        source_archive='gs://my-bucket/function.zip',
+        runtime='nodejs6')
     create_request = self.GetFunctionsCreateRequest(function, location)
     operation = self._GenerateActiveOperation('operations/operation')
     self.mock_client.projects_locations_functions.Create.Expect(
@@ -834,7 +856,8 @@ class TriggerTests(DeployTestBase):
     self.MockGetExistingFunction(response=function)
 
     result = self.Run('functions deploy my-test --trigger-http '
-                      '--source gs://my-bucket/function.zip --quiet')
+                      '--source gs://my-bucket/function.zip --quiet '
+                      '--runtime=nodejs6')
     self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESSFUL_DEPLOY_STDERR)
 
@@ -864,7 +887,8 @@ class UpdateTests(DeployTestBase):
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
         event_trigger=trigger,
-        source_archive=original_source_archive_url
+        source_archive=original_source_archive_url,
+        runtime='nodejs6'
     )
     self.MockGetExistingFunction(response=original_function)
     self.Run('functions deploy my-test')
@@ -922,7 +946,8 @@ class UpdateTests(DeployTestBase):
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
         event_trigger=original_trigger,
-        source_archive=source_archive_url
+        source_archive=source_archive_url,
+        runtime='nodejs6'
     )
     updated_function = self.GetFunctionMessage(
         _DEFAULT_REGION,
@@ -931,8 +956,10 @@ class UpdateTests(DeployTestBase):
         source_archive=source_archive_url,
         memory=memory,
         timeout=timeout,
-        entry_point=entry_point
+        entry_point=entry_point,
+        runtime='nodejs6'
     )
+    update_mask.append('runtime')
 
     self.ExpectFunctionPatch(
         function_name=function_name,
@@ -941,7 +968,8 @@ class UpdateTests(DeployTestBase):
         update_mask=','.join(sorted(update_mask)),
     )
 
-    self.Run('functions deploy my-test {}'.format(' '.join(update_lst)))
+    self.Run('functions deploy my-test {} --runtime=nodejs6'
+             .format(' '.join(update_lst)))
 
   def testAddLabels(self):
     """Test adding labels to function with no labels."""
@@ -952,7 +980,8 @@ class UpdateTests(DeployTestBase):
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
         event_trigger=trigger,
-        source_archive=source_archive_url
+        source_archive=source_archive_url,
+        runtime='nodejs6'
     )
 
     updated_labels = self.GetLabelsMessage([
@@ -964,7 +993,8 @@ class UpdateTests(DeployTestBase):
         _DEFAULT_FUNCTION_NAME,
         event_trigger=trigger,
         source_archive=source_archive_url,
-        labels=updated_labels
+        labels=updated_labels,
+        runtime='nodejs6'
     )
 
     self.ExpectFunctionPatch(
@@ -990,7 +1020,8 @@ class UpdateTests(DeployTestBase):
         _DEFAULT_FUNCTION_NAME,
         event_trigger=trigger,
         source_archive=source_archive_url,
-        labels=original_labels
+        labels=original_labels,
+        runtime='nodejs6'
     )
 
     updated_labels = self.GetLabelsMessage([
@@ -1003,20 +1034,21 @@ class UpdateTests(DeployTestBase):
         _DEFAULT_FUNCTION_NAME,
         event_trigger=trigger,
         source_archive=source_archive_url,
-        labels=updated_labels
+        labels=updated_labels,
+        runtime='nodejs6'
     )
 
     self.ExpectFunctionPatch(
         function_name=function_name,
         original_function=original_function,
         updated_function=updated_function,
-        update_mask='labels',
+        update_mask='labels,runtime',
     )
-    self.Run('functions deploy my-test '
+    self.Run('functions deploy my-test --runtime=nodejs6 '
              '--update-labels foo=baz,boo=add_me,bar=newvalue')
 
   def testRemoveLabels(self):
-    """Test removing specific lables labels only."""
+    """Test removing specific labels only."""
     function_name = self.GetFunctionResource(self.GetRegion(), 'my-test')
     source_archive_url = 'gs://bucket'
     trigger = self.GetPubSubTrigger(self.Project(), 'topic')
@@ -1030,7 +1062,8 @@ class UpdateTests(DeployTestBase):
         _DEFAULT_FUNCTION_NAME,
         event_trigger=trigger,
         source_archive=source_archive_url,
-        labels=original_labels
+        labels=original_labels,
+        runtime='nodejs6'
     )
 
     updated_labels = self.GetLabelsMessage([
@@ -1042,17 +1075,18 @@ class UpdateTests(DeployTestBase):
         _DEFAULT_FUNCTION_NAME,
         event_trigger=trigger,
         source_archive=source_archive_url,
-        labels=updated_labels
+        labels=updated_labels,
+        runtime='nodejs6'
     )
 
     self.ExpectFunctionPatch(
         function_name=function_name,
         original_function=original_function,
         updated_function=updated_function,
-        update_mask='labels',
+        update_mask='labels,runtime',
     )
     self.Run('functions deploy my-test '
-             '--remove-labels boo')
+             '--remove-labels boo --runtime=nodejs6')
 
   def testClearLabels(self):
     """Test removing all labels."""
@@ -1070,7 +1104,8 @@ class UpdateTests(DeployTestBase):
         _DEFAULT_FUNCTION_NAME,
         event_trigger=trigger,
         source_archive=source_archive_url,
-        labels=original_labels
+        labels=original_labels,
+        runtime='nodejs6'
     )
 
     updated_labels = self.GetLabelsMessage()
@@ -1079,17 +1114,18 @@ class UpdateTests(DeployTestBase):
         _DEFAULT_FUNCTION_NAME,
         event_trigger=trigger,
         source_archive=source_archive_url,
-        labels=updated_labels
+        labels=updated_labels,
+        runtime='nodejs6'
     )
 
     self.ExpectFunctionPatch(
         function_name=function_name,
         original_function=original_function,
         updated_function=updated_function,
-        update_mask='labels',
+        update_mask='labels,runtime',
     )
     self.Run('functions deploy my-test '
-             '--clear-labels')
+             '--clear-labels --runtime=nodejs6')
 
   def testLocalSourceExplicit(self):
     """Test update local source with --source arg."""
@@ -1101,24 +1137,27 @@ class UpdateTests(DeployTestBase):
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
         event_trigger=trigger,
-        source_archive=original_source_archive_url
+        source_archive=original_source_archive_url,
+        runtime='nodejs6'
     )
 
     updated_function = self.GetFunctionMessage(
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
         event_trigger=trigger,
-        source_upload_url='foo'
+        source_upload_url='foo',
+        runtime='nodejs6'
     )
     self.ExpectFunctionPatch(
         function_name=function_name,
         original_function=original_function,
         updated_function=updated_function,
         expect_get_upload_url=True,
-        update_mask='sourceUploadUrl',
+        update_mask='runtime,sourceUploadUrl',
     )
     self.MockUploadToSignedUrl()
-    self.Run('functions deploy my-test --source {}'.format(path))
+    self.Run('functions deploy my-test --source {} --runtime=nodejs6'
+             .format(path))
 
   @parameterized.parameters(['', '--source .'])
   def testLocalSourceCwd(self, source_flag):
@@ -1129,25 +1168,28 @@ class UpdateTests(DeployTestBase):
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
         https_trigger=self.messages.HttpsTrigger(),
-        source_upload_url='foo'
+        source_upload_url='foo',
+        runtime='nodejs6'
     )
 
     updated_function = self.GetFunctionMessage(
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
         https_trigger=self.messages.HttpsTrigger(),
-        source_upload_url='foo'
+        source_upload_url='foo',
+        runtime='nodejs6'
     )
     self.ExpectFunctionPatch(
         function_name=function_name,
         original_function=original_function,
         updated_function=updated_function,
         expect_get_upload_url=True,
-        update_mask='sourceUploadUrl',
+        update_mask='runtime,sourceUploadUrl',
     )
     self.MockUploadToSignedUrl()
     with files.ChDir(path):
-      self.Run('functions deploy my-test {}'.format(source_flag))
+      self.Run('functions deploy my-test {} --runtime=nodejs6'
+               .format(source_flag))
 
   def testImpliedLocalSourceForRepoAndGcsPrintsToStdErr(self):
     """Test update from local source with no source flag for GCS and CSR."""
@@ -1175,21 +1217,24 @@ class UpdateTests(DeployTestBase):
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
         event_trigger=old_topic_trigger,
-        source_archive=source_archive_url
+        source_archive=source_archive_url,
+        runtime='nodejs6'
     )
     updated_function = self.GetFunctionMessage(
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
         event_trigger=new_topic_trigger,
-        source_archive=source_archive_url
+        source_archive=source_archive_url,
+        runtime='nodejs6'
     )
     self.ExpectFunctionPatch(
         function_name=function_name,
         original_function=original_function,
         updated_function=updated_function,
-        update_mask='eventTrigger,httpsTrigger',
+        update_mask='eventTrigger,httpsTrigger,runtime',
     )
-    self.Run('functions deploy my-test --trigger-topic new-topic')
+    self.Run(
+        'functions deploy my-test --trigger-topic new-topic --runtime=nodejs6')
 
   @parameterized.named_parameters(
       # Change function source from bucket in sourceArchiveUrl field to
@@ -1236,13 +1281,15 @@ class UpdateTests(DeployTestBase):
     original_function = self.GetFunctionMessage(
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
-        event_trigger=trigger
+        event_trigger=trigger,
+        runtime='nodejs6'
     )
 
     updated_function = self.GetFunctionMessage(
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
-        event_trigger=trigger
+        event_trigger=trigger,
+        runtime='nodejs6'
     )
 
     if original_field == 'sourceRepository':
@@ -1251,13 +1298,15 @@ class UpdateTests(DeployTestBase):
     if updated_field == 'sourceRepository':
       updated_value = self.messages.SourceRepository(url=updated_value)
     setattr(updated_function, updated_field, updated_value)
+
     self.ExpectFunctionPatch(
         function_name=function_name,
         original_function=original_function,
         updated_function=updated_function,
-        update_mask=updated_field,
+        update_mask=','.join(sorted([updated_field, 'runtime']))
     )
-    self.Run('functions deploy my-test {}'.format(source_flag))
+    self.Run('functions deploy my-test --runtime=nodejs6 {}'
+             .format(source_flag))
 
   @parameterized.named_parameters(
       # Change function trigger from https to pubsub topic
@@ -1309,21 +1358,24 @@ class UpdateTests(DeployTestBase):
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
         event_trigger=original_event_trigger,
-        https_trigger=original_http_trigger)
+        https_trigger=original_http_trigger,
+        runtime='nodejs6')
 
     updated_function = self.GetFunctionMessage(
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
         event_trigger=updated_event_trigger,
-        https_trigger=update_http_trigger)
+        https_trigger=update_http_trigger,
+        runtime='nodejs6')
 
     self.ExpectFunctionPatch(
         function_name=function_name,
         original_function=original_function,
         updated_function=updated_function,
-        update_mask='eventTrigger,httpsTrigger',
+        update_mask='eventTrigger,httpsTrigger,runtime',
     )
-    self.Run('functions deploy my-test {}'.format(trigger_flag))
+    self.Run('functions deploy my-test {} --runtime=nodejs6'
+             .format(trigger_flag))
 
   def testUpdateLegacyGcsTriggerError(self):
     """Test update of legacy trigger for a gcs based function."""
@@ -1333,11 +1385,12 @@ class UpdateTests(DeployTestBase):
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
         event_trigger=trigger,
-        source_archive='gs://my-bucket/function.zip')
+        source_archive='gs://my-bucket/function.zip',
+        runtime='nodejs6')
     self.MockGetExistingFunction(response=function)
     with self.assertRaises(trigger_util.TriggerCompatibilityError):
       self.Run(
-          'functions deploy my-test --trigger-bucket {} '
+          'functions deploy my-test --trigger-bucket {} --runtime=nodejs6 '
           '--source gs://my-bucket/function.zip --quiet'.format(
               _TEST_GS_BUCKET))
       self.AsserErrContains(trigger_util.GCS_COMPATIBILITY_ERROR)
@@ -1350,11 +1403,12 @@ class UpdateTests(DeployTestBase):
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
         event_trigger=trigger,
-        source_archive='gs://my-bucket/function.zip')
+        source_archive='gs://my-bucket/function.zip',
+        runtime='nodejs6')
     self.MockGetExistingFunction(response=function)
     with self.assertRaises(trigger_util.TriggerCompatibilityError):
       self.Run(
-          'functions deploy my-test '
+          'functions deploy my-test --runtime=nodejs6 '
           '--trigger-event google.storage.object.finalize '
           '--trigger-resource {resource} '
           '--source gs://my-bucket/function.zip --quiet'.format(
@@ -1370,11 +1424,14 @@ class UpdateTests(DeployTestBase):
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
         event_trigger=topic_trigger,
-        source_archive=source_archive_url
+        source_archive=source_archive_url,
+        runtime='nodejs6'
     )
     self.MockGetExistingFunction(response=original_function)
     with self.assertRaises(trigger_util.TriggerCompatibilityError):
-      self.Run('functions deploy my-test --trigger-topic new-topic')
+      self.Run(
+          'functions deploy my-test --trigger-topic new-topic --runtime=nodejs6'
+          )
       self.AssertErrorContains(trigger_util.PUBSUB_COMPATIBILITY_ERROR)
 
   def testUpdateLegacyPubSubTriggerError_EventFlags(self):
@@ -1386,12 +1443,13 @@ class UpdateTests(DeployTestBase):
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
         event_trigger=topic_trigger,
-        source_archive=source_archive_url
+        source_archive=source_archive_url,
+        runtime='nodejs6'
     )
     self.MockGetExistingFunction(response=original_function)
     with self.assertRaises(trigger_util.TriggerCompatibilityError):
       self.Run(
-          'functions deploy my-test '
+          'functions deploy my-test --runtime=nodejs6 '
           '--trigger-event google.pubsub.topic.publish '
           '--trigger-resource topic '
           '--source gs://my-bucket/function.zip --quiet')
@@ -1404,7 +1462,8 @@ class UpdateTests(DeployTestBase):
         'Label keys starting with `deployment` are reserved for use by '
         'deployment tools and cannot be specified manually.'):
       self.Run(
-          'functions deploy my-test --update-labels=deployment=contingency ')
+          'functions deploy my-test --update-labels=deployment=contingency '
+          '--runtime=nodejs6')
 
   def testRemoveDeploymentLabelFails(self):
     """Test that removing deployment label raises exception."""
@@ -1413,7 +1472,8 @@ class UpdateTests(DeployTestBase):
         'Label keys starting with `deployment` are reserved for use by '
         'deployment tools and cannot be specified manually.'):
       self.Run(
-          'functions deploy my-test --remove-labels=deployment ')
+          'functions deploy my-test --remove-labels=deployment '
+          '--runtime=nodejs6')
 
 
 class DeployRuntimeTests(DeployTestBase):
@@ -1426,12 +1486,13 @@ class DeployRuntimeTests(DeployTestBase):
     original_function = self.GetFunctionMessage(
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
-        source_archive=source_archive_url)
+        source_archive=source_archive_url,
+        runtime='nodejs6')
     updated_function = self.GetFunctionMessage(
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
-        source_archive=source_archive_url)
-    updated_function.runtime = 'python37'
+        source_archive=source_archive_url,
+        runtime='python37')
 
     self.ExpectFunctionPatch(
         function_name=function_name,
@@ -1450,8 +1511,8 @@ class DeployRuntimeTests(DeployTestBase):
         _DEFAULT_REGION,
         _DEFAULT_FUNCTION_NAME,
         event_trigger=trigger,
-        source_archive='gs://my-bucket/function.zip')
-    function.runtime = 'python37'
+        source_archive='gs://my-bucket/function.zip',
+        runtime='python37')
     create_request = self.GetFunctionsCreateRequest(function, location)
     operation = self._GenerateActiveOperation('operations/operation')
     self.mock_client.projects_locations_functions.Create.Expect(
@@ -1517,7 +1578,8 @@ class EnvVarsTests(DeployTestBase):
         _DEFAULT_FUNCTION_NAME,
         https_trigger=self.messages.HttpsTrigger(),
         source_archive=source_archive_url,
-        env_vars=env_vars_message
+        env_vars=env_vars_message,
+        runtime='nodejs6'
     )
 
     create_request = self.GetFunctionsCreateRequest(function, location)
@@ -1530,7 +1592,7 @@ class EnvVarsTests(DeployTestBase):
     self.MockGetExistingFunction(response=function)
 
     self.Run('functions deploy my-test --trigger-http --source gs://bucket '
-             '{}'.format(flags))
+             '{} --runtime=nodejs6'.format(flags))
 
   @parameterized.named_parameters(
       (
@@ -1575,7 +1637,8 @@ class EnvVarsTests(DeployTestBase):
         _DEFAULT_FUNCTION_NAME,
         event_trigger=trigger,
         source_archive=source_archive_url,
-        env_vars=original_env_vars
+        env_vars=original_env_vars,
+        runtime='nodejs6'
     )
 
     updated_env_vars = env_vars_api_util.DictToEnvVarsProperty(new_env_vars)
@@ -1584,7 +1647,8 @@ class EnvVarsTests(DeployTestBase):
         _DEFAULT_FUNCTION_NAME,
         event_trigger=trigger,
         source_archive=source_archive_url,
-        env_vars=updated_env_vars
+        env_vars=updated_env_vars,
+        runtime='nodejs6'
     )
 
     self.ExpectFunctionPatch(
@@ -1611,7 +1675,8 @@ class EnvVarsTests(DeployTestBase):
         _DEFAULT_FUNCTION_NAME,
         https_trigger=self.messages.HttpsTrigger(),
         source_archive=source_archive_url,
-        env_vars=env_vars
+        env_vars=env_vars,
+        runtime='nodejs6'
     )
 
     create_request = self.GetFunctionsCreateRequest(function, location)
@@ -1629,7 +1694,7 @@ class EnvVarsTests(DeployTestBase):
           'BAR': 'baa',
       }
       self.Run('functions deploy my-test --trigger-http --source gs://bucket '
-               '--env-vars-file env.yaml')
+               '--env-vars-file env.yaml --runtime=nodejs6')
 
   def testEnvVarsFileExistingFunction(self):
     """Test adding env vars to function with no env vars."""
@@ -1646,7 +1711,8 @@ class EnvVarsTests(DeployTestBase):
         _DEFAULT_FUNCTION_NAME,
         event_trigger=trigger,
         source_archive=source_archive_url,
-        env_vars=original_env_vars
+        env_vars=original_env_vars,
+        runtime='nodejs6'
     )
 
     updated_env_vars = env_vars_api_util.DictToEnvVarsProperty({
@@ -1658,7 +1724,8 @@ class EnvVarsTests(DeployTestBase):
         _DEFAULT_FUNCTION_NAME,
         event_trigger=trigger,
         source_archive=source_archive_url,
-        env_vars=updated_env_vars
+        env_vars=updated_env_vars,
+        runtime='nodejs6'
     )
 
     self.ExpectFunctionPatch(
@@ -1673,7 +1740,8 @@ class EnvVarsTests(DeployTestBase):
           'BAZ': 'boo',
           'BAR': 'baa',
       }
-      self.Run('functions deploy my-test --env-vars-file env.yaml')
+      self.Run(
+          'functions deploy my-test --env-vars-file env.yaml')
 
   @parameterized.parameters(
       '--set-env-vars X_GOOGLE_FOO=bar',
@@ -1687,7 +1755,7 @@ class EnvVarsTests(DeployTestBase):
         cli_test_base.MockArgumentError,
         'Environment variable keys that start with `X_GOOGLE_` are reserved '
         'for use by deployment tools and cannot be specified manually.'):
-      self.Run('functions deploy my-test {}'.format(flags))
+      self.Run('functions deploy my-test {} --runtime=nodejs6'.format(flags))
 
   @parameterized.parameters(
       ({'': 'boo'}, 'Environment variable keys cannot be empty.'),
@@ -1704,7 +1772,8 @@ class EnvVarsTests(DeployTestBase):
       with mock.patch('googlecloudsdk.core.yaml.load_path') as yaml_load_path:
         yaml_load_path.return_value = file_env_vars
 
-        self.Run('functions deploy my-test --env-vars-file env.yaml')
+        self.Run('functions deploy my-test --env-vars-file env.yaml '
+                 '--runtime=nodejs6')
 
 
 # TODO(b/109938541): Remove this after new non-gsutil implementation seems

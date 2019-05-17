@@ -109,3 +109,8 @@ class WorkflowTemplatesJobSparkUnitTestBeta(WorkflowTemplatesJobSparkUnitTest,
         '--class {1} -- foo --bar baz '.format(self.WORKFLOW_TEMPLATE,
                                                self.CLASS))
     self.AssertMessagesEqual(expected, result)
+
+
+class WorkflowTemplatesJobSparkUnitTestAlpha(
+    WorkflowTemplatesJobSparkUnitTestBeta, base.DataprocTestBaseAlpha):
+  pass

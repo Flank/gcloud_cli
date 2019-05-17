@@ -102,6 +102,7 @@ class ImagesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
             NAME               PROJECT      FAMILY   DEPRECATED STATUS
             image-1            my-project                       READY
             image-2            my-project                       READY
+            image-4            my-project                       READY
             centos-6-v20140408 centos-cloud centos-6            READY
             """), normalize_space=True)
 
@@ -124,6 +125,7 @@ class ImagesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
         textwrap.dedent("""\
             https://www.googleapis.com/compute/v1/projects/my-project/global/images/image-1
             https://www.googleapis.com/compute/v1/projects/my-project/global/images/image-2
+            https://www.googleapis.com/compute/v1/projects/my-project/global/images/image-4
             """))
 
   def testWithShowPreviewImages(self):
@@ -145,6 +147,7 @@ class ImagesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
         textwrap.dedent("""\
             https://www.googleapis.com/compute/v1/projects/my-project/global/images/image-1
             https://www.googleapis.com/compute/v1/projects/my-project/global/images/image-2
+            https://www.googleapis.com/compute/v1/projects/my-project/global/images/image-4
             """))
 
   def testWithShowDeprecated(self):
@@ -163,6 +166,7 @@ class ImagesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
             image-1            my-project                       READY
             image-2            my-project                       READY
             image-3            my-project            DEPRECATED READY
+            image-4            my-project                       READY
             centos-6-v20140408 centos-cloud centos-6            READY
             centos-6-v20140318 centos-cloud centos-6 DEPRECATED READY
             """), normalize_space=True)
@@ -233,6 +237,7 @@ class ImagesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
         textwrap.dedent("""\
             https://www.googleapis.com/compute/v1/projects/my-project/global/images/image-1
             https://www.googleapis.com/compute/v1/projects/my-project/global/images/image-2
+            https://www.googleapis.com/compute/v1/projects/my-project/global/images/image-4
             https://www.googleapis.com/compute/v1/projects/centos-cloud/global/images/centos-6-v20140408
             """))
 
@@ -317,6 +322,7 @@ class ImagesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
             NAME    PROJECT    FAMILY DEPRECATED STATUS
             image-1 my-project                   READY
             image-2 my-project                   READY
+            image-4 my-project                   READY
             """), normalize_space=True)
 
   def testImagesCompleter(self):
@@ -333,6 +339,7 @@ class ImagesListTest(test_base.BaseTest, completer_test_base.CompleterBase):
         expected_completions=[
             'image-1',
             'image-2',
+            'image-4',
         ],
         cli=self.cli,
     )
@@ -427,6 +434,7 @@ class ImagesListBetaTest(test_base.BaseTest):
         NAME               PROJECT      FAMILY   DEPRECATED STATUS
         image-1            my-project                       BLOCKED_BY_POLICY
         image-2            my-project                       BLOCKED_BY_POLICY
+        image-4            my-project                       BLOCKED_BY_POLICY
         centos-6-v20140408 centos-cloud centos-6            READY
         """,
         normalize_space=True)
@@ -457,6 +465,7 @@ class ImagesListBetaTest(test_base.BaseTest):
         NAME               PROJECT      FAMILY   DEPRECATED STATUS
         image-1            my-project                       READY
         image-2            my-project                       READY
+        image-4            my-project                       READY
         centos-6-v20140408 centos-cloud centos-6            READY
         """,
         normalize_space=True)

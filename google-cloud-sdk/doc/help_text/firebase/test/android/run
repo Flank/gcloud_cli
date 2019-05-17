@@ -8,16 +8,15 @@ SYNOPSIS
         [--type=TYPE] [--app-package=APP_PACKAGE] [--async]
         [--auto-google-login] [--directories-to-pull=[DIR_TO_PULL,...]]
         [--environment-variables=[KEY=VALUE,...]]
-        [--obb-files=OBB_FILE,[OBB_FILE]] [--performance-metrics]
-        [--record-video] [--results-bucket=RESULTS_BUCKET]
-        [--results-dir=RESULTS_DIR]
+        [--num-flaky-test-attempts=int] [--obb-files=OBB_FILE,[OBB_FILE]]
+        [--performance-metrics] [--record-video]
+        [--results-bucket=RESULTS_BUCKET] [--results-dir=RESULTS_DIR]
         [--results-history-name=RESULTS_HISTORY_NAME]
         [--scenario-labels=LABEL,[LABEL,...]]
         [--scenario-numbers=int,[int,...]] [--test-package=TEST_PACKAGE]
         [--test-runner-class=TEST_RUNNER_CLASS]
         [--test-targets=TEST_TARGET,[TEST_TARGET,...]] [--use-orchestrator]
-        [--app-initial-activity=APP_INITIAL_ACTIVITY] [--max-depth=int]
-        [--max-steps=int] [--robo-directives=[TYPE:RESOURCE_NAME=INPUT,...]]
+        [--robo-directives=[TYPE:RESOURCE_NAME=INPUT,...]]
         [--device-ids=MODEL_ID,[MODEL_ID,...], -d MODEL_ID,[MODEL_ID,...]]
         [--locales=LOCALE,[LOCALE,...], -l LOCALE,[LOCALE,...]]
         [--orientations=ORIENTATION,[ORIENTATION],
@@ -108,8 +107,12 @@ COMMONLY USED FLAGS
 
 FLAGS
      --app-package=APP_PACKAGE
-        The Java package of the application under test (default: extracted from
-        the APK manifest).
+        (DEPRECATED) The Java package of the application under test (default:
+        extracted from the APK manifest).
+
+        The --app-package flag is deprecated and should no longer be used. By
+        default, the correct application package name is parsed from the APK
+        manifest.
 
      --async
         Invoke a test asynchronously without waiting for test results.
@@ -141,10 +144,10 @@ FLAGS
 
             --environment-variables numShards=4,shardIndex=0
 
-        Enable code coverage and provide a file path to store the coverage
+        Enable code coverage and provide a directory to store the coverage
         results when using Android Test Orchestrator (--use-orchestrator):
 
-            --environment-variables clearPackageData,coverage=true,coverageFile=/sdcard/coverage.ec
+            --environment-variables clearPackageData=true,coverage=true,coverageFilePath=/sdcard/
 
         Enable code coverage and provide a file path to store the coverage
         results when not using Android Test Orchestrator
@@ -154,6 +157,14 @@ FLAGS
 
         Note: If you need to embed a comma into a VALUE string, please refer to
         gcloud topic escaping for ways to change the default list delimiter.
+
+     --num-flaky-test-attempts=int
+        Specifies the number of times a test execution should be reattempted if
+        one or more of its test cases fail for any reason. An execution that
+        initially fails but succeeds on any reattempt is reported as FLAKY.
+
+        The maximum number of reruns allowed is 10. (Default: 0, which implies
+        no reruns.) All additional attempts are executed in parallel.
 
      --obb-files=OBB_FILE,[OBB_FILE]
         A list of one or two Android OBB file names which will be copied to
@@ -209,8 +220,11 @@ ANDROID GAME-LOOP TEST FLAGS
 
 ANDROID INSTRUMENTATION TEST FLAGS
      --test-package=TEST_PACKAGE
-        The Java package name of the instrumentation test (default: extracted
-        from the APK manifest).
+        (DEPRECATED) The Java package name of the instrumentation test
+        (default: extracted from the APK manifest).
+
+        The --test-package flag is deprecated and should no longer be used. By
+        default, the correct test package name is parsed from the APK manifest.
 
      --test-runner-class=TEST_RUNNER_CLASS
         The fully-qualified Java class name of the instrumentation test runner
@@ -240,49 +254,30 @@ ANDROID INSTRUMENTATION TEST FLAGS
         for more information about Android Test Orchestrator.
 
 ANDROID ROBO TEST FLAGS
-     --app-initial-activity=APP_INITIAL_ACTIVITY
-        (DEPRECATED) The initial activity used to start the app during a Robo
-        test.
-
-        The --app-initial-activity flag is deprecated and no longer has any
-        effect on the Robo crawler. Alternatively, the --robo-script flag (in
-        beta) can be used to guide Robo to a specific part of your app before
-        the Robo test begins.
-
-     --max-depth=int
-        (DEPRECATED) The maximum depth of the traversal stack a Robo test can
-        explore. Needs to be at least 2 to make Robo explore the app beyond the
-        first activity (default: 50).
-
-        The --max-depth flag is deprecated and no longer has any effect on the
-        actions of the Robo crawler.
-
-     --max-steps=int
-        (DEPRECATED) The maximum number of steps/actions a Robo test can
-        execute (default: no limit).
-
-        The --max-steps flag is deprecated and no longer has any effect on the
-        Robo crawler. The --timeout flag may be optionally used to limit the
-        maximum length of a Robo test.
-
      --robo-directives=[TYPE:RESOURCE_NAME=INPUT,...]
         A comma-separated (<type>:<key>=<value>) map of robo_directives that
         you can use to customize the behavior of Robo test. The type specifies
-        the action type of the directive, which may take on values click or
-        text. If no type is provided, text will be used by default. Each key
-        should be the Android resource name of a target UI element and each
+        the action type of the directive, which may take on values click, text
+        or ignore. If no type is provided, text will be used by default. Each
+        key should be the Android resource name of a target UI element and each
         value should be the text input for that element. Values are only
         permitted for text type elements, so no value should be specified for
-        click type elements. For example, use
+        click and ignore type elements.
+
+        To provide custom login credentials for your app, use
 
             --robo-directives text:username_resource=username,text:password_resource=password
 
-        to provide custom login credentials for your app, or
+        To instruct Robo to click on the sign-in button, use
 
             --robo-directives click:sign_in_button=
 
-        to instruct Robo to click on the sign in button. To learn more about
-        Robo test and robo_directives, see
+        To instruct Robo to ignore any UI elements with resource names which
+        equal or start with the user-defined value, use
+
+            --robo-directives ignore:ignored_ui_element_resource_name=
+
+        To learn more about Robo test and robo_directives, see
         https://firebase.google.com/docs/test-lab/android/command-line#custom_login_and_text_input_with_robo_test.
 
         Caution: You should only use credentials for test accounts that are not
@@ -334,8 +329,9 @@ LIST COMMAND FLAGS
         applied in this order: --flatten, --sort-by, --filter, --limit.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

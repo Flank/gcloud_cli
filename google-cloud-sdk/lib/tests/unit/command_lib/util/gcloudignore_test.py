@@ -526,12 +526,93 @@ class FileChooserGetIncludedFilesTest(test_case.Base):
 
   @test_case.Filters.DoNotRunOnWindows(
       'Symlinks don\'t work on Windows without binary extensions to Python.')
-  def testGetIncludedFiles_SymlinksAreNotDirectories(self):
+  def testGetIncludedFiles_SymlinkIgnored(self):
     with _TempDir() as temp_path:
       self.Touch(os.path.join(temp_path, 'foo'), 'bar', makedirs=True)
       os.symlink(os.path.join(temp_path, 'foo'), os.path.join(temp_path, 'baz'))
       file_chooser = gcloudignore.FileChooser.FromString('baz/')
+      self.assertNotIn('baz', set(file_chooser.GetIncludedFiles(temp_path)))
+
+  @test_case.Filters.DoNotRunOnWindows(
+      'Symlinks don\'t work on Windows without binary extensions to Python.')
+  def testGetIncludedFiles_WithinSymlinkIgnored(self):
+    with _TempDir() as temp_path:
+      self.Touch(os.path.join(temp_path, 'foo'), 'bar', makedirs=True)
+      os.symlink(os.path.join(temp_path, 'foo'), os.path.join(temp_path, 'baz'))
+      file_chooser = gcloudignore.FileChooser.FromString('baz/bar')
       self.assertIn('baz', set(file_chooser.GetIncludedFiles(temp_path)))
+      self.assertNotIn('baz/bar', set(file_chooser.GetIncludedFiles(temp_path)))
+
+  @test_case.Filters.DoNotRunOnWindows(
+      'Symlinks don\'t work on Windows without binary extensions to Python.')
+  def testGetIncludedFiles_SymlinkFollowed(self):
+    with _TempDir() as temp_path:
+      self.Touch(os.path.join(temp_path, 'foo'), 'bar', makedirs=True)
+      os.symlink(os.path.join(temp_path, 'foo'), os.path.join(temp_path, 'baz'))
+      file_chooser = gcloudignore.FileChooser.FromString('')
+      included = set(file_chooser.GetIncludedFiles(temp_path))
+      self.assertIn('baz', included)
+      self.assertIn('baz/bar', included)
+
+  @test_case.Filters.DoNotRunOnWindows(
+      'Symlinks don\'t work on Windows without binary extensions to Python.')
+  def testGetIncludedFiles_SymlinkLoop(self):
+    with _TempDir() as temp_path:
+      self.Touch(os.path.join(temp_path, 'foo'), 'bar', makedirs=True)
+      os.symlink(os.path.join(temp_path, 'foo'),
+                 os.path.join(temp_path, 'foo', 'baz'))
+      file_chooser = gcloudignore.FileChooser.FromString('')
+      with self.assertRaises(gcloudignore.SymlinkLoopError):
+        list(file_chooser.GetIncludedFiles(temp_path))
+
+  @test_case.Filters.DoNotRunOnWindows(
+      'Symlinks don\'t work on Windows without binary extensions to Python.')
+  def testGetIncludedFiles_SymlinkLoopExcluded(self):
+    with _TempDir() as temp_path:
+      self.Touch(os.path.join(temp_path, 'foo'), 'bar', makedirs=True)
+      os.symlink(os.path.join(temp_path, 'foo'),
+                 os.path.join(temp_path, 'foo', 'baz'))
+      file_chooser = gcloudignore.FileChooser.FromString('foo')
+      # Don't error on a symlink loop if we're excluding it.
+      list(file_chooser.GetIncludedFiles(temp_path))
+
+  @test_case.Filters.DoNotRunOnWindows(
+      'Symlinks don\'t work on Windows without binary extensions to Python.')
+  def testGetIncludedFiles_SymlinkLoopIndirect(self):
+    with _TempDir() as temp_path:
+      self.Touch(os.path.join(temp_path, 'foo', 'bar'), 'baz', makedirs=True)
+      os.symlink(os.path.join(temp_path, 'foo'),
+                 os.path.join(temp_path, 'foo', 'bar', 'foo'))
+      file_chooser = gcloudignore.FileChooser.FromString('')
+      with self.assertRaises(gcloudignore.SymlinkLoopError):
+        list(file_chooser.GetIncludedFiles(temp_path))
+
+  @test_case.Filters.DoNotRunOnWindows(
+      'Symlinks don\'t work on Windows without binary extensions to Python.')
+  def testGetIncludedFiles_SymlinkLoopSiblings(self):
+    with _TempDir() as temp_path:
+      self.Touch(os.path.join(temp_path, 'foo'), 'asdf', makedirs=True)
+      os.symlink(os.path.join(temp_path, 'foo', 'bar'),
+                 os.path.join(temp_path, 'foo', 'baz'))
+      os.symlink(os.path.join(temp_path, 'foo', 'baz'),
+                 os.path.join(temp_path, 'foo', 'bar'))
+      file_chooser = gcloudignore.FileChooser.FromString('')
+      with self.assertRaises(gcloudignore.SymlinkLoopError):
+        list(file_chooser.GetIncludedFiles(temp_path))
+
+  @test_case.Filters.DoNotRunOnWindows(
+      'Symlinks don\'t work on Windows without binary extensions to Python.')
+  def testGetIncludedFiles_SymlinkDirSiblings(self):
+    with _TempDir() as temp_path:
+      self.Touch(os.path.join(temp_path, 'foo'), 'a.txt', makedirs=True)
+      self.Touch(os.path.join(temp_path, 'baz'), 'b.txt', makedirs=True)
+      os.symlink(os.path.join(temp_path, 'baz'),
+                 os.path.join(temp_path, 'foo', 'bar'))
+      os.symlink(os.path.join(temp_path, 'foo'),
+                 os.path.join(temp_path, 'baz', 'quux'))
+      file_chooser = gcloudignore.FileChooser.FromString('')
+      with self.assertRaises(gcloudignore.SymlinkLoopError):
+        list(file_chooser.GetIncludedFiles(temp_path))
 
 
 class GetFileChooserForDirTests(sdk_test_base.WithLogCapture):

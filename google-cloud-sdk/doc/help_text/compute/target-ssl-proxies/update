@@ -13,7 +13,7 @@ DESCRIPTION
     SSL proxies. A target SSL proxy is referenced by one or more forwarding
     rules which define which packets the proxy is responsible for routing. The
     target SSL proxy in turn points to a backend service which will handle the
-    requests. The target SSL proxy also points to at most 10 SSL certificates
+    requests. The target SSL proxy also points to at most 15 SSL certificates
     used for server-side authentication. The target SSL proxy can be associated
     with at most one SSL policy.
 
@@ -37,7 +37,7 @@ FLAGS
             information.
 
      --ssl-certificates=SSL_CERTIFICATE,[...]
-        References to at most 10 SSL certificate resources that are used for
+        References to at most 15 SSL certificate resources that are used for
         server-side authentication. The first SSL certificate in this list is
         considered the primary SSL certificate associated with the load
         balancer. The SSL certificate must exist and cannot be deleted while
@@ -55,8 +55,9 @@ FLAGS
           be deleted while referenced by a target SSL proxy.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

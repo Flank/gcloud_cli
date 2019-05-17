@@ -24,7 +24,6 @@ from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.api_lib.util import exceptions
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions as c_exc
-from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.apitools import http_error
@@ -32,10 +31,10 @@ from tests.lib.surface.source import base
 import mock
 
 
-@parameterized.named_parameters((calliope_base.ReleaseTrack.GA,
-                                 calliope_base.ReleaseTrack.BETA))
-class CloneTestBetaAndGA(parameterized.TestCase, base.SourceSdkTest,
-                         sdk_test_base.WithOutputCapture):
+class RepoCloneTestGA(base.SourceSdkTest, sdk_test_base.WithOutputCapture):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.messages = core_apis.GetMessagesModule('sourcerepo', 'v1')
@@ -46,8 +45,7 @@ class CloneTestBetaAndGA(parameterized.TestCase, base.SourceSdkTest,
     self.mock_client.Mock()
     self.addCleanup(self.mock_client.Unmock)
 
-  def testClone(self, track):
-    self.track = track
+  def testClone(self):
     self.mock_client.projects_repos.Get.Expect(
         self.messages.SourcerepoProjectsReposGetRequest(
             name='projects/' + self.Project() + '/repos/default'),
@@ -60,8 +58,7 @@ class CloneTestBetaAndGA(parameterized.TestCase, base.SourceSdkTest,
       self.AssertErrContains('Project [{0}] repository [default] was'
                              ' cloned to [default].\n'.format(self.Project()))
 
-  def testCloneDryRun(self, track):
-    self.track = track
+  def testCloneDryRun(self):
     self.mock_client.projects_repos.Get.Expect(
         self.messages.SourcerepoProjectsReposGetRequest(
             name='projects/' + self.Project() + '/repos/default'),
@@ -73,8 +70,7 @@ class CloneTestBetaAndGA(parameterized.TestCase, base.SourceSdkTest,
           mock.ANY, full_path=False, destination_path='default', dry_run=True)
       self.AssertErrNotContains('was cloned')
 
-  def testCloneWithDestination(self, track):
-    self.track = track
+  def testCloneWithDestination(self):
     self.mock_client.projects_repos.Get.Expect(
         self.messages.SourcerepoProjectsReposGetRequest(
             name='projects/' + self.Project() + '/repos/my-repo'),
@@ -90,8 +86,7 @@ class CloneTestBetaAndGA(parameterized.TestCase, base.SourceSdkTest,
       self.AssertErrContains('Project [{0}] repository [my-repo] was cloned to '
                              '[my-repo-path].\n'.format(self.Project()))
 
-  def testCloneFails(self, track):
-    self.track = track
+  def testCloneFails(self):
     self.mock_client.projects_repos.Get.Expect(
         self.messages.SourcerepoProjectsReposGetRequest(
             name='projects/' + self.Project() + '/repos/my-repo'),
@@ -103,8 +98,7 @@ class CloneTestBetaAndGA(parameterized.TestCase, base.SourceSdkTest,
           mock.ANY, full_path=False, destination_path='my-repo', dry_run=False)
       self.assertEqual('', self.GetErr())
 
-  def testGetRepoRaisesPermissionDenied(self, track):
-    self.track = track
+  def testGetRepoRaisesPermissionDenied(self):
     self.mock_client.projects_repos.Get.Expect(
         self.messages.SourcerepoProjectsReposGetRequest(
             name='projects/' + self.Project() + '/repos/my-repo'),
@@ -113,8 +107,7 @@ class CloneTestBetaAndGA(parameterized.TestCase, base.SourceSdkTest,
       self.RunSourceRepos(['clone', 'my-repo'])
       self.AssertErrContains('PERMISSION_DENIED')
 
-  def testGetRepoRaisesNotFound(self, track):
-    self.track = track
+  def testGetRepoRaisesNotFound(self):
     self.mock_client.projects_repos.Get.Expect(
         self.messages.SourcerepoProjectsReposGetRequest(
             name='projects/' + self.Project() + '/repos/my-repo'),
@@ -122,6 +115,18 @@ class CloneTestBetaAndGA(parameterized.TestCase, base.SourceSdkTest,
     with self.assertRaises(exceptions.HttpException):
       self.RunSourceRepos(['clone', 'my-repo'])
       self.AssertErrContains('NOT_FOUND')
+
+
+class RepoCloneTestBeta(RepoCloneTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class RepoCloneTestAlpha(RepoCloneTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 class CloneTestGaOnly(base.SourceSdkTest, sdk_test_base.WithOutputCapture):

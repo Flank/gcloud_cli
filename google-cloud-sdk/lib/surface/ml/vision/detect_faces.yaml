@@ -2,8 +2,12 @@
 
   help_text:
     brief: Detect faces within an image.
-    DESCRIPTION: |
+    description: |
       Detect faces within an image.
+    examples: |
+      To detect faces in image 'gs://my_bucket/input_file':
+
+        $ {command} gs://my_bucket/input_file
 
   request:
     _COMMON_: request
@@ -25,8 +29,12 @@
 
   help_text:
     brief: Detect faces within an image.
-    DESCRIPTION: |
+    description: |
       Detect faces within an image.
+    examples: |
+      To detect faces in image 'gs://my_bucket/input_file':
+
+        $ {command} gs://my_bucket/input_file
 
   request:
     _COMMON_: request

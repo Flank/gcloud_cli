@@ -21,8 +21,10 @@ from __future__ import unicode_literals
 
 import os
 
+from googlecloudsdk.command_lib.compute import iap_tunnel
 from googlecloudsdk.command_lib.util.ssh import ssh
 from googlecloudsdk.core import execution_utils
+from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.util import files
@@ -280,6 +282,44 @@ class KeysTest(sdk_test_base.WithTempCWD,
       ssh.Keys.PublicKey.FromKeyString(key_string)
 
 
+class KnownHostsTest(test_case.TestCase):
+  """Tests for ssh.KnownHosts class."""
+
+  def SetUp(self):
+    known_hosts_entries = [
+        'compute.1234 ssh-rsa asdfasdfasdf',
+        'compute.3456 ssh-rsa asdfasdfasdf',
+    ]
+    self.known_hosts = ssh.KnownHosts(known_hosts_entries, '/tmp/foo')
+
+  def testAddMultiple(self):
+    host_keys_to_add = [
+        'ssh-rsa jkljkljkljkl',
+        'ecdsa-sha2-nistp256 jkljkljkljkl',
+    ]
+    added = self.known_hosts.AddMultiple('compute.5678', host_keys_to_add)
+    self.assertTrue(added)
+    self.assertIn('compute.5678 ssh-rsa jkljkljkljkl',
+                  self.known_hosts.known_hosts)
+    self.assertIn('compute.5678 ecdsa-sha2-nistp256 jkljkljkljkl',
+                  self.known_hosts.known_hosts)
+
+    added = self.known_hosts.AddMultiple('compute.1234', host_keys_to_add)
+    self.assertFalse(added)
+    self.assertNotIn('compute.1234 ssh-rsa jkljkljkljkl',
+                     self.known_hosts.known_hosts)
+
+    added = self.known_hosts.AddMultiple('compute.1234', host_keys_to_add,
+                                         overwrite=True)
+    self.assertTrue(added)
+    self.assertIn('compute.1234 ssh-rsa jkljkljkljkl',
+                  self.known_hosts.known_hosts)
+    self.assertNotIn('compute.1234 ssh-rsa asdfasdfasdf',
+                     self.known_hosts.known_hosts)
+
+    self.assertFalse(self.known_hosts.AddMultiple('compute.7890', []))
+
+
 class RemoteTest(test_case.TestCase):
   """Tests for ssh.Remote class."""
 
@@ -382,6 +422,14 @@ class CommandTestBase(test_case.TestCase):
     self.ref_local_2 = ssh.FileReference('local_2')
 
     self.remote = ssh.Remote('myhost')
+
+    # Example iap_tunnel.SshTunnelArgs
+    self.iap_tunnel_args = iap_tunnel.SshTunnelArgs()
+    self.iap_tunnel_args.track = 'beta'
+    self.iap_tunnel_args.project = 'my-project'
+    self.iap_tunnel_args.zone = 'my-zone'
+    self.iap_tunnel_args.instance = self.remote.host
+    self.iap_tunnel_args.interface = 'nic0'
 
   def SplitIfString(self, arg):
     """If `arg` is a string, split it into an array.
@@ -618,6 +666,41 @@ class SSHCommandTest(CommandTestBase):
         'ssh -t myhost -- echo hello',
         'putty -t myhost echo hello')
 
+  def testIapTunnel(self):
+    self.StartObjectPatch(execution_utils, 'ArgsForGcloud',
+                          return_value=['python', '/a/b/gcloud.py'])
+    self.StartObjectPatch(log, 'GetVerbosityName', return_value='warning')
+    self.AssertCommandBuild(
+        ssh.SSHCommand(self.remote, iap_tunnel_args=self.iap_tunnel_args),
+        ['ssh', '-t', '-o',
+         ('ProxyCommand python /a/b/gcloud.py beta compute start-iap-tunnel '
+          'myhost %p --listen-on-stdin --project=my-project --zone=my-zone '
+          '--network-interface=nic0 --verbosity=warning'),
+         '-o', 'ProxyUseFdpass=no', 'myhost'],
+        ['putty', '-t', '-proxycmd',
+         ('"python" "/a/b/gcloud.py" beta compute start-iap-tunnel myhost '
+          '%port --listen-on-stdin --project=my-project --zone=my-zone '
+          '--network-interface=nic0 --verbosity=warning'),
+         'myhost'])
+
+  def testIapTunnelMoreArgs(self):
+    self.StartObjectPatch(execution_utils, 'ArgsForGcloud',
+                          return_value=['python', '/a/b/gcloud.py'])
+    self.StartObjectPatch(log, 'GetVerbosityName', return_value='warning')
+    self.AssertCommandBuild(
+        ssh.SSHCommand(self.remote, options={'Opt': 123}, extra_flags=['-b'],
+                       iap_tunnel_args=self.iap_tunnel_args),
+        ['ssh', '-t', '-o', 'Opt=123', '-o',
+         ('ProxyCommand python /a/b/gcloud.py beta compute start-iap-tunnel '
+          'myhost %p --listen-on-stdin --project=my-project --zone=my-zone '
+          '--network-interface=nic0 --verbosity=warning'),
+         '-o', 'ProxyUseFdpass=no', '-b', 'myhost'],
+        ['putty', '-t', '-proxycmd',
+         ('"python" "/a/b/gcloud.py" beta compute start-iap-tunnel myhost '
+          '%port --listen-on-stdin --project=my-project --zone=my-zone '
+          '--network-interface=nic0 --verbosity=warning'),
+         '-b', 'myhost'])
+
   def testAllArgs(self):
     """Test all arguments together in one invocation."""
     remote = ssh.Remote('myhost', user='me')
@@ -627,7 +710,7 @@ class SSHCommandTest(CommandTestBase):
     cmd = ssh.SSHCommand(remote, port='8080',
                          identity_file='/path/to/key', options=options,
                          extra_flags=extra_flags, remote_command=remote_command,
-                         tty=False)
+                         tty=False, iap_tunnel_args=None)
     self.AssertCommandBuild(
         cmd,
         ['ssh', '-T', '-p', '8080', '-i', '/path/to/key', '-o', 'Opt=123', '-o',
@@ -894,6 +977,24 @@ class SCPCommandTest(CommandTestBase):
         'scp -b -k v local_1 myhost:remote_1',
         'pscp -b -k v local_1 myhost:remote_1')
 
+  def testIapTunnel(self):
+    self.StartObjectPatch(execution_utils, 'ArgsForGcloud',
+                          return_value=['python', '/a/b/gcloud.py'])
+    self.StartObjectPatch(log, 'GetVerbosityName', return_value='warning')
+    self.AssertCommandBuild(
+        ssh.SCPCommand(self.ref_local_1, self.ref_remote_1,
+                       iap_tunnel_args=self.iap_tunnel_args),
+        ['scp', '-o',
+         ('ProxyCommand python /a/b/gcloud.py beta compute start-iap-tunnel '
+          'myhost %p --listen-on-stdin --project=my-project --zone=my-zone '
+          '--network-interface=nic0 --verbosity=warning'),
+         '-o', 'ProxyUseFdpass=no', 'local_1', 'myhost:remote_1'],
+        ['pscp', '-proxycmd',
+         ('"python" "/a/b/gcloud.py" beta compute start-iap-tunnel myhost '
+          '%port --listen-on-stdin --project=my-project --zone=my-zone '
+          '--network-interface=nic0 --verbosity=warning'),
+         'local_1', 'myhost:remote_1'])
+
   def testAllArgs(self):
     """Test all arguments together in one invocation."""
 
@@ -902,7 +1003,7 @@ class SCPCommandTest(CommandTestBase):
     cmd = ssh.SCPCommand([self.ref_local_1, self.ref_local_2],
                          self.ref_remote_2, recursive=True, port='8080',
                          identity_file='/path/to/key', options=options,
-                         extra_flags=extra_flags)
+                         extra_flags=extra_flags, iap_tunnel_args=None)
     self.AssertCommandBuild(
         cmd,
         'scp -r -P 8080 -i /path/to/key -o Opt=123 -o Other=no -b -k v '
@@ -1116,12 +1217,16 @@ class SSHPollerTest(CommandTestBase):
     extra_flags = ['-b', '-k', 'v']
     poller = ssh.SSHPoller(remote, port='8080',
                            identity_file='/path/to/key', options=options,
-                           extra_flags=extra_flags)
+                           extra_flags=extra_flags, iap_tunnel_args=None)
     self.AssertCommandBuild(
         poller.ssh_command,
         ('ssh -T -p 8080 -i /path/to/key -o Opt=123 -o Other=no -b -k v '
          'me@myhost -- true'),
         'plink -T -P 8080 -i /path/to/key.ppk -b -k v me@myhost true')
+
+  def testIapTunnel(self):
+    poller = ssh.SSHPoller(self.remote, iap_tunnel_args=self.iap_tunnel_args)
+    self.assertEqual(poller.ssh_command.iap_tunnel_args, self.iap_tunnel_args)
 
   def testPollFirstSuccess(self):
     """Run the poller and succeed at once."""
@@ -1167,6 +1272,94 @@ class SSHPollerTest(CommandTestBase):
     self.assertEqual(self.time_ms.call_count, 2)
     self.ssh_run_mock.assert_called_once_with(
         env='fake-env', force_connect=True)
+
+
+class BuildIapTunnelProxyCommandArgsTest(CommandTestBase):
+  """Test building proxy command arguments."""
+
+  def SetUp(self):
+    self.StartObjectPatch(execution_utils, 'ArgsForGcloud',
+                          return_value=['python', '/a/b/gcloud.py'])
+    self.get_verbosity_name = self.StartObjectPatch(log, 'GetVerbosityName',
+                                                    return_value='warning')
+
+  def testDisabled(self):
+    self.assertEqual(ssh._BuildIapTunnelProxyCommandArgs(None, self.openssh),
+                     [])
+    self.assertEqual(ssh._BuildIapTunnelProxyCommandArgs(None, self.putty), [])
+
+  def testBasic(self):
+    self.assertEqual(
+        ssh._BuildIapTunnelProxyCommandArgs(self.iap_tunnel_args, self.openssh),
+        ['-o',
+         ('ProxyCommand python /a/b/gcloud.py beta compute start-iap-tunnel '
+          'myhost %p --listen-on-stdin --project=my-project --zone=my-zone '
+          '--network-interface=nic0 --verbosity=warning'),
+         '-o', 'ProxyUseFdpass=no'])
+    self.assertEqual(
+        ssh._BuildIapTunnelProxyCommandArgs(self.iap_tunnel_args, self.putty),
+        ['-proxycmd',
+         ('"python" "/a/b/gcloud.py" beta compute start-iap-tunnel myhost '
+          '%port --listen-on-stdin --project=my-project --zone=my-zone '
+          '--network-interface=nic0 --verbosity=warning')])
+
+  def testGaNoVerbosityPassThrough(self):
+    self.get_verbosity_name.return_value = None
+    self.iap_tunnel_args.track = None
+    self.iap_tunnel_args.pass_through_args = ['--a=b', '--c=d']
+    self.assertEqual(
+        ssh._BuildIapTunnelProxyCommandArgs(self.iap_tunnel_args, self.openssh),
+        ['-o',
+         ('ProxyCommand python /a/b/gcloud.py compute start-iap-tunnel myhost '
+          '%p --listen-on-stdin --project=my-project --zone=my-zone '
+          '--network-interface=nic0 --a=b --c=d'),
+         '-o', 'ProxyUseFdpass=no'])
+    self.assertEqual(
+        ssh._BuildIapTunnelProxyCommandArgs(self.iap_tunnel_args, self.putty),
+        ['-proxycmd',
+         ('"python" "/a/b/gcloud.py" compute start-iap-tunnel myhost %port '
+          '--listen-on-stdin --project=my-project --zone=my-zone '
+          '--network-interface=nic0 "--a=b" "--c=d"')])
+
+
+class EscapeProxyCommandArgTest(CommandTestBase):
+  """Test that proxy command argument escaping works."""
+
+  def testBadCharacters(self):
+    with self.assertRaises(ssh.BadCharacterError):
+      ssh._EscapeProxyCommandArg('ab\tcd', self.openssh)
+    with self.assertRaises(ssh.BadCharacterError):
+      ssh._EscapeProxyCommandArg('abñcd', self.openssh)
+    with self.assertRaises(ssh.BadCharacterError):
+      ssh._EscapeProxyCommandArg('\x7f', self.openssh)
+
+  def testEscapes(self):
+    cases = [
+        ('a', 'a', '"a"'),
+        ('azAZ09', 'azAZ09', '"azAZ09"'),
+        ('%+-./:=@_', '%%+-./:=@_', '"%%+-./:=@_"'),
+        ('%%', '%%%%', '"%%%%"'),
+        ('\'', '\\\'', '"\'"'),
+        ('~!$', '\\~\\!\\$', '"~!$"'),
+        ('  ', '\\ \\ ', '"  "'),
+        ('\\', '\\\\', '"\\\\\\\\"'),
+        ('\\a', '\\\\a', '"\\\\a"'),
+        ('a\\', 'a\\\\', '"a\\\\\\\\"'),
+        ('"', '\\"', '"\\\\""'),
+        ('""', '\\"\\"', '"\\\\"\\\\""'),
+        ('ab\\cd', 'ab\\\\cd', '"ab\\\\cd"'),
+        ('ab\\\\cd', 'ab\\\\\\\\cd', '"ab\\\\\\\\cd"'),
+        ('ab"cd', 'ab\\"cd', '"ab\\\\"cd"'),
+        ('ab\\"cd', 'ab\\\\\\"cd', '"ab\\\\\\\\\\\\"cd"'),
+        ('ab\\\\"cd', 'ab\\\\\\\\\\"cd', '"ab\\\\\\\\\\\\\\\\\\\\"cd"'),
+        ('ab"\\cd', 'ab\\"\\\\cd', '"ab\\\\"\\\\cd"'),
+        ('ab\\x"cd', 'ab\\\\x\\"cd', '"ab\\\\x\\\\"cd"'),
+    ]
+    for s, expected_openssh, expected_putty in cases:
+      self.assertEqual(ssh._EscapeProxyCommandArg(s, self.openssh),
+                       expected_openssh)
+      self.assertEqual(ssh._EscapeProxyCommandArg(s, self.putty),
+                       expected_putty)
 
 
 if __name__ == '__main__':

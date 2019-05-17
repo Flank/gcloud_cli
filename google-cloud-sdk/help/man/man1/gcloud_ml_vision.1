@@ -23,10 +23,11 @@ Use Google Cloud Vision to analyze images.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -60,12 +61,24 @@ Detect popular natural and man\-made structures within an image.
 Detect popular product logos within an image.
 
 .TP 2m
+\fBdetect\-objects\fR
+Detect and extract multiple objects in an image with object localization.
+
+.TP 2m
 \fBdetect\-safe\-search\fR
 Detect explicit content in an image.
 
 .TP 2m
 \fBdetect\-text\fR
 Detect and extract text within an image.
+
+.TP 2m
+\fBdetect\-text\-pdf\fR
+Detect and transcribe text from PDF files stored in Google Cloud Storage.
+
+.TP 2m
+\fBdetect\-text\-tiff\fR
+Detect and transcribe text from TIFF files stored in Google Cloud Storage.
 
 .TP 2m
 \fBdetect\-web\fR

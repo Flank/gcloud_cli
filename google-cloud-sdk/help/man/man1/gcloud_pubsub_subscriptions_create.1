@@ -11,7 +11,7 @@ gcloud pubsub subscriptions create \- creates one or more Cloud Pub/Sub subscrip
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud pubsub subscriptions create\fR \fISUBSCRIPTION\fR [\fISUBSCRIPTION\fR\ ...] (\fB\-\-topic\fR=\fITOPIC\fR\ :\ \fB\-\-topic\-project\fR=\fITOPIC_PROJECT\fR) [\fB\-\-ack\-deadline\fR=\fIACK_DEADLINE\fR] [\fB\-\-push\-endpoint\fR=\fIPUSH_ENDPOINT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud pubsub subscriptions create\fR \fISUBSCRIPTION\fR [\fISUBSCRIPTION\fR\ ...] (\fB\-\-topic\fR=\fITOPIC\fR\ :\ \fB\-\-topic\-project\fR=\fITOPIC_PROJECT\fR) [\fB\-\-ack\-deadline\fR=\fIACK_DEADLINE\fR] [\fB\-\-expiration\-period\fR=\fIEXPIRATION_PERIOD\fR] [\fB\-\-message\-retention\-duration\fR=\fIMESSAGE_RETENTION_DURATION\fR] [\fB\-\-push\-endpoint\fR=\fIPUSH_ENDPOINT\fR] [\fB\-\-retain\-acked\-messages\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -79,9 +79,33 @@ The number of seconds the system will wait for a subscriber to acknowledge
 receiving a message before re\-attempting delivery.
 
 .TP 2m
+\fB\-\-expiration\-period\fR=\fIEXPIRATION_PERIOD\fR
+The subscription will expire if it is inactive for the given period. Valid
+values are strings of the form INTEGER[UNIT], where UNIT is one of "s", "m",
+"h", and "d" for seconds, minutes, hours, and days, respectively. If the unit is
+omitted, seconds is assumed. This flag additionally accepts the special value
+"never" to indicate that the subscription will never expire.
+
+.TP 2m
+\fB\-\-message\-retention\-duration\fR=\fIMESSAGE_RETENTION_DURATION\fR
+How long to retain unacknowledged messages in the subscription's backlog, from
+the moment a message is published. If \-\-retain\-acked\-messages is true, this
+also configures the retention of acknowledged messages. The default value is 7
+days, the minimum is 10 minutes, and the maximum is 7 days. Valid values are
+strings of the form INTEGER[UNIT], where UNIT is one of "s", "m", "h", and "d"
+for seconds, minutes, hours, and days, respectively. If the unit is omitted,
+seconds is assumed.
+
+.TP 2m
 \fB\-\-push\-endpoint\fR=\fIPUSH_ENDPOINT\fR
 A URL to use as the endpoint for this subscription. This will also automatically
 set the subscription type to PUSH.
+
+.TP 2m
+\fB\-\-retain\-acked\-messages\fR
+Whether or not to retain acknowledged messages. If true, messages are not
+expunged from the subscription's backlog until they fall out of the
+\-\-message\-retention\-duration window.
 
 
 .RE
@@ -89,10 +113,11 @@ set the subscription type to PUSH.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

@@ -32,4 +32,4 @@ class NoProjectResourcesTest(base.ServerlessSurfaceBase):
         Exception,
         'Please specify the argument .?--project.? on the command line or '
         'set the property .?core/project.?.'):
-      self.Run('run services list')
+      self.Run('run services list --region=us-central1')

@@ -1,7 +1,7 @@
 title: instance-template create-with-container --container-mount-disk tests
 description: |
   Tests --container-mount-disk flag.
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -139,6 +139,7 @@ actions:
     track_values:
       ALPHA: alpha
       BETA: beta
+      GA: v1
 - execute_command:
     # Create disk, device name given
     command: |

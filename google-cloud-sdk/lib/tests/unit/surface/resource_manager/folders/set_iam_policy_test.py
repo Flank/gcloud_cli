@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 from apitools.base.py import encoding
 
 from googlecloudsdk.api_lib.resource_manager import folders
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core.util import http_encoding
 from tests.lib import test_case
@@ -121,6 +122,18 @@ class FoldersSetIamPolicyTest(testbase.FoldersUnitTestBase):
         ],
         etag=http_encoding.Encode('someUniqueEtag'),
         version=1)
+
+
+class FoldersSetIamPolicyAlphaTest(FoldersSetIamPolicyTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class FoldersSetIamPolicyBetaTest(FoldersSetIamPolicyTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 if __name__ == '__main__':

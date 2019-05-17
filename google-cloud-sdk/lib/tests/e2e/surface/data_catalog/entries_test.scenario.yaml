@@ -1,0 +1,161 @@
+skip:
+  reason: Failing
+  bug: b/131865269
+title: Lookup, describe, and update a Data Catalog entry.
+release_tracks: [BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: pubsub topics create $$my-topic$$
+  - stderr: |
+      Created topic [projects/cloud-sdk-integration-testing/topics/$$my-topic$$].
+- execute:
+  - command: data-catalog entries lookup "pubsub.`cloud-sdk-integration-testing`.$$my-topic$$"
+  - stdout: .*$$my-entry$$.*$
+- execute:
+  - command: data-catalog entries describe $$my-entry$$
+  - stdout: .*$$my-entry$$.*$
+- execute:
+  - command: data-catalog entries update $$my-entry$$ --schema="field1=type1"
+  - stderr: |
+      Updated entry [cHJvamVjdHMvY2xvdWQtc2RrLWludGVncmF0aW9uLXRlc3RpbmcvdG9waWNzL3RvcGljLTIwMTkwMzI3LTIxMDgwNi0xc2Y4].
+  - stdout: |
+      linkedResource: //pubsub.googleapis.com/projects/cloud-sdk-integration-testing/topics/$$my-topic$$
+      name: $$my-entry$$
+      schema:
+        columns:
+        - column: field1
+          mode: NULLABLE
+          type: type1
+      sourceSystemTimestamps:
+        createTime: '2019-03-27T21:08:07.409Z'
+        expireTime: '1970-01-01T00:00:00Z'
+        updateTime: '2019-03-27T21:08:07.409Z'
+- execute:
+  - command: pubsub topics delete $$my-topic$$
+  - stderr: |
+      Deleted topic [projects/cloud-sdk-integration-testing/topics/$$my-topic$$].
+actions:
+- generate_resource_id:
+    reference: my-topic
+    prefix: topic
+    delimiter: _
+- execute_command:
+    command: pubsub topics create $$my-topic$$
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Created topic [projects/cloud-sdk-integration-testing/topics/$$my-topic$$].
+    - expect_exit:
+        code: 0
+- execute_command_until:
+    command: data-catalog entries lookup "pubsub.`cloud-sdk-integration-testing`.$$my-topic$$"
+    exit_code: 0
+    exponential_sleep_multiplier: '1.5'
+    timeout: 20
+- execute_command:
+    command: data-catalog entries lookup "pubsub.`cloud-sdk-integration-testing`.$$my-topic$$"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://datacatalog.googleapis.com/v1beta1/entries:lookup?alt=json&sqlResource=pubsub.%60cloud-sdk-integration-testing%60.$$my-topic$$
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '485'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/global/entryGroups/@pubsub/entries/cHJvamVjdHMvY2xvdWQtc2RrLWludGVncmF0aW9uLXRlc3RpbmcvdG9waWNzL3RvcGljLTIwMTkwMzI3LTIxMDgwNi0xc2Y4
+            sourceSystemTimestamps:
+              createTime: '2019-03-27T21:08:07.409Z'
+              updateTime: '2019-03-27T21:08:07.409Z'
+              expireTime: '1970-01-01T00:00:00Z'
+            linkedResource: //pubsub.googleapis.com/projects/cloud-sdk-integration-testing/topics/$$my-topic$$
+        expect_response:
+          extract_references:
+          - field: name
+            reference: my-entry
+          body:
+            text:
+              is_none: false
+    - expect_stdout:
+        matches: .*$$my-entry$$.*
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: data-catalog entries describe $$my-entry$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://datacatalog.googleapis.com/v1beta1/$$my-entry$$?alt=json
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '485'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/global/entryGroups/@pubsub/entries/cHJvamVjdHMvY2xvdWQtc2RrLWludGVncmF0aW9uLXRlc3RpbmcvdG9waWNzL3RvcGljLTIwMTkwMzI3LTIxMDgwNi0xc2Y4
+            sourceSystemTimestamps:
+              createTime: '2019-03-27T21:08:07.409Z'
+              updateTime: '2019-03-27T21:08:07.409Z'
+              expireTime: '1970-01-01T00:00:00Z'
+            linkedResource: //pubsub.googleapis.com/projects/cloud-sdk-integration-testing/topics/$$my-topic$$
+    - expect_stdout:
+        matches: .*$$my-entry$$.*
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: data-catalog entries update $$my-entry$$ --schema="field1=type1"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://datacatalog.googleapis.com/v1beta1/$$my-entry$$?alt=json&updateMask=schema
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              schema:
+                columns:
+                - column: field1
+                  type: type1
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '623'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/global/entryGroups/@pubsub/entries/cHJvamVjdHMvY2xvdWQtc2RrLWludGVncmF0aW9uLXRlc3RpbmcvdG9waWNzL3RvcGljLTIwMTkwMzI3LTIxMDgwNi0xc2Y4
+            schema:
+              columns:
+              - type: type1
+                mode: NULLABLE
+                column: field1
+            sourceSystemTimestamps:
+              createTime: '2019-03-27T21:08:07.409Z'
+              updateTime: '2019-03-27T21:08:07.409Z'
+              expireTime: '1970-01-01T00:00:00Z'
+            linkedResource: //pubsub.googleapis.com/projects/cloud-sdk-integration-testing/topics/$$my-topic$$
+    - expect_stderr:
+        matches: Updated entry.*
+    - expect_stdout:
+        matches: .*field1.*
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: pubsub topics delete $$my-topic$$
+    validation_only: true
+    cleanup_for: my-topic
+    events:
+    - expect_stderr: |
+        Deleted topic [projects/cloud-sdk-integration-testing/topics/$$my-topic$$].
+    - expect_exit:
+        code: 0

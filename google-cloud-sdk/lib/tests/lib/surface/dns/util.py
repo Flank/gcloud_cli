@@ -19,6 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.api_lib.dns import util as dns_util
 from googlecloudsdk.api_lib.util import apis
 
 
@@ -26,27 +27,65 @@ def GetMessages(api_version="v1"):
   return apis.GetMessagesModule("dns", api_version)
 
 
+def GetDnsVisibilityDict(version,
+                         visibility="public",
+                         network_urls=None,
+                         messages=None):
+  """Build visibility messages."""
+  if messages:
+    m = messages
+  else:
+    m = GetMessages()
+
+  result = {"visibility": m.ManagedZone.VisibilityValueValuesEnum(visibility)}
+
+  if visibility == "private":
+    if network_urls:
+
+      def GetNetworkSelfLink(network_url):
+        return dns_util.GetRegistry(version).Parse(
+            network_url,
+            collection="compute.networks",
+            params={
+                "project": "fake-project"
+            }).SelfLink()
+
+      network_configs = [
+          m.ManagedZonePrivateVisibilityConfigNetwork(
+              networkUrl=GetNetworkSelfLink(nurl)) for nurl in network_urls
+      ]
+    else:
+      network_configs = []
+
+    pvcfg = m.ManagedZonePrivateVisibilityConfig
+    result["privateVisibilityConfig"] = pvcfg(networks=network_configs)
+  return result
+
+
 def GetManagedZones(api_version="v1"):
+  m = GetMessages(api_version)
   return [
-      GetMessages(api_version).ManagedZone(
+      m.ManagedZone(
           creationTime="2014-10-20T20:06:50.077Z",
           description="My zone!",
           dnsName="zone.com.",
           id=67371891,
           kind="dns#managedZone",
           name="mz",
+          visibility=m.ManagedZone.VisibilityValueValuesEnum.public,
           nameServers=[
               "ns-cloud-e1.googledomains.com.",
               "ns-cloud-e2.googledomains.com.",
               "ns-cloud-e3.googledomains.com.",
               "ns-cloud-e4.googledomains.com."]),
-      GetMessages(api_version).ManagedZone(
+      m.ManagedZone(
           creationTime="2014-10-21T20:06:50.077Z",
           description="My zone 1!",
           dnsName="zone1.com.",
           id=67671341,
           kind="dns#managedZone",
           name="mz1",
+          visibility=m.ManagedZone.VisibilityValueValuesEnum.public,
           nameServers=[
               "ns-cloud-e2.googledomains.com.",
               "ns-cloud-e1.googledomains.com.",
@@ -55,7 +94,9 @@ def GetManagedZones(api_version="v1"):
   ]
 
 
-def GetManagedZoneBeforeCreation(messages, dns_sec_config=False):
+def GetManagedZoneBeforeCreation(messages,
+                                 dns_sec_config=False,
+                                 visibility_dict=None):
   """Generate a create message for a managed zone."""
   m = messages
   mzone = m.ManagedZone(
@@ -75,9 +116,12 @@ def GetManagedZoneBeforeCreation(messages, dns_sec_config=False):
         state=m.ManagedZoneDnsSecConfig.StateValueValuesEnum.on,
     )
 
-  if hasattr(messages.ManagedZone, "VisibilityValueValuesEnum"):
+  if visibility_dict:
+    mzone.visibility = visibility_dict["visibility"]
+    if mzone.visibility == m.ManagedZone.VisibilityValueValuesEnum("private"):
+      mzone.privateVisibilityConfig = visibility_dict["privateVisibilityConfig"]
+  else:
     mzone.visibility = messages.ManagedZone.VisibilityValueValuesEnum.public
-
   return mzone
 
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -53,7 +53,15 @@ class RefError(Error):
 
 
 class ValidationError(Error):
-  """Validation error -- YAML data does not match the schema."""
+  """Validation error -- YAML data does not match the schema.
+
+  Attributes:
+      message: A user-readable error message describing the validation error.
+  """
+
+  def __init__(self, error):
+    super(ValidationError, self).__init__(error)
+    self.message = error.message
 
 
 class Validator(object):

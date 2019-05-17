@@ -19,9 +19,14 @@ class AuthorizeEnvironmentRequest(_messages.Message):
   Fields:
     accessToken: The OAuth access token that should be sent to the
       environment.
+    expireTime: The time when the credentials expire. If not set, defaults to
+      one hour from when the server received the request.
+    idToken: The OAuth ID token that should be sent to the environment.
   """
 
   accessToken = _messages.StringField(1)
+  expireTime = _messages.StringField(2)
+  idToken = _messages.StringField(3)
 
 
 class CloudshellUsersEnvironmentsAuthorizeRequest(_messages.Message):
@@ -30,8 +35,8 @@ class CloudshellUsersEnvironmentsAuthorizeRequest(_messages.Message):
   Fields:
     authorizeEnvironmentRequest: A AuthorizeEnvironmentRequest resource to be
       passed as the request body.
-    name: Name of the resource that should receive the token, for example
-      `users/me/environments/default` or
+    name: Name of the resource that should receive the credentials, for
+      example `users/me/environments/default` or
       `users/someone@example.com/environments/default`.
   """
 
@@ -219,7 +224,8 @@ class Operation(_messages.Message):
       if any.
     name: The server-assigned name, which is only unique within the same
       service that originally returns it. If you use the default HTTP mapping,
-      the `name` should have the format of `operations/some/unique/name`.
+      the `name` should be a resource name ending with
+      `operations/{unique_id}`.
     response: The normal response of the operation in case of success.  If the
       original method returns no data on success, such as `Delete`, the
       response is `google.protobuf.Empty`.  If the original method is standard

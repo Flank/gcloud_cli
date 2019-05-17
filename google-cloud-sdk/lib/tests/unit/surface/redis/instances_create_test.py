@@ -23,32 +23,26 @@ import copy
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope.concepts import handlers as concepts_handler
 from googlecloudsdk.core import properties
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface import redis_test_base
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,
-                           calliope_base.ReleaseTrack.BETA,
-                           calliope_base.ReleaseTrack.GA])
-class CreateTest(redis_test_base.InstancesUnitTestBase, parameterized.TestCase):
+class CreateTestGA(redis_test_base.InstancesUnitTestBase):
 
-  def testCreate_NoOptions(self, track):
-    self.SetUpForTrack(track)
-    self.SetUpInstancesForTrack()
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def testCreate_NoOptions(self):
     instance_to_create = self.MakeDefaultInstance()
     expected_instance = self._ExpectCreate(instance_to_create, self.instance_id,
                                            self.instance_relative_name)
 
-    actual_instance = self.Run('redis instances create {} --region {}'
-                               .format(self.instance_id, self.region_id))
+    actual_instance = self.Run('redis instances create {} --region {}'.format(
+        self.instance_id, self.region_id))
 
     self.assertEqual(actual_instance, expected_instance)
 
-  def testCreate_AllOptions(self, track):
-    self.SetUpForTrack(track)
-    self.SetUpInstancesForTrack()
+  def testCreate_AllOptions32(self):
     instance_to_create = self.MakeAllOptionsInstance()
     expected_instance = self._ExpectCreate(instance_to_create, self.instance_id,
                                            self.instance_relative_name)
@@ -64,63 +58,82 @@ class CreateTest(redis_test_base.InstancesUnitTestBase, parameterized.TestCase):
         ' --reserved-ip-range 10.0.0.0/29'
         ' --size 4'
         ' --tier standard'
-        ' --zone zone1'
-        .format(self.instance_id, self.region_id))
+        ' --zone zone1'.format(self.instance_id, self.region_id))
 
     self.assertEqual(actual_instance, expected_instance)
 
-  def testCreate_UsingRegionProperty(self, track):
-    self.SetUpForTrack(track)
-    self.SetUpInstancesForTrack()
+  def testCreate_AllOptions40(self):
+    instance_to_create = self.MakeAllOptionsInstance(redis_version='REDIS_4_0')
+    expected_instance = self._ExpectCreate(instance_to_create, self.instance_id,
+                                           self.instance_relative_name)
+
+    actual_instance = self.Run(
+        'redis instances create {} --region {}'
+        ' --alternative-zone zone2'
+        ' --display-name my-display-name'
+        ' --labels a=1,b=2'
+        ' --network my-network'
+        ' --redis-config maxmemory-policy=allkeys-lfu,notify-keyspace-events=El'
+        ',activedefrag=yes,lfu-log-factor=2,lfu-decay-time=10'
+        ' --redis-version redis_4_0'
+        ' --reserved-ip-range 10.0.0.0/29'
+        ' --size 4'
+        ' --tier standard'
+        ' --zone zone1'.format(self.instance_id, self.region_id))
+
+    self.assertEqual(actual_instance, expected_instance)
+
+  def testCreate_UsingRegionProperty(self):
     instance_to_create = self.MakeDefaultInstance()
     expected_instance = self._ExpectCreate(instance_to_create, self.instance_id,
                                            self.instance_relative_name)
 
     properties.VALUES.redis.region.Set(self.region_id)
-    actual_instance = self.Run('redis instances create {}'
-                               .format(self.instance_id))
+    actual_instance = self.Run('redis instances create {}'.format(
+        self.instance_id))
 
     self.assertEqual(actual_instance, expected_instance)
 
-  def testCreate_UsingRelativeInstanceName(self, track):
-    self.SetUpForTrack(track)
-    self.SetUpInstancesForTrack()
+  def testCreate_UsingRelativeInstanceName(self):
     instance_to_create = self.MakeDefaultInstance()
     expected_instance = self._ExpectCreate(instance_to_create, self.instance_id,
                                            self.instance_relative_name)
 
-    actual_instance = self.Run('redis instances create {}'
-                               .format(self.instance_relative_name))
+    actual_instance = self.Run('redis instances create {}'.format(
+        self.instance_relative_name))
 
     self.assertEqual(actual_instance, expected_instance)
 
-  def testCreate_NoRegion(self, track):
-    self.SetUpForTrack(track)
-    self.SetUpInstancesForTrack()
+  def testCreate_NoRegion(self):
     with self.assertRaises(concepts_handler.ParseError):
       self.Run('redis instances create {}'.format(self.instance_id))
 
-  def testCreate_Async(self, track):
-    self.SetUpForTrack(track)
-    self.SetUpInstancesForTrack()
+  def testCreate_Async(self):
     instance_to_create = self.MakeDefaultInstance()
-    self._ExpectCreate(instance_to_create, self.instance_id,
-                       self.instance_relative_name, is_async=True)
+    self._ExpectCreate(
+        instance_to_create,
+        self.instance_id,
+        self.instance_relative_name,
+        is_async=True)
 
-    self.Run('redis instances create {} --region {} --async'
-             .format(self.instance_id, self.region_id))
+    self.Run('redis instances create {} --region {} --async'.format(
+        self.instance_id, self.region_id))
 
-    self.AssertErrContains('Create request issued for: [{}]'.
-                           format(self.instance_id))
-    self.AssertErrContains('Check operation [{}] for status.'.
-                           format(self.wait_operation_id))
+    self.AssertErrContains('Create request issued for: [{}]'.format(
+        self.instance_id))
+    self.AssertErrContains('Check operation [{}] for status.'.format(
+        self.wait_operation_id))
 
-  def _ExpectCreate(self, instance_to_create, instance_to_create_id,
-                    instance_to_create_name, is_async=False):
+  def _ExpectCreate(self,
+                    instance_to_create,
+                    instance_to_create_id,
+                    instance_to_create_name,
+                    is_async=False):
     operation = self.messages.Operation(name=self.wait_operation_relative_name)
     self.instances_service.Create.Expect(
         request=self.messages.RedisProjectsLocationsInstancesCreateRequest(
-            instance=instance_to_create, instanceId=instance_to_create_id,
+            instance=instance_to_create,
+            instanceId=instance_to_create_id,
             parent=self.region_relative_name),
         response=operation)
 
@@ -142,6 +155,18 @@ class CreateTest(redis_test_base.InstancesUnitTestBase, parameterized.TestCase):
         response=expected_created_instance)
 
     return expected_created_instance
+
+
+class CreateTestBeta(CreateTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class CreateTestAlpha(CreateTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

@@ -1,0 +1,69 @@
+NAME
+    gcloud compute snapshots add-iam-policy-binding - add IAM policy binding to
+        a Google Compute Engine snapshot
+
+SYNOPSIS
+    gcloud compute snapshots add-iam-policy-binding SNAPSHOT_NAME
+        --member=MEMBER --role=ROLE [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Add an IAM policy binding to a Google Compute Engine snapshot.
+
+POSITIONAL ARGUMENTS
+     Snapshot resource - The snapshot for which to add IAM policy binding to.
+     This represents a Cloud resource. (NOTE) Some attributes are not given
+     arguments in this group but can be set in other ways. To set the [project]
+     attribute: provide the argument [snapshot_name] on the command line with a
+     fully specified name; set the property [core/project]; provide the
+     argument [--project] on the command line. This must be specified.
+
+       SNAPSHOT_NAME
+          ID of the snapshot or fully qualified identifier for the snapshot.
+
+REQUIRED FLAGS
+     --member=MEMBER
+        The member to add the binding for. Should be of the form
+        user|group|serviceAccount:email or domain:domain.
+
+        Examples: user:test-user@gmail.com, group:admins@example.com,
+        serviceAccount:test123@example.domain.com, or
+        domain:example.domain.com.
+
+        Can also be one of the following special values:
+        * allUsers - Special identifier that represents anyone who is on the
+          internet, with or without a Google account.
+        * allAuthenticatedUsers - Special identifier that represents anyone
+          who is authenticated with a Google account or a service account.
+
+     --role=ROLE
+        Define the role of the member.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+API REFERENCE
+    This command uses the compute/v1 API. The full documentation for this API
+    can be found at:
+    https://developers.google.com/compute/docs/reference/latest/
+
+EXAMPLES
+    To add an IAM policy binding for the role of 'roles/compute.securityAdmin'
+    for the user 'test-user@gmail.com' with snapshot 'my-snapshot', run:
+
+        $ gcloud compute snapshots add-iam-policy-binding my-snapshot \
+            --member='user:test-user@gmail.com' \
+            --role='roles/compute.securityAdmin'
+
+    See https://cloud.google.com/iam/docs/managing-policies for details of
+    policy role and member types.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha compute snapshots add-iam-policy-binding
+        $ gcloud beta compute snapshots add-iam-policy-binding
+

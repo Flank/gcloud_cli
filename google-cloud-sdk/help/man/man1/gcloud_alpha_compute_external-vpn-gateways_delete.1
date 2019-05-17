@@ -1,0 +1,61 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_EXTERNAL\-VPN\-GATEWAYS_DELETE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute external\-vpn\-gateways delete \- delete a Google Compute Engine external VPN gateway
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute external\-vpn\-gateways delete\fR \fINAME\fR [\fINAME\fR\ ...] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR \fBgcloud alpha compute external\-vpn\-gateways delete\fR is used
+to delete all data associated with a Google Compute Engine external VPN gateway
+in a project.
+
+An external VPN gateway provides the information to Google Cloud Platform about
+your on\-premises side or another Cloud provider's VPN gateway.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR [\fINAME\fR ...]
+Names of the external VPN gateways to delete.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute external\-vpn\-gateways delete
+.RE
+

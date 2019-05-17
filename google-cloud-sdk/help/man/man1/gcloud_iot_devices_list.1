@@ -11,7 +11,7 @@ gcloud iot devices list \- list devices
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud iot devices list\fR (\fB\-\-registry\fR=\fIREGISTRY\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-device\-ids\fR=[[\fIID\fR,...],...]] [\fB\-\-device\-num\-ids\fR=[[\fINUM_ID\fR,...],...]] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud iot devices list\fR (\fB\-\-registry\fR=\fIREGISTRY\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-device\-ids\fR=[\fIDEVICE_IDS\fR,...]] [\fB\-\-device\-num\-ids\fR=[\fIDEVICE_NUM_IDS\fR,...]] [\fB\-\-device\-type\fR=\fIDEVICE_TYPE\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -26,12 +26,13 @@ List devices.
 .RS 2m
 .TP 2m
 
-Registry resource \- The device registry in which to show devices. The arguments
-in this group can be used to specify the attributes of this resource. (NOTE)
-Some attributes are not given arguments in this group but can be set in other
-ways. To set the [project] attribute: provide the argument [\-\-registry] on the
-command line with a fully specified name; provide the argument [\-\-project] on
-the command line; set the property [core/project]. This must be specified.
+Registry resource \- The registry you want to list the devices for. The
+arguments in this group can be used to specify the attributes of this resource.
+(NOTE) Some attributes are not given arguments in this group but can be set in
+other ways. To set the [project] attribute: provide the argument [\-\-registry]
+on the command line with a fully specified name; provide the argument
+[\-\-project] on the command line; set the property [core/project]. This must be
+specified.
 
 .RS 2m
 .TP 2m
@@ -41,7 +42,7 @@ must be specified if any of the other arguments in this group are specified.
 
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-The Cloud region for the registry.
+The name of the Cloud IoT region.
 
 
 .RE
@@ -52,12 +53,18 @@ The Cloud region for the registry.
 
 .RS 2m
 .TP 2m
-\fB\-\-device\-ids\fR=[[\fIID\fR,...],...]
+\fB\-\-device\-ids\fR=[\fIDEVICE_IDS\fR,...]
 If given, show only devices with one of the provided IDs.
 
 .TP 2m
-\fB\-\-device\-num\-ids\fR=[[\fINUM_ID\fR,...],...]
+\fB\-\-device\-num\-ids\fR=[\fIDEVICE_NUM_IDS\fR,...]
 If given, show only devices with one of the provided numerical IDs.
+
+.TP 2m
+\fB\-\-device\-type\fR=\fIDEVICE_TYPE\fR
+If specified, show only devices of that type. If left unspecified, show devices
+of any type. \fIDEVICE_TYPE\fR must be one of: \fBgateway\fR,
+\fBnon\-gateway\fR.
 
 
 .RE
@@ -105,10 +112,18 @@ Print a list of resource URIs instead of the default output.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBcloudiot/v1\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/iot
 
 
 

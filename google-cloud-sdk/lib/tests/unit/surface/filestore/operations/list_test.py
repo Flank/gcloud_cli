@@ -26,7 +26,7 @@ from tests.lib.surface.filestore import base
 class CloudFilestoreOperationsListTest(base.CloudFilestoreUnitTestBase):
 
   def SetUp(self):
-    self.SetUpTrack(calliope_base.ReleaseTrack.BETA)
+    self.SetUpTrack(calliope_base.ReleaseTrack.GA)
 
   def RunList(self, *args):
     return self.Run(['filestore', 'operations', 'list'] + list(args))
@@ -60,7 +60,17 @@ class CloudFilestoreOperationsListTest(base.CloudFilestoreUnitTestBase):
     results = list(self.RunList())
     self.assertEquals(test_operations, results)
 
-  def testListWithLocation(self):
+  def testListWithZone(self):
+    test_operation = self.GetTestCloudFilestoreOperation()
+    parent = 'projects/{}/locations/us-central1-c'.format(self.Project())
+    self.mock_client.projects_locations_operations.List.Expect(
+        self.messages.FileProjectsLocationsOperationsListRequest(
+            name=parent, pageSize=100),
+        self.messages.ListOperationsResponse(operations=[test_operation]))
+    results = list(self.RunList('--zone=us-central1-c'))
+    self.assertEqual([test_operation], results)
+
+  def testListWithDeprecatedLocation(self):
     test_operation = self.GetTestCloudFilestoreOperation()
     parent = 'projects/{}/locations/us-central1-c'.format(self.Project())
     self.mock_client.projects_locations_operations.List.Expect(
@@ -87,6 +97,12 @@ class CloudFilestoreOperationsListTest(base.CloudFilestoreUnitTestBase):
         normalize_space=True
     )
     # pylint: enable=line-too-long
+
+
+class CloudFilestoreOperationsListBetaTest(CloudFilestoreOperationsListTest):
+
+  def SetUp(self):
+    self.SetUpTrack(calliope_base.ReleaseTrack.BETA)
 
 
 class CloudFilestoreOperationsListAlphaTest(CloudFilestoreOperationsListTest):

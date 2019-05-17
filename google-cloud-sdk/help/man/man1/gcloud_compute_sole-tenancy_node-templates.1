@@ -26,10 +26,11 @@ localSSD.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -38,6 +39,10 @@ gcloud help\fR for details.
 \f5\fICOMMAND\fR\fR is one of the following:
 
 .RS 2m
+.TP 2m
+\fBadd\-iam\-policy\-binding\fR
+Add IAM policy binding to a Google Compute Engine node template.
+
 .TP 2m
 \fBcreate\fR
 Creates a Google Compute Engine node template.
@@ -51,8 +56,20 @@ Deletes a Google Compute Engine node template.
 Describes a Google Compute Engine node template.
 
 .TP 2m
+\fBget\-iam\-policy\fR
+Get the IAM Policy for a Google Compute Engine node template.
+
+.TP 2m
 \fBlist\fR
 List Google Compute Engine node templates.
+
+.TP 2m
+\fBremove\-iam\-policy\-binding\fR
+Remove IAM policy binding from a Google Compute Engine node template.
+
+.TP 2m
+\fBset\-iam\-policy\fR
+Set the IAM policy for a Google Compute Engine node template.
 
 
 .RE

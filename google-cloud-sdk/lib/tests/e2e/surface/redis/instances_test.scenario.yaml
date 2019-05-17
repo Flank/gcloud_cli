@@ -1,17 +1,15 @@
 title: instances create/list/update/describe/delete scenario test
 release_tracks: [GA]
-skip:
-  reason: failing
-  bug: b/119025858
 
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: redis instances create --region us-central1 $$redis-instance$$ --network="do-not-delete-redis-network"
+      --tier=standard
   - stderr: |
       Create request issued for: [$$redis-instance$$]
   - progress_tracker:
-    - message: Waiting for operation [$$operation-basename$$] to complete
+    - message: Waiting for operation [$$operation$$] to complete
     - status: SUCCESS
   - stderr: |
       Created instance [$$redis-instance$$].
@@ -39,6 +37,18 @@ summary:
   - stdout: |
       displayName: a_fancy_redis_instance
 - execute:
+  - command: redis instances failover --region="us-central1" $$redis-instance$$
+  - prompt:
+    - message: "WARNING: Failover can result in the loss of unreplicated data. Using
+        'force-data-loss' can potentially cause significant data loss. See manual failover
+        documentation for more details."
+    - input: y
+  - stderr: |
+      Request issued for: [$$redis-instance$$]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation-basename$$] to complete
+    - status: SUCCESS
+- execute:
   - command: redis instances delete --region="us-central1" $$redis-instance$$
   - prompt:
     - message: |
@@ -48,7 +58,7 @@ summary:
   - stderr: |
       Delete request issued for: [$$redis-instance$$]
   - progress_tracker:
-    - message: Waiting for operation [$$operation-basename$$] to complete
+    - message: Waiting for operation [$$operation$$] to complete
     - status: SUCCESS
   - stderr: |
       Deleted instance [$$redis-instance$$].
@@ -58,6 +68,7 @@ actions:
     prefix: redis-instance
 - execute_command:
     command: redis instances create --region us-central1 $$redis-instance$$ --network="do-not-delete-redis-network"
+      --tier=standard
     events:
     - api_call:
         expect_request:
@@ -68,7 +79,7 @@ actions:
             json:
               authorizedNetwork: projects/cloud-sdk-integration-testing/global/networks/do-not-delete-redis-network
               memorySizeGb: 1
-              tier: BASIC
+              tier: STANDARD_HA
         return_response:
           headers:
             cache-control: private
@@ -76,10 +87,10 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/operation-1541007658205-57989ce104157-cbc4cd8a-2ee36d3c
+            name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/operation-1552500917914-583fdc9b9c9ee-bf8d3a12-36406474
             metadata:
               '@type': type.googleapis.com/google.cloud.redis.v1.OperationMetadata
-              createTime: '2018-10-31T17:40:58.622599620Z'
+              createTime: '2019-03-13T18:15:18.424255848Z'
               target: projects/cloud-sdk-integration-testing/locations/us-central1/instances/$$redis-instance$$
               verb: create
               cancelRequested: false
@@ -97,7 +108,7 @@ actions:
     - expect_stderr: |
         Create request issued for: [$$redis-instance$$]
     - expect_progress_tracker:
-        message: Waiting for operation [$$operation-basename$$] to complete
+        message: Waiting for operation [$$operation$$] to complete
         status: SUCCESS
     - api_call:
         expect_request:
@@ -108,20 +119,21 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '617'
+            content-length: '669'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
             name: projects/cloud-sdk-integration-testing/locations/us-central1/instances/$$redis-instance$$
-            locationId: us-central1-b
+            locationId: us-central1-a
+            alternativeLocationId: us-central1-b
             redisVersion: REDIS_3_2
-            reservedIpRange: 10.0.0.0/29
-            host: 10.0.0.3
+            reservedIpRange: 10.0.0.32/29
+            host: 10.0.0.36
             port: 6379
-            currentLocationId: us-central1-b
-            createTime: '2018-10-31T17:40:58.616617866Z'
+            currentLocationId: us-central1-a
+            createTime: '2019-03-13T18:15:18.415444661Z'
             state: READY
-            tier: BASIC
+            tier: STANDARD_HA
             memorySizeGb: 1
             authorizedNetwork: projects/cloud-sdk-integration-testing/global/networks/do-not-delete-redis-network
             persistenceIamIdentity: serviceAccount:139285888481-compute@developer.gserviceaccount.com
@@ -143,21 +155,36 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '5407'
+            content-length: '6193'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
             instances:
-            - name: projects/cloud-sdk-integration-testing/locations/us-central1/instances/$$redis-instance$$
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/instances/redis-instance-20190313-181925-6q5a
+              displayName: a_fancy_redis_instance
               locationId: us-central1-b
               redisVersion: REDIS_3_2
-              reservedIpRange: 10.0.0.0/29
-              host: 10.0.0.3
+              reservedIpRange: 10.0.0.48/29
+              host: 10.0.0.51
               port: 6379
               currentLocationId: us-central1-b
-              createTime: '2018-10-31T17:40:58.616617866Z'
-              state: READY
+              createTime: '2019-03-13T18:19:26.092400539Z'
+              state: DELETING
               tier: BASIC
+              memorySizeGb: 1
+              authorizedNetwork: projects/cloud-sdk-integration-testing/global/networks/do-not-delete-redis-network
+              persistenceIamIdentity: serviceAccount:139285888481-compute@developer.gserviceaccount.com
+            - name: projects/cloud-sdk-integration-testing/locations/us-central1/instances/$$redis-instance$$
+              locationId: us-central1-a
+              alternativeLocationId: us-central1-b
+              redisVersion: REDIS_3_2
+              reservedIpRange: 10.0.0.32/29
+              host: 10.0.0.36
+              port: 6379
+              currentLocationId: us-central1-a
+              createTime: '2019-03-13T18:15:18.415444661Z'
+              state: READY
+              tier: STANDARD_HA
               memorySizeGb: 1
               authorizedNetwork: projects/cloud-sdk-integration-testing/global/networks/do-not-delete-redis-network
               persistenceIamIdentity: serviceAccount:139285888481-compute@developer.gserviceaccount.com
@@ -275,20 +302,21 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '617'
+            content-length: '669'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
             name: projects/cloud-sdk-integration-testing/locations/us-central1/instances/$$redis-instance$$
-            locationId: us-central1-b
+            locationId: us-central1-a
+            alternativeLocationId: us-central1-b
             redisVersion: REDIS_3_2
-            reservedIpRange: 10.0.0.0/29
-            host: 10.0.0.3
+            reservedIpRange: 10.0.0.32/29
+            host: 10.0.0.36
             port: 6379
-            currentLocationId: us-central1-b
-            createTime: '2018-10-31T17:40:58.616617866Z'
+            currentLocationId: us-central1-a
+            createTime: '2019-03-13T18:15:18.415444661Z'
             state: READY
-            tier: BASIC
+            tier: STANDARD_HA
             memorySizeGb: 1
             authorizedNetwork: projects/cloud-sdk-integration-testing/global/networks/do-not-delete-redis-network
             persistenceIamIdentity: serviceAccount:139285888481-compute@developer.gserviceaccount.com
@@ -310,10 +338,10 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/operation-1541007866225-57989da766384-b08bb232-39e64615
+            name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/operation-1552501484434-583fdeb7e32ec-4ca51cfc-04c8aedf
             metadata:
               '@type': type.googleapis.com/google.cloud.redis.v1.OperationMetadata
-              createTime: '2018-10-31T17:44:26.323157647Z'
+              createTime: '2019-03-13T18:24:44.454734221Z'
               target: projects/cloud-sdk-integration-testing/locations/us-central1/instances/$$redis-instance$$
               verb: update
               cancelRequested: false
@@ -334,21 +362,22 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '660'
+            content-length: '712'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
             name: projects/cloud-sdk-integration-testing/locations/us-central1/instances/$$redis-instance$$
             displayName: a_fancy_redis_instance
-            locationId: us-central1-b
+            locationId: us-central1-a
+            alternativeLocationId: us-central1-b
             redisVersion: REDIS_3_2
-            reservedIpRange: 10.0.0.0/29
-            host: 10.0.0.3
+            reservedIpRange: 10.0.0.32/29
+            host: 10.0.0.36
             port: 6379
-            currentLocationId: us-central1-b
-            createTime: '2018-10-31T17:40:58.616617866Z'
+            currentLocationId: us-central1-a
+            createTime: '2019-03-13T18:15:18.415444661Z'
             state: READY
-            tier: BASIC
+            tier: STANDARD_HA
             memorySizeGb: 1
             authorizedNetwork: projects/cloud-sdk-integration-testing/global/networks/do-not-delete-redis-network
             persistenceIamIdentity: serviceAccount:139285888481-compute@developer.gserviceaccount.com
@@ -370,26 +399,93 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '660'
+            content-length: '712'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
             name: projects/cloud-sdk-integration-testing/locations/us-central1/instances/$$redis-instance$$
             displayName: a_fancy_redis_instance
-            locationId: us-central1-b
+            locationId: us-central1-a
+            alternativeLocationId: us-central1-b
             redisVersion: REDIS_3_2
-            reservedIpRange: 10.0.0.0/29
-            host: 10.0.0.3
+            reservedIpRange: 10.0.0.32/29
+            host: 10.0.0.36
             port: 6379
-            currentLocationId: us-central1-b
-            createTime: '2018-10-31T17:40:58.616617866Z'
+            currentLocationId: us-central1-a
+            createTime: '2019-03-13T18:15:18.415444661Z'
             state: READY
-            tier: BASIC
+            tier: STANDARD_HA
             memorySizeGb: 1
             authorizedNetwork: projects/cloud-sdk-integration-testing/global/networks/do-not-delete-redis-network
             persistenceIamIdentity: serviceAccount:139285888481-compute@developer.gserviceaccount.com
     - expect_stdout: |
         displayName: a_fancy_redis_instance
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: redis instances failover --region="us-central1" $$redis-instance$$
+    events:
+    - expect_prompt_continue:
+        message: "WARNING: Failover can result in the loss of unreplicated data. Using
+          'force-data-loss' can potentially cause significant data loss. See manual
+          failover documentation for more details."
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://redis.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-central1/instances/$$redis-instance$$:failover?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '511'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/operation-1552501486983-583fdeba518f1-af0eb832-fb9f07ed
+            metadata:
+              '@type': type.googleapis.com/google.cloud.redis.v1.OperationMetadata
+              createTime: '2019-03-13T18:24:47.047233388Z'
+              target: projects/cloud-sdk-integration-testing/locations/us-central1/instances/$$redis-instance$$
+              verb: failover
+              cancelRequested: false
+              apiVersion: v1
+            done: false
+        poll_operation: true
+    - expect_stderr: |
+        Request issued for: [$$redis-instance$$]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation-basename$$] to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://redis.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-central1/instances/$$redis-instance$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '712'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-central1/instances/$$redis-instance$$
+            displayName: a_fancy_redis_instance
+            locationId: us-central1-a
+            alternativeLocationId: us-central1-b
+            redisVersion: REDIS_3_2
+            reservedIpRange: 10.0.0.32/29
+            host: 10.0.0.36
+            port: 6379
+            currentLocationId: us-central1-b
+            createTime: '2019-03-13T18:15:18.415444661Z'
+            state: READY
+            tier: STANDARD_HA
+            memorySizeGb: 1
+            authorizedNetwork: projects/cloud-sdk-integration-testing/global/networks/do-not-delete-redis-network
+            persistenceIamIdentity: serviceAccount:139285888481-compute@developer.gserviceaccount.com
     - expect_exit:
         code: 0
 - execute_command:
@@ -413,10 +509,10 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/operation-1541007868579-57989da9a4e3f-1e02c30c-b73a9fe0
+            name: projects/cloud-sdk-integration-testing/locations/us-central1/operations/operation-1552501513793-583fded3e2ede-85597e0e-60d78f8c
             metadata:
               '@type': type.googleapis.com/google.cloud.redis.v1.OperationMetadata
-              createTime: '2018-10-31T17:44:28.599688157Z'
+              createTime: '2019-03-13T18:25:13.835569425Z'
               target: projects/cloud-sdk-integration-testing/locations/us-central1/instances/$$redis-instance$$
               verb: delete
               cancelRequested: false
@@ -434,7 +530,7 @@ actions:
     - expect_stderr: |
         Delete request issued for: [$$redis-instance$$]
     - expect_progress_tracker:
-        message: Waiting for operation [$$operation-basename$$] to complete
+        message: Waiting for operation [$$operation$$] to complete
         status: SUCCESS
     - expect_stderr: |
         Deleted instance [$$redis-instance$$].

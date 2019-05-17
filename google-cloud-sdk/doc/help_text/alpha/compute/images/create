@@ -7,9 +7,13 @@ SYNOPSIS
           | --source-image-family=SOURCE_IMAGE_FAMILY
           | --source-snapshot=SOURCE_SNAPSHOT | --source-uri=SOURCE_URI)
         [--csek-key-file=FILE] [--description=DESCRIPTION] [--family=FAMILY]
-        [--force] [--force-create] [--guest-os-features=[GUEST_OS_FEATURE,...]]
-        [--labels=[KEY=VALUE,...]] [--licenses=[LICENSES,...]]
-        [--no-require-csek-key-create] [--source-disk-zone=SOURCE_DISK_ZONE]
+        [--forbidden-database-file=[DBX_VALUE,...]] [--force] [--force-create]
+        [--guest-os-features=[GUEST_OS_FEATURE,...]]
+        [--key-exchange-key-file=[KEK_VALUE,...]] [--labels=[KEY=VALUE,...]]
+        [--licenses=[LICENSES,...]] [--platform-key-file=PLATFORM_KEY_FILE]
+        [--no-require-csek-key-create]
+        [--signature-database-file=[DB_VALUE,...]]
+        [--source-disk-zone=SOURCE_DISK_ZONE]
         [--source-image-project=SOURCE_IMAGE_PROJECT]
         [--storage-location=LOCATION]
         [--kms-key=KMS_KEY : --kms-keyring=KMS_KEYRING
@@ -82,6 +86,10 @@ OPTIONAL FLAGS
         a family will cause the latest non-deprecated image in the family to be
         used.
 
+     --forbidden-database-file=[DBX_VALUE,...]
+        List of revoked certificates file paths used when booting up shieled
+        instance from this image.
+
      --force
         By default, image creation fails when it is created from a disk that is
         attached to a running instance. When this flag is used, image creation
@@ -122,7 +130,11 @@ OPTIONAL FLAGS
           is a Windows image.
 
     GUEST_OS_FEATURE must be one of: MULTI_IP_SUBNET, SECURE_BOOT,
-    UEFI_COMPATIBLE, VIRTIO_SCSI_MULTIQUEUE, WINDOWS.
+    UEFI_COMPATIBLE, VIRTIO_SCSI_MULTIQUEUE, WINDOWS, GVNIC.
+
+     --key-exchange-key-file=[KEK_VALUE,...]
+        List of key exchange key file paths used when booting up shieled
+        instance from this image.
 
      --labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to add.
@@ -135,6 +147,10 @@ OPTIONAL FLAGS
      --licenses=[LICENSES,...]
         Comma-separated list of URIs to license resources.
 
+     --platform-key-file=PLATFORM_KEY_FILE
+        Single Platform Key file path used when booting up shielded instance
+        from this image.
+
      --require-csek-key-create
         Refuse to create images not protected by a user managed key in the key
         file when --csek-key-file is given. This behavior is enabled by default
@@ -145,6 +161,10 @@ OPTIONAL FLAGS
         https://cloud.google.com/compute/docs/disks/customer-supplied-encryption
         for more details. Enabled by default, use --no-require-csek-key-create
         to disable.
+
+     --signature-database-file=[DB_VALUE,...]
+        List of valid public certificates file paths used when booting up
+        shieled instance from this image.
 
      --source-disk-zone=SOURCE_DISK_ZONE
         Zone of the source disk to operate on. If not specified and the
@@ -194,8 +214,9 @@ OPTIONAL FLAGS
           The Cloud project for the key.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

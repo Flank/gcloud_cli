@@ -68,6 +68,11 @@ class SurveyTest(cli_test_base.CliTestBase):
         'Cannot find survey SurveyNotExisting.yaml .*'):
       _ = survey.Survey('SurveyNotExisting')
 
+  def testPrintSurveyInstruction(self):
+    self.survey.PrintInstruction()
+    self.AssertErrEquals(
+        'To skip this question, type s; to exit the survey, type x.\n')
+
 
 if __name__ == '__main__':
   test_case.main()

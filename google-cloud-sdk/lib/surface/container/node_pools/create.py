@@ -28,10 +28,10 @@ from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.container import constants
+from googlecloudsdk.command_lib.container import container_command_util as cmd_util
 from googlecloudsdk.command_lib.container import flags
 from googlecloudsdk.command_lib.container import messages
 from googlecloudsdk.core import log
-from googlecloudsdk.core import properties
 
 DETAILED_HELP = {
     'DESCRIPTION':
@@ -101,7 +101,6 @@ on the Compute Engine API instance object and can be used in firewall rules.
 See https://cloud.google.com/sdk/gcloud/reference/compute/firewall-rules/create
 for examples.
 """)
-  flags.AddEnableAutoUpgradeFlag(parser, for_node_pool=True)
   parser.display_info.AddFormat(util.NODEPOOLS_FORMAT)
   flags.AddNodeVersionFlag(parser)
   flags.AddAcceleratorArgs(parser)
@@ -111,18 +110,8 @@ for examples.
 
 def ParseCreateNodePoolOptionsBase(args):
   """Parses the flags provided with the node pool creation command."""
-  if (args.IsSpecified('enable_cloud_endpoints') and
-      properties.VALUES.container.new_scopes_behavior.GetBool()):
-    raise util.Error('Flag --[no-]enable-cloud-endpoints is not allowed if '
-                     'property container/ new_scopes_behavior is set to true.')
-  if args.IsSpecified('enable_autorepair'):
-    enable_autorepair = args.enable_autorepair
-  else:
-    # Node pools using COS support auto repairs, enable it for them by default.
-    # Other node pools using (Ubuntu, custom images) don't support node auto
-    # repairs, attempting to enable autorepair for them will result in API call
-    # failing so don't do it.
-    enable_autorepair = ((args.image_type or '').lower() in ['', 'cos'])
+  enable_autorepair = cmd_util.GetAutoRepair(args)
+  flags.WarnForNodeModification(args, enable_autorepair)
   metadata = metadata_utils.ConstructMetadataDict(args.metadata,
                                                   args.metadata_from_file)
   return api_adapter.CreateNodePoolOptions(
@@ -131,7 +120,6 @@ def ParseCreateNodePoolOptionsBase(args):
       disk_size_gb=utils.BytesToGb(args.disk_size),
       scopes=args.scopes,
       node_version=args.node_version,
-      enable_cloud_endpoints=args.enable_cloud_endpoints,
       num_nodes=args.num_nodes,
       local_ssd_count=args.local_ssd_count,
       tags=args.tags,
@@ -147,10 +135,11 @@ def ParseCreateNodePoolOptionsBase(args):
       image_family=args.image_family,
       preemptible=args.preemptible,
       enable_autorepair=enable_autorepair,
-      enable_autoupgrade=args.enable_autoupgrade,
+      enable_autoupgrade=cmd_util.GetAutoUpgrade(args),
       service_account=args.service_account,
       disk_type=args.disk_type,
-      metadata=metadata)
+      metadata=metadata,
+      max_pods_per_node=args.max_pods_per_node)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.GA)
@@ -166,9 +155,12 @@ class Create(base.CreateCommand):
     flags.AddEnableAutoRepairFlag(parser, for_node_pool=True, for_create=True)
     flags.AddMinCpuPlatformFlag(parser, for_node_pool=True)
     flags.AddNodeTaintsFlag(parser, for_node_pool=True)
-    flags.AddDeprecatedNodePoolNodeIdentityFlags(parser)
+    flags.AddNodePoolNodeIdentityFlags(parser)
+    flags.AddMaxPodsPerNodeFlag(parser, for_node_pool=True)
+    flags.AddEnableAutoUpgradeFlag(parser, for_node_pool=True)
 
   def ParseCreateNodePoolOptions(self, args):
+    flags.WarnGAForFutureAutoUpgradeChange()
     return ParseCreateNodePoolOptionsBase(args)
 
   def Run(self, args):
@@ -206,11 +198,6 @@ class Create(base.CreateCommand):
             messages.AutoUpdateUpgradeRepairMessage(options.enable_autorepair,
                                                     'autorepair'))
 
-      if options.enable_autoupgrade is not None:
-        log.status.Print(
-            messages.AutoUpdateUpgradeRepairMessage(options.enable_autoupgrade,
-                                                    'autoupgrade'))
-
       if options.accelerators is not None:
         log.status.Print(constants.KUBERNETES_GPU_LIMITATION_MSG)
 
@@ -245,13 +232,15 @@ class CreateBeta(Create):
     flags.AddNodePoolNodeIdentityFlags(parser)
     flags.AddNodePoolAutoprovisioningFlag(parser, hidden=True)
     flags.AddMaxPodsPerNodeFlag(parser, for_node_pool=True)
+    flags.AddEnableAutoUpgradeFlag(parser, for_node_pool=True, default=True)
+    flags.AddSandboxFlag(parser)
 
   def ParseCreateNodePoolOptions(self, args):
     ops = ParseCreateNodePoolOptionsBase(args)
+    flags.WarnForNodeVersionAutoUpgrade(args)
     ops.workload_metadata_from_node = args.workload_metadata_from_node
-    ops.new_scopes_behavior = True
     ops.enable_autoprovisioning = args.enable_autoprovisioning
-    ops.max_pods_per_node = args.max_pods_per_node
+    ops.sandbox = args.sandbox
     return ops
 
 
@@ -261,13 +250,13 @@ class CreateAlpha(Create):
 
   def ParseCreateNodePoolOptions(self, args):
     ops = ParseCreateNodePoolOptionsBase(args)
+    flags.WarnForNodeVersionAutoUpgrade(args)
     ops.workload_metadata_from_node = args.workload_metadata_from_node
     ops.enable_autoprovisioning = args.enable_autoprovisioning
-    ops.new_scopes_behavior = True
     ops.local_ssd_volume_configs = args.local_ssd_volumes
-    ops.max_pods_per_node = args.max_pods_per_node
     ops.sandbox = args.sandbox
     ops.node_group = args.node_group
+    ops.linux_sysctls = args.linux_sysctls
     return ops
 
   @staticmethod
@@ -283,8 +272,10 @@ class CreateAlpha(Create):
     flags.AddNodeTaintsFlag(parser, for_node_pool=True)
     flags.AddNodePoolNodeIdentityFlags(parser)
     flags.AddMaxPodsPerNodeFlag(parser, for_node_pool=True)
-    flags.AddSandboxFlag(parser, hidden=True)
+    flags.AddSandboxFlag(parser)
     flags.AddNodeGroupFlag(parser)
+    flags.AddEnableAutoUpgradeFlag(parser, for_node_pool=True, default=True)
+    flags.AddLinuxSysctlFlags(parser, for_node_pool=True)
 
 
 Create.detailed_help = DETAILED_HELP

@@ -1,81 +1,41 @@
 title: Serverless deploy to gke cluster with knative addon.
-release_tracks: [ALPHA]
-skip:
-  reason: python config on some systems, no TLS 1.2
-  bug: b/118669304
+release_tracks: [ALPHA, BETA]
 summary:
 # This summary is generated automatically on update and should not be edited.
-- set_property: container/use_client_certificate True
 - set_property: run/cluster do-not-delete-gke-knative-test-cluster
 - set_property: run/cluster_location us-central1-a
 - execute:
-  - command: run deploy --region us-central1 --image gcr.io/knative-samples/helloworld-nodejs
-      $$service-name$$
+  - command: run deploy --image gcr.io/knative-samples/helloworld-nodejs $$service-name$$
   - stderr: |
-      Deploying container to service [$$service-name$$] in namespace [default] of cluster [do-not-delete-gke-knative-test-cluster]
+      Deploying container to Cloud Run on GKE service [$$service-name$$] in namespace [default] of cluster [do-not-delete-gke-knative-test-cluster]
   - stderr: |
       Creating new service [$$service-name$$]
   - staged_progress_tracker:
+    - message: Deploying new service...
+    - status: SUCCESS
+  - stderr: |-
+      Service \[$$service-name$$\] revision \[$$service-name$$-[a-z0-9]+\] has been deployed and is serving traffic at $$service-name$$\.default\.example\.com
+      $
+- execute:
+  - command: run services describe $$service-name$$ --format="value(metadata.name)"
+  - stdout: |
+      $$service-name$$
+- execute:
+  - command: run services update $$service-name$$ --memory 512Mi --concurrency 3 --update-env-vars
+      FOO=bar
+  - staged_progress_tracker:
     - message: Deploying...
     - status: SUCCESS
-    - succeeded_stages: &id001
+    - succeeded_stages:
       - Creating Revision...
       - Routing traffic...
-      - Readying...
-  - stderr: |
-      Service [$$service-name$$] revision [$$service-name$$-00001] has been deployed and is serving traffic at $$service-name$$.default.example.com
-- execute:
-  - command: run services describe $$service-name$$
-  - stdout: |
-      apiVersion: serving.knative.dev/v1alpha1
-      kind: Service
-      metadata:
-        clusterName: ''
-        creationTimestamp: '2018-10-16T17:22:12Z'
-        generation: 1
-        name: $$service-name$$
-        namespace: default
-        resourceVersion: '711559'
-        selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$
-        uid: 04b92114-d168-11e8-b1bf-42010a800150
-      spec:
-        generation: 1
-        runLatest:
-          configuration:
-            revisionTemplate:
-              metadata:
-                initializers: {}
-              spec:
-                concurrencyModel: Multi
-                container:
-                  image: gcr.io/knative-samples/helloworld-nodejs
-                  name: ''
-                  resources: {}
-      status:
-        conditions:
-        - lastTransitionTime: '2018-10-16T17:22:15Z'
-          status: 'True'
-          type: ConfigurationsReady
-        - lastTransitionTime: '2018-10-16T17:22:15Z'
-          status: 'True'
-          type: RoutesReady
-        - lastTransitionTime: '2018-10-16T17:22:15Z'
-          status: 'True'
-          type: Ready
-        domain: $$service-name$$.default.example.com
-        domainInternal: $$service-name$$.default.svc.cluster.local
-        latestCreatedRevisionName: $$service-name$$-00001
-        latestReadyRevisionName: $$service-name$$-00001
-        observedGeneration: 1
-        traffic:
-        - configurationName: $$service-name$$
-          percent: 100
-          revisionName: $$service-name$$-00001
+  - stderr: |-
+      Service \[$$service-name$$\] revision \[$$service-name$$-[a-z0-9]+\] is active and serving traffic at $$service-name$$\.default\.example\.com
+      $
 - execute:
   - command: run services delete $$service-name$$ -q
   - stderr: |
       Deleted service [$$service-name$$].
-
 actions:
 
 - set_property:
@@ -89,27 +49,24 @@ actions:
     prefix: service-name
 
 - execute_command:
-    command: run deploy --region us-central1 --image gcr.io/knative-samples/helloworld-nodejs
-      $$service-name$$
+    command: run deploy --image gcr.io/knative-samples/helloworld-nodejs $$service-name$$
     events:
-    - expect_stderr: |
-        Deploying container to service [$$service-name$$] in namespace [default] of cluster [do-not-delete-gke-knative-test-cluster]
     - api_call:
         expect_request:
           uri: https://container.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-central1-a/clusters/do-not-delete-gke-knative-test-cluster?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             cache-control: private
-            content-length: '8247'
+            content-length: '8334'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
             name: do-not-delete-gke-knative-test-cluster
             nodeConfig:
-              machineType: n1-standard-4
+              machineType: n1-standard-2
               diskSizeGb: 100
               oauthScopes:
               - https://www.googleapis.com/auth/cloud-platform
@@ -121,14 +78,14 @@ actions:
               diskType: pd-standard
             masterAuth:
               username: admin
-              password: 3qi3FU3qImMQ7mVW
-              clusterCaCertificate: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURERENDQWZTZ0F3SUJBZ0lSQVBCZEs0UzRwMVpCSVNBd2dwUzdXRGd3RFFZSktvWklodmNOQVFFTEJRQXcKTHpFdE1Dc0dBMVVFQXhNa1lqSTFOR0ppTXpNdFlUWmtZUzAwWldVMUxUazNNV1V0WWpFelpqbG1PR0kyWkRJNApNQjRYRFRFNE1UQXhNakU1TlRVek1Gb1hEVEl6TVRBeE1USXdOVFV6TUZvd0x6RXRNQ3NHQTFVRUF4TWtZakkxCk5HSmlNek10WVRaa1lTMDBaV1UxTFRrM01XVXRZakV6WmpsbU9HSTJaREk0TUlJQklqQU5CZ2txaGtpRzl3MEIKQVFFRkFBT0NBUThBTUlJQkNnS0NBUUVBdTR6VG1oSzkzNTVsSVByK3hKbE00N0YrU3RKeGZBSFNURlNKUi9rTQpwM2R3NUhFQ01iNnN1anIwMEIyNjVnVE9EK1ArcXF3QUNUR2pxSE1Va2xIZ0pkRjBYNlkybDVINU5JdVRSTmJXCndvdUs3OVM2Zm5HVGg3YjV4cVY1dUllNjAzcGFPRmVjRVQrcHVhbE5nYllLRG9SNWc1MkIzMWEvOTRmLzYrWGQKVHF5ek1UOURMNWpwQVlORzM4d1c2TzFwUThXR2d1L0c4VzFqR3ZORW5QSFlTOXNHODNmNWxXcnNoNFRydkt0KwpkL2t1M0JsV2ZVNzlQZTRCTVU5ZTBESUhMdXRiZ0d2WTRxSmYraVRFT3BZeVU2UFRjTVE4MmwwcGRkNlZlUG0vCkg2MzRHRG9rcXVuSVRpbU5LRWl2eWFQbWk2YkNOYVByb0FuQk1LOGs3akpiandJREFRQUJveU13SVRBT0JnTlYKSFE4QkFmOEVCQU1DQWdRd0R3WURWUjBUQVFIL0JBVXdBd0VCL3pBTkJna3Foa2lHOXcwQkFRc0ZBQU9DQVFFQQpJVVZNRDNWbWxIREF6dFBpUTl4UDhGKzl1Zmd2VDNJSlhrM0JFOEhXZ2dIYUNvQkVrRWxxMk9MUUVDYTZqTmlwCk1YMlg2RTdKdDE5dXdhd2tzTGg0Y2JOZ2JPbVdILzZiQUtqTW9pcVJxZjVJUlQ4SS9HTWxMT01xdUpoNktUMWYKekJiVk1rMVY5Uld4RXZoOUpKcU5xazNIN2pvZXlYMWZFNWF2V3BZdU03cTlGNitkY0tnQ0t6MTl4MzdMNTNpUwpZcExXcTd1cXppZktvZHBqQ25oUnZGN1VmWmQvQjZqUlJZQ0EzYk9EcmRyZWxLekd1REhaOWZWRWcvZXpTenBPClZXSXRheEZYWFVyMUwzbzdnanNkSGZUR084Q2FQLzVnWUd3VzVtajRYcmNQV1VhVjVPcHY3Q0lHZEx3Um5UQ20KWldCYXhMTiswTCszU2RyT1ZJeTlYZz09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
-              clientCertificate: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUMyakNDQWNLZ0F3SUJBZ0lRSm5zbktPeEdiVmg3Mnk2czF0K0t4VEFOQmdrcWhraUc5dzBCQVFzRkFEQXYKTVMwd0t3WURWUVFERXlSaU1qVTBZbUl6TXkxaE5tUmhMVFJsWlRVdE9UY3haUzFpTVRObU9XWTRZalprTWpndwpIaGNOTVRneE1ERXlNakExTlRNeFdoY05Nak14TURFeE1qQTFOVE14V2pBUk1ROHdEUVlEVlFRREV3WmpiR2xsCmJuUXdnZ0VpTUEwR0NTcUdTSWIzRFFFQkFRVUFBNElCRHdBd2dnRUtBb0lCQVFDM2tya3hNOGdwMENkV0E4bXgKaTJsQ043emlvQUljR2V2ZWdpUkRTeE8rUUhacmFyS1hVUjl0WlV3WTRyOTk2akdxUTk1dWJXSUxKWHBKeVdIRAo2V1FxdEZNdi85dHNMemZkejRJM2lDNHplMTFVdGxOazNCd3dXWitMTzBIZnRBVUc5clN1K0RkemV0bXo4K1BOCm5oQ2xYOExvZGhiUmVLUDJNUU5TSms1Y3VCYVZ5cFRHN1pmSTRJM3lKT2VKUWY5ZXRERGFXTFAyZGxLS3hYV2UKVnE5ZTFsdTJrZDJoYTROOUl1K09wbmFhTSt5dXZ0RTRtNTdqMUM1QjBiMXJXZlJaeW5hMXdSLy9QZjF5SGlOUQp5YVZxS0dTdFIxRTVhamRWamorL01kMklkRGtVZlNVWlFkaFZkMHJtaFBtY0dKQ0lERW0vSkNXZ0tQMnM3T20wCmpra2pBZ01CQUFHakVEQU9NQXdHQTFVZEV3RUIvd1FDTUFBd0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFCazMKUTNFVW1NRklKbURkRGxwVURwVkx5Zzd2S3VBSVpwajdZSDllbzRadENUZWdScEdMeWtiZVRxalJkMjFtZUdsRAp2OGJoek5ZbG4zWmplYzIzNktjYmRUTXBaM3VXQllOcjhvUXkzUWVaV00xNkVZRGRxRFlxTmVjUGtEVGJpRjdLCjUxaHNHdUgvVzFxYnhINVdwY0FUL3QrWFFEbDdTMC9SL1cvL0xxcDZENGZaVTQyNDhMQXlKV053T1FUNzI4aGUKY0kwTTN3K1JrcTQyVmc3WDhWbXBWQmpPUld0VjM4eG11bDR1ZVhhUTR6Nkl1by8vT1pkeS9NYUJ1cGRjV3ZLQwpKYU1ad0lEUXJZbW5TUDVXcEVMV0N4WVZkQ2xXV3l2cGpvbDJXUEMzelNDZjEvcmVGM0pLV2FJSmQ1WmZ1ZHduClRUc3VPYjdSV1BjcGJ2aU1WWjQ9Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
-              clientKey: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFb3dJQkFBS0NBUUVBdDVLNU1UUElLZEFuVmdQSnNZdHBRamU4NHFBQ0hCbnIzb0lrUTBzVHZrQjJhMnF5CmwxRWZiV1ZNR09LL2Zlb3hxa1BlYm0xaUN5VjZTY2xodytsa0tyUlRMLy9iYkM4MzNjK0NONGd1TTN0ZFZMWlQKWk53Y01GbWZpenRCMzdRRkJ2YTBydmczYzNyWnMvUGp6WjRRcFYvQzZIWVcwWGlqOWpFRFVpWk9YTGdXbGNxVQp4dTJYeU9DTjhpVG5pVUgvWHJRdzJsaXo5blpTaXNWMW5sYXZYdFpidHBIZG9XdURmU0x2anFaMm1qUHNycjdSCk9KdWU0OVF1UWRHOWExbjBXY3AydGNFZi96MzljaDRqVU1tbGFpaGtyVWRST1dvM1ZZNC92ekhkaUhRNUZIMGwKR1VIWVZYZEs1b1Q1bkJpUWlBeEp2eVFsb0NqOXJPenB0STVKSXdJREFRQUJBb0lCQUE1Sml4bWw1V21XVzhRTwpzMm53RWNIU1EyU0NxT2RnVlJmbm1tN3FXWit3WUxHODNOTE9GakRBeTRxOFN4bS9yOGN5cW1NcDBaR2wyYjRECkZjQXJzQWRxMVhhaU85cFFWU2JHK2JtSFl5RWxTWDd6QkhhUWN3UGRxeW5UbmkyTS9lblcxYVV3aUdXaWVzTWoKWGoxOTZkOFZIdW1uYklzM3Vuc2ZiQm9VQlNhamJiUVBQTG1XUUpGMzlGYXB3RGZjeVNqR0tCN2Q2VkluL25YRwpDRERFTjBZRFd3amR5VUNuczN4Z08rYXc3YVVmVGkwK3J4MjZVK0RMQ1ZXTWZKMytZWkV1TkthdXRBV0NBY2ROCkExNlVBdzBPZUFSb2RpSGZWbVE0VlgwTENsK25TRXVvUWUrL0FNdnFNS1BDUGVQQmMvNk43VEwva2l5K3JMNDMKQllRRU91RUNnWUVBL3RqaXhzNHlSRytNYytPNWt3RjhNN1F4bkRYbDdGclYvTmRDRHlYdXhJbHgzL3lzM3N5UApEbGl4dFNvTCtsVXhQU2plckw5MVV5eUgwRXl3a2hKV3BTRTh4Tzl4ckF1YThhRFkzak9kWXJyRjZwR0hnQ3dICjgzL05QUHBpYzV2bm1oUlAydGdNV3kzdUFiTGhMcldWYmxGNC82Y2dzMWRnZUR4bGNBdEJpUnNDZ1lFQXVHZE4KU0NpUVFWUUVBazFyV2xhYWV4NERoZFhWVHgzQWZmY0NuYU9EMnFrNlJZS2xGTnY1UW1GUnk2bDBqd20wcU0ycgpsN2lkOTZSN1JXYjM1N3dydDZNWnUweXU4ZXF6cFA5RmVIWXNXSlM5elMyZ1RjNkJtbnY2aXVuOXBwNVdmR1BDCk5MMXVWOVdUMU5UZkNLckpSeFhiRXFOZUtlVXFKaG9NT1NwM2lKa0NnWUJuNVVmZXdPVmhYUkNubG1scmN5bU4KY3FMZkNtSW9ENGc1d2hBZVdOcVVxV3dSWXRPZktVb1JFVHV4bmVpd0w5Y1pGZlpoK3RQOENxVjcyQ2dNQlFucAozRGtJR0k0QkUrSWhLKy85OXBEdFZUT213NW00T1Rzc25DZXgrbW4wczlTaHpqSVlDQWhSaTlJQ1Ewam1ZQVVCCnFwbG5zRnoyZ0dMRjRlbUEyalhualFLQmdBalF2MndNckdERElISHZ1NHNWQ3N1SjhzY3FJc2xtZGJaUDRhc2gKandNY0JmSWV2YitTaUliNDJnMHZhNmdPNGJrVUkvamIxWWxxTG81eHpyWWdVOEt5cEY5RTJqUXNjU3daRy93WApRaVYxN3VEcEpubXh2cFpoQ09ndEtYZ1dwN0hJbnhjZ1d5OE53Y1J4N0x1Z1ZvRDBkWVdkazduUy84SFVpdk1NCnFhdzVBb0dCQVBCQ0ZnbWdXSldtenNyWTdHbW9xdEM2TTdGR0Vkc3h5TTBzZGJ3K2lsREFSeEZ0N1JnbkdUOHAKZHJqUStoSnBiTllQZE9MVm1CV1F4elBpbU0ySXJvN2EvU2VZajN1aWVhbzZHVGw4YVk3VE0rRW1ONE90MXErSQpJQkJCdGdzdlU3THRnK0c3VGU4QWFHME94SzRJSW9oKzlCc1VTalg3UXZtbEszdXJBQ2NVCi0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tCg==
-            loggingService: logging.googleapis.com
-            monitoringService: monitoring.googleapis.com
+              password: ZJc50VU8iCswDyUe
+              clusterCaCertificate: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURERENDQWZTZ0F3SUJBZ0lSQUo1SmYrdGdIL0JRWnpiZGlQMGwxb0l3RFFZSktvWklodmNOQVFFTEJRQXcKTHpFdE1Dc0dBMVVFQXhNa09HRXdZalUwWlRFdE16azJPUzAwTkdGaUxXRTFabVF0TmpnM056QmhOalEzT1RVNQpNQjRYRFRFNU1ESXhNREl4TXpBeU5Gb1hEVEkwTURJd09USXlNekF5TkZvd0x6RXRNQ3NHQTFVRUF4TWtPR0V3CllqVTBaVEV0TXprMk9TMDBOR0ZpTFdFMVptUXROamczTnpCaE5qUTNPVFU1TUlJQklqQU5CZ2txaGtpRzl3MEIKQVFFRkFBT0NBUThBTUlJQkNnS0NBUUVBcE9oKzN1d3BnemN2cCttVTRLL1pNYzRoeW1wUmhCVTBSMHlCb25lcgpWemhpL1dTK3BHd29kcjRnS1pSS3ZtdnF0VGs2R0NLbXhWd0Y0ZGp1eVNTb0VEYURaOFlCWGNnSzlJdjBiWVZ5CklqZFNTc2VqZXR0WkFrQ3RIZ0VzRVdGSCtISStVTUJvYmFEcWc0a3piYi9WbmZDVGwySU9ja0tYZCtWK1hxUVoKTHpoaUZRVEcvYTNXdjhldC9mM0ZkTUc1Q1VRSmkzUFozL3ZxSHYyRnpFRkpnNnlzY21GU2pwQmwydnRmSEJ3dAoxMGMrWWZCZ3VzT0lmeFBXR21rQlhkUXNBcjl2dTcvRlBBUi9mZjhXSm5KQjJZbTJXeTRKUVF4VHpqUmNPUldjCk8xR00wVG5Qb1VLL2xGMk5MQVdMbXAzWThFQ0UrYnBVejE0RDhxbDlHaDUrUVFJREFRQUJveU13SVRBT0JnTlYKSFE4QkFmOEVCQU1DQWdRd0R3WURWUjBUQVFIL0JBVXdBd0VCL3pBTkJna3Foa2lHOXcwQkFRc0ZBQU9DQVFFQQpneGhRRlZNMml1c2Z0NFhhU0YxeGpUWGtTTlRhU3FEL1BDZUJPb2xpRm8wK0lxaUxiRjVteldLVnpITFU1VERyCnY2OFd0ZEFkOUdwUlJ0K3dJOFpsRHhuRXNiYTZoYkluMzExVWw1ZUNsMGFtWjc5eUtwaEQyZzd1OVUxc0lEQjgKM0g3YVZNUklma0Z4OXhacDE0L3FVNjU0cXU3UHZIdzdYTFdKNm5pZXpkV1FiWkprUW5OWGQxWjUvVnNEUjExcgp4SWxzSjlKWmJZREM4OEtreWlEZEpFcGs2djExVkpYTUpaQzdJYzZoR3V0QnkxZ2J1TUZ3elh3UndPc0I1RG1oCkRwVWdyWDN3ZVp6VXg1WkhyTG9CUnV0U2Jxb1pxUk02ZHV1ZEJLV2xNcUxETlNzWXlLMjBJQXZLclF6cXBtaVEKeUlZMFE0eWp6cVJIUXJUZnUvdmJidz09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+              clientCertificate: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUMyekNDQWNPZ0F3SUJBZ0lSQVBKZlRXRk1GRHVrN1pmb3J1NlZGR2t3RFFZSktvWklodmNOQVFFTEJRQXcKTHpFdE1Dc0dBMVVFQXhNa09HRXdZalUwWlRFdE16azJPUzAwTkdGaUxXRTFabVF0TmpnM056QmhOalEzT1RVNQpNQjRYRFRFNU1ESXhNREl5TXpBeU5Wb1hEVEkwTURJd09USXlNekF5TlZvd0VURVBNQTBHQTFVRUF4TUdZMnhwClpXNTBNSUlCSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DQVE4QU1JSUJDZ0tDQVFFQXd5RkVOVGZqN1AzZytRMnMKWVR1Q3M3TElTeU9yc1dHQWxHYnptRk5zaFdyVWdJWnJHV1UxUk9MdEpLK2V2WGhxajh6dkhBQWF4VDJWVDRRVQpFQUJaRURFN0NZYzhxaktKSlRLZ3ozeHBOMEZ4QTQ2aHo3UXBmVUVuS2ZrUm9peDRjUUZ2MHJZQVIvU1ZwVlp5CnplSDFZcGZOY0ZvdjBYcDJteEMwTnlrV05CeGN4YVJtUmlYOWtOcVR1dHY2UEJIUFdUTnBHdUd5ZGg5VldwUVUKZmpiaGJSb2dRTlZ1VW9ISHV5ODF6Z3V3SFl0K1ltQ21Jd09udytjZGJBUklBdldXNU1OdTR1M0xQNmxPNDROZwpZeVpqVjljZFJaNWdVVnVXdjlCWUhQR0dPdnk1aFBvRERCck5OZ0dLaDVhWnhGb3l1K1FUbVJyK2cwT0MxOEtSCi82QjB2UUlEQVFBQm94QXdEakFNQmdOVkhSTUJBZjhFQWpBQU1BMEdDU3FHU0liM0RRRUJDd1VBQTRJQkFRQWMKb1J1NFBaOS84dkx1VERYaDI5MFV2NkpiNmdySW9xcHF5TERZdG5aTnkxYWhJTElqdDQreExUV0pHNVZvN3BuQgo4Q2VnRWRYMklYQlY4VEhlZGdndDcrOUl0TGZtRlk3U2FIT1BoRFllcnpkMWc0WFltVS9nOXNvbU9ndnFnZnM0CitkRFZzUWwxN2k2UitiT0Y1RHBCK2x2OUs0bEpjQkpremtNWThETHMrdU92TXFzUUpaRWtXMnRsN3NSU1AxcmwKd2pWc3k2aE4rZ1YreElZeWp4cWVMemw4VVRFMTFNYkp4VkVodGZzeEFsSW5md29sQmMzNjNYK2RLRVdXZ1RXbwpaaUZMYkpwZll1aWpEdkxNWnpPUWxhRzlKdnpqMExlL1UrcjRmNGJ3Y241d0tQczZRSnhNWE5ObW1TejJtTFFMClpBMlgxbGpsQS9BcDQ4dlBiVEJwCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+              clientKey: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFb3dJQkFBS0NBUUVBd3lGRU5UZmo3UDNnK1Eyc1lUdUNzN0xJU3lPcnNXR0FsR2J6bUZOc2hXclVnSVpyCkdXVTFST0x0SksrZXZYaHFqOHp2SEFBYXhUMlZUNFFVRUFCWkVERTdDWWM4cWpLSkpUS2d6M3hwTjBGeEE0NmgKejdRcGZVRW5LZmtSb2l4NGNRRnYwcllBUi9TVnBWWnl6ZUgxWXBmTmNGb3YwWHAybXhDME55a1dOQnhjeGFSbQpSaVg5a05xVHV0djZQQkhQV1ROcEd1R3lkaDlWV3BRVWZqYmhiUm9nUU5WdVVvSEh1eTgxemd1d0hZdCtZbUNtCkl3T253K2NkYkFSSUF2V1c1TU51NHUzTFA2bE80NE5nWXlaalY5Y2RSWjVnVVZ1V3Y5QllIUEdHT3Z5NWhQb0QKREJyTk5nR0toNWFaeEZveXUrUVRtUnIrZzBPQzE4S1IvNkIwdlFJREFRQUJBb0lCQUF0VEZXM1BRaE9oZ2xxQgo4Q1N1ZXYzcDNOVDdpMzNlYmtOdW5DbVZnZUZXVzJIZ0t6d01reVJkMVN5QllzR1ZTUDN5ZzFnSks0U1I5K1huCkFQRVN6Qmh6K3Z5cEZCeStsUllMRTZrbkM4WXdycG5wdjd0WnRlUzJrTXJQVVRZcnhZdXRiU3Q1ODVjNWV5dmUKMGdmZjJzbHZqUFU5enJPbUcxY1JoNXdCN3U5ME1keUllTnd1NDlqalo0VXY5ZlJIRmNEK09ZMGhkRDRzSHZRSApJamwwRm5pUERJMEROSm5Ud2R1Z1c5MkVsMUhzcDhaNkozNjNZSkJCUHROdVlkeUhyZURBRXlKcm0xMUgyZjNKClRURnFOMko2ZkU5eEVtRzl4MGRldmlzbXBUMEJMTy9FMVZNMUFpNko1OUNIdVp5dzRWV2VMUGU3Zk1NdFBqbXMKNmFZWVllRUNnWUVBOTJYRXJMSWM4eHpMazBXY1lYcnZiSndITXRoRkI1WTIxTWNtYUIyem51aG45RzJrOVhWKwpyMkFyYzQxbW5PeG1IWlIxTmpOUmh1NHZ6WXY5b2I0RVdHUlY3aFJzOEJIZGY1WU51SWVqc2o3ZDNuRmhPdHhoCko2cmNLbTRhbGJZUDBYUC9EaVBoUWhSbUlwTXZQdCt4dVY3UnlvRm5VV2M5R0pZS0tIZkVEVEVDZ1lFQXllbzcKeGcyYmgvNm94UHlSdkJNQ2pESElVNE83Qi93TkxRRkVRMDVKQzN4SUJZWUJXWmpvVkJCc3NLa0JvZGpPMTUvOAozeG9CcW1aNHJZM0RkVDRUQ2NXV21mckdWTFZObDRlbzhkQUtkbHdObnEybGhFM2xaamlYVTU0R2lGbzVyR2NsCjVGQTVjek5ldlR4OGVzMVdRZS9WR1NTWUZMZDRDTy9tYlpHTkRVMENnWUVBMEtIK0xqVTJ2TDczM3diQlRtUEMKTGJHWFVJV2FFVC9ZbGJBczczaTgxYkhnbVAwdU0rSVdLQWZPSFBDT0xLQWZyYXBZL3BCZ25JMlp1cG5vRnRLTQpENDd0K0kwNUlXdXZnNzBqYlE3V09hZFNyQmlwaWwzM2dPQlNNMllPL1ZwQUZMN2h4U2IwL0NqL3lRQ2V3ME1hCk9kMkF4bXBDbXgrWkluYkZza0x1RHNFQ2dZQUhNQlJ5cDNkYTd3RFpDbGl4eGtkMzhDbStkMWtJSHJ2bFZ6OHoKMml5VmdSWWJSRHIyRXBCcXRhNzQxdnRjNUpmd2F4eVlZSmVnbGtkRGZtRnY0Z2JSZVR3MFBRNGtZOVBnU2c4RQpsTEJhcUVvLzFOU29raEZSZzBBMzFNOU11VkdHUnFHOXIvRnJuVytJOHdkSFk5bm5QUDlzQnJaM1BsVENsSyt5ClJOVXRuUUtCZ0Z4MlBreCtETmZKREpmQmxDOFdMTU16VG0xMVVCSmRkRTkwMG1LL2hnQit1TkxlYTA5QmtBMXUKK0pBMmowMTVPZVA5Yk5PUW4zLzhMY0Q2SGRuM2FwVEhHQ2FQUmUwQmVpTVRHMWw1YjBDY0NFK2wwMTZvWkYragp5dENHMjJKWi9wamVyNktuRVJrSFBadU12citRN2JsckIxZmM3ei9oemdjM0FSdnNnZzl0Ci0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tCg==
+            loggingService: logging.googleapis.com/kubernetes
+            monitoringService: monitoring.googleapis.com/kubernetes
             network: default
-            clusterIpv4Cidr: 10.36.0.0/14
+            clusterIpv4Cidr: 10.64.0.0/14
             addonsConfig:
               httpLoadBalancing:
                 disabled: true
@@ -141,7 +98,7 @@ actions:
             nodePools:
             - name: default-pool
               config:
-                machineType: n1-standard-4
+                machineType: n1-standard-2
                 diskSizeGb: 100
                 oauthScopes:
                 - https://www.googleapis.com/auth/cloud-platform
@@ -159,9 +116,9 @@ actions:
               management:
                 autoRepair: true
               selfLink: https://container.googleapis.com/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/clusters/do-not-delete-gke-knative-test-cluster/nodePools/default-pool
-              version: 1.10.7-gke.6
+              version: 1.11.6-gke.6
               instanceGroupUrls:
-              - https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instanceGroupManagers/gke-serverless-gke-test--default-pool-9fae783c-grp
+              - https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instanceGroupManagers/gke-do-not-delete-gke-kn-default-pool-2c29644d-grp
               status: RUNNING
             locations:
             - us-central1-a
@@ -171,17 +128,18 @@ actions:
               network: projects/cloud-sdk-integration-testing/global/networks/default
             selfLink: https://container.googleapis.com/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/clusters/do-not-delete-gke-knative-test-cluster
             zone: us-central1-a
-            endpoint: 35.239.174.71
-            initialClusterVersion: 1.10.7-gke.6
-            currentMasterVersion: 1.10.7-gke.6
-            currentNodeVersion: 1.10.7-gke.6
-            createTime: '2018-10-12T20:55:30+00:00'
+            endpoint: 35.239.121.203
+            initialClusterVersion: 1.11.6-gke.6
+            currentMasterVersion: 1.11.6-gke.6
+            currentNodeVersion: 1.11.6-gke.6
+            createTime: '2019-02-10T22:30:24+00:00'
             status: RUNNING
             nodeIpv4CidrSize: 24
-            servicesIpv4Cidr: 10.39.240.0/20
+            servicesIpv4Cidr: 10.67.240.0/20
             instanceGroupUrls:
-            - https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instanceGroupManagers/gke-serverless-gke-test--default-pool-9fae783c-grp
+            - https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instanceGroupManagers/gke-do-not-delete-gke-kn-default-pool-2c29644d-grp
             currentNodeCount: 3
+            location: us-central1-a
     - api_call:
         expect_request:
           uri:
@@ -191,10 +149,10 @@ actions:
             matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$\?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
-            audit-id: 06c18aa3-255e-4e70-be7f-14d8124a1517
+            audit-id: 07874bcc-c7f8-40e6-9f64-2e286d400fe5
             content-length: '292'
             content-type: application/json
             status: '404'
@@ -211,7 +169,36 @@ actions:
               kind: services
             code: 404
     - expect_stderr: |
-        Creating new service [$$service-name$$]
+        Deploying container to Cloud Run on GKE service [$$service-name$$] in namespace [default] of cluster [do-not-delete-gke-knative-test-cluster]
+    - api_call:
+        repeatable: true
+        expect_request:
+          uri:
+            # The uri hostname varies. With python2 it would be kubernetes.default. With
+            # python3 it would be monkey patched into IP address of the gke cluster. For the monkey
+            # patch information: CL/217804288.
+            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$\?alt=json
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            audit-id: 07874bcc-c7f8-40e6-9f64-2e286d400fe5
+            content-length: '292'
+            content-type: application/json
+            status: '404'
+          body:
+            kind: Status
+            apiVersion: v1
+            metadata: {}
+            status: Failure
+            message: services.serving.knative.dev "$$service-name$$" not found
+            reason: NotFound
+            details:
+              name: $$service-name$$
+              group: serving.knative.dev
+              kind: services
+            code: 404
     - api_call:
         expect_request:
           uri:
@@ -242,24 +229,23 @@ actions:
               status: {}
         return_response:
           headers:
-            audit-id: b0726ff9-5992-4618-bfac-5e86cefeaa82
-            content-length: '677'
+            audit-id: 7064f178-f0d3-410a-8856-8fb438a94f48
+            content-length: '743'
             content-type: application/json
             status: '201'
           body:
             apiVersion: serving.knative.dev/v1alpha1
             kind: Service
             metadata:
-              annotations: {}
-              clusterName: ''
-              creationTimestamp: '2018-10-16T17:22:12Z'
+              annotations:
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+              creationTimestamp: '2019-02-12T01:15:54Z'
               generation: 1
-              labels: {}
               name: $$service-name$$
               namespace: default
-              resourceVersion: '711455'
+              resourceVersion: '273778'
               selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$
-              uid: 04b92114-d168-11e8-b1bf-42010a800150
+              uid: beb78e44-2e63-11e9-b885-42010a80008c
             spec:
               generation: 1
               runLatest:
@@ -268,155 +254,161 @@ actions:
                     metadata:
                       annotations: {}
                       initializers: {}
-                      labels: {}
+                      labels:
+                        client.knative.dev/nonce: tfukseouqd
                     spec:
-                      concurrencyModel: Multi
                       container:
                         image: gcr.io/knative-samples/helloworld-nodejs
-            status: {}
+                      timeoutSeconds: 300
     - api_call:
+        # Initial GET requests may be partially incomplete as the service is created
         repeatable: true
         expect_request:
           uri:
             matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$\?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
-            audit-id: cf42fa55-9521-43d6-91a6-f9741bf6bb10
-            content-length: '1394'
+            audit-id: 5cea3605-79bc-4bae-a570-b6dceb97ebb6
+            content-length: '1552'
             content-type: application/json
             status: '200'
           body:
             apiVersion: serving.knative.dev/v1alpha1
             kind: Service
             metadata:
-              clusterName: ''
-              creationTimestamp: '2018-10-16T17:22:12Z'
+              annotations:
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+              creationTimestamp: '2019-02-12T01:15:54Z'
               generation: 1
               name: $$service-name$$
               namespace: default
-              resourceVersion: '711559'
+              resourceVersion: '273854'
               selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$
-              uid: 04b92114-d168-11e8-b1bf-42010a800150
+              uid: beb78e44-2e63-11e9-b885-42010a80008c
             spec:
               generation: 1
               runLatest:
                 configuration:
                   revisionTemplate:
                     metadata:
-                      creationTimestamp: null
-                      initializers:
-                        pending: null
+                      annotations: {}
+                      initializers: {}
+                      labels:
+                        client.knative.dev/nonce: tfukseouqd
                     spec:
-                      concurrencyModel: Multi
                       container:
                         image: gcr.io/knative-samples/helloworld-nodejs
-                        name: ''
-                        resources: {}
+                      timeoutSeconds: 300
             status:
               conditions:
-              - lastTransitionTime: '2018-10-16T17:22:15Z'
+              - lastTransitionTime: '2019-02-12T01:16:00Z'
+                severity: Error
                 status: 'True'
                 type: ConfigurationsReady
-              - lastTransitionTime: '2018-10-16T17:22:15Z'
-                status: 'True'
-                type: RoutesReady
-              - lastTransitionTime: '2018-10-16T17:22:15Z'
+              - lastTransitionTime: '2019-02-12T01:16:00Z'
+                severity: Error
                 status: 'True'
                 type: Ready
-              domain: $$service-name$$.default.example.com
-              domainInternal: $$service-name$$.default.svc.cluster.local
-              latestCreatedRevisionName: $$service-name$$-00001
-              latestReadyRevisionName: $$service-name$$-00001
+              - lastTransitionTime: '2019-02-12T01:16:00Z'
+                severity: Error
+                status: 'True'
+                type: RoutesReady
               observedGeneration: 1
-              traffic:
-              - configurationName: $$service-name$$
-                percent: 100
-                revisionName: $$service-name$$-00001
     - expect_staged_progress_tracker:
-        message: Deploying...
+        message: Deploying new service...
         status: SUCCESS
     - api_call:
+        # Final GET request should have complete and ready service
         expect_request:
           uri:
             matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$\?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
-            audit-id: 1b0e67e9-7e21-4fa2-907a-90ba0dc2826e
-            content-length: '1394'
+            audit-id: 70271dc2-3302-4b53-a42c-c41af329ee1a
+            content-length: '1552'
             content-type: application/json
             status: '200'
           body:
             apiVersion: serving.knative.dev/v1alpha1
             kind: Service
             metadata:
-              clusterName: ''
-              creationTimestamp: '2018-10-16T17:22:12Z'
+              annotations:
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+              creationTimestamp: '2019-02-12T01:15:54Z'
               generation: 1
               name: $$service-name$$
               namespace: default
-              resourceVersion: '711559'
+              resourceVersion: '273854'
               selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$
-              uid: 04b92114-d168-11e8-b1bf-42010a800150
+              uid: beb78e44-2e63-11e9-b885-42010a80008c
             spec:
               generation: 1
               runLatest:
                 configuration:
                   revisionTemplate:
                     metadata:
-                      creationTimestamp: null
-                      initializers:
-                        pending: null
+                      annotations: {}
+                      initializers: {}
+                      labels:
+                        client.knative.dev/nonce: tfukseouqd
                     spec:
-                      concurrencyModel: Multi
                       container:
                         image: gcr.io/knative-samples/helloworld-nodejs
-                        name: ''
-                        resources: {}
+                      timeoutSeconds: 300
             status:
+              address:
+                hostname: $$service-name$$.default.svc.cluster.local
               conditions:
-              - lastTransitionTime: '2018-10-16T17:22:15Z'
+              - lastTransitionTime: '2019-02-12T01:16:01Z'
+                severity: Error
                 status: 'True'
                 type: ConfigurationsReady
-              - lastTransitionTime: '2018-10-16T17:22:15Z'
-                status: 'True'
-                type: RoutesReady
-              - lastTransitionTime: '2018-10-16T17:22:15Z'
+              - lastTransitionTime: '2019-02-12T01:16:01Z'
+                severity: Error
                 status: 'True'
                 type: Ready
+              - lastTransitionTime: '2019-02-12T01:16:01Z'
+                severity: Error
+                status: 'True'
+                type: RoutesReady
               domain: $$service-name$$.default.example.com
               domainInternal: $$service-name$$.default.svc.cluster.local
-              latestCreatedRevisionName: $$service-name$$-00001
-              latestReadyRevisionName: $$service-name$$-00001
+              latestCreatedRevisionName: $$service-name$$-rev01
+              latestReadyRevisionName: $$service-name$$-rev01
               observedGeneration: 1
               traffic:
-              - configurationName: $$service-name$$
-                percent: 100
-                revisionName: $$service-name$$-00001
+              - percent: 100
+                revisionName: $$service-name$$-rev01
+        expect_response:
+          extract_references:
+          - field: status.latestCreatedRevisionName
+            reference: service-revision-name
+          body:
+            json: {}
     - api_call:
         expect_request:
           uri:
             matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/configurations/$$service-name$$\?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
-            audit-id: a9145277-88a9-4ba0-a72a-ec852d8b30d9
-            content-length: '1271'
+            audit-id: 0f701344-3561-4acb-93f3-63416eeb24bb
+            content-length: '1318'
             content-type: application/json
             status: '200'
           body:
             apiVersion: serving.knative.dev/v1alpha1
             kind: Configuration
             metadata:
-              clusterName: ''
-              creationTimestamp: '2018-10-16T17:22:12Z'
+              creationTimestamp: '2019-02-12T01:15:54Z'
               generation: 1
               labels:
                 serving.knative.dev/route: $$service-name$$
@@ -429,33 +421,37 @@ actions:
                 controller: true
                 kind: Service
                 name: $$service-name$$
-                uid: 04b92114-d168-11e8-b1bf-42010a800150
-              resourceVersion: '711548'
+                uid: beb78e44-2e63-11e9-b885-42010a80008c
+              resourceVersion: '273847'
               selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/configurations/$$service-name$$
-              uid: 04bc6090-d168-11e8-b1bf-42010a800150
+              uid: bec6c140-2e63-11e9-b885-42010a80008c
             spec:
               generation: 1
               revisionTemplate:
                 metadata:
-                  creationTimestamp: null
+                  creationTimestamp:
                   initializers:
-                    pending: null
+                    pending:
+                  labels:
+                    client.knative.dev/nonce: tfukseouqd
                 spec:
-                  concurrencyModel: Multi
                   container:
                     image: gcr.io/knative-samples/helloworld-nodejs
                     name: ''
                     resources: {}
+                  timeoutSeconds: 300
             status:
               conditions:
-              - lastTransitionTime: '2018-10-16T17:22:15Z'
+              - lastTransitionTime: '2019-02-12T01:16:01Z'
+                severity: Error
                 status: 'True'
                 type: Ready
-              latestCreatedRevisionName: $$service-name$$-00001
-              latestReadyRevisionName: $$service-name$$-00001
+              latestCreatedRevisionName: $$service-revision-name$$
+              latestReadyRevisionName: $$service-revision-name$$
               observedGeneration: 1
-    - expect_stderr: |
-        Service [$$service-name$$] revision [$$service-name$$-00001] has been deployed and is serving traffic at $$service-name$$.default.example.com
+    - expect_stderr:
+        matches: |
+          Service \[$$service-name$$\] revision \[$$service-name$$-[a-z0-9]+\] has been deployed and is serving traffic at $$service-name$$\.default\.example\.com
     - expect_exit:
         code: 0
 
@@ -468,17 +464,17 @@ actions:
           uri: https://container.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-central1-a/clusters/do-not-delete-gke-knative-test-cluster?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             cache-control: private
-            content-length: '8247'
+            content-length: '8334'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
             name: do-not-delete-gke-knative-test-cluster
             nodeConfig:
-              machineType: n1-standard-4
+              machineType: n1-standard-2
               diskSizeGb: 100
               oauthScopes:
               - https://www.googleapis.com/auth/cloud-platform
@@ -490,14 +486,14 @@ actions:
               diskType: pd-standard
             masterAuth:
               username: admin
-              password: 3qi3FU3qImMQ7mVW
-              clusterCaCertificate: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURERENDQWZTZ0F3SUJBZ0lSQVBCZEs0UzRwMVpCSVNBd2dwUzdXRGd3RFFZSktvWklodmNOQVFFTEJRQXcKTHpFdE1Dc0dBMVVFQXhNa1lqSTFOR0ppTXpNdFlUWmtZUzAwWldVMUxUazNNV1V0WWpFelpqbG1PR0kyWkRJNApNQjRYRFRFNE1UQXhNakU1TlRVek1Gb1hEVEl6TVRBeE1USXdOVFV6TUZvd0x6RXRNQ3NHQTFVRUF4TWtZakkxCk5HSmlNek10WVRaa1lTMDBaV1UxTFRrM01XVXRZakV6WmpsbU9HSTJaREk0TUlJQklqQU5CZ2txaGtpRzl3MEIKQVFFRkFBT0NBUThBTUlJQkNnS0NBUUVBdTR6VG1oSzkzNTVsSVByK3hKbE00N0YrU3RKeGZBSFNURlNKUi9rTQpwM2R3NUhFQ01iNnN1anIwMEIyNjVnVE9EK1ArcXF3QUNUR2pxSE1Va2xIZ0pkRjBYNlkybDVINU5JdVRSTmJXCndvdUs3OVM2Zm5HVGg3YjV4cVY1dUllNjAzcGFPRmVjRVQrcHVhbE5nYllLRG9SNWc1MkIzMWEvOTRmLzYrWGQKVHF5ek1UOURMNWpwQVlORzM4d1c2TzFwUThXR2d1L0c4VzFqR3ZORW5QSFlTOXNHODNmNWxXcnNoNFRydkt0KwpkL2t1M0JsV2ZVNzlQZTRCTVU5ZTBESUhMdXRiZ0d2WTRxSmYraVRFT3BZeVU2UFRjTVE4MmwwcGRkNlZlUG0vCkg2MzRHRG9rcXVuSVRpbU5LRWl2eWFQbWk2YkNOYVByb0FuQk1LOGs3akpiandJREFRQUJveU13SVRBT0JnTlYKSFE4QkFmOEVCQU1DQWdRd0R3WURWUjBUQVFIL0JBVXdBd0VCL3pBTkJna3Foa2lHOXcwQkFRc0ZBQU9DQVFFQQpJVVZNRDNWbWxIREF6dFBpUTl4UDhGKzl1Zmd2VDNJSlhrM0JFOEhXZ2dIYUNvQkVrRWxxMk9MUUVDYTZqTmlwCk1YMlg2RTdKdDE5dXdhd2tzTGg0Y2JOZ2JPbVdILzZiQUtqTW9pcVJxZjVJUlQ4SS9HTWxMT01xdUpoNktUMWYKekJiVk1rMVY5Uld4RXZoOUpKcU5xazNIN2pvZXlYMWZFNWF2V3BZdU03cTlGNitkY0tnQ0t6MTl4MzdMNTNpUwpZcExXcTd1cXppZktvZHBqQ25oUnZGN1VmWmQvQjZqUlJZQ0EzYk9EcmRyZWxLekd1REhaOWZWRWcvZXpTenBPClZXSXRheEZYWFVyMUwzbzdnanNkSGZUR084Q2FQLzVnWUd3VzVtajRYcmNQV1VhVjVPcHY3Q0lHZEx3Um5UQ20KWldCYXhMTiswTCszU2RyT1ZJeTlYZz09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
-              clientCertificate: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUMyakNDQWNLZ0F3SUJBZ0lRSm5zbktPeEdiVmg3Mnk2czF0K0t4VEFOQmdrcWhraUc5dzBCQVFzRkFEQXYKTVMwd0t3WURWUVFERXlSaU1qVTBZbUl6TXkxaE5tUmhMVFJsWlRVdE9UY3haUzFpTVRObU9XWTRZalprTWpndwpIaGNOTVRneE1ERXlNakExTlRNeFdoY05Nak14TURFeE1qQTFOVE14V2pBUk1ROHdEUVlEVlFRREV3WmpiR2xsCmJuUXdnZ0VpTUEwR0NTcUdTSWIzRFFFQkFRVUFBNElCRHdBd2dnRUtBb0lCQVFDM2tya3hNOGdwMENkV0E4bXgKaTJsQ043emlvQUljR2V2ZWdpUkRTeE8rUUhacmFyS1hVUjl0WlV3WTRyOTk2akdxUTk1dWJXSUxKWHBKeVdIRAo2V1FxdEZNdi85dHNMemZkejRJM2lDNHplMTFVdGxOazNCd3dXWitMTzBIZnRBVUc5clN1K0RkemV0bXo4K1BOCm5oQ2xYOExvZGhiUmVLUDJNUU5TSms1Y3VCYVZ5cFRHN1pmSTRJM3lKT2VKUWY5ZXRERGFXTFAyZGxLS3hYV2UKVnE5ZTFsdTJrZDJoYTROOUl1K09wbmFhTSt5dXZ0RTRtNTdqMUM1QjBiMXJXZlJaeW5hMXdSLy9QZjF5SGlOUQp5YVZxS0dTdFIxRTVhamRWamorL01kMklkRGtVZlNVWlFkaFZkMHJtaFBtY0dKQ0lERW0vSkNXZ0tQMnM3T20wCmpra2pBZ01CQUFHakVEQU9NQXdHQTFVZEV3RUIvd1FDTUFBd0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFCazMKUTNFVW1NRklKbURkRGxwVURwVkx5Zzd2S3VBSVpwajdZSDllbzRadENUZWdScEdMeWtiZVRxalJkMjFtZUdsRAp2OGJoek5ZbG4zWmplYzIzNktjYmRUTXBaM3VXQllOcjhvUXkzUWVaV00xNkVZRGRxRFlxTmVjUGtEVGJpRjdLCjUxaHNHdUgvVzFxYnhINVdwY0FUL3QrWFFEbDdTMC9SL1cvL0xxcDZENGZaVTQyNDhMQXlKV053T1FUNzI4aGUKY0kwTTN3K1JrcTQyVmc3WDhWbXBWQmpPUld0VjM4eG11bDR1ZVhhUTR6Nkl1by8vT1pkeS9NYUJ1cGRjV3ZLQwpKYU1ad0lEUXJZbW5TUDVXcEVMV0N4WVZkQ2xXV3l2cGpvbDJXUEMzelNDZjEvcmVGM0pLV2FJSmQ1WmZ1ZHduClRUc3VPYjdSV1BjcGJ2aU1WWjQ9Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
-              clientKey: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFb3dJQkFBS0NBUUVBdDVLNU1UUElLZEFuVmdQSnNZdHBRamU4NHFBQ0hCbnIzb0lrUTBzVHZrQjJhMnF5CmwxRWZiV1ZNR09LL2Zlb3hxa1BlYm0xaUN5VjZTY2xodytsa0tyUlRMLy9iYkM4MzNjK0NONGd1TTN0ZFZMWlQKWk53Y01GbWZpenRCMzdRRkJ2YTBydmczYzNyWnMvUGp6WjRRcFYvQzZIWVcwWGlqOWpFRFVpWk9YTGdXbGNxVQp4dTJYeU9DTjhpVG5pVUgvWHJRdzJsaXo5blpTaXNWMW5sYXZYdFpidHBIZG9XdURmU0x2anFaMm1qUHNycjdSCk9KdWU0OVF1UWRHOWExbjBXY3AydGNFZi96MzljaDRqVU1tbGFpaGtyVWRST1dvM1ZZNC92ekhkaUhRNUZIMGwKR1VIWVZYZEs1b1Q1bkJpUWlBeEp2eVFsb0NqOXJPenB0STVKSXdJREFRQUJBb0lCQUE1Sml4bWw1V21XVzhRTwpzMm53RWNIU1EyU0NxT2RnVlJmbm1tN3FXWit3WUxHODNOTE9GakRBeTRxOFN4bS9yOGN5cW1NcDBaR2wyYjRECkZjQXJzQWRxMVhhaU85cFFWU2JHK2JtSFl5RWxTWDd6QkhhUWN3UGRxeW5UbmkyTS9lblcxYVV3aUdXaWVzTWoKWGoxOTZkOFZIdW1uYklzM3Vuc2ZiQm9VQlNhamJiUVBQTG1XUUpGMzlGYXB3RGZjeVNqR0tCN2Q2VkluL25YRwpDRERFTjBZRFd3amR5VUNuczN4Z08rYXc3YVVmVGkwK3J4MjZVK0RMQ1ZXTWZKMytZWkV1TkthdXRBV0NBY2ROCkExNlVBdzBPZUFSb2RpSGZWbVE0VlgwTENsK25TRXVvUWUrL0FNdnFNS1BDUGVQQmMvNk43VEwva2l5K3JMNDMKQllRRU91RUNnWUVBL3RqaXhzNHlSRytNYytPNWt3RjhNN1F4bkRYbDdGclYvTmRDRHlYdXhJbHgzL3lzM3N5UApEbGl4dFNvTCtsVXhQU2plckw5MVV5eUgwRXl3a2hKV3BTRTh4Tzl4ckF1YThhRFkzak9kWXJyRjZwR0hnQ3dICjgzL05QUHBpYzV2bm1oUlAydGdNV3kzdUFiTGhMcldWYmxGNC82Y2dzMWRnZUR4bGNBdEJpUnNDZ1lFQXVHZE4KU0NpUVFWUUVBazFyV2xhYWV4NERoZFhWVHgzQWZmY0NuYU9EMnFrNlJZS2xGTnY1UW1GUnk2bDBqd20wcU0ycgpsN2lkOTZSN1JXYjM1N3dydDZNWnUweXU4ZXF6cFA5RmVIWXNXSlM5elMyZ1RjNkJtbnY2aXVuOXBwNVdmR1BDCk5MMXVWOVdUMU5UZkNLckpSeFhiRXFOZUtlVXFKaG9NT1NwM2lKa0NnWUJuNVVmZXdPVmhYUkNubG1scmN5bU4KY3FMZkNtSW9ENGc1d2hBZVdOcVVxV3dSWXRPZktVb1JFVHV4bmVpd0w5Y1pGZlpoK3RQOENxVjcyQ2dNQlFucAozRGtJR0k0QkUrSWhLKy85OXBEdFZUT213NW00T1Rzc25DZXgrbW4wczlTaHpqSVlDQWhSaTlJQ1Ewam1ZQVVCCnFwbG5zRnoyZ0dMRjRlbUEyalhualFLQmdBalF2MndNckdERElISHZ1NHNWQ3N1SjhzY3FJc2xtZGJaUDRhc2gKandNY0JmSWV2YitTaUliNDJnMHZhNmdPNGJrVUkvamIxWWxxTG81eHpyWWdVOEt5cEY5RTJqUXNjU3daRy93WApRaVYxN3VEcEpubXh2cFpoQ09ndEtYZ1dwN0hJbnhjZ1d5OE53Y1J4N0x1Z1ZvRDBkWVdkazduUy84SFVpdk1NCnFhdzVBb0dCQVBCQ0ZnbWdXSldtenNyWTdHbW9xdEM2TTdGR0Vkc3h5TTBzZGJ3K2lsREFSeEZ0N1JnbkdUOHAKZHJqUStoSnBiTllQZE9MVm1CV1F4elBpbU0ySXJvN2EvU2VZajN1aWVhbzZHVGw4YVk3VE0rRW1ONE90MXErSQpJQkJCdGdzdlU3THRnK0c3VGU4QWFHME94SzRJSW9oKzlCc1VTalg3UXZtbEszdXJBQ2NVCi0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tCg==
-            loggingService: logging.googleapis.com
-            monitoringService: monitoring.googleapis.com
+              password: ZJc50VU8iCswDyUe
+              clusterCaCertificate: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURERENDQWZTZ0F3SUJBZ0lSQUo1SmYrdGdIL0JRWnpiZGlQMGwxb0l3RFFZSktvWklodmNOQVFFTEJRQXcKTHpFdE1Dc0dBMVVFQXhNa09HRXdZalUwWlRFdE16azJPUzAwTkdGaUxXRTFabVF0TmpnM056QmhOalEzT1RVNQpNQjRYRFRFNU1ESXhNREl4TXpBeU5Gb1hEVEkwTURJd09USXlNekF5TkZvd0x6RXRNQ3NHQTFVRUF4TWtPR0V3CllqVTBaVEV0TXprMk9TMDBOR0ZpTFdFMVptUXROamczTnpCaE5qUTNPVFU1TUlJQklqQU5CZ2txaGtpRzl3MEIKQVFFRkFBT0NBUThBTUlJQkNnS0NBUUVBcE9oKzN1d3BnemN2cCttVTRLL1pNYzRoeW1wUmhCVTBSMHlCb25lcgpWemhpL1dTK3BHd29kcjRnS1pSS3ZtdnF0VGs2R0NLbXhWd0Y0ZGp1eVNTb0VEYURaOFlCWGNnSzlJdjBiWVZ5CklqZFNTc2VqZXR0WkFrQ3RIZ0VzRVdGSCtISStVTUJvYmFEcWc0a3piYi9WbmZDVGwySU9ja0tYZCtWK1hxUVoKTHpoaUZRVEcvYTNXdjhldC9mM0ZkTUc1Q1VRSmkzUFozL3ZxSHYyRnpFRkpnNnlzY21GU2pwQmwydnRmSEJ3dAoxMGMrWWZCZ3VzT0lmeFBXR21rQlhkUXNBcjl2dTcvRlBBUi9mZjhXSm5KQjJZbTJXeTRKUVF4VHpqUmNPUldjCk8xR00wVG5Qb1VLL2xGMk5MQVdMbXAzWThFQ0UrYnBVejE0RDhxbDlHaDUrUVFJREFRQUJveU13SVRBT0JnTlYKSFE4QkFmOEVCQU1DQWdRd0R3WURWUjBUQVFIL0JBVXdBd0VCL3pBTkJna3Foa2lHOXcwQkFRc0ZBQU9DQVFFQQpneGhRRlZNMml1c2Z0NFhhU0YxeGpUWGtTTlRhU3FEL1BDZUJPb2xpRm8wK0lxaUxiRjVteldLVnpITFU1VERyCnY2OFd0ZEFkOUdwUlJ0K3dJOFpsRHhuRXNiYTZoYkluMzExVWw1ZUNsMGFtWjc5eUtwaEQyZzd1OVUxc0lEQjgKM0g3YVZNUklma0Z4OXhacDE0L3FVNjU0cXU3UHZIdzdYTFdKNm5pZXpkV1FiWkprUW5OWGQxWjUvVnNEUjExcgp4SWxzSjlKWmJZREM4OEtreWlEZEpFcGs2djExVkpYTUpaQzdJYzZoR3V0QnkxZ2J1TUZ3elh3UndPc0I1RG1oCkRwVWdyWDN3ZVp6VXg1WkhyTG9CUnV0U2Jxb1pxUk02ZHV1ZEJLV2xNcUxETlNzWXlLMjBJQXZLclF6cXBtaVEKeUlZMFE0eWp6cVJIUXJUZnUvdmJidz09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+              clientCertificate: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUMyekNDQWNPZ0F3SUJBZ0lSQVBKZlRXRk1GRHVrN1pmb3J1NlZGR2t3RFFZSktvWklodmNOQVFFTEJRQXcKTHpFdE1Dc0dBMVVFQXhNa09HRXdZalUwWlRFdE16azJPUzAwTkdGaUxXRTFabVF0TmpnM056QmhOalEzT1RVNQpNQjRYRFRFNU1ESXhNREl5TXpBeU5Wb1hEVEkwTURJd09USXlNekF5TlZvd0VURVBNQTBHQTFVRUF4TUdZMnhwClpXNTBNSUlCSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DQVE4QU1JSUJDZ0tDQVFFQXd5RkVOVGZqN1AzZytRMnMKWVR1Q3M3TElTeU9yc1dHQWxHYnptRk5zaFdyVWdJWnJHV1UxUk9MdEpLK2V2WGhxajh6dkhBQWF4VDJWVDRRVQpFQUJaRURFN0NZYzhxaktKSlRLZ3ozeHBOMEZ4QTQ2aHo3UXBmVUVuS2ZrUm9peDRjUUZ2MHJZQVIvU1ZwVlp5CnplSDFZcGZOY0ZvdjBYcDJteEMwTnlrV05CeGN4YVJtUmlYOWtOcVR1dHY2UEJIUFdUTnBHdUd5ZGg5VldwUVUKZmpiaGJSb2dRTlZ1VW9ISHV5ODF6Z3V3SFl0K1ltQ21Jd09udytjZGJBUklBdldXNU1OdTR1M0xQNmxPNDROZwpZeVpqVjljZFJaNWdVVnVXdjlCWUhQR0dPdnk1aFBvRERCck5OZ0dLaDVhWnhGb3l1K1FUbVJyK2cwT0MxOEtSCi82QjB2UUlEQVFBQm94QXdEakFNQmdOVkhSTUJBZjhFQWpBQU1BMEdDU3FHU0liM0RRRUJDd1VBQTRJQkFRQWMKb1J1NFBaOS84dkx1VERYaDI5MFV2NkpiNmdySW9xcHF5TERZdG5aTnkxYWhJTElqdDQreExUV0pHNVZvN3BuQgo4Q2VnRWRYMklYQlY4VEhlZGdndDcrOUl0TGZtRlk3U2FIT1BoRFllcnpkMWc0WFltVS9nOXNvbU9ndnFnZnM0CitkRFZzUWwxN2k2UitiT0Y1RHBCK2x2OUs0bEpjQkpremtNWThETHMrdU92TXFzUUpaRWtXMnRsN3NSU1AxcmwKd2pWc3k2aE4rZ1YreElZeWp4cWVMemw4VVRFMTFNYkp4VkVodGZzeEFsSW5md29sQmMzNjNYK2RLRVdXZ1RXbwpaaUZMYkpwZll1aWpEdkxNWnpPUWxhRzlKdnpqMExlL1UrcjRmNGJ3Y241d0tQczZRSnhNWE5ObW1TejJtTFFMClpBMlgxbGpsQS9BcDQ4dlBiVEJwCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+              clientKey: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFb3dJQkFBS0NBUUVBd3lGRU5UZmo3UDNnK1Eyc1lUdUNzN0xJU3lPcnNXR0FsR2J6bUZOc2hXclVnSVpyCkdXVTFST0x0SksrZXZYaHFqOHp2SEFBYXhUMlZUNFFVRUFCWkVERTdDWWM4cWpLSkpUS2d6M3hwTjBGeEE0NmgKejdRcGZVRW5LZmtSb2l4NGNRRnYwcllBUi9TVnBWWnl6ZUgxWXBmTmNGb3YwWHAybXhDME55a1dOQnhjeGFSbQpSaVg5a05xVHV0djZQQkhQV1ROcEd1R3lkaDlWV3BRVWZqYmhiUm9nUU5WdVVvSEh1eTgxemd1d0hZdCtZbUNtCkl3T253K2NkYkFSSUF2V1c1TU51NHUzTFA2bE80NE5nWXlaalY5Y2RSWjVnVVZ1V3Y5QllIUEdHT3Z5NWhQb0QKREJyTk5nR0toNWFaeEZveXUrUVRtUnIrZzBPQzE4S1IvNkIwdlFJREFRQUJBb0lCQUF0VEZXM1BRaE9oZ2xxQgo4Q1N1ZXYzcDNOVDdpMzNlYmtOdW5DbVZnZUZXVzJIZ0t6d01reVJkMVN5QllzR1ZTUDN5ZzFnSks0U1I5K1huCkFQRVN6Qmh6K3Z5cEZCeStsUllMRTZrbkM4WXdycG5wdjd0WnRlUzJrTXJQVVRZcnhZdXRiU3Q1ODVjNWV5dmUKMGdmZjJzbHZqUFU5enJPbUcxY1JoNXdCN3U5ME1keUllTnd1NDlqalo0VXY5ZlJIRmNEK09ZMGhkRDRzSHZRSApJamwwRm5pUERJMEROSm5Ud2R1Z1c5MkVsMUhzcDhaNkozNjNZSkJCUHROdVlkeUhyZURBRXlKcm0xMUgyZjNKClRURnFOMko2ZkU5eEVtRzl4MGRldmlzbXBUMEJMTy9FMVZNMUFpNko1OUNIdVp5dzRWV2VMUGU3Zk1NdFBqbXMKNmFZWVllRUNnWUVBOTJYRXJMSWM4eHpMazBXY1lYcnZiSndITXRoRkI1WTIxTWNtYUIyem51aG45RzJrOVhWKwpyMkFyYzQxbW5PeG1IWlIxTmpOUmh1NHZ6WXY5b2I0RVdHUlY3aFJzOEJIZGY1WU51SWVqc2o3ZDNuRmhPdHhoCko2cmNLbTRhbGJZUDBYUC9EaVBoUWhSbUlwTXZQdCt4dVY3UnlvRm5VV2M5R0pZS0tIZkVEVEVDZ1lFQXllbzcKeGcyYmgvNm94UHlSdkJNQ2pESElVNE83Qi93TkxRRkVRMDVKQzN4SUJZWUJXWmpvVkJCc3NLa0JvZGpPMTUvOAozeG9CcW1aNHJZM0RkVDRUQ2NXV21mckdWTFZObDRlbzhkQUtkbHdObnEybGhFM2xaamlYVTU0R2lGbzVyR2NsCjVGQTVjek5ldlR4OGVzMVdRZS9WR1NTWUZMZDRDTy9tYlpHTkRVMENnWUVBMEtIK0xqVTJ2TDczM3diQlRtUEMKTGJHWFVJV2FFVC9ZbGJBczczaTgxYkhnbVAwdU0rSVdLQWZPSFBDT0xLQWZyYXBZL3BCZ25JMlp1cG5vRnRLTQpENDd0K0kwNUlXdXZnNzBqYlE3V09hZFNyQmlwaWwzM2dPQlNNMllPL1ZwQUZMN2h4U2IwL0NqL3lRQ2V3ME1hCk9kMkF4bXBDbXgrWkluYkZza0x1RHNFQ2dZQUhNQlJ5cDNkYTd3RFpDbGl4eGtkMzhDbStkMWtJSHJ2bFZ6OHoKMml5VmdSWWJSRHIyRXBCcXRhNzQxdnRjNUpmd2F4eVlZSmVnbGtkRGZtRnY0Z2JSZVR3MFBRNGtZOVBnU2c4RQpsTEJhcUVvLzFOU29raEZSZzBBMzFNOU11VkdHUnFHOXIvRnJuVytJOHdkSFk5bm5QUDlzQnJaM1BsVENsSyt5ClJOVXRuUUtCZ0Z4MlBreCtETmZKREpmQmxDOFdMTU16VG0xMVVCSmRkRTkwMG1LL2hnQit1TkxlYTA5QmtBMXUKK0pBMmowMTVPZVA5Yk5PUW4zLzhMY0Q2SGRuM2FwVEhHQ2FQUmUwQmVpTVRHMWw1YjBDY0NFK2wwMTZvWkYragp5dENHMjJKWi9wamVyNktuRVJrSFBadU12citRN2JsckIxZmM3ei9oemdjM0FSdnNnZzl0Ci0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tCg==
+            loggingService: logging.googleapis.com/kubernetes
+            monitoringService: monitoring.googleapis.com/kubernetes
             network: default
-            clusterIpv4Cidr: 10.36.0.0/14
+            clusterIpv4Cidr: 10.64.0.0/14
             addonsConfig:
               httpLoadBalancing:
                 disabled: true
@@ -510,7 +506,7 @@ actions:
             nodePools:
             - name: default-pool
               config:
-                machineType: n1-standard-4
+                machineType: n1-standard-2
                 diskSizeGb: 100
                 oauthScopes:
                 - https://www.googleapis.com/auth/cloud-platform
@@ -528,9 +524,9 @@ actions:
               management:
                 autoRepair: true
               selfLink: https://container.googleapis.com/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/clusters/do-not-delete-gke-knative-test-cluster/nodePools/default-pool
-              version: 1.10.7-gke.6
+              version: 1.11.6-gke.6
               instanceGroupUrls:
-              - https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instanceGroupManagers/gke-serverless-gke-test--default-pool-9fae783c-grp
+              - https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instanceGroupManagers/gke-do-not-delete-gke-kn-default-pool-2c29644d-grp
               status: RUNNING
             locations:
             - us-central1-a
@@ -540,82 +536,652 @@ actions:
               network: projects/cloud-sdk-integration-testing/global/networks/default
             selfLink: https://container.googleapis.com/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/clusters/do-not-delete-gke-knative-test-cluster
             zone: us-central1-a
-            endpoint: 35.239.174.71
-            initialClusterVersion: 1.10.7-gke.6
-            currentMasterVersion: 1.10.7-gke.6
-            currentNodeVersion: 1.10.7-gke.6
-            createTime: '2018-10-12T20:55:30+00:00'
+            endpoint: 35.239.121.203
+            initialClusterVersion: 1.11.6-gke.6
+            currentMasterVersion: 1.11.6-gke.6
+            currentNodeVersion: 1.11.6-gke.6
+            createTime: '2019-02-10T22:30:24+00:00'
             status: RUNNING
             nodeIpv4CidrSize: 24
-            servicesIpv4Cidr: 10.39.240.0/20
+            servicesIpv4Cidr: 10.67.240.0/20
             instanceGroupUrls:
-            - https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instanceGroupManagers/gke-serverless-gke-test--default-pool-9fae783c-grp
+            - https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instanceGroupManagers/gke-do-not-delete-gke-kn-default-pool-2c29644d-grp
             currentNodeCount: 3
+            location: us-central1-a
     - api_call:
         expect_request:
           uri:
             matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$\?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
-            audit-id: 5e421ea7-0737-49e8-bbf6-04359126e04a
-            content-length: '1394'
+            audit-id: 745fd48f-4baa-44c4-ad44-180c0b5c292c
+            content-length: '1552'
             content-type: application/json
             status: '200'
           body:
             apiVersion: serving.knative.dev/v1alpha1
             kind: Service
             metadata:
-              clusterName: ''
-              creationTimestamp: '2018-10-16T17:22:12Z'
+              annotations:
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+              creationTimestamp: '2019-02-12T01:15:54Z'
               generation: 1
               name: $$service-name$$
               namespace: default
-              resourceVersion: '711559'
+              resourceVersion: '273854'
               selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$
-              uid: 04b92114-d168-11e8-b1bf-42010a800150
+              uid: beb78e44-2e63-11e9-b885-42010a80008c
             spec:
               generation: 1
               runLatest:
                 configuration:
                   revisionTemplate:
                     metadata:
-                      creationTimestamp: null
-                      initializers:
-                        pending: null
+                      annotations: {}
+                      initializers: {}
+                      labels:
+                        client.knative.dev/nonce: tfukseouqd
                     spec:
-                      concurrencyModel: Multi
                       container:
                         image: gcr.io/knative-samples/helloworld-nodejs
-                        name: ''
-                        resources: {}
+                      timeoutSeconds: 300
             status:
+              address:
+                hostname: $$service-name$$.default.svc.cluster.local
               conditions:
-              - lastTransitionTime: '2018-10-16T17:22:15Z'
+              - lastTransitionTime: '2019-02-12T01:16:01Z'
+                severity: Error
                 status: 'True'
                 type: ConfigurationsReady
-              - lastTransitionTime: '2018-10-16T17:22:15Z'
-                status: 'True'
-                type: RoutesReady
-              - lastTransitionTime: '2018-10-16T17:22:15Z'
+              - lastTransitionTime: '2019-02-12T01:16:01Z'
+                severity: Error
                 status: 'True'
                 type: Ready
+              - lastTransitionTime: '2019-02-12T01:16:01Z'
+                severity: Error
+                status: 'True'
+                type: RoutesReady
               domain: $$service-name$$.default.example.com
               domainInternal: $$service-name$$.default.svc.cluster.local
-              latestCreatedRevisionName: $$service-name$$-00001
-              latestReadyRevisionName: $$service-name$$-00001
+              latestCreatedRevisionName: $$service-revision-name$$
+              latestReadyRevisionName: $$service-revision-name$$
               observedGeneration: 1
               traffic:
-              - configurationName: $$service-name$$
-                percent: 100
-                revisionName: $$service-name$$-00001
+              - percent: 100
+                revisionName: $$service-revision-name$$
     - expect_stdout: |
         $$service-name$$
     - expect_exit:
         code: 0
 
+- execute_command:
+    command: run services update $$service-name$$ --memory 512Mi --concurrency 3 --update-env-vars
+      FOO=bar
+    events:
+    - api_call:
+        expect_request:
+          uri: https://container.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-central1-a/clusters/do-not-delete-gke-knative-test-cluster?alt=json
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '8334'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: do-not-delete-gke-knative-test-cluster
+            nodeConfig:
+              machineType: n1-standard-2
+              diskSizeGb: 100
+              oauthScopes:
+              - https://www.googleapis.com/auth/cloud-platform
+              - https://www.googleapis.com/auth/logging.write
+              - https://www.googleapis.com/auth/monitoring.write
+              - https://www.googleapis.com/auth/pubsub
+              imageType: COS
+              serviceAccount: default
+              diskType: pd-standard
+            masterAuth:
+              username: admin
+              password: ZJc50VU8iCswDyUe
+              clusterCaCertificate: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURERENDQWZTZ0F3SUJBZ0lSQUo1SmYrdGdIL0JRWnpiZGlQMGwxb0l3RFFZSktvWklodmNOQVFFTEJRQXcKTHpFdE1Dc0dBMVVFQXhNa09HRXdZalUwWlRFdE16azJPUzAwTkdGaUxXRTFabVF0TmpnM056QmhOalEzT1RVNQpNQjRYRFRFNU1ESXhNREl4TXpBeU5Gb1hEVEkwTURJd09USXlNekF5TkZvd0x6RXRNQ3NHQTFVRUF4TWtPR0V3CllqVTBaVEV0TXprMk9TMDBOR0ZpTFdFMVptUXROamczTnpCaE5qUTNPVFU1TUlJQklqQU5CZ2txaGtpRzl3MEIKQVFFRkFBT0NBUThBTUlJQkNnS0NBUUVBcE9oKzN1d3BnemN2cCttVTRLL1pNYzRoeW1wUmhCVTBSMHlCb25lcgpWemhpL1dTK3BHd29kcjRnS1pSS3ZtdnF0VGs2R0NLbXhWd0Y0ZGp1eVNTb0VEYURaOFlCWGNnSzlJdjBiWVZ5CklqZFNTc2VqZXR0WkFrQ3RIZ0VzRVdGSCtISStVTUJvYmFEcWc0a3piYi9WbmZDVGwySU9ja0tYZCtWK1hxUVoKTHpoaUZRVEcvYTNXdjhldC9mM0ZkTUc1Q1VRSmkzUFozL3ZxSHYyRnpFRkpnNnlzY21GU2pwQmwydnRmSEJ3dAoxMGMrWWZCZ3VzT0lmeFBXR21rQlhkUXNBcjl2dTcvRlBBUi9mZjhXSm5KQjJZbTJXeTRKUVF4VHpqUmNPUldjCk8xR00wVG5Qb1VLL2xGMk5MQVdMbXAzWThFQ0UrYnBVejE0RDhxbDlHaDUrUVFJREFRQUJveU13SVRBT0JnTlYKSFE4QkFmOEVCQU1DQWdRd0R3WURWUjBUQVFIL0JBVXdBd0VCL3pBTkJna3Foa2lHOXcwQkFRc0ZBQU9DQVFFQQpneGhRRlZNMml1c2Z0NFhhU0YxeGpUWGtTTlRhU3FEL1BDZUJPb2xpRm8wK0lxaUxiRjVteldLVnpITFU1VERyCnY2OFd0ZEFkOUdwUlJ0K3dJOFpsRHhuRXNiYTZoYkluMzExVWw1ZUNsMGFtWjc5eUtwaEQyZzd1OVUxc0lEQjgKM0g3YVZNUklma0Z4OXhacDE0L3FVNjU0cXU3UHZIdzdYTFdKNm5pZXpkV1FiWkprUW5OWGQxWjUvVnNEUjExcgp4SWxzSjlKWmJZREM4OEtreWlEZEpFcGs2djExVkpYTUpaQzdJYzZoR3V0QnkxZ2J1TUZ3elh3UndPc0I1RG1oCkRwVWdyWDN3ZVp6VXg1WkhyTG9CUnV0U2Jxb1pxUk02ZHV1ZEJLV2xNcUxETlNzWXlLMjBJQXZLclF6cXBtaVEKeUlZMFE0eWp6cVJIUXJUZnUvdmJidz09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+              clientCertificate: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUMyekNDQWNPZ0F3SUJBZ0lSQVBKZlRXRk1GRHVrN1pmb3J1NlZGR2t3RFFZSktvWklodmNOQVFFTEJRQXcKTHpFdE1Dc0dBMVVFQXhNa09HRXdZalUwWlRFdE16azJPUzAwTkdGaUxXRTFabVF0TmpnM056QmhOalEzT1RVNQpNQjRYRFRFNU1ESXhNREl5TXpBeU5Wb1hEVEkwTURJd09USXlNekF5TlZvd0VURVBNQTBHQTFVRUF4TUdZMnhwClpXNTBNSUlCSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DQVE4QU1JSUJDZ0tDQVFFQXd5RkVOVGZqN1AzZytRMnMKWVR1Q3M3TElTeU9yc1dHQWxHYnptRk5zaFdyVWdJWnJHV1UxUk9MdEpLK2V2WGhxajh6dkhBQWF4VDJWVDRRVQpFQUJaRURFN0NZYzhxaktKSlRLZ3ozeHBOMEZ4QTQ2aHo3UXBmVUVuS2ZrUm9peDRjUUZ2MHJZQVIvU1ZwVlp5CnplSDFZcGZOY0ZvdjBYcDJteEMwTnlrV05CeGN4YVJtUmlYOWtOcVR1dHY2UEJIUFdUTnBHdUd5ZGg5VldwUVUKZmpiaGJSb2dRTlZ1VW9ISHV5ODF6Z3V3SFl0K1ltQ21Jd09udytjZGJBUklBdldXNU1OdTR1M0xQNmxPNDROZwpZeVpqVjljZFJaNWdVVnVXdjlCWUhQR0dPdnk1aFBvRERCck5OZ0dLaDVhWnhGb3l1K1FUbVJyK2cwT0MxOEtSCi82QjB2UUlEQVFBQm94QXdEakFNQmdOVkhSTUJBZjhFQWpBQU1BMEdDU3FHU0liM0RRRUJDd1VBQTRJQkFRQWMKb1J1NFBaOS84dkx1VERYaDI5MFV2NkpiNmdySW9xcHF5TERZdG5aTnkxYWhJTElqdDQreExUV0pHNVZvN3BuQgo4Q2VnRWRYMklYQlY4VEhlZGdndDcrOUl0TGZtRlk3U2FIT1BoRFllcnpkMWc0WFltVS9nOXNvbU9ndnFnZnM0CitkRFZzUWwxN2k2UitiT0Y1RHBCK2x2OUs0bEpjQkpremtNWThETHMrdU92TXFzUUpaRWtXMnRsN3NSU1AxcmwKd2pWc3k2aE4rZ1YreElZeWp4cWVMemw4VVRFMTFNYkp4VkVodGZzeEFsSW5md29sQmMzNjNYK2RLRVdXZ1RXbwpaaUZMYkpwZll1aWpEdkxNWnpPUWxhRzlKdnpqMExlL1UrcjRmNGJ3Y241d0tQczZRSnhNWE5ObW1TejJtTFFMClpBMlgxbGpsQS9BcDQ4dlBiVEJwCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+              clientKey: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFb3dJQkFBS0NBUUVBd3lGRU5UZmo3UDNnK1Eyc1lUdUNzN0xJU3lPcnNXR0FsR2J6bUZOc2hXclVnSVpyCkdXVTFST0x0SksrZXZYaHFqOHp2SEFBYXhUMlZUNFFVRUFCWkVERTdDWWM4cWpLSkpUS2d6M3hwTjBGeEE0NmgKejdRcGZVRW5LZmtSb2l4NGNRRnYwcllBUi9TVnBWWnl6ZUgxWXBmTmNGb3YwWHAybXhDME55a1dOQnhjeGFSbQpSaVg5a05xVHV0djZQQkhQV1ROcEd1R3lkaDlWV3BRVWZqYmhiUm9nUU5WdVVvSEh1eTgxemd1d0hZdCtZbUNtCkl3T253K2NkYkFSSUF2V1c1TU51NHUzTFA2bE80NE5nWXlaalY5Y2RSWjVnVVZ1V3Y5QllIUEdHT3Z5NWhQb0QKREJyTk5nR0toNWFaeEZveXUrUVRtUnIrZzBPQzE4S1IvNkIwdlFJREFRQUJBb0lCQUF0VEZXM1BRaE9oZ2xxQgo4Q1N1ZXYzcDNOVDdpMzNlYmtOdW5DbVZnZUZXVzJIZ0t6d01reVJkMVN5QllzR1ZTUDN5ZzFnSks0U1I5K1huCkFQRVN6Qmh6K3Z5cEZCeStsUllMRTZrbkM4WXdycG5wdjd0WnRlUzJrTXJQVVRZcnhZdXRiU3Q1ODVjNWV5dmUKMGdmZjJzbHZqUFU5enJPbUcxY1JoNXdCN3U5ME1keUllTnd1NDlqalo0VXY5ZlJIRmNEK09ZMGhkRDRzSHZRSApJamwwRm5pUERJMEROSm5Ud2R1Z1c5MkVsMUhzcDhaNkozNjNZSkJCUHROdVlkeUhyZURBRXlKcm0xMUgyZjNKClRURnFOMko2ZkU5eEVtRzl4MGRldmlzbXBUMEJMTy9FMVZNMUFpNko1OUNIdVp5dzRWV2VMUGU3Zk1NdFBqbXMKNmFZWVllRUNnWUVBOTJYRXJMSWM4eHpMazBXY1lYcnZiSndITXRoRkI1WTIxTWNtYUIyem51aG45RzJrOVhWKwpyMkFyYzQxbW5PeG1IWlIxTmpOUmh1NHZ6WXY5b2I0RVdHUlY3aFJzOEJIZGY1WU51SWVqc2o3ZDNuRmhPdHhoCko2cmNLbTRhbGJZUDBYUC9EaVBoUWhSbUlwTXZQdCt4dVY3UnlvRm5VV2M5R0pZS0tIZkVEVEVDZ1lFQXllbzcKeGcyYmgvNm94UHlSdkJNQ2pESElVNE83Qi93TkxRRkVRMDVKQzN4SUJZWUJXWmpvVkJCc3NLa0JvZGpPMTUvOAozeG9CcW1aNHJZM0RkVDRUQ2NXV21mckdWTFZObDRlbzhkQUtkbHdObnEybGhFM2xaamlYVTU0R2lGbzVyR2NsCjVGQTVjek5ldlR4OGVzMVdRZS9WR1NTWUZMZDRDTy9tYlpHTkRVMENnWUVBMEtIK0xqVTJ2TDczM3diQlRtUEMKTGJHWFVJV2FFVC9ZbGJBczczaTgxYkhnbVAwdU0rSVdLQWZPSFBDT0xLQWZyYXBZL3BCZ25JMlp1cG5vRnRLTQpENDd0K0kwNUlXdXZnNzBqYlE3V09hZFNyQmlwaWwzM2dPQlNNMllPL1ZwQUZMN2h4U2IwL0NqL3lRQ2V3ME1hCk9kMkF4bXBDbXgrWkluYkZza0x1RHNFQ2dZQUhNQlJ5cDNkYTd3RFpDbGl4eGtkMzhDbStkMWtJSHJ2bFZ6OHoKMml5VmdSWWJSRHIyRXBCcXRhNzQxdnRjNUpmd2F4eVlZSmVnbGtkRGZtRnY0Z2JSZVR3MFBRNGtZOVBnU2c4RQpsTEJhcUVvLzFOU29raEZSZzBBMzFNOU11VkdHUnFHOXIvRnJuVytJOHdkSFk5bm5QUDlzQnJaM1BsVENsSyt5ClJOVXRuUUtCZ0Z4MlBreCtETmZKREpmQmxDOFdMTU16VG0xMVVCSmRkRTkwMG1LL2hnQit1TkxlYTA5QmtBMXUKK0pBMmowMTVPZVA5Yk5PUW4zLzhMY0Q2SGRuM2FwVEhHQ2FQUmUwQmVpTVRHMWw1YjBDY0NFK2wwMTZvWkYragp5dENHMjJKWi9wamVyNktuRVJrSFBadU12citRN2JsckIxZmM3ei9oemdjM0FSdnNnZzl0Ci0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tCg==
+            loggingService: logging.googleapis.com/kubernetes
+            monitoringService: monitoring.googleapis.com/kubernetes
+            network: default
+            clusterIpv4Cidr: 10.64.0.0/14
+            addonsConfig:
+              httpLoadBalancing:
+                disabled: true
+              horizontalPodAutoscaling:
+                disabled: true
+              kubernetesDashboard:
+                disabled: true
+              networkPolicyConfig:
+                disabled: true
+            nodePools:
+            - name: default-pool
+              config:
+                machineType: n1-standard-2
+                diskSizeGb: 100
+                oauthScopes:
+                - https://www.googleapis.com/auth/cloud-platform
+                - https://www.googleapis.com/auth/logging.write
+                - https://www.googleapis.com/auth/monitoring.write
+                - https://www.googleapis.com/auth/pubsub
+                imageType: COS
+                serviceAccount: default
+                diskType: pd-standard
+              initialNodeCount: 3
+              autoscaling:
+                enabled: true
+                minNodeCount: 1
+                maxNodeCount: 10
+              management:
+                autoRepair: true
+              selfLink: https://container.googleapis.com/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/clusters/do-not-delete-gke-knative-test-cluster/nodePools/default-pool
+              version: 1.11.6-gke.6
+              instanceGroupUrls:
+              - https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instanceGroupManagers/gke-do-not-delete-gke-kn-default-pool-2c29644d-grp
+              status: RUNNING
+            locations:
+            - us-central1-a
+            labelFingerprint: a9dc16a7
+            legacyAbac: {}
+            networkConfig:
+              network: projects/cloud-sdk-integration-testing/global/networks/default
+            selfLink: https://container.googleapis.com/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/clusters/do-not-delete-gke-knative-test-cluster
+            zone: us-central1-a
+            endpoint: 35.239.121.203
+            initialClusterVersion: 1.11.6-gke.6
+            currentMasterVersion: 1.11.6-gke.6
+            currentNodeVersion: 1.11.6-gke.6
+            createTime: '2019-02-10T22:30:24+00:00'
+            status: RUNNING
+            nodeIpv4CidrSize: 24
+            servicesIpv4Cidr: 10.67.240.0/20
+            instanceGroupUrls:
+            - https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instanceGroupManagers/gke-do-not-delete-gke-kn-default-pool-2c29644d-grp
+            currentNodeCount: 3
+            location: us-central1-a
+    - api_call:
+        expect_request:
+          uri:
+            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$\?alt=json
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            audit-id: 44bf5116-f988-4703-b409-2ad182d14514
+            content-length: '1552'
+            content-type: application/json
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1alpha1
+            kind: Service
+            metadata:
+              annotations:
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+              creationTimestamp: '2019-02-12T01:15:54Z'
+              generation: 1
+              name: $$service-name$$
+              namespace: default
+              resourceVersion: '273854'
+              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$
+              uid: beb78e44-2e63-11e9-b885-42010a80008c
+            spec:
+              generation: 1
+              runLatest:
+                configuration:
+                  revisionTemplate:
+                    metadata:
+                      annotations: {}
+                      initializers: {}
+                      labels:
+                        client.knative.dev/nonce: tfukseouqd
+                    spec:
+                      container:
+                        image: gcr.io/knative-samples/helloworld-nodejs
+                        resources:
+                          requests:
+                      timeoutSeconds: 300
+            status:
+              address:
+                hostname: $$service-name$$.default.svc.cluster.local
+              conditions:
+              - lastTransitionTime: '2019-02-12T01:16:01Z'
+                severity: Error
+                status: 'True'
+                type: ConfigurationsReady
+              - lastTransitionTime: '2019-02-12T01:16:01Z'
+                severity: Error
+                status: 'True'
+                type: Ready
+              - lastTransitionTime: '2019-02-12T01:16:01Z'
+                severity: Error
+                status: 'True'
+                type: RoutesReady
+              domain: $$service-name$$.default.example.com
+              domainInternal: $$service-name$$.default.svc.cluster.local
+              latestCreatedRevisionName: $$service-revision-name$$
+              latestReadyRevisionName: $$service-revision-name$$
+              observedGeneration: 1
+              traffic:
+              - percent: 100
+                revisionName: $$service-revision-name$$
+    - api_call:
+        expect_request:
+          uri:
+            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/revisions\?alt=json&labelSelector=client.knative.dev%2Fnonce\+%3D\+.*
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            audit-id: 8cd6469d-55d3-4856-bea1-1d2e747ee234
+            content-type: application/json
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1alpha1
+            items:
+            - apiVersion: serving.knative.dev/v1alpha1
+              kind: Revision
+              metadata:
+                annotations:
+                  serving.knative.dev/lastPinned: '1549934161'
+                creationTimestamp: '2019-02-12T01:15:54Z'
+                generation: 1
+                labels:
+                  client.knative.dev/nonce: tfukseouqd
+                  serving.knative.dev/configuration: $$service-name$$
+                  serving.knative.dev/configurationGeneration: '1'
+                  serving.knative.dev/configurationMetadataGeneration: '1'
+                  serving.knative.dev/service: $$service-name$$
+                name: $$service-revision-name$$
+                namespace: default
+                ownerReferences:
+                - apiVersion: serving.knative.dev/v1alpha1
+                  blockOwnerDeletion: true
+                  controller: true
+                  kind: Configuration
+                  name: $$service-name$$
+                  uid: bec6c140-2e63-11e9-b885-42010a80008c
+                resourceVersion: '273841'
+                selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/revisions/$$service-revision-name$$
+                uid: bec9bd90-2e63-11e9-b885-42010a80008c
+              spec:
+                container:
+                  image: gcr.io/knative-samples/helloworld-nodejs
+                  name: ''
+                  resources:
+                    requests:
+                generation: 1
+                timeoutSeconds: 300
+              status:
+                conditions:
+                - lastTransitionTime: '2019-02-12T01:16:01Z'
+                  severity: Info
+                  status: 'True'
+                  type: Active
+                - lastTransitionTime: '2019-02-12T01:15:54Z'
+                  severity: Error
+                  status: 'True'
+                  type: BuildSucceeded
+                - lastTransitionTime: '2019-02-12T01:16:01Z'
+                  severity: Error
+                  status: 'True'
+                  type: ContainerHealthy
+                - lastTransitionTime: '2019-02-12T01:16:01Z'
+                  severity: Error
+                  status: 'True'
+                  type: Ready
+                - lastTransitionTime: '2019-02-12T01:16:01Z'
+                  severity: Error
+                  status: 'True'
+                  type: ResourcesAvailable
+                imageDigest: gcr.io/knative-samples/helloworld-nodejs@sha256:ae8c741379bbe004df62c1f29bbfd9bc92c84060a6d4af409d220e54f29959f6
+                logUrl: |
+                  http://localhost:8001/api/v1/namespaces/knative-monitoring/services/kibana-logging/proxy/app/kibana#/discover?_a=(query:(match:(kubernetes.labels.knative-dev%2FrevisionUID:(query:'bec9bd90-2e63-11e9-b885-42010a80008c',type:phrase))))
+                serviceName: $$service-revision-name$$-service
+            kind: RevisionList
+            metadata:
+              continue: ''
+              resourceVersion: '273860'
+              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/revisions
+    - api_call:
+        expect_request:
+          uri:
+            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$\?alt=json
+          method: PUT
+          headers: {}
+          body:
+            json:
+              apiVersion: serving.knative.dev/v1alpha1
+              kind: Service
+              metadata:
+                annotations:
+                  client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+                generation: 1
+                name: $$service-name$$
+                namespace: default
+              spec:
+                runLatest:
+                  configuration:
+                    revisionTemplate:
+                      spec:
+                        container:
+                          env:
+                          - name: FOO
+                            value: bar
+                          image: gcr.io/knative-samples/helloworld-nodejs@sha256:ae8c741379bbe004df62c1f29bbfd9bc92c84060a6d4af409d220e54f29959f6
+                          resources:
+                            limits:
+                              memory: 512Mi
+                            requests:
+                        containerConcurrency: 3
+                        timeoutSeconds: 300
+              status:
+                address:
+                  hostname: $$service-name$$.default.svc.cluster.local
+                conditions:
+                - status: 'True'
+                  type: ConfigurationsReady
+                - status: 'True'
+                  type: Ready
+                - status: 'True'
+                  type: RoutesReady
+                domain: $$service-name$$.default.example.com
+                domainInternal: $$service-name$$.default.svc.cluster.local
+                latestCreatedRevisionName: $$service-revision-name$$
+                latestReadyRevisionName: $$service-revision-name$$
+                observedGeneration: 1
+                traffic:
+                - percent: 100
+                  revisionName: $$service-revision-name$$
+        return_response:
+          headers:
+            audit-id: 432cf41c-915f-444d-b96b-a52d72330cc0
+            content-length: '1778'
+            content-type: application/json
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1alpha1
+            kind: Service
+            metadata:
+              annotations:
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+              creationTimestamp: '2019-02-12T01:15:54Z'
+              generation: 2
+              name: $$service-name$$
+              namespace: default
+              resourceVersion: '273862'
+              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$
+              uid: beb78e44-2e63-11e9-b885-42010a80008c
+            spec:
+              generation: 2
+              runLatest:
+                configuration:
+                  revisionTemplate:
+                    metadata:
+                      annotations: {}
+                      initializers: {}
+                      labels:
+                        client.knative.dev/nonce: kunbxexcfz
+                    spec:
+                      container:
+                        env:
+                        - name: FOO
+                          value: bar
+                        image: gcr.io/knative-samples/helloworld-nodejs@sha256:ae8c741379bbe004df62c1f29bbfd9bc92c84060a6d4af409d220e54f29959f6
+                        resources:
+                          limits:
+                            memory: 512Mi
+                          requests:
+                      containerConcurrency: 3
+                      timeoutSeconds: 300
+            status:
+              address:
+                hostname: $$service-name$$.default.svc.cluster.local
+              conditions:
+              - lastTransitionTime: '2019-02-12T01:16:01Z'
+                severity: Error
+                status: 'True'
+                type: ConfigurationsReady
+              - lastTransitionTime: '2019-02-12T01:16:01Z'
+                severity: Error
+                status: 'True'
+                type: Ready
+              - lastTransitionTime: '2019-02-12T01:16:01Z'
+                severity: Error
+                status: 'True'
+                type: RoutesReady
+              domain: $$service-name$$.default.example.com
+              domainInternal: $$service-name$$.default.svc.cluster.local
+              latestCreatedRevisionName: $$service-revision-name$$
+              latestReadyRevisionName: $$service-revision-name$$
+              observedGeneration: 1
+              traffic:
+              - percent: 100
+                revisionName: $$service-revision-name$$
+    - api_call:
+        repeatable: true
+        expect_request:
+          uri:
+            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$\?alt=json
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            audit-id: 13dbd071-a30c-4b16-8f12-e0c42b71134c
+            content-length: '1778'
+            content-type: application/json
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1alpha1
+            kind: Service
+            metadata:
+              annotations:
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+              creationTimestamp: '2019-02-12T01:15:54Z'
+              generation: 2
+              name: $$service-name$$
+              namespace: default
+              resourceVersion: '273864'
+              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$
+              uid: beb78e44-2e63-11e9-b885-42010a80008c
+            spec:
+              generation: 2
+              runLatest:
+                configuration:
+                  revisionTemplate:
+                    metadata:
+                      annotations: {}
+                      initializers: {}
+                      labels:
+                        client.knative.dev/nonce: kunbxexcfz
+                    spec:
+                      container:
+                        env:
+                        - name: FOO
+                          value: bar
+                        image: gcr.io/knative-samples/helloworld-nodejs@sha256:ae8c741379bbe004df62c1f29bbfd9bc92c84060a6d4af409d220e54f29959f6
+                        resources:
+                          limits:
+                            memory: 512Mi
+                          requests:
+                      containerConcurrency: 3
+                      timeoutSeconds: 300
+            status:
+              address:
+                hostname: $$service-name$$.default.svc.cluster.local
+              conditions:
+              - lastTransitionTime: '2019-02-12T01:16:01Z'
+                severity: Error
+                status: 'True'
+                type: ConfigurationsReady
+              - lastTransitionTime: '2019-02-12T01:16:01Z'
+                severity: Error
+                status: 'True'
+                type: Ready
+              - lastTransitionTime: '2019-02-12T01:16:01Z'
+                severity: Error
+                status: 'True'
+                type: RoutesReady
+              domain: $$service-name$$.default.example.com
+              domainInternal: $$service-name$$.default.svc.cluster.local
+              latestCreatedRevisionName: $$service-name$$-rev02
+              latestReadyRevisionName: $$service-name$$-rev02
+              observedGeneration: 2
+              traffic:
+              - percent: 100
+                revisionName: $$service-revision-name$$
+        expect_response:
+          extract_references:
+          - field: status.latestCreatedRevisionName
+            reference: service-revision-name-2
+          body:
+            json: {}
+    - expect_staged_progress_tracker:
+        message: Deploying...
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri:
+            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$\?alt=json
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            audit-id: 3514ebf5-94bd-44a7-8bc9-d40e1e4200f0
+            content-length: '1784'
+            content-type: application/json
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1alpha1
+            kind: Service
+            metadata:
+              annotations:
+                client.knative.dev/user-image: gcr.io/knative-samples/helloworld-nodejs
+              creationTimestamp: '2019-02-12T01:15:54Z'
+              generation: 2
+              name: $$service-name$$
+              namespace: default
+              resourceVersion: '273868'
+              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$
+              uid: beb78e44-2e63-11e9-b885-42010a80008c
+            spec:
+              generation: 2
+              runLatest:
+                configuration:
+                  revisionTemplate:
+                    metadata:
+                      annotations: {}
+                      initializers: {}
+                      labels:
+                        client.knative.dev/nonce: kunbxexcfz
+                    spec:
+                      container:
+                        env:
+                        - name: FOO
+                          value: bar
+                        image: gcr.io/knative-samples/helloworld-nodejs@sha256:ae8c741379bbe004df62c1f29bbfd9bc92c84060a6d4af409d220e54f29959f6
+                        resources:
+                          limits:
+                            memory: 512Mi
+                          requests:
+                      containerConcurrency: 3
+                      timeoutSeconds: 300
+            status:
+              address:
+                hostname: $$service-name$$.default.svc.cluster.local
+              conditions:
+              - status: 'True'
+                type: ConfigurationsReady
+              - status: 'True'
+                type: Ready
+              - status: 'True'
+                type: RoutesReady
+              domain: $$service-name$$.default.example.com
+              domainInternal: $$service-name$$.default.svc.cluster.local
+              latestCreatedRevisionName: $$service-revision-name-2$$
+              latestReadyRevisionName: $$service-revision-name-2$$
+              observedGeneration: 2
+              traffic:
+              - percent: 100
+                revisionName: $$service-revision-name-2$$
+    - api_call:
+        expect_request:
+          uri:
+            matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/routes/$$service-name$$\?alt=json
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            audit-id: 42941863-a80b-48d7-a0bf-32d697f66d34
+            content-length: '1425'
+            content-type: application/json
+            status: '200'
+          body:
+            apiVersion: serving.knative.dev/v1alpha1
+            kind: Route
+            metadata:
+              creationTimestamp: '2019-02-12T01:15:54Z'
+              generation: 1
+              labels:
+                serving.knative.dev/service: $$service-name$$
+              name: $$service-name$$
+              namespace: default
+              ownerReferences:
+              - apiVersion: serving.knative.dev/v1alpha1
+                blockOwnerDeletion: true
+                controller: true
+                kind: Service
+                name: $$service-name$$
+                uid: beb78e44-2e63-11e9-b885-42010a80008c
+              resourceVersion: '273852'
+              selfLink: /apis/serving.knative.dev/v1alpha1/namespaces/default/routes/$$service-name$$
+              uid: bec8991b-2e63-11e9-b885-42010a80008c
+            spec:
+              generation: 1
+              traffic:
+              - configurationName: $$service-name$$
+                percent: 100
+            status:
+              address:
+                hostname: $$service-name$$.default.svc.cluster.local
+              conditions:
+              - lastTransitionTime: '2019-02-12T01:16:01Z'
+                severity: Error
+                status: 'True'
+                type: AllTrafficAssigned
+              - lastTransitionTime: '2019-02-12T01:16:01Z'
+                severity: Error
+                status: 'True'
+                type: IngressReady
+              - lastTransitionTime: '2019-02-12T01:16:01Z'
+                severity: Error
+                status: 'True'
+                type: Ready
+              domain: $$service-name$$.default.example.com
+              domainInternal: $$service-name$$.default.svc.cluster.local
+              traffic:
+              - percent: 100
+                revisionName: $$service-revision-name-2$$
+    - expect_stderr:
+        matches: |
+          Service \[$$service-name$$\] revision \[$$service-name$$-[a-z0-9]+\] is active and serving traffic at $$service-name$$\.default\.example\.com
+    - expect_exit:
+        code: 0
 - execute_command:
     command: run services delete $$service-name$$ -q
     cleanup_for: service-name
@@ -625,17 +1191,17 @@ actions:
           uri: https://container.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-central1-a/clusters/do-not-delete-gke-knative-test-cluster?alt=json
           method: GET
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
             cache-control: private
-            content-length: '8247'
+            content-length: '8334'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
             name: do-not-delete-gke-knative-test-cluster
             nodeConfig:
-              machineType: n1-standard-4
+              machineType: n1-standard-2
               diskSizeGb: 100
               oauthScopes:
               - https://www.googleapis.com/auth/cloud-platform
@@ -647,14 +1213,14 @@ actions:
               diskType: pd-standard
             masterAuth:
               username: admin
-              password: 3qi3FU3qImMQ7mVW
-              clusterCaCertificate: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURERENDQWZTZ0F3SUJBZ0lSQVBCZEs0UzRwMVpCSVNBd2dwUzdXRGd3RFFZSktvWklodmNOQVFFTEJRQXcKTHpFdE1Dc0dBMVVFQXhNa1lqSTFOR0ppTXpNdFlUWmtZUzAwWldVMUxUazNNV1V0WWpFelpqbG1PR0kyWkRJNApNQjRYRFRFNE1UQXhNakU1TlRVek1Gb1hEVEl6TVRBeE1USXdOVFV6TUZvd0x6RXRNQ3NHQTFVRUF4TWtZakkxCk5HSmlNek10WVRaa1lTMDBaV1UxTFRrM01XVXRZakV6WmpsbU9HSTJaREk0TUlJQklqQU5CZ2txaGtpRzl3MEIKQVFFRkFBT0NBUThBTUlJQkNnS0NBUUVBdTR6VG1oSzkzNTVsSVByK3hKbE00N0YrU3RKeGZBSFNURlNKUi9rTQpwM2R3NUhFQ01iNnN1anIwMEIyNjVnVE9EK1ArcXF3QUNUR2pxSE1Va2xIZ0pkRjBYNlkybDVINU5JdVRSTmJXCndvdUs3OVM2Zm5HVGg3YjV4cVY1dUllNjAzcGFPRmVjRVQrcHVhbE5nYllLRG9SNWc1MkIzMWEvOTRmLzYrWGQKVHF5ek1UOURMNWpwQVlORzM4d1c2TzFwUThXR2d1L0c4VzFqR3ZORW5QSFlTOXNHODNmNWxXcnNoNFRydkt0KwpkL2t1M0JsV2ZVNzlQZTRCTVU5ZTBESUhMdXRiZ0d2WTRxSmYraVRFT3BZeVU2UFRjTVE4MmwwcGRkNlZlUG0vCkg2MzRHRG9rcXVuSVRpbU5LRWl2eWFQbWk2YkNOYVByb0FuQk1LOGs3akpiandJREFRQUJveU13SVRBT0JnTlYKSFE4QkFmOEVCQU1DQWdRd0R3WURWUjBUQVFIL0JBVXdBd0VCL3pBTkJna3Foa2lHOXcwQkFRc0ZBQU9DQVFFQQpJVVZNRDNWbWxIREF6dFBpUTl4UDhGKzl1Zmd2VDNJSlhrM0JFOEhXZ2dIYUNvQkVrRWxxMk9MUUVDYTZqTmlwCk1YMlg2RTdKdDE5dXdhd2tzTGg0Y2JOZ2JPbVdILzZiQUtqTW9pcVJxZjVJUlQ4SS9HTWxMT01xdUpoNktUMWYKekJiVk1rMVY5Uld4RXZoOUpKcU5xazNIN2pvZXlYMWZFNWF2V3BZdU03cTlGNitkY0tnQ0t6MTl4MzdMNTNpUwpZcExXcTd1cXppZktvZHBqQ25oUnZGN1VmWmQvQjZqUlJZQ0EzYk9EcmRyZWxLekd1REhaOWZWRWcvZXpTenBPClZXSXRheEZYWFVyMUwzbzdnanNkSGZUR084Q2FQLzVnWUd3VzVtajRYcmNQV1VhVjVPcHY3Q0lHZEx3Um5UQ20KWldCYXhMTiswTCszU2RyT1ZJeTlYZz09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
-              clientCertificate: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUMyakNDQWNLZ0F3SUJBZ0lRSm5zbktPeEdiVmg3Mnk2czF0K0t4VEFOQmdrcWhraUc5dzBCQVFzRkFEQXYKTVMwd0t3WURWUVFERXlSaU1qVTBZbUl6TXkxaE5tUmhMVFJsWlRVdE9UY3haUzFpTVRObU9XWTRZalprTWpndwpIaGNOTVRneE1ERXlNakExTlRNeFdoY05Nak14TURFeE1qQTFOVE14V2pBUk1ROHdEUVlEVlFRREV3WmpiR2xsCmJuUXdnZ0VpTUEwR0NTcUdTSWIzRFFFQkFRVUFBNElCRHdBd2dnRUtBb0lCQVFDM2tya3hNOGdwMENkV0E4bXgKaTJsQ043emlvQUljR2V2ZWdpUkRTeE8rUUhacmFyS1hVUjl0WlV3WTRyOTk2akdxUTk1dWJXSUxKWHBKeVdIRAo2V1FxdEZNdi85dHNMemZkejRJM2lDNHplMTFVdGxOazNCd3dXWitMTzBIZnRBVUc5clN1K0RkemV0bXo4K1BOCm5oQ2xYOExvZGhiUmVLUDJNUU5TSms1Y3VCYVZ5cFRHN1pmSTRJM3lKT2VKUWY5ZXRERGFXTFAyZGxLS3hYV2UKVnE5ZTFsdTJrZDJoYTROOUl1K09wbmFhTSt5dXZ0RTRtNTdqMUM1QjBiMXJXZlJaeW5hMXdSLy9QZjF5SGlOUQp5YVZxS0dTdFIxRTVhamRWamorL01kMklkRGtVZlNVWlFkaFZkMHJtaFBtY0dKQ0lERW0vSkNXZ0tQMnM3T20wCmpra2pBZ01CQUFHakVEQU9NQXdHQTFVZEV3RUIvd1FDTUFBd0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFCazMKUTNFVW1NRklKbURkRGxwVURwVkx5Zzd2S3VBSVpwajdZSDllbzRadENUZWdScEdMeWtiZVRxalJkMjFtZUdsRAp2OGJoek5ZbG4zWmplYzIzNktjYmRUTXBaM3VXQllOcjhvUXkzUWVaV00xNkVZRGRxRFlxTmVjUGtEVGJpRjdLCjUxaHNHdUgvVzFxYnhINVdwY0FUL3QrWFFEbDdTMC9SL1cvL0xxcDZENGZaVTQyNDhMQXlKV053T1FUNzI4aGUKY0kwTTN3K1JrcTQyVmc3WDhWbXBWQmpPUld0VjM4eG11bDR1ZVhhUTR6Nkl1by8vT1pkeS9NYUJ1cGRjV3ZLQwpKYU1ad0lEUXJZbW5TUDVXcEVMV0N4WVZkQ2xXV3l2cGpvbDJXUEMzelNDZjEvcmVGM0pLV2FJSmQ1WmZ1ZHduClRUc3VPYjdSV1BjcGJ2aU1WWjQ9Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
-              clientKey: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFb3dJQkFBS0NBUUVBdDVLNU1UUElLZEFuVmdQSnNZdHBRamU4NHFBQ0hCbnIzb0lrUTBzVHZrQjJhMnF5CmwxRWZiV1ZNR09LL2Zlb3hxa1BlYm0xaUN5VjZTY2xodytsa0tyUlRMLy9iYkM4MzNjK0NONGd1TTN0ZFZMWlQKWk53Y01GbWZpenRCMzdRRkJ2YTBydmczYzNyWnMvUGp6WjRRcFYvQzZIWVcwWGlqOWpFRFVpWk9YTGdXbGNxVQp4dTJYeU9DTjhpVG5pVUgvWHJRdzJsaXo5blpTaXNWMW5sYXZYdFpidHBIZG9XdURmU0x2anFaMm1qUHNycjdSCk9KdWU0OVF1UWRHOWExbjBXY3AydGNFZi96MzljaDRqVU1tbGFpaGtyVWRST1dvM1ZZNC92ekhkaUhRNUZIMGwKR1VIWVZYZEs1b1Q1bkJpUWlBeEp2eVFsb0NqOXJPenB0STVKSXdJREFRQUJBb0lCQUE1Sml4bWw1V21XVzhRTwpzMm53RWNIU1EyU0NxT2RnVlJmbm1tN3FXWit3WUxHODNOTE9GakRBeTRxOFN4bS9yOGN5cW1NcDBaR2wyYjRECkZjQXJzQWRxMVhhaU85cFFWU2JHK2JtSFl5RWxTWDd6QkhhUWN3UGRxeW5UbmkyTS9lblcxYVV3aUdXaWVzTWoKWGoxOTZkOFZIdW1uYklzM3Vuc2ZiQm9VQlNhamJiUVBQTG1XUUpGMzlGYXB3RGZjeVNqR0tCN2Q2VkluL25YRwpDRERFTjBZRFd3amR5VUNuczN4Z08rYXc3YVVmVGkwK3J4MjZVK0RMQ1ZXTWZKMytZWkV1TkthdXRBV0NBY2ROCkExNlVBdzBPZUFSb2RpSGZWbVE0VlgwTENsK25TRXVvUWUrL0FNdnFNS1BDUGVQQmMvNk43VEwva2l5K3JMNDMKQllRRU91RUNnWUVBL3RqaXhzNHlSRytNYytPNWt3RjhNN1F4bkRYbDdGclYvTmRDRHlYdXhJbHgzL3lzM3N5UApEbGl4dFNvTCtsVXhQU2plckw5MVV5eUgwRXl3a2hKV3BTRTh4Tzl4ckF1YThhRFkzak9kWXJyRjZwR0hnQ3dICjgzL05QUHBpYzV2bm1oUlAydGdNV3kzdUFiTGhMcldWYmxGNC82Y2dzMWRnZUR4bGNBdEJpUnNDZ1lFQXVHZE4KU0NpUVFWUUVBazFyV2xhYWV4NERoZFhWVHgzQWZmY0NuYU9EMnFrNlJZS2xGTnY1UW1GUnk2bDBqd20wcU0ycgpsN2lkOTZSN1JXYjM1N3dydDZNWnUweXU4ZXF6cFA5RmVIWXNXSlM5elMyZ1RjNkJtbnY2aXVuOXBwNVdmR1BDCk5MMXVWOVdUMU5UZkNLckpSeFhiRXFOZUtlVXFKaG9NT1NwM2lKa0NnWUJuNVVmZXdPVmhYUkNubG1scmN5bU4KY3FMZkNtSW9ENGc1d2hBZVdOcVVxV3dSWXRPZktVb1JFVHV4bmVpd0w5Y1pGZlpoK3RQOENxVjcyQ2dNQlFucAozRGtJR0k0QkUrSWhLKy85OXBEdFZUT213NW00T1Rzc25DZXgrbW4wczlTaHpqSVlDQWhSaTlJQ1Ewam1ZQVVCCnFwbG5zRnoyZ0dMRjRlbUEyalhualFLQmdBalF2MndNckdERElISHZ1NHNWQ3N1SjhzY3FJc2xtZGJaUDRhc2gKandNY0JmSWV2YitTaUliNDJnMHZhNmdPNGJrVUkvamIxWWxxTG81eHpyWWdVOEt5cEY5RTJqUXNjU3daRy93WApRaVYxN3VEcEpubXh2cFpoQ09ndEtYZ1dwN0hJbnhjZ1d5OE53Y1J4N0x1Z1ZvRDBkWVdkazduUy84SFVpdk1NCnFhdzVBb0dCQVBCQ0ZnbWdXSldtenNyWTdHbW9xdEM2TTdGR0Vkc3h5TTBzZGJ3K2lsREFSeEZ0N1JnbkdUOHAKZHJqUStoSnBiTllQZE9MVm1CV1F4elBpbU0ySXJvN2EvU2VZajN1aWVhbzZHVGw4YVk3VE0rRW1ONE90MXErSQpJQkJCdGdzdlU3THRnK0c3VGU4QWFHME94SzRJSW9oKzlCc1VTalg3UXZtbEszdXJBQ2NVCi0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tCg==
-            loggingService: logging.googleapis.com
-            monitoringService: monitoring.googleapis.com
+              password: ZJc50VU8iCswDyUe
+              clusterCaCertificate: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURERENDQWZTZ0F3SUJBZ0lSQUo1SmYrdGdIL0JRWnpiZGlQMGwxb0l3RFFZSktvWklodmNOQVFFTEJRQXcKTHpFdE1Dc0dBMVVFQXhNa09HRXdZalUwWlRFdE16azJPUzAwTkdGaUxXRTFabVF0TmpnM056QmhOalEzT1RVNQpNQjRYRFRFNU1ESXhNREl4TXpBeU5Gb1hEVEkwTURJd09USXlNekF5TkZvd0x6RXRNQ3NHQTFVRUF4TWtPR0V3CllqVTBaVEV0TXprMk9TMDBOR0ZpTFdFMVptUXROamczTnpCaE5qUTNPVFU1TUlJQklqQU5CZ2txaGtpRzl3MEIKQVFFRkFBT0NBUThBTUlJQkNnS0NBUUVBcE9oKzN1d3BnemN2cCttVTRLL1pNYzRoeW1wUmhCVTBSMHlCb25lcgpWemhpL1dTK3BHd29kcjRnS1pSS3ZtdnF0VGs2R0NLbXhWd0Y0ZGp1eVNTb0VEYURaOFlCWGNnSzlJdjBiWVZ5CklqZFNTc2VqZXR0WkFrQ3RIZ0VzRVdGSCtISStVTUJvYmFEcWc0a3piYi9WbmZDVGwySU9ja0tYZCtWK1hxUVoKTHpoaUZRVEcvYTNXdjhldC9mM0ZkTUc1Q1VRSmkzUFozL3ZxSHYyRnpFRkpnNnlzY21GU2pwQmwydnRmSEJ3dAoxMGMrWWZCZ3VzT0lmeFBXR21rQlhkUXNBcjl2dTcvRlBBUi9mZjhXSm5KQjJZbTJXeTRKUVF4VHpqUmNPUldjCk8xR00wVG5Qb1VLL2xGMk5MQVdMbXAzWThFQ0UrYnBVejE0RDhxbDlHaDUrUVFJREFRQUJveU13SVRBT0JnTlYKSFE4QkFmOEVCQU1DQWdRd0R3WURWUjBUQVFIL0JBVXdBd0VCL3pBTkJna3Foa2lHOXcwQkFRc0ZBQU9DQVFFQQpneGhRRlZNMml1c2Z0NFhhU0YxeGpUWGtTTlRhU3FEL1BDZUJPb2xpRm8wK0lxaUxiRjVteldLVnpITFU1VERyCnY2OFd0ZEFkOUdwUlJ0K3dJOFpsRHhuRXNiYTZoYkluMzExVWw1ZUNsMGFtWjc5eUtwaEQyZzd1OVUxc0lEQjgKM0g3YVZNUklma0Z4OXhacDE0L3FVNjU0cXU3UHZIdzdYTFdKNm5pZXpkV1FiWkprUW5OWGQxWjUvVnNEUjExcgp4SWxzSjlKWmJZREM4OEtreWlEZEpFcGs2djExVkpYTUpaQzdJYzZoR3V0QnkxZ2J1TUZ3elh3UndPc0I1RG1oCkRwVWdyWDN3ZVp6VXg1WkhyTG9CUnV0U2Jxb1pxUk02ZHV1ZEJLV2xNcUxETlNzWXlLMjBJQXZLclF6cXBtaVEKeUlZMFE0eWp6cVJIUXJUZnUvdmJidz09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+              clientCertificate: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUMyekNDQWNPZ0F3SUJBZ0lSQVBKZlRXRk1GRHVrN1pmb3J1NlZGR2t3RFFZSktvWklodmNOQVFFTEJRQXcKTHpFdE1Dc0dBMVVFQXhNa09HRXdZalUwWlRFdE16azJPUzAwTkdGaUxXRTFabVF0TmpnM056QmhOalEzT1RVNQpNQjRYRFRFNU1ESXhNREl5TXpBeU5Wb1hEVEkwTURJd09USXlNekF5TlZvd0VURVBNQTBHQTFVRUF4TUdZMnhwClpXNTBNSUlCSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DQVE4QU1JSUJDZ0tDQVFFQXd5RkVOVGZqN1AzZytRMnMKWVR1Q3M3TElTeU9yc1dHQWxHYnptRk5zaFdyVWdJWnJHV1UxUk9MdEpLK2V2WGhxajh6dkhBQWF4VDJWVDRRVQpFQUJaRURFN0NZYzhxaktKSlRLZ3ozeHBOMEZ4QTQ2aHo3UXBmVUVuS2ZrUm9peDRjUUZ2MHJZQVIvU1ZwVlp5CnplSDFZcGZOY0ZvdjBYcDJteEMwTnlrV05CeGN4YVJtUmlYOWtOcVR1dHY2UEJIUFdUTnBHdUd5ZGg5VldwUVUKZmpiaGJSb2dRTlZ1VW9ISHV5ODF6Z3V3SFl0K1ltQ21Jd09udytjZGJBUklBdldXNU1OdTR1M0xQNmxPNDROZwpZeVpqVjljZFJaNWdVVnVXdjlCWUhQR0dPdnk1aFBvRERCck5OZ0dLaDVhWnhGb3l1K1FUbVJyK2cwT0MxOEtSCi82QjB2UUlEQVFBQm94QXdEakFNQmdOVkhSTUJBZjhFQWpBQU1BMEdDU3FHU0liM0RRRUJDd1VBQTRJQkFRQWMKb1J1NFBaOS84dkx1VERYaDI5MFV2NkpiNmdySW9xcHF5TERZdG5aTnkxYWhJTElqdDQreExUV0pHNVZvN3BuQgo4Q2VnRWRYMklYQlY4VEhlZGdndDcrOUl0TGZtRlk3U2FIT1BoRFllcnpkMWc0WFltVS9nOXNvbU9ndnFnZnM0CitkRFZzUWwxN2k2UitiT0Y1RHBCK2x2OUs0bEpjQkpremtNWThETHMrdU92TXFzUUpaRWtXMnRsN3NSU1AxcmwKd2pWc3k2aE4rZ1YreElZeWp4cWVMemw4VVRFMTFNYkp4VkVodGZzeEFsSW5md29sQmMzNjNYK2RLRVdXZ1RXbwpaaUZMYkpwZll1aWpEdkxNWnpPUWxhRzlKdnpqMExlL1UrcjRmNGJ3Y241d0tQczZRSnhNWE5ObW1TejJtTFFMClpBMlgxbGpsQS9BcDQ4dlBiVEJwCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+              clientKey: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFb3dJQkFBS0NBUUVBd3lGRU5UZmo3UDNnK1Eyc1lUdUNzN0xJU3lPcnNXR0FsR2J6bUZOc2hXclVnSVpyCkdXVTFST0x0SksrZXZYaHFqOHp2SEFBYXhUMlZUNFFVRUFCWkVERTdDWWM4cWpLSkpUS2d6M3hwTjBGeEE0NmgKejdRcGZVRW5LZmtSb2l4NGNRRnYwcllBUi9TVnBWWnl6ZUgxWXBmTmNGb3YwWHAybXhDME55a1dOQnhjeGFSbQpSaVg5a05xVHV0djZQQkhQV1ROcEd1R3lkaDlWV3BRVWZqYmhiUm9nUU5WdVVvSEh1eTgxemd1d0hZdCtZbUNtCkl3T253K2NkYkFSSUF2V1c1TU51NHUzTFA2bE80NE5nWXlaalY5Y2RSWjVnVVZ1V3Y5QllIUEdHT3Z5NWhQb0QKREJyTk5nR0toNWFaeEZveXUrUVRtUnIrZzBPQzE4S1IvNkIwdlFJREFRQUJBb0lCQUF0VEZXM1BRaE9oZ2xxQgo4Q1N1ZXYzcDNOVDdpMzNlYmtOdW5DbVZnZUZXVzJIZ0t6d01reVJkMVN5QllzR1ZTUDN5ZzFnSks0U1I5K1huCkFQRVN6Qmh6K3Z5cEZCeStsUllMRTZrbkM4WXdycG5wdjd0WnRlUzJrTXJQVVRZcnhZdXRiU3Q1ODVjNWV5dmUKMGdmZjJzbHZqUFU5enJPbUcxY1JoNXdCN3U5ME1keUllTnd1NDlqalo0VXY5ZlJIRmNEK09ZMGhkRDRzSHZRSApJamwwRm5pUERJMEROSm5Ud2R1Z1c5MkVsMUhzcDhaNkozNjNZSkJCUHROdVlkeUhyZURBRXlKcm0xMUgyZjNKClRURnFOMko2ZkU5eEVtRzl4MGRldmlzbXBUMEJMTy9FMVZNMUFpNko1OUNIdVp5dzRWV2VMUGU3Zk1NdFBqbXMKNmFZWVllRUNnWUVBOTJYRXJMSWM4eHpMazBXY1lYcnZiSndITXRoRkI1WTIxTWNtYUIyem51aG45RzJrOVhWKwpyMkFyYzQxbW5PeG1IWlIxTmpOUmh1NHZ6WXY5b2I0RVdHUlY3aFJzOEJIZGY1WU51SWVqc2o3ZDNuRmhPdHhoCko2cmNLbTRhbGJZUDBYUC9EaVBoUWhSbUlwTXZQdCt4dVY3UnlvRm5VV2M5R0pZS0tIZkVEVEVDZ1lFQXllbzcKeGcyYmgvNm94UHlSdkJNQ2pESElVNE83Qi93TkxRRkVRMDVKQzN4SUJZWUJXWmpvVkJCc3NLa0JvZGpPMTUvOAozeG9CcW1aNHJZM0RkVDRUQ2NXV21mckdWTFZObDRlbzhkQUtkbHdObnEybGhFM2xaamlYVTU0R2lGbzVyR2NsCjVGQTVjek5ldlR4OGVzMVdRZS9WR1NTWUZMZDRDTy9tYlpHTkRVMENnWUVBMEtIK0xqVTJ2TDczM3diQlRtUEMKTGJHWFVJV2FFVC9ZbGJBczczaTgxYkhnbVAwdU0rSVdLQWZPSFBDT0xLQWZyYXBZL3BCZ25JMlp1cG5vRnRLTQpENDd0K0kwNUlXdXZnNzBqYlE3V09hZFNyQmlwaWwzM2dPQlNNMllPL1ZwQUZMN2h4U2IwL0NqL3lRQ2V3ME1hCk9kMkF4bXBDbXgrWkluYkZza0x1RHNFQ2dZQUhNQlJ5cDNkYTd3RFpDbGl4eGtkMzhDbStkMWtJSHJ2bFZ6OHoKMml5VmdSWWJSRHIyRXBCcXRhNzQxdnRjNUpmd2F4eVlZSmVnbGtkRGZtRnY0Z2JSZVR3MFBRNGtZOVBnU2c4RQpsTEJhcUVvLzFOU29raEZSZzBBMzFNOU11VkdHUnFHOXIvRnJuVytJOHdkSFk5bm5QUDlzQnJaM1BsVENsSyt5ClJOVXRuUUtCZ0Z4MlBreCtETmZKREpmQmxDOFdMTU16VG0xMVVCSmRkRTkwMG1LL2hnQit1TkxlYTA5QmtBMXUKK0pBMmowMTVPZVA5Yk5PUW4zLzhMY0Q2SGRuM2FwVEhHQ2FQUmUwQmVpTVRHMWw1YjBDY0NFK2wwMTZvWkYragp5dENHMjJKWi9wamVyNktuRVJrSFBadU12citRN2JsckIxZmM3ei9oemdjM0FSdnNnZzl0Ci0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tCg==
+            loggingService: logging.googleapis.com/kubernetes
+            monitoringService: monitoring.googleapis.com/kubernetes
             network: default
-            clusterIpv4Cidr: 10.36.0.0/14
+            clusterIpv4Cidr: 10.64.0.0/14
             addonsConfig:
               httpLoadBalancing:
                 disabled: true
@@ -667,7 +1233,7 @@ actions:
             nodePools:
             - name: default-pool
               config:
-                machineType: n1-standard-4
+                machineType: n1-standard-2
                 diskSizeGb: 100
                 oauthScopes:
                 - https://www.googleapis.com/auth/cloud-platform
@@ -685,9 +1251,9 @@ actions:
               management:
                 autoRepair: true
               selfLink: https://container.googleapis.com/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/clusters/do-not-delete-gke-knative-test-cluster/nodePools/default-pool
-              version: 1.10.7-gke.6
+              version: 1.11.6-gke.6
               instanceGroupUrls:
-              - https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instanceGroupManagers/gke-serverless-gke-test--default-pool-9fae783c-grp
+              - https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instanceGroupManagers/gke-do-not-delete-gke-kn-default-pool-2c29644d-grp
               status: RUNNING
             locations:
             - us-central1-a
@@ -697,28 +1263,29 @@ actions:
               network: projects/cloud-sdk-integration-testing/global/networks/default
             selfLink: https://container.googleapis.com/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/clusters/do-not-delete-gke-knative-test-cluster
             zone: us-central1-a
-            endpoint: 35.239.174.71
-            initialClusterVersion: 1.10.7-gke.6
-            currentMasterVersion: 1.10.7-gke.6
-            currentNodeVersion: 1.10.7-gke.6
-            createTime: '2018-10-12T20:55:30+00:00'
+            endpoint: 35.239.121.203
+            initialClusterVersion: 1.11.6-gke.6
+            currentMasterVersion: 1.11.6-gke.6
+            currentNodeVersion: 1.11.6-gke.6
+            createTime: '2019-02-10T22:30:24+00:00'
             status: RUNNING
             nodeIpv4CidrSize: 24
-            servicesIpv4Cidr: 10.39.240.0/20
+            servicesIpv4Cidr: 10.67.240.0/20
             instanceGroupUrls:
-            - https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instanceGroupManagers/gke-serverless-gke-test--default-pool-9fae783c-grp
+            - https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-a/instanceGroupManagers/gke-do-not-delete-gke-kn-default-pool-2c29644d-grp
             currentNodeCount: 3
+            location: us-central1-a
     - api_call:
         expect_request:
           uri:
             matches: https://.*/apis/serving.knative.dev/v1alpha1/namespaces/default/services/$$service-name$$\?alt=json
           method: DELETE
           headers: {}
-          body: null
+          body:
         return_response:
           headers:
-            audit-id: e6a3f1b2-ba2b-4210-9019-923da521e8dd
-            content-length: '228'
+            audit-id: 23958f32-6aa4-4c1b-af0b-2fa90c92033a
+            content-length: '217'
             content-type: application/json
             status: '200'
           body:
@@ -730,8 +1297,7 @@ actions:
               name: $$service-name$$
               group: serving.knative.dev
               kind: services
-              uid: 04b92114-d168-11e8-b1bf-42010a800150
-            code: 200
+              uid: beb78e44-2e63-11e9-b885-42010a80008c
     - expect_stderr: |
         Deleted service [$$service-name$$].
     - expect_exit:

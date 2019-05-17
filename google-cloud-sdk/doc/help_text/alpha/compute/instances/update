@@ -5,11 +5,10 @@ NAME
 SYNOPSIS
     gcloud alpha compute instances update INSTANCE_NAME
         [--[no-]deletion-protection] [--[no-]enable-display-device]
-        [--min-cpu-platform=PLATFORM] [--[no-]shielded-vm-integrity-monitoring]
-        [--shielded-vm-learn-integrity-policy] [--[no-]shielded-vm-secure-boot]
-        [--[no-]shielded-vm-vtpm] [--update-labels=[KEY=VALUE,...]]
-        [--zone=ZONE] [--clear-labels | --remove-labels=[KEY,...]]
-        [GCLOUD_WIDE_FLAG ...]
+        [--min-cpu-platform=PLATFORM] [--[no-]shielded-integrity-monitoring]
+        [--shielded-learn-integrity-policy] [--[no-]shielded-secure-boot]
+        [--[no-]shielded-vtpm] [--update-labels=[KEY=VALUE,...]] [--zone=ZONE]
+        [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute instances update updates labels and requested
@@ -59,35 +58,35 @@ FLAGS
         You can find more information on-line:
         https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform
 
-     --[no-]shielded-vm-integrity-monitoring
+     --[no-]shielded-integrity-monitoring
         Enables monitoring and attestation of the boot integrity of the
         instance. The attestation is performed against the integrity policy
         baseline. This baseline is initially derived from the implicitly
         trusted boot image when the instance is created. This baseline can be
         updated by using --shielded-vm-learn-integrity-policy. Changes to this
         setting (via the update command) will only take effect after stopping
-        and starting the instance. Use --shielded-vm-integrity-monitoring to
-        enable and --no-shielded-vm-integrity-monitoring to disable.
+        and starting the instance. Use --shielded-integrity-monitoring to
+        enable and --no-shielded-integrity-monitoring to disable.
 
-     --shielded-vm-learn-integrity-policy
+     --shielded-learn-integrity-policy
         Causes the instance to re-learn the integrity policy baseline using the
         current instance configuration. Use this flag after any planned
         boot-specific changes in the instance configuration, like kernel
         updates or kernel driver installation.
 
-     --[no-]shielded-vm-secure-boot
+     --[no-]shielded-secure-boot
         The instance will boot with secure boot enabled. Changes to this
         setting (via the update command) will only take effect after stopping
-        and starting the instance. Use --shielded-vm-secure-boot to enable and
-        --no-shielded-vm-secure-boot to disable.
+        and starting the instance. Use --shielded-secure-boot to enable and
+        --no-shielded-secure-boot to disable.
 
-     --[no-]shielded-vm-vtpm
+     --[no-]shielded-vtpm
         The instance will boot with the TPM (Trusted Platform Module) enabled.
         A TPM is a hardware module that can be used for different security
         operations such as remote attestation, encryption and sealing of keys.
         Changes to this setting (via the update command) will only take effect
-        after stopping and starting the instance. Use --shielded-vm-vtpm to
-        enable and --no-shielded-vm-vtpm to disable.
+        after stopping and starting the instance. Use --shielded-vtpm to enable
+        and --no-shielded-vtpm to disable.
 
      --update-labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to update. If a label exists its value is
@@ -140,8 +139,9 @@ FLAGS
           silently ignored.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

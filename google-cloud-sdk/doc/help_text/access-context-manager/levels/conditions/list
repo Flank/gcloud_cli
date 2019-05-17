@@ -1,0 +1,42 @@
+NAME
+    gcloud access-context-manager levels conditions list - list conditions for
+        an access level
+
+SYNOPSIS
+    gcloud access-context-manager levels conditions list
+        (--level=LEVEL : --policy=POLICY) [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    List conditions for a basic access level.
+
+REQUIRED FLAGS
+     Level resource - The access level you want to list the conditions for. The
+     arguments in this group can be used to specify the attributes of this
+     resource. This must be specified.
+
+       --level=LEVEL
+          ID of the level or fully qualified identifier for the level. This
+          flag must be specified if any of the other arguments in this group
+          are specified.
+
+       --policy=POLICY
+          The ID of the access policy.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+API REFERENCE
+    This command uses the accesscontextmanager/v1 API. The full documentation
+    for this API can be found at:
+    https://cloud.google.com/access-context-manager/docs/reference/rest/
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha access-context-manager levels conditions list
+        $ gcloud beta access-context-manager levels conditions list
+

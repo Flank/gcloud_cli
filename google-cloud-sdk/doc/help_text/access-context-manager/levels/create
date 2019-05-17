@@ -1,0 +1,72 @@
+NAME
+    gcloud access-context-manager levels create - create a new access level
+
+SYNOPSIS
+    gcloud access-context-manager levels create (LEVEL : --policy=POLICY)
+        --basic-level-spec=BASIC_LEVEL_SPEC --title=TITLE [--async]
+        [--combine-function=COMBINE_FUNCTION; default="and"]
+        [--description=DESCRIPTION] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Create a new access level in a given access policy.
+
+POSITIONAL ARGUMENTS
+     Level resource - The access level to create. The arguments in this group
+     can be used to specify the attributes of this resource. This must be
+     specified.
+
+       LEVEL
+          ID of the level or fully qualified identifier for the level. This
+          positional must be specified if any of the other arguments in this
+          group are specified.
+
+       --policy=POLICY
+          The ID of the access policy.
+
+REQUIRED FLAGS
+     --basic-level-spec=BASIC_LEVEL_SPEC
+        Path to a file containing a list of basic access level conditions.
+
+        An access level condition file is a YAML-formatted list of conditions,
+        which are YAML objects representing a Condition as described in the API
+        reference. For example:
+
+             - ipSubnetworks:
+               - 192.168.100.14/24
+               - 2001:db8::/48
+             - members
+               - user:user@example.com
+
+     --title=TITLE
+        Short human-readable title of the access level.
+
+OPTIONAL FLAGS
+     --async
+        Display information about the operation in progress, without waiting
+        for the operation to complete.
+
+     --combine-function=COMBINE_FUNCTION; default="and"
+        For a basic level, determines how conditions are combined.
+        COMBINE_FUNCTION must be one of: and, or.
+
+     --description=DESCRIPTION
+        Long-form description of access level.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+API REFERENCE
+    This command uses the accesscontextmanager/v1 API. The full documentation
+    for this API can be found at:
+    https://cloud.google.com/access-context-manager/docs/reference/rest/
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha access-context-manager levels create
+        $ gcloud beta access-context-manager levels create
+

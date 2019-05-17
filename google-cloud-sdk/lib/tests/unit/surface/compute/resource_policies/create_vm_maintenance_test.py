@@ -18,14 +18,18 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import resource_policies_base
 
 
-class CreateVmMaintenanceTest(resource_policies_base.TestBase,
-                              parameterized.TestCase):
+class CreateVmMaintenanceAlphaTest(resource_policies_base.TestBase,
+                                   parameterized.TestCase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
   def SetUp(self):
     self.day_enum = (

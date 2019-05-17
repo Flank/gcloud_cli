@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.util import exceptions as api_exceptions
+from googlecloudsdk.command_lib.projects import flags
 from googlecloudsdk.core.resource import resource_projector
 from tests.lib import test_case
 from tests.lib.apitools import http_error
@@ -42,8 +43,10 @@ class ProjectsDeleteTest(base.ProjectsUnitTestBase):
     self.AssertOutputEquals('')
     self.AssertErrContains('Your project will be deleted')
     self.AssertErrContains(
-        'You can undo this operation for a limited period by running:\n'
-        '  $ gcloud projects undelete {0}'.format(test_project_id))
+        """\nYou can undo this operation for a limited period by running '
+        commands below. {0}
+         $ gcloud projects undelete {1}"""
+        .format(flags.SHUT_DOWN_PROJECTS, test_project_id))
 
   def testNotDeleteValidProject(self):
     test_project_id = util.GetTestActiveProject().projectId
@@ -53,8 +56,10 @@ class ProjectsDeleteTest(base.ProjectsUnitTestBase):
     self.AssertOutputEquals('')
     self.AssertErrContains('Your project will be deleted')
     self.AssertErrNotContains(
-        'You can undo this operation for a limited period by running:\n'
-        '  $ gcloud projects undelete {0}'.format(test_project_id))
+        """\nYou can undo this operation for a limited period by running '
+        commands below. {0}
+         $ gcloud projects undelete {1}"""
+        .format(flags.SHUT_DOWN_PROJECTS, test_project_id))
 
   def testDeleteValidProjectWithFormat(self):
     test_project_id = util.GetTestActiveProject().projectId

@@ -22,7 +22,9 @@ import json
 
 from googlecloudsdk.api_lib.ml_engine import predict
 from googlecloudsdk.core import exceptions as core_exceptions
+from googlecloudsdk.core import http
 from googlecloudsdk.core import resources
+from googlecloudsdk.core.credentials import http as cred_http
 from tests.lib import test_case
 from tests.lib.surface.ml_engine import base
 
@@ -32,14 +34,12 @@ class PredictTestBase(object):
   _BASE_URL = 'https://ml.googleapis.com/v1/'
 
   def SetUp(self):
-    self.mock_http = self.StartPatch('httplib2.Http')
+    self.mock_http = self.StartObjectPatch(http, 'Http').return_value
+    self.StartObjectPatch(cred_http, 'Http').return_value = self.mock_http
     self.http_response = {'status': '200'}
     self.http_body = '{"predictions": [{"prediction": 1}, {"prediction": 2}]}'
     self.test_instances = [{'images': [0, 1], 'key': 3}]
     self.expected_body = '{"instances": [{"images": [0, 1], "key": 3}]}'
-    self.StartPatch(
-        'googlecloudsdk.core.credentials.http.Http',
-        return_value=self.mock_http)
     self.version_ref = resources.REGISTRY.Create('ml.projects.models.versions',
                                                  projectsId=self.Project(),
                                                  modelsId='my_model',

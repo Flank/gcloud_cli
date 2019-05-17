@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.resource_manager import exceptions
 from googlecloudsdk.api_lib.resource_manager import folders
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from tests.lib import test_case
 from tests.lib.surface.resource_manager import testbase
@@ -127,6 +128,18 @@ class FoldersListTest(testbase.FoldersUnitTestBase):
     limit_args = ['--limit', limit] if limit is not None else []
     all_args = folder_args + org_args + page_size_args + limit_args
     return self.RunFolders('list', *all_args)
+
+
+class FoldersListAlphaTest(FoldersListTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class FoldersListBetaTest(FoldersListTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 if __name__ == '__main__':

@@ -1579,5 +1579,275 @@ class WithCdnSignedUrlApiUpdateTest(BetaUpdateTestBase):
           """)
 
 
+class WithFailoverPolicyApiTest(BetaUpdateTestBase):
+
+  def SetUp(self):
+    messages = self.messages
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', 'beta')
+
+    self.orig_backend_service = messages.BackendService(
+        backends=[],
+        description='my backend service',
+        healthChecks=[
+            self.resources.Create(
+                'compute.healthChecks',
+                healthCheck='orig-health-check',
+                project='my-project').SelfLink(),
+        ],
+        loadBalancingScheme=(
+            messages.BackendService.LoadBalancingSchemeValueValuesEnum.INTERNAL
+        ),
+        name='backend-service-3',
+        portName='http',
+        protocol=messages.BackendService.ProtocolValueValuesEnum.TCP,
+        selfLink=self.resources.Create(
+            'compute.backendServices',
+            backendService='backend-service-3',
+            project='my-project').SelfLink(),
+        timeoutSec=30)
+
+  def CheckResults(self, expected_message=None):
+    messages = self.messages
+
+    self.CheckRequests(
+        [(self.compute.regionBackendServices, 'Get',
+          messages.ComputeRegionBackendServicesGetRequest(
+              backendService='backend-service-3',
+              project='my-project',
+              region='us-central1'))],
+        [(self.compute.regionBackendServices, 'Patch',
+          messages.ComputeRegionBackendServicesPatchRequest(
+              backendService='backend-service-3',
+              backendServiceResource=messages.BackendService(
+                  backends=[],
+                  description='my backend service',
+                  healthChecks=[
+                      self.resources.Create(
+                          'compute.healthChecks',
+                          healthCheck='orig-health-check',
+                          project='my-project').SelfLink(),
+                  ],
+                  loadBalancingScheme=(
+                      messages.BackendService.
+                      LoadBalancingSchemeValueValuesEnum.INTERNAL),
+                  failoverPolicy=expected_message,
+                  name='backend-service-3',
+                  portName='http',
+                  protocol=(
+                      messages.BackendService.ProtocolValueValuesEnum.TCP),
+                  selfLink=self.resources.Create(
+                      'compute.backendServices',
+                      backendService='backend-service-3',
+                      project='my-project').SelfLink(),
+                  timeoutSec=30),
+              project='my-project',
+              region='us-central1'))],
+    )
+
+  def testEnableFailoverOptions(self):
+    self.make_requests.side_effect = iter([
+        [self.orig_backend_service],
+        [],
+    ])
+
+    self.RunUpdate('backend-service-3 --region us-central1'
+                   ' --no-connection-drain-on-failover'
+                   ' --drop-traffic-if-unhealthy'
+                   ' --failover-ratio 0.5',
+                   use_global=False)
+    self.CheckResults(
+        self.messages.BackendServiceFailoverPolicy(
+            disableConnectionDrainOnFailover=True,
+            dropTrafficIfUnhealthy=True,
+            failoverRatio=0.5))
+
+  def testDisableFailoverOptions(self):
+    self.make_requests.side_effect = iter([
+        [self.orig_backend_service],
+        [],
+    ])
+
+    self.RunUpdate('backend-service-3 --region us-central1'
+                   ' --connection-drain-on-failover'
+                   ' --no-drop-traffic-if-unhealthy'
+                   ' --failover-ratio 0.5',
+                   use_global=False)
+    self.CheckResults(
+        self.messages.BackendServiceFailoverPolicy(
+            disableConnectionDrainOnFailover=False,
+            dropTrafficIfUnhealthy=False,
+            failoverRatio=0.5))
+
+  def testEnableFailoverOptionsWithExistingFailoverOptions(self):
+    backend_service_with_failover_options = copy.deepcopy(
+        self.orig_backend_service)
+    backend_service_with_failover_options.failoverPolicy = (
+        self.messages.BackendServiceFailoverPolicy(failoverRatio=0.5))
+    self.make_requests.side_effect = iter([
+        [backend_service_with_failover_options],
+        [],
+    ])
+
+    self.RunUpdate(
+        'backend-service-3 --region us-central1'
+        ' --no-connection-drain-on-failover',
+        use_global=False)
+    self.CheckResults(
+        self.messages.BackendServiceFailoverPolicy(
+            disableConnectionDrainOnFailover=True, failoverRatio=0.5))
+
+  def testCannotSpecifyFailoverPolicyForGlobalBackendService(self):
+    self.make_requests.side_effect = iter([
+        [self._http_backend_services_with_health_check[0]],
+        [],
+    ])
+
+    with self.AssertRaisesToolExceptionRegexp(
+        '^Invalid value for \\[--global\\]: cannot specify failover policies'
+        ' for global backend services.'):
+      self.RunUpdate('backend-service-3'
+                     ' --protocol TCP'
+                     ' --connection-drain-on-failover')
+
+  def testInvalidLoadBalancingSchemeWithInternalFailoverOptions(self):
+    external_tcp_backend_service = copy.deepcopy(self.orig_backend_service)
+    external_tcp_backend_service.loadBalancingScheme = (
+        self.messages.BackendService.LoadBalancingSchemeValueValuesEnum.EXTERNAL
+    )
+    self.make_requests.side_effect = iter([
+        [external_tcp_backend_service],
+        [],
+    ])
+
+    with self.AssertRaisesToolExceptionRegexp(
+        '^Invalid value for \\[--load-balancing-scheme\\]: can only specify '
+        '--connection-drain-on-failover or --drop-traffic-if-unhealthy'
+        ' if the load balancing scheme is INTERNAL.'):
+      self.RunUpdate(
+          'backend-service-3'
+          ' --region us-central1'
+          ' --drop-traffic-if-unhealthy',
+          use_global=False)
+
+  def testInvalidProtocolWithConnectionDrainOnFailover(self):
+    ssl_backend_service = copy.deepcopy(self.orig_backend_service)
+    ssl_backend_service.protocol = (
+        self.messages.BackendService.ProtocolValueValuesEnum.SSL)
+    self.make_requests.side_effect = iter([
+        [ssl_backend_service],
+        [],
+    ])
+
+    with self.AssertRaisesToolExceptionRegexp(
+        '^Invalid value for \\[--protocol\\]: can only specify '
+        '--connection-drain-on-failover if the protocol is TCP.'):
+      self.RunUpdate(
+          'backend-service-3'
+          ' --region us-central1'
+          ' --connection-drain-on-failover',
+          use_global=False)
+
+
+class WithLogConfigApiTest(BetaUpdateTestBase):
+
+  def SetUp(self):
+    messages = self.messages
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', 'beta')
+
+    self.orig_backend_service = messages.BackendService(
+        backends=[],
+        description='my backend service',
+        healthChecks=[
+            self.resources.Create(
+                'compute.healthChecks',
+                healthCheck='orig-health-check',
+                project='my-project').SelfLink(),
+        ],
+        loadBalancingScheme=(messages.BackendService
+                             .LoadBalancingSchemeValueValuesEnum.EXTERNAL),
+        name='backend-service-3',
+        portName='http',
+        protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
+        selfLink=self.resources.Create(
+            'compute.backendServices',
+            backendService='backend-service-3',
+            project='my-project').SelfLink(),
+        timeoutSec=30)
+
+  def CheckResults(self, expected_message=None):
+    messages = self.messages
+
+    self.CheckRequests(
+        [(self.compute.backendServices, 'Get',
+          messages.ComputeBackendServicesGetRequest(
+              backendService='backend-service-3', project='my-project'))],
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
+              backendService='backend-service-3',
+              backendServiceResource=messages.BackendService(
+                  backends=[],
+                  description='my backend service',
+                  healthChecks=[
+                      self.resources.Create(
+                          'compute.healthChecks',
+                          healthCheck='orig-health-check',
+                          project='my-project').SelfLink(),
+                  ],
+                  loadBalancingScheme=(
+                      messages.BackendService.LoadBalancingSchemeValueValuesEnum
+                      .EXTERNAL),
+                  logConfig=expected_message,
+                  name='backend-service-3',
+                  portName='http',
+                  protocol=(
+                      messages.BackendService.ProtocolValueValuesEnum.HTTP),
+                  selfLink=self.resources.Create(
+                      'compute.backendServices',
+                      backendService='backend-service-3',
+                      project='my-project').SelfLink(),
+                  timeoutSec=30),
+              project='my-project'))],
+    )
+
+  def testEnableLogging(self):
+    self.make_requests.side_effect = iter([
+        [self.orig_backend_service],
+        [],
+    ])
+
+    self.RunUpdate('backend-service-3 --global'
+                   ' --enable-logging'
+                   ' --logging-sample-rate 0.7')
+    self.CheckResults(
+        self.messages.BackendServiceLogConfig(enable=True, sampleRate=0.7))
+
+  def testDisableLogging(self):
+    self.make_requests.side_effect = iter([
+        [self.orig_backend_service],
+        [],
+    ])
+
+    self.RunUpdate('backend-service-3 --global'
+                   ' --no-enable-logging'
+                   ' --logging-sample-rate 0.0')
+    self.CheckResults(
+        self.messages.BackendServiceLogConfig(enable=False, sampleRate=0.0))
+
+  def testToggleSampleRateWithExistingLogConfig(self):
+    backend_service_with_log_config = copy.deepcopy(self.orig_backend_service)
+    backend_service_with_log_config.logConfig = (
+        self.messages.BackendServiceLogConfig(enable=True))
+    self.make_requests.side_effect = iter([
+        [backend_service_with_log_config],
+        [],
+    ])
+
+    self.RunUpdate('backend-service-3 --global --logging-sample-rate 0.9')
+    self.CheckResults(
+        self.messages.BackendServiceLogConfig(enable=True, sampleRate=0.9))
+
+
 if __name__ == '__main__':
   test_case.main()

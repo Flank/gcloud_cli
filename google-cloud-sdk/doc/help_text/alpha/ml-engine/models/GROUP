@@ -1,13 +1,13 @@
 NAME
-    gcloud alpha ml-engine models - cloud ML Engine Models commands
+    gcloud alpha ml-engine models - AI Platform Models commands
 
 SYNOPSIS
     gcloud alpha ml-engine models COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) A Cloud ML Engine model is a container representing an ML
-    application or service. A model may contain multiple versions which act as
-    the implementation of the service. See also:
+    (ALPHA) An AI Platform model is a container representing an ML application
+    or service. A model may contain multiple versions which act as the
+    implementation of the service. See also:
 
         $ gcloud alpha ml-engine versions --help.
 
@@ -15,8 +15,9 @@ DESCRIPTION
     https://cloud.google.com/ml/docs/concepts/technical-overview#model
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -27,19 +28,19 @@ COMMANDS
         (ALPHA) Add IAM policy binding for a model.
 
      create
-        (ALPHA) Create a new Cloud ML Engine model.
+        (ALPHA) Create a new AI Platform model.
 
      delete
-        (ALPHA) Delete an existing Cloud ML Engine model.
+        (ALPHA) Delete an existing AI Platform model.
 
      describe
-        (ALPHA) Describe an existing Cloud ML Engine model.
+        (ALPHA) Describe an existing AI Platform model.
 
      get-iam-policy
         (ALPHA) Get the IAM policy for a model.
 
      list
-        (ALPHA) List existing Cloud ML Engine models.
+        (ALPHA) List existing AI Platform models.
 
      remove-iam-policy-binding
         (ALPHA) Remove IAM policy binding from a ML model.
@@ -48,7 +49,7 @@ COMMANDS
         (ALPHA) Set the IAM policy for a model.
 
      update
-        (ALPHA) Update an existing Cloud ML Engine model.
+        (ALPHA) Update an existing AI Platform model.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

@@ -12,50 +12,32 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Tests that ensure deserialization of server responses work properly."""
-
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.calliope import exceptions as gcloud_exceptions
 from tests.lib import cli_test_base
-from tests.lib import parameterized
-from tests.lib import test_case
 from tests.lib.surface.iam import unit_test_base
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class UpdateTest(unit_test_base.BaseTest):
+class UpdateTestGA(unit_test_base.BaseTest):
 
-  def _DoUpdateServiceAccount(self,
-                              command,
-                              service_account,
-                              track,
-                              run_asserts=True):
-    # For other tracks, '-' in {projectsId} is used as wildcard. This
-    # would get clean up after the declarative update command promoted to other
-    # tracks.
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def _DoUpdateServiceAccount(self, command, service_account, run_asserts=True):
+    # For this track, '-' in {projectsId} is used as wildcard. This
+    # will be cleaned up after the declarative update command is promoted to GA.
     service_account_name = 'projects/-/serviceAccounts/{}'.format(
         service_account)
-    if track == calliope_base.ReleaseTrack.ALPHA:
-      service_account_name = 'projects/{0}/serviceAccounts/{1}'.format(
-          self.Project(), service_account)
-
-    self.track = track
-    self.client.projects_serviceAccounts.Get.Expect(
-        request=self.msgs.IamProjectsServiceAccountsGetRequest(
-            name=service_account_name),
-        response=self.msgs.ServiceAccount(etag=b'etag'))
 
     self.client.projects_serviceAccounts.Update.Expect(
         request=self.msgs.ServiceAccount(
-            name=service_account_name, etag=b'etag', displayName='New Name'),
+            name=service_account_name, displayName='New Name'),
         response=self.msgs.ServiceAccount(
             email=service_account,
             name=service_account_name,
@@ -71,28 +53,159 @@ class UpdateTest(unit_test_base.BaseTest):
       self.AssertOutputContains('name: ' + service_account_name)
       self.AssertErrEquals('Updated serviceAccount [%s].\n' % service_account)
 
-  def testUpdateServiceAccount(self, track):
+  def testUpdateServiceAccount(self):
+    service_account = 'test@test-project.iam.gserviceaccount.com'
+    command = ('iam service-accounts update --display-name "New Name" ' +
+               service_account)
+    self._DoUpdateServiceAccount(command, service_account)
+
+  def testUpdateServiceAccountWithServiceAccount(self):
     service_account = 'test@test-project.iam.gserviceaccount.com'
     command = ('iam service-accounts update --display-name "New Name" '
-               + service_account)
-    self._DoUpdateServiceAccount(command, service_account, track=track)
+               '%s --account test2@test-project.iam.gserviceaccount.com' %
+               service_account)
+    self._DoUpdateServiceAccount(command, service_account)
 
-  def testUpdateServiceAccountWithServiceAccount(self, track):
-    service_account = 'test@test-project.iam.gserviceaccount.com'
-    command = ('iam service-accounts update --display-name "New Name" '
-               '%s --account test2@test-project.iam.gserviceaccount.com'
-               % service_account)
-    self._DoUpdateServiceAccount(command, service_account, track=track)
-
-  def testUpdateServiceAccountValidUniqueId(self, track):
+  def testUpdateServiceAccountValidUniqueId(self):
     service_account = self.sample_unique_id
-    command = ('iam service-accounts update --display-name "New Name" '
-               + service_account)
+    command = ('iam service-accounts update --display-name "New Name" ' +
+               service_account)
     try:
-      self._DoUpdateServiceAccount(
-          command, service_account, track=track, run_asserts=False)
+      self._DoUpdateServiceAccount(command, service_account, run_asserts=False)
     except cli_test_base.MockArgumentError:
       self.fail('update should accept unique ids for service accounts.')
 
-if __name__ == '__main__':
-  test_case.main()
+
+class UpdateTestBeta(UpdateTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def _DoUpdateServiceAccount(self, command, service_account, run_asserts=True):
+    service_account_name = self.get_service_account_name(
+        self.Project(), service_account)
+    self.client.projects_serviceAccounts.Patch.Expect(
+        request=self.msgs.IamProjectsServiceAccountsPatchRequest(
+            name=service_account_name,
+            patchServiceAccountRequest=self.msgs.PatchServiceAccountRequest(
+                updateMask='displayName',
+                serviceAccount=self.msgs.ServiceAccount(
+                    displayName='New Name'))),
+        response=self.msgs.ServiceAccount(
+            name=service_account_name, displayName='New Name'))
+
+    self.Run(command)
+
+    if run_asserts:
+      self.AssertOutputContains('displayName: New Name')
+      self.AssertOutputContains('name: ' + service_account_name)
+      self.AssertErrEquals('Updated serviceAccount [%s].\n' % service_account)
+
+  # For other tracks, '-' in {projectsId} is used as wildcard. This
+  # would get clean up after the declarative update command promoted to other
+  # tracks.
+  def get_service_account_name(self, project, service_account):
+    return 'projects/{0}/serviceAccounts/{1}'.format(project, service_account)
+
+  def testUpdateServiceAccountWithDisplayName(self):
+    service_account = 'test@test-project.iam.gserviceaccount.com'
+    service_account_name = self.get_service_account_name(
+        self.Project(), service_account)
+    command = ('iam service-accounts update --display-name "New Name" ' +
+               service_account)
+
+    self.client.projects_serviceAccounts.Patch.Expect(
+        request=self.msgs.IamProjectsServiceAccountsPatchRequest(
+            name=service_account_name,
+            patchServiceAccountRequest=self.msgs.PatchServiceAccountRequest(
+                updateMask='displayName',
+                serviceAccount=self.msgs.ServiceAccount(
+                    displayName='New Name'))),
+        response=self.msgs.ServiceAccount(
+            name=service_account_name, displayName='New Name'))
+
+    self.Run(command)
+
+    self.AssertOutputContains('displayName: New Name')
+    self.AssertOutputContains('name: ' + service_account_name)
+    self.AssertErrEquals('Updated serviceAccount [%s].\n' % service_account)
+
+  def testUpdateServiceAccountWithDescription(self):
+    service_account = 'test@test-project.iam.gserviceaccount.com'
+    service_account_name = self.get_service_account_name(
+        self.Project(), service_account)
+    command = ('iam service-accounts update --description "New Description" ' +
+               service_account)
+
+    self.client.projects_serviceAccounts.Patch.Expect(
+        request=self.msgs.IamProjectsServiceAccountsPatchRequest(
+            name=service_account_name,
+            patchServiceAccountRequest=self.msgs.PatchServiceAccountRequest(
+                updateMask='description',
+                serviceAccount=self.msgs.ServiceAccount(
+                    description='New Description'))),
+        response=self.msgs.ServiceAccount(
+            name=service_account_name, description='New Description'))
+
+    self.Run(command)
+
+    self.AssertOutputContains('description: New Description')
+    self.AssertOutputContains('name: ' + service_account_name)
+    self.AssertErrEquals('Updated serviceAccount [%s].\n' % service_account)
+
+  def testUpdateServiceAccountWithDisplayNameAndDescription(self):
+    service_account = 'test@test-project.iam.gserviceaccount.com'
+    service_account_name = self.get_service_account_name(
+        self.Project(), service_account)
+    command = ('iam service-accounts update --display-name "New Name" '
+               '--description "New Description" ' + service_account)
+
+    self.client.projects_serviceAccounts.Patch.Expect(
+        request=self.msgs.IamProjectsServiceAccountsPatchRequest(
+            name=service_account_name,
+            patchServiceAccountRequest=self.msgs.PatchServiceAccountRequest(
+                updateMask='description,displayName',
+                serviceAccount=self.msgs.ServiceAccount(
+                    description='New Description', displayName='New Name'))),
+        response=self.msgs.ServiceAccount(
+            name=service_account_name,
+            description='New Description',
+            displayName='New Name'))
+
+    self.Run(command)
+
+    self.AssertOutputContains('displayName: New Name')
+    self.AssertOutputContains('description: New Description')
+    self.AssertOutputContains('name: ' + service_account_name)
+    self.AssertErrEquals('Updated serviceAccount [%s].\n' % service_account)
+
+  def testUpdateServiceAccountWithNoArgumentsShouldFail(self):
+    service_account = 'test@test-project.iam.gserviceaccount.com'
+    command = ('iam service-accounts update ' + service_account)
+
+    with self.assertRaisesRegexp(
+        gcloud_exceptions.OneOfArgumentsRequiredException,
+        'Specify at least one field to update.'):
+      self.Run(command)
+
+  def testUpdateServiceAccountWithServiceAccount(self):
+    service_account = 'test@test-project.iam.gserviceaccount.com'
+    command = ('iam service-accounts update --display-name "New Name" '
+               '%s --account test2@test-project.iam.gserviceaccount.com' %
+               service_account)
+    self._DoUpdateServiceAccount(command, service_account)
+
+  def testUpdateServiceAccountValidUniqueId(self):
+    service_account = self.sample_unique_id
+    command = ('iam service-accounts update --display-name "New Name" ' +
+               service_account)
+    try:
+      self._DoUpdateServiceAccount(command, service_account, run_asserts=False)
+    except cli_test_base.MockArgumentError:
+      self.fail('update should accept unique ids for service accounts.')
+
+
+class UpdateTestAlpha(UpdateTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA

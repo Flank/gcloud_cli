@@ -1,0 +1,36 @@
+NAME
+    gcloud alpha domains registrations check-availability - check availability
+        of a specific domain
+
+SYNOPSIS
+    gcloud alpha domains registrations check-availability DOMAIN
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) This command checks availability of a single domain and provides
+    additional information such as pricing, supported WHOIS privacy modes &
+    notices.
+
+POSITIONAL ARGUMENTS
+     DOMAIN
+        Domain to check availability for.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+EXAMPLES
+    To check if example.com is available for registration, run:
+
+        $ gcloud alpha domains registrations check-availability example.com
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/.
+

@@ -1,0 +1,55 @@
+NAME
+    gcloud alpha recommender recommendations - manage Cloud resource
+        recommendations
+
+SYNOPSIS
+    gcloud alpha recommender recommendations COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage Cloud resource recommendations.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create-rule
+        (ALPHA) Create a Rule from the recommendation.
+
+     list
+        (ALPHA) Lists recommendations for a Cloud project.
+
+     mark-active
+        (ALPHA) Mark a recommendation's state as ACTIVE. Can only be performed
+        on a recommendation in DISMISSED state.
+
+     mark-claimed
+        (ALPHA) Mark the Recommendation State as Claimed. Users can use this
+        method to. indicate to the Recommender API that they are starting to
+        apply the recommendation themselves. This stops the recommendation
+        content from being updated. mark-claimed can be applied to
+        recommendations in CLAIMED, or ACTIVE state.
+
+     mark-failed
+        (ALPHA) Mark a recommendation's state as FAILED. mark-failed can be
+        applied to recommendations in ACTIVE, CLAIMED, SUCCEEDED, or FAILED
+        state.
+
+     mark-succeeded
+        (ALPHA) Mark a recommendation's state as SUCCEEDED. mark-succeeded can
+        be applied to recommendations in ACTIVE, CLAIMED, SUCCEEDED, or FAILED
+        state.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you will have to apply for early access and
+    have your projects registered on the API whitelist to use it. To do so,
+    contact Support at https://cloud.google.com/support/.
+

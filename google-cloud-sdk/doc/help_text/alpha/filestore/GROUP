@@ -17,8 +17,9 @@ DESCRIPTION
     here: https://cloud.google.com/filestore/docs/
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -26,20 +27,27 @@ GROUPS
     GROUP is one of the following:
 
      instances
-        (ALPHA) Manage Cloud Filestore instances.
+        (ALPHA) Create and manage Cloud Filestore instances.
 
      locations
-        (ALPHA) List locations where Cloud Filestore is available.
+        (ALPHA) (DEPRECATED) List locations where Cloud Filestore is available.
 
      operations
         (ALPHA) Read and manipulate Cloud Filestore operations.
+
+     regions
+        (ALPHA) List regions where Cloud Filestore is available.
+
+     zones
+        (ALPHA) List zones where Cloud Filestore is available.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you will have to apply for early access and have your projects
     registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    https://cloud.google.com/support/. These variants are also available:
 
+        $ gcloud filestore
         $ gcloud beta filestore
 

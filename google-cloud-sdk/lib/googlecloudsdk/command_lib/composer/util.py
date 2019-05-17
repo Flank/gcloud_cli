@@ -59,30 +59,38 @@ client [kubectl]. To install, run
   $ gcloud components install kubectl
 """
 
+SUBCOMMAND_DEPRECATION = [
+    'initdb',
+    'resetdb',
+    'upgradedb',
+]
+
 SUBCOMMAND_WHITELIST = [
     'backfill',
     'clear',
     'connections',
     'dag_state',
     'delete_dag',
-    'initdb',
     'kerberos',
     'list_dags',
     'list_tasks',
     'pause',
     'pool',
     'render',
-    'resetdb',
     'run',
     'task_failed_deps',
     'task_state',
     'test',
     'trigger_dag',
     'unpause',
-    'upgradedb',
     'variables',
     'version',
-]
+] + SUBCOMMAND_DEPRECATION
+
+DEFAULT_NAMESPACE = 'default'
+NAMESPACE_ARG_NAME = '--namespace'
+NAMESPACE_ARG_ALIAS = '-n'
+NAMESPACE_STATUS_ACTIVE = 'active'
 
 
 class Error(core_exceptions.Error):
@@ -223,7 +231,7 @@ def ExtractGkeClusterLocationId(env_object):
       'location:')]
 
 
-def GetGkePod(pod_substr=None):
+def GetGkePod(pod_substr=None, kubectl_namespace=None):
   """Returns the name of a running pod in a GKE cluster.
 
   Retrieves pods in the GKE cluster pointed to by the current kubeconfig
@@ -238,6 +246,7 @@ def GetGkePod(pod_substr=None):
   Args:
     pod_substr: string, a filter to apply to pods. The returned pod name must
         contain pod_substr (if it is not None).
+    kubectl_namespace: string or None, namespace to query for gke pods
 
   Raises:
     Error: if GKE pods cannot be retrieved or desired pod is not found.
@@ -249,7 +258,11 @@ def GetGkePod(pod_substr=None):
   ]
 
   try:
-    RunKubectlCommand(args, out_func=pod_out.write, err_func=log.err.write)
+    RunKubectlCommand(
+        args,
+        out_func=pod_out.write,
+        err_func=log.err.write,
+        namespace=kubectl_namespace)
   except KubectlError as e:
     raise Error('Error retrieving GKE pods: %s' % e)
 
@@ -278,7 +291,7 @@ def IsValidEnvironmentName(name):
   return ENVIRONMENT_NAME_PATTERN.match(name) is not None
 
 
-def RunKubectlCommand(args, out_func=None, err_func=None):
+def RunKubectlCommand(args, out_func=None, err_func=None, namespace=None):
   """Shells out a command to kubectl.
 
   This command should be called within the context of a TemporaryKubeconfig
@@ -293,6 +306,7 @@ def RunKubectlCommand(args, out_func=None, err_func=None):
         command
     err_func: str->None, a function to call with the stderr of the kubectl
         command
+    namespace: str or None, the kubectl namespace to apply to the command
 
   Raises:
     Error: if kubectl could not be called
@@ -307,9 +321,15 @@ def RunKubectlCommand(args, out_func=None, err_func=None):
   if kubectl_path is None:
     raise Error(MISSING_KUBECTL_MSG)
 
+  exec_args = AddKubectlNamespace(
+      namespace, execution_utils.ArgsForExecutableTool(kubectl_path, *args))
+
   try:
+    # All kubectl requests will execute within the scope of the 'default'
+    # namespace, unless the namespace scope has been explicitly set within the
+    # args.
     retval = execution_utils.Exec(
-        execution_utils.ArgsForExecutableTool(kubectl_path, *args),
+        exec_args,
         no_exit=True,
         out_func=out_func,
         err_func=err_func,
@@ -319,6 +339,83 @@ def RunKubectlCommand(args, out_func=None, err_func=None):
     raise KubectlError(six.text_type(e))
   if retval:
     raise KubectlError('kubectl returned non-zero status code.')
+
+
+def ConvertImageVersionToNamespacePrefix(image_version):
+  """Converts an image version string to a kubernetes namespace string."""
+  return image_version.replace('.', '-')
+
+
+def FetchKubectlNamespace(env_image_version):
+  """Checks environment for valid namespace options.
+
+  First checks for the existence of a kubectl namespace based on the env image
+  version. If namespace does not exist, then return the 'default' namespace.
+
+  Args:
+    env_image_version: str, the environment image version string.
+
+  Returns:
+    The namespace string to apply to any `environments run` commands.
+  """
+  image_version_ns_prefix = ConvertImageVersionToNamespacePrefix(
+      env_image_version)
+  args = [
+      'get', 'namespace', '--all-namespaces',
+      '--sort-by=.metadata.creationTimestamp', '--output',
+      r'jsonpath={range .items[*]}{.metadata.name}{"\t"}{.status.phase}{"\n"}',
+      '--ignore-not-found=true'
+  ]
+
+  ns_output = io.StringIO()
+  RunKubectlCommand(args, ns_output.write, log.err.write)
+
+  # Reverses namespace result list because the kubectl query command only sorts
+  # in ascending order.
+  namespaces = reversed(ns_output.getvalue().split('\n'))
+  for ns_entry in namespaces:
+    ns_parts = ns_entry.split('\t') if ns_entry.strip() else None
+    # Checks if namespace is 'Active' and matches the image version prefix.
+    if (ns_parts and ns_parts[1].lower() == NAMESPACE_STATUS_ACTIVE and
+        ns_parts[0].startswith(image_version_ns_prefix)):
+      return ns_parts[0]
+
+  return DEFAULT_NAMESPACE
+
+
+def AddKubectlNamespace(namespace, kubectl_args):
+  """Adds namespace arguments to the provided list of kubectl args.
+
+  If a namespace arg is not already present, insert `--namespace <namespace>`
+  after the `kubectl` command and before all other arg elements.
+
+  Resulting in this general format:
+    ['kubectl', '--namespace', 'namespace_foo', ... <remaining args> ... ]
+
+  Args:
+    namespace: name of the namespace scope
+    kubectl_args: list of kubectl command arguments. Expects that the first
+      element will be the `kubectl` command, followed by all additional
+      arguments.
+
+  Returns:
+    list of kubectl args with the additional namespace args (if necessary).
+  """
+  if namespace is None:
+    return kubectl_args
+
+  # Checks for existing namespace args before adding new ones.
+  if {NAMESPACE_ARG_NAME, NAMESPACE_ARG_ALIAS}.isdisjoint(set(kubectl_args)):
+    idx = 0
+    if kubectl_args and _KUBECTL_COMPONENT_NAME in kubectl_args[0]:
+      idx = 1
+
+    # Inserts new namespace arguments to a fixed index of the kubectl_args list,
+    # so the list of new args will be inserted in reverse.
+    for new_arg in [namespace, NAMESPACE_ARG_NAME]:
+      # Expects `kubectl` command to be the first argument.
+      kubectl_args.insert(idx, new_arg)
+  return kubectl_args
 
 
 def ParseRequirementsFile(requirements_file_path):

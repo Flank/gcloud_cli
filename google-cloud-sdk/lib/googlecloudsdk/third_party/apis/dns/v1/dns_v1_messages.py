@@ -12,7 +12,13 @@ package = 'dns'
 
 
 class Change(_messages.Message):
-  r"""An atomic update to a collection of ResourceRecordSets.
+  r"""A Change represents a set of ResourceRecordSet additions and deletions
+  applied atomically to a ManagedZone. ResourceRecordSets within a ManagedZone
+  are modified by creating a new Change element in the Changes collection. In
+  turn the Changes collection also records the past modifications to the
+  ResourceRecordSets in a ManagedZone. The current state of the ManagedZone is
+  the sum effect of applying all Change elements in the Changes collection in
+  sequence.
 
   Enums:
     StatusValueValuesEnum: Status of the operation (output only). A status of
@@ -617,6 +623,11 @@ class ManagedZone(_messages.Message):
   responsibility. A ManagedZone is a resource that represents a DNS zone
   hosted by the Cloud DNS service.
 
+  Enums:
+    VisibilityValueValuesEnum: The zone's visibility: public zones are exposed
+      to the Internet, while private zones are visible only to Virtual Private
+      Cloud resources.
+
   Messages:
     LabelsValue: User labels.
 
@@ -642,7 +653,23 @@ class ManagedZone(_messages.Message):
       the same ManagedZones. Most users will leave this field unset.
     nameServers: Delegate your managed_zone to these virtual name servers;
       defined by the server (output only)
+    privateVisibilityConfig: For privately visible zones, the set of Virtual
+      Private Cloud resources that the zone is visible from.
+    visibility: The zone's visibility: public zones are exposed to the
+      Internet, while private zones are visible only to Virtual Private Cloud
+      resources.
   """
+
+  class VisibilityValueValuesEnum(_messages.Enum):
+    r"""The zone's visibility: public zones are exposed to the Internet, while
+    private zones are visible only to Virtual Private Cloud resources.
+
+    Values:
+      private: <no description>
+      public: <no description>
+    """
+    private = 0
+    public = 1
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
@@ -678,6 +705,8 @@ class ManagedZone(_messages.Message):
   name = _messages.StringField(8)
   nameServerSet = _messages.StringField(9)
   nameServers = _messages.StringField(10, repeated=True)
+  privateVisibilityConfig = _messages.MessageField('ManagedZonePrivateVisibilityConfig', 11)
+  visibility = _messages.EnumField('VisibilityValueValuesEnum', 12)
 
 
 class ManagedZoneDnsSecConfig(_messages.Message):
@@ -752,6 +781,34 @@ class ManagedZoneOperationsListResponse(_messages.Message):
   kind = _messages.StringField(2, default=u'dns#managedZoneOperationsListResponse')
   nextPageToken = _messages.StringField(3)
   operations = _messages.MessageField('Operation', 4, repeated=True)
+
+
+class ManagedZonePrivateVisibilityConfig(_messages.Message):
+  r"""A ManagedZonePrivateVisibilityConfig object.
+
+  Fields:
+    kind: Identifies what kind of resource this is. Value: the fixed string
+      "dns#managedZonePrivateVisibilityConfig".
+    networks: The list of VPC networks that can see this zone.
+  """
+
+  kind = _messages.StringField(1, default=u'dns#managedZonePrivateVisibilityConfig')
+  networks = _messages.MessageField('ManagedZonePrivateVisibilityConfigNetwork', 2, repeated=True)
+
+
+class ManagedZonePrivateVisibilityConfigNetwork(_messages.Message):
+  r"""A ManagedZonePrivateVisibilityConfigNetwork object.
+
+  Fields:
+    kind: Identifies what kind of resource this is. Value: the fixed string
+      "dns#managedZonePrivateVisibilityConfigNetwork".
+    networkUrl: The fully qualified URL of the VPC network to bind to. This
+      should be formatted like https://www.googleapis.com/compute/v1/projects/
+      {project}/global/networks/{network}
+  """
+
+  kind = _messages.StringField(1, default=u'dns#managedZonePrivateVisibilityConfigNetwork')
+  networkUrl = _messages.StringField(2)
 
 
 class ManagedZonesListResponse(_messages.Message):
@@ -889,6 +946,10 @@ class Quota(_messages.Message):
     kind: Identifies what kind of resource this is. Value: the fixed string
       "dns#quota".
     managedZones: Maximum allowed number of managed zones in the project.
+    managedZonesPerNetwork: Maximum allowed number of managed zones which can
+      be attached to a network.
+    networksPerManagedZone: Maximum allowed number of networks to which a
+      privately scoped zone can be attached.
     resourceRecordsPerRrset: Maximum allowed number of ResourceRecords per
       ResourceRecordSet.
     rrsetAdditionsPerChange: Maximum allowed number of ResourceRecordSets to
@@ -906,12 +967,14 @@ class Quota(_messages.Message):
   dnsKeysPerManagedZone = _messages.IntegerField(1, variant=_messages.Variant.INT32)
   kind = _messages.StringField(2, default=u'dns#quota')
   managedZones = _messages.IntegerField(3, variant=_messages.Variant.INT32)
-  resourceRecordsPerRrset = _messages.IntegerField(4, variant=_messages.Variant.INT32)
-  rrsetAdditionsPerChange = _messages.IntegerField(5, variant=_messages.Variant.INT32)
-  rrsetDeletionsPerChange = _messages.IntegerField(6, variant=_messages.Variant.INT32)
-  rrsetsPerManagedZone = _messages.IntegerField(7, variant=_messages.Variant.INT32)
-  totalRrdataSizePerChange = _messages.IntegerField(8, variant=_messages.Variant.INT32)
-  whitelistedKeySpecs = _messages.MessageField('DnsKeySpec', 9, repeated=True)
+  managedZonesPerNetwork = _messages.IntegerField(4, variant=_messages.Variant.INT32)
+  networksPerManagedZone = _messages.IntegerField(5, variant=_messages.Variant.INT32)
+  resourceRecordsPerRrset = _messages.IntegerField(6, variant=_messages.Variant.INT32)
+  rrsetAdditionsPerChange = _messages.IntegerField(7, variant=_messages.Variant.INT32)
+  rrsetDeletionsPerChange = _messages.IntegerField(8, variant=_messages.Variant.INT32)
+  rrsetsPerManagedZone = _messages.IntegerField(9, variant=_messages.Variant.INT32)
+  totalRrdataSizePerChange = _messages.IntegerField(10, variant=_messages.Variant.INT32)
+  whitelistedKeySpecs = _messages.MessageField('DnsKeySpec', 11, repeated=True)
 
 
 class ResourceRecordSet(_messages.Message):
@@ -921,12 +984,13 @@ class ResourceRecordSet(_messages.Message):
     kind: Identifies what kind of resource this is. Value: the fixed string
       "dns#resourceRecordSet".
     name: For example, www.example.com.
-    rrdatas: As defined in RFC 1035 (section 5) and RFC 1034 (section 3.6.1).
+    rrdatas: As defined in RFC 1035 (section 5) and RFC 1034 (section 3.6.1)
+      -- see examples.
     signatureRrdatas: As defined in RFC 4034 (section 3.2).
     ttl: Number of seconds that this ResourceRecordSet can be cached by
       resolvers.
-    type: The identifier of a supported record type, for example, A, AAAA, MX,
-      TXT, and so on.
+    type: The identifier of a supported record type. See the list of Supported
+      DNS record types.
   """
 
   kind = _messages.StringField(1, default=u'dns#resourceRecordSet')

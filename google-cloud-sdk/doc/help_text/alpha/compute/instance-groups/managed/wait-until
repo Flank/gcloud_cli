@@ -1,0 +1,69 @@
+NAME
+    gcloud alpha compute instance-groups managed wait-until - wait until
+        managed instance group reaches desired state
+
+SYNOPSIS
+    gcloud alpha compute instance-groups managed wait-until NAME
+        (--stable | --version-target-reached) [--timeout=TIMEOUT]
+        [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Wait until managed instance group reaches desired state.
+
+POSITIONAL ARGUMENTS
+     NAME
+        Name of the managed instance group to operate on.
+
+REQUIRED FLAGS
+     Exactly one of these must be specified:
+
+       --stable
+          Wait until the group is stable.
+
+       --version-target-reached
+          Wait until version target is reached.
+
+OPTIONAL FLAGS
+     --timeout=TIMEOUT
+        Waiting time in seconds for group to reach desired state.
+
+     At most one of these may be specified:
+
+       --region=REGION
+          Region of the managed instance group to operate on. If not specified,
+          you may be prompted to select a region.
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          Overrides the default compute/region property value for this command
+          invocation.
+
+       --zone=ZONE
+          Zone of the managed instance group to operate on. If not specified,
+          you may be prompted to select a zone.
+
+          A list of zones can be fetched by running:
+
+              $ gcloud compute zones list
+
+          Overrides the default compute/zone property value for this command
+          invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. This variant is also available:
+
+        $ gcloud beta compute instance-groups managed wait-until
+

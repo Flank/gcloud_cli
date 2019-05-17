@@ -35,12 +35,15 @@ class ConfigurationsListTest(base.ServerlessSurfaceBase):
     for i, r in enumerate(self.configurations):
       r.name = 'conf{}'.format(i)
       r.metadata.creationTimestamp = '2018/01/01 00:{}0:00Z'.format(i)
+      r.metadata.selfLink = '/apis/serving.knative.dev/v1alpha1/namespaces/{}/configurations/{}'.format(
+          self.namespace.Name(), r.name)
       r.status.latestCreatedRevisionName = '{}.3'.format(r.name)
       r.status.latestReadyRevisionName = '{}.1'.format(r.name)
       r.status.conditions = [self.serverless_messages.ConfigurationCondition(
           type='Ready',
           status=six.text_type(bool(i%2)))]
     self.operations.ListConfigurations.return_value = self.configurations
+    self._MockConnectionContext()
 
   def testNoArg(self):
     """Two configurations are listable using the Serverless API format."""
@@ -53,4 +56,15 @@ class ConfigurationsListTest(base.ServerlessSurfaceBase):
         X conf0 conf0.3 conf0.1
         + conf1 conf1.3 conf1.1
         """, normalize_space=True)
+
+  def testNoArgUri(self):
+    """Two routes are listable using the Serverless API format."""
+    self.Run('run configurations list --uri')
+
+    self.operations.ListConfigurations.assert_called_once_with(self.namespace)
+    self.AssertOutputEquals(
+        """https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/configurations/conf0
+        https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/configurations/conf1
+        """,
+        normalize_space=True)
 

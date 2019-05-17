@@ -19,19 +19,16 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface import redis_test_base
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,
-                           calliope_base.ReleaseTrack.BETA,
-                           calliope_base.ReleaseTrack.GA])
-class DescribeTest(redis_test_base.UnitTestBase, parameterized.TestCase):
+class DescribeTestGA(redis_test_base.UnitTestBase):
 
-  def testDescribe(self, track):
-    self.SetUpForTrack(track)
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def testDescribe(self):
     expected_region = self.messages.Location(name=self.region_relative_name)
     self._ExpectDescribe(expected_region)
 
@@ -39,8 +36,7 @@ class DescribeTest(redis_test_base.UnitTestBase, parameterized.TestCase):
 
     self.assertEqual(actual_region, expected_region)
 
-  def testDescribe_UsingRelativeRegionName(self, track):
-    self.SetUpForTrack(track)
+  def testDescribe_UsingRelativeRegionName(self):
     expected_region = self.messages.Location(name=self.region_relative_name)
     self._ExpectDescribe(expected_region)
 
@@ -54,6 +50,18 @@ class DescribeTest(redis_test_base.UnitTestBase, parameterized.TestCase):
         request=self.messages.RedisProjectsLocationsGetRequest(
             name=expected_region.name),
         response=expected_region)
+
+
+class DescribeTestBeta(DescribeTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class DescribeTestAlpha(DescribeTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

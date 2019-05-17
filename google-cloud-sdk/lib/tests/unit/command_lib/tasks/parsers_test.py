@@ -22,6 +22,7 @@ import os
 from apitools.base.py import encoding
 from googlecloudsdk.api_lib import tasks as tasks_api_lib
 from googlecloudsdk.api_lib.util import apis
+from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.tasks import app
 from googlecloudsdk.command_lib.tasks import constants
 from googlecloudsdk.command_lib.tasks import flags
@@ -36,10 +37,12 @@ from tests.lib.calliope import util as calliope_test_util
 
 _ALPHA_MESSAGES_MODULE = apis.GetMessagesModule(tasks_api_lib.API_NAME,
                                                 tasks_api_lib.ALPHA_API_VERSION)
+_BETA_MESSAGES_MODULE = apis.GetMessagesModule(tasks_api_lib.API_NAME,
+                                               tasks_api_lib.BETA_API_VERSION)
 _MESSAGES_MODULE = apis.GetMessagesModule(tasks_api_lib.API_NAME,
-                                          tasks_api_lib.BETA_API_VERSION)
+                                          tasks_api_lib.GA_API_VERSION)
 _SELF_LINK_PREFIX = 'https://{}.googleapis.com/{}'.format(
-    tasks_api_lib.API_NAME, tasks_api_lib.ALPHA_API_VERSION)
+    tasks_api_lib.API_NAME, tasks_api_lib.GA_API_VERSION)
 
 
 class ParseLocationTest(sdk_test_base.SdkBase):
@@ -153,7 +156,7 @@ class ParseTaskTest(sdk_test_base.SdkBase):
     self.assertEqual(actual_task_ref.SelfLink(), expected_self_link)
 
   def testParseTaskId_NoQueueRef(self):
-    with self.assertRaises(resources.RequiredFieldOmittedException):
+    with self.assertRaises(parsers.FullTaskUnspecifiedError):
       parsers.ParseTask('my-task')
 
   def testParseTaskUri(self):
@@ -196,7 +199,8 @@ class ParseCreateOrUpdatePullQueueArgsTest(ParseArgsTestBase):
     expected_config.pullTarget = _ALPHA_MESSAGES_MODULE.PullTarget()
     args = self.parser.parse_args([])
     actual_config = parsers.ParseCreateOrUpdateQueueArgs(
-        args, constants.PULL_QUEUE, _ALPHA_MESSAGES_MODULE, is_alpha=True)
+        args, constants.PULL_QUEUE, _ALPHA_MESSAGES_MODULE,
+        release_track=base.ReleaseTrack.ALPHA)
     self.assertEqual(actual_config, expected_config)
 
   def testParseCreateOrUpdateQueueArgs_AllArgs(self):
@@ -207,7 +211,8 @@ class ParseCreateOrUpdatePullQueueArgsTest(ParseArgsTestBase):
     args = self.parser.parse_args(['--max-attempts=10',
                                    '--max-retry-duration=5s'])
     actual_config = parsers.ParseCreateOrUpdateQueueArgs(
-        args, constants.PULL_QUEUE, _ALPHA_MESSAGES_MODULE, is_alpha=True)
+        args, constants.PULL_QUEUE, _ALPHA_MESSAGES_MODULE,
+        release_track=base.ReleaseTrack.ALPHA)
     self.assertEqual(actual_config, expected_config)
 
   def testParseCreateOrUpdateQueueArgs_AllArgs_MaxAttemptsUnlimited(self):
@@ -218,10 +223,11 @@ class ParseCreateOrUpdatePullQueueArgsTest(ParseArgsTestBase):
     args = self.parser.parse_args(['--max-attempts=unlimited',
                                    '--max-retry-duration=5s'])
     actual_config = parsers.ParseCreateOrUpdateQueueArgs(
-        args, constants.PULL_QUEUE, _ALPHA_MESSAGES_MODULE, is_alpha=True)
+        args, constants.PULL_QUEUE, _ALPHA_MESSAGES_MODULE,
+        release_track=base.ReleaseTrack.ALPHA)
     self.assertEqual(actual_config, expected_config)
 
-  def testParseCreateOrUpdateQueueArgs_IncludeAppEngineArgs(self):
+  def testParseCreateOrUpdateQueueArgs_IncludePushArgs(self):
     with self.AssertRaisesArgumentErrorMatches('unrecognized arguments:'):
       self.parser.parse_args(['--max-attempts=10',
                               '--max-retry-duration=5s',
@@ -245,27 +251,36 @@ class ParseLeaseTasksArgsTest(ParseArgsTestBase):
       self.parser.parse_args(['--oldest-tag', '--tag=tag'])
 
 
-class ParseCreateOrUpdateAppEngineQueueArgsTest(ParseArgsTestBase):
+class ParseCreateOrUpdatePushQueueArgsTest(ParseArgsTestBase):
 
   def SetUp(self):
-    flags.AddCreateAppEngineQueueFlags(self.parser)
+    flags.AddCreatePushQueueFlags(self.parser)
+
+  def testParseBetaCreateOrUpdateQueueArgs_NoArgs(self):
+    expected_config = _BETA_MESSAGES_MODULE.Queue()
+    expected_config.appEngineHttpQueue = (
+        _BETA_MESSAGES_MODULE.AppEngineHttpQueue())
+    args = self.parser.parse_args([])
+    actual_config = parsers.ParseCreateOrUpdateQueueArgs(
+        args, constants.PUSH_QUEUE, _BETA_MESSAGES_MODULE,
+        release_track=base.ReleaseTrack.BETA)
+    self.assertEqual(actual_config, expected_config)
 
   def testParseCreateOrUpdateQueueArgs_NoArgs(self):
     expected_config = _MESSAGES_MODULE.Queue()
-    expected_config.appEngineHttpQueue = _MESSAGES_MODULE.AppEngineHttpQueue()
     args = self.parser.parse_args([])
     actual_config = parsers.ParseCreateOrUpdateQueueArgs(
-        args, constants.APP_ENGINE_QUEUE, _MESSAGES_MODULE)
+        args, constants.PUSH_QUEUE, _MESSAGES_MODULE)
     self.assertEqual(actual_config, expected_config)
 
-  def testParseCreateOrUpdateQueueArgs_AllArgs(self):
-    expected_config = _MESSAGES_MODULE.Queue()
-    expected_config.retryConfig = _MESSAGES_MODULE.RetryConfig(
+  def testParseBetaCreateOrUpdateQueueArgs_AllArgs(self):
+    expected_config = _BETA_MESSAGES_MODULE.Queue()
+    expected_config.retryConfig = _BETA_MESSAGES_MODULE.RetryConfig(
         maxAttempts=10, maxRetryDuration='5s', maxDoublings=4, minBackoff='1s',
         maxBackoff='10s')
-    expected_config.rateLimits = _MESSAGES_MODULE.RateLimits(
+    expected_config.rateLimits = _BETA_MESSAGES_MODULE.RateLimits(
         maxDispatchesPerSecond=100, maxConcurrentDispatches=10)
-    expected_config.appEngineHttpQueue = _MESSAGES_MODULE.AppEngineHttpQueue(
+    expected_config.appEngineHttpQueue = _BETA_MESSAGES_MODULE.AppEngineHttpQueue(
         appEngineRoutingOverride={'service': 'abc'})
     args = self.parser.parse_args(['--max-attempts=10',
                                    '--max-retry-duration=5s',
@@ -276,17 +291,38 @@ class ParseCreateOrUpdateAppEngineQueueArgsTest(ParseArgsTestBase):
                                    '--max-concurrent-dispatches=10',
                                    '--routing-override=service:abc'])
     actual_config = parsers.ParseCreateOrUpdateQueueArgs(
-        args, constants.APP_ENGINE_QUEUE, _MESSAGES_MODULE)
+        args, constants.PUSH_QUEUE, _BETA_MESSAGES_MODULE,
+        release_track=base.ReleaseTrack.BETA)
     self.assertEqual(actual_config, expected_config)
 
-  def testParseCreateOrUpdateQueueArgs_AllArgs_MaxAttemptsUnlimited(self):
+  def testParseCreateOrUpdateQueueArgs_AllArgs(self):
     expected_config = _MESSAGES_MODULE.Queue()
     expected_config.retryConfig = _MESSAGES_MODULE.RetryConfig(
-        maxAttempts=-1, maxRetryDuration='5s', maxDoublings=4,
-        minBackoff='1s', maxBackoff='10s')
+        maxAttempts=10, maxRetryDuration='5s', maxDoublings=4, minBackoff='1s',
+        maxBackoff='10s')
     expected_config.rateLimits = _MESSAGES_MODULE.RateLimits(
         maxDispatchesPerSecond=100, maxConcurrentDispatches=10)
-    expected_config.appEngineHttpQueue = _MESSAGES_MODULE.AppEngineHttpQueue(
+    expected_config.appEngineRoutingOverride = {'service': 'abc'}
+    args = self.parser.parse_args(['--max-attempts=10',
+                                   '--max-retry-duration=5s',
+                                   '--max-doublings=4',
+                                   '--min-backoff=1s',
+                                   '--max-backoff=10s',
+                                   '--max-dispatches-per-second=100',
+                                   '--max-concurrent-dispatches=10',
+                                   '--routing-override=service:abc'])
+    actual_config = parsers.ParseCreateOrUpdateQueueArgs(
+        args, constants.PUSH_QUEUE, _MESSAGES_MODULE)
+    self.assertEqual(actual_config, expected_config)
+
+  def testParseBetaCreateOrUpdateQueueArgs_AllArgs_MaxAttemptsUnlimited(self):
+    expected_config = _BETA_MESSAGES_MODULE.Queue()
+    expected_config.retryConfig = _BETA_MESSAGES_MODULE.RetryConfig(
+        maxAttempts=-1, maxRetryDuration='5s', maxDoublings=4,
+        minBackoff='1s', maxBackoff='10s')
+    expected_config.rateLimits = _BETA_MESSAGES_MODULE.RateLimits(
+        maxDispatchesPerSecond=100, maxConcurrentDispatches=10)
+    expected_config.appEngineHttpQueue = _BETA_MESSAGES_MODULE.AppEngineHttpQueue(
         appEngineRoutingOverride={'service': 'abc'})
     args = self.parser.parse_args(['--max-attempts=unlimited',
                                    '--max-retry-duration=5s',
@@ -297,7 +333,28 @@ class ParseCreateOrUpdateAppEngineQueueArgsTest(ParseArgsTestBase):
                                    '--max-concurrent-dispatches=10',
                                    '--routing-override=service:abc'])
     actual_config = parsers.ParseCreateOrUpdateQueueArgs(
-        args, constants.APP_ENGINE_QUEUE, _MESSAGES_MODULE)
+        args, constants.PUSH_QUEUE, _BETA_MESSAGES_MODULE,
+        release_track=base.ReleaseTrack.BETA)
+    self.assertEqual(actual_config, expected_config)
+
+  def testParseCreateOrUpdateQueueArgs_AllArgs_MaxAttemptsUnlimited(self):
+    expected_config = _MESSAGES_MODULE.Queue()
+    expected_config.retryConfig = _MESSAGES_MODULE.RetryConfig(
+        maxAttempts=-1, maxRetryDuration='5s', maxDoublings=4,
+        minBackoff='1s', maxBackoff='10s')
+    expected_config.rateLimits = _MESSAGES_MODULE.RateLimits(
+        maxDispatchesPerSecond=100, maxConcurrentDispatches=10)
+    expected_config.appEngineRoutingOverride = {'service': 'abc'}
+    args = self.parser.parse_args(['--max-attempts=unlimited',
+                                   '--max-retry-duration=5s',
+                                   '--max-doublings=4',
+                                   '--min-backoff=1s',
+                                   '--max-backoff=10s',
+                                   '--max-dispatches-per-second=100',
+                                   '--max-concurrent-dispatches=10',
+                                   '--routing-override=service:abc'])
+    actual_config = parsers.ParseCreateOrUpdateQueueArgs(
+        args, constants.PUSH_QUEUE, _MESSAGES_MODULE)
     self.assertEqual(actual_config, expected_config)
 
   def testAppEngineRoutingOverrideValidator(self):
@@ -319,16 +376,16 @@ class ParseClearQueueFieldsTest(ParseArgsTestBase):
         constants.PULL_QUEUE,
         _ALPHA_MESSAGES_MODULE,
         is_update=True,
-        is_alpha=True)
+        release_track=base.ReleaseTrack.ALPHA)
     self.assertEqual(actual_config, expected_config)
 
-  def testParseClearAppEngineFlags(self):
-    flags.AddUpdateAppEngineQueueFlags(self.parser)
-    expected_config = _MESSAGES_MODULE.Queue(
-        retryConfig=_MESSAGES_MODULE.RetryConfig(),
-        rateLimits=_MESSAGES_MODULE.RateLimits(),
-        appEngineHttpQueue=_MESSAGES_MODULE.AppEngineHttpQueue(
-            appEngineRoutingOverride=_MESSAGES_MODULE.AppEngineRouting()))
+  def testParseBetaClearPushFlags(self):
+    flags.AddUpdatePushQueueFlags(self.parser)
+    expected_config = _BETA_MESSAGES_MODULE.Queue(
+        retryConfig=_BETA_MESSAGES_MODULE.RetryConfig(),
+        rateLimits=_BETA_MESSAGES_MODULE.RateLimits(),
+        appEngineHttpQueue=_BETA_MESSAGES_MODULE.AppEngineHttpQueue(
+            appEngineRoutingOverride=_BETA_MESSAGES_MODULE.AppEngineRouting()))
     args = self.parser.parse_args(['--clear-max-attempts',
                                    '--clear-max-retry-duration',
                                    '--clear-max-doublings',
@@ -338,7 +395,26 @@ class ParseClearQueueFieldsTest(ParseArgsTestBase):
                                    '--clear-max-concurrent-dispatches',
                                    '--clear-routing-override'])
     actual_config = parsers.ParseCreateOrUpdateQueueArgs(
-        args, constants.APP_ENGINE_QUEUE, _MESSAGES_MODULE, is_update=True)
+        args, constants.PUSH_QUEUE, _BETA_MESSAGES_MODULE, is_update=True,
+        release_track=base.ReleaseTrack.BETA)
+    self.assertEqual(actual_config, expected_config)
+
+  def testParseClearPushFlags(self):
+    flags.AddUpdatePushQueueFlags(self.parser)
+    expected_config = _MESSAGES_MODULE.Queue(
+        retryConfig=_MESSAGES_MODULE.RetryConfig(),
+        rateLimits=_MESSAGES_MODULE.RateLimits(),
+        appEngineRoutingOverride=_MESSAGES_MODULE.AppEngineRouting())
+    args = self.parser.parse_args(['--clear-max-attempts',
+                                   '--clear-max-retry-duration',
+                                   '--clear-max-doublings',
+                                   '--clear-min-backoff',
+                                   '--clear-max-backoff',
+                                   '--clear-max-dispatches-per-second',
+                                   '--clear-max-concurrent-dispatches',
+                                   '--clear-routing-override'])
+    actual_config = parsers.ParseCreateOrUpdateQueueArgs(
+        args, constants.PUSH_QUEUE, _MESSAGES_MODULE, is_update=True)
     self.assertEqual(actual_config, expected_config)
 
 
@@ -426,7 +502,7 @@ class ParseAppEngineTaskArgsTest(ParseArgsTestBase):
         '--header=header2:value2', '--routing=service:abc'
     ])
     actual_config = parsers.ParseCreateTaskArgs(
-        args, constants.APP_ENGINE_QUEUE, _MESSAGES_MODULE)
+        args, constants.PUSH_QUEUE, _MESSAGES_MODULE)
     self.assertEqual(actual_config, expected_config)
 
   def testParseCreateTaskArgs_AllArgs_PayloadFile(self):
@@ -454,7 +530,7 @@ class ParseAppEngineTaskArgsTest(ParseArgsTestBase):
         '--routing=service:abc'
     ])
     actual_config = parsers.ParseCreateTaskArgs(
-        args, constants.APP_ENGINE_QUEUE, _MESSAGES_MODULE)
+        args, constants.PUSH_QUEUE, _MESSAGES_MODULE)
     self.assertEqual(actual_config, expected_config)
 
   def testParseCreateTaskArgs_RepeatedHeadersKey(self):
@@ -469,7 +545,7 @@ class ParseAppEngineTaskArgsTest(ParseArgsTestBase):
         '--header=header:value2'
     ])
     actual_config = parsers.ParseCreateTaskArgs(
-        args, constants.APP_ENGINE_QUEUE, _MESSAGES_MODULE)
+        args, constants.PUSH_QUEUE, _MESSAGES_MODULE)
     self.assertEqual(actual_config, expected_config)
 
   def testParseCreateTaskArgs_IncludePullArgs(self):

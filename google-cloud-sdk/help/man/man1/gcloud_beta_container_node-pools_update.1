@@ -11,7 +11,7 @@ gcloud beta container node\-pools update \- updates a node pool in a running clu
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta container node\-pools update\fR \fINAME\fR (\fB\-\-enable\-autoscaling\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR\ |\ \fB\-\-enable\-autorepair\fR\ \fB\-\-enable\-autoupgrade\fR) [\fB\-\-cluster\fR=\fICLUSTER\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta container node\-pools update\fR \fINAME\fR (\fB\-\-workload\-metadata\-from\-node\fR=\fIWORKLOAD_METADATA_FROM_NODE\fR\ |\ \fB\-\-enable\-autoscaling\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR\ |\ \fB\-\-enable\-autorepair\fR\ \fB\-\-enable\-autoupgrade\fR) [\fB\-\-cluster\fR=\fICLUSTER\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -41,6 +41,38 @@ The name of the node pool.
 Exactly one of these must be specified:
 
 .RS 2m
+.TP 2m
+\fB\-\-workload\-metadata\-from\-node\fR=\fIWORKLOAD_METADATA_FROM_NODE\fR
+Type of metadata server available to pods running in the nodepool.
+\fIWORKLOAD_METADATA_FROM_NODE\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBEXPOSED\fR
+Pods running in this nodepool have access to the node's underlying Compute
+Engine Metadata Server.
+.TP 2m
+\fBGKE_METADATA_SERVER\fR
+Run the Kubernetes Engine Metadata Server on this node. The Kubernetes Engine
+Metadata Server exposes a metadata API to workloads that is compatible with the
+V1 Compute Metadata APIs exposed by the Compute Engine and App Engine Metadata
+Servers. This feature can only be enabled if Workload Identity is enabled at the
+cluster level.
+.TP 2m
+\fBSECURE\fR
+Prevents pods not in hostNetwork from accessing certain VM metadata,
+specifically kube\-env, which contains Kubelet credentials, and the instance
+identity token. This is a temporary security solution available while the
+bootstrapping process for cluster nodes is being redesigned with significant
+security improvements. This feature is scheduled to be deprecated in the future
+and later removed.
+.TP 2m
+\fBUNSPECIFIED\fR
+Chooses the default.
+.RE
+.sp
+
+
 .TP 2m
 
 Cluster autoscaling
@@ -97,8 +129,8 @@ $ gcloud beta container node\-pools update node\-pool\-1 \e
     \-\-cluster=example\-cluster \-\-enable\-autoupgrade
 .RE
 
-See https://cloud.google.com/kubernetes\-engine/docs/node\-management for more
-info.
+See https://cloud.google.com/kubernetes\-engine/docs/node\-auto\-upgrades for
+more info.
 
 
 .RE
@@ -135,10 +167,11 @@ Compute zone (e.g. us\-central1\-a) for the cluster. Overrides the default
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

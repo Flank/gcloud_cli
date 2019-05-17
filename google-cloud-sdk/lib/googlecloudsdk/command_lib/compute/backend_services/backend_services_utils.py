@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -153,9 +153,9 @@ def _ValidateGroupMatchesArgs(args):
           'cannot be set with --network-endpoint-group')
 
 
-def ValidateBalancingModeArgs(messages, add_or_update_backend_args,
-                              current_balancing_mode=None,
-                              supports_neg=False):
+def ValidateBalancingModeArgs(messages,
+                              add_or_update_backend_args,
+                              current_balancing_mode=None):
   """Check whether the setup of the backend LB related fields is valid.
 
   Args:
@@ -165,8 +165,6 @@ def ValidateBalancingModeArgs(messages, add_or_update_backend_args,
     current_balancing_mode: BalancingModeValueValuesEnum. The balancing mode
       of the existing backend, in case of update-backend command. Must be
       None otherwise.
-    supports_neg: bool, if the args contains network endpoint group related
-      args.
   """
   balancing_mode_enum = messages.Backend.BalancingModeValueValuesEnum
   balancing_mode = current_balancing_mode
@@ -174,8 +172,7 @@ def ValidateBalancingModeArgs(messages, add_or_update_backend_args,
     balancing_mode = balancing_mode_enum(
         add_or_update_backend_args.balancing_mode)
 
-  if supports_neg:  # Validate flags are specified with the correct group.
-    _ValidateGroupMatchesArgs(add_or_update_backend_args)
+  _ValidateGroupMatchesArgs(add_or_update_backend_args)
 
   invalid_arg = None
   if balancing_mode == balancing_mode_enum.RATE:
@@ -185,8 +182,7 @@ def ValidateBalancingModeArgs(messages, add_or_update_backend_args,
       invalid_arg = '--max-connections'
     elif add_or_update_backend_args.max_connections_per_instance is not None:
       invalid_arg = '--max-connections-per-instance'
-    elif (supports_neg and
-          add_or_update_backend_args.max_connections_per_endpoint is not None):
+    elif add_or_update_backend_args.max_connections_per_endpoint is not None:
       invalid_arg = '--max-connections-per-endpoint'
 
     if invalid_arg is not None:
@@ -200,8 +196,7 @@ def ValidateBalancingModeArgs(messages, add_or_update_backend_args,
       invalid_arg = '--max-rate'
     elif add_or_update_backend_args.max_rate_per_instance is not None:
       invalid_arg = '--max-rate-per-instance'
-    elif (supports_neg and
-          add_or_update_backend_args.max_rate_per_endpoint is not None):
+    elif add_or_update_backend_args.max_rate_per_endpoint is not None:
       invalid_arg = '--max-rate-per-endpoint'
 
     if invalid_arg is not None:
@@ -209,8 +204,7 @@ def ValidateBalancingModeArgs(messages, add_or_update_backend_args,
           invalid_arg,
           'cannot be set with CONNECTION balancing mode')
   elif balancing_mode == balancing_mode_enum.UTILIZATION:
-    if (supports_neg and
-        add_or_update_backend_args.network_endpoint_group is not None):
+    if add_or_update_backend_args.network_endpoint_group is not None:
       raise exceptions.InvalidArgumentException(
           '--network-endpoint-group',
           'cannot be set with UTILIZATION balancing mode')
@@ -394,6 +388,58 @@ def ApplyFailoverPolicyArgs(messages, args, backend_service):
           not args.connection_drain_on_failover)
     if args.drop_traffic_if_unhealthy is not None:
       failover_policy.dropTrafficIfUnhealthy = args.drop_traffic_if_unhealthy
-    if args.failover_ratio:
+    if args.failover_ratio is not None:
       failover_policy.failoverRatio = args.failover_ratio
     backend_service.failoverPolicy = failover_policy
+
+
+def ApplyLogConfigArgs(messages, args, backend_service):
+  """Applies the LogConfig arguments to the specified backend service.
+
+  If there are no arguments related to LogConfig, the backend service
+  remains unmodified.
+
+  Args:
+    messages: The avalible API proto messages.
+    args: The arguments passed to the gcloud command.
+    backend_service: The backend service proto message object.
+  """
+  if ((args.enable_logging is not None or args.logging_sample_rate is not None)
+      and backend_service.loadBalancingScheme is not None and
+      backend_service.loadBalancingScheme !=
+      messages.BackendService.LoadBalancingSchemeValueValuesEnum.EXTERNAL):
+    raise exceptions.InvalidArgumentException(
+        '--load-balancing-scheme',
+        'can only specify --enable-logging or --logging-sample-rate if the '
+        'load balancing scheme is EXTERNAL.')
+  if ((args.enable_logging is not None or
+       args.logging_sample_rate is not None) and backend_service.protocol !=
+      messages.BackendService.ProtocolValueValuesEnum.HTTP and
+      backend_service.protocol !=
+      messages.BackendService.ProtocolValueValuesEnum.HTTPS):
+    raise exceptions.InvalidArgumentException(
+        '--protocol',
+        'can only specify --enable-logging or --logging-sample-rate if the '
+        'protocol is HTTP/HTTPS.')
+
+  if args.enable_logging is not None or args.logging_sample_rate is not None:
+    if backend_service.logConfig:
+      log_config = backend_service.logConfig
+    else:
+      log_config = messages.BackendServiceLogConfig()
+    if args.enable_logging is not None:
+      log_config.enable = args.enable_logging
+    if args.logging_sample_rate is not None:
+      log_config.sampleRate = args.logging_sample_rate
+    backend_service.logConfig = log_config
+
+
+def SendGetRequest(client, backend_service_ref):
+  """Send Backend Services get request."""
+  if backend_service_ref.Collection() == 'compute.regionBackendServices':
+    return client.apitools_client.regionBackendServices.Get(
+        client.messages.ComputeRegionBackendServicesGetRequest(
+            **backend_service_ref.AsDict()))
+  return client.apitools_client.backendServices.Get(
+      client.messages.ComputeBackendServicesGetRequest(
+          **backend_service_ref.AsDict()))

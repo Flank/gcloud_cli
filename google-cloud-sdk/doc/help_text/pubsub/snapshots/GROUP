@@ -1,0 +1,37 @@
+NAME
+    gcloud pubsub snapshots - manage Cloud Pub/Sub snapshots
+
+SYNOPSIS
+    gcloud pubsub snapshots COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Manage Cloud Pub/Sub snapshots.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        Creates one or more Cloud Pub/Sub snapshots.
+
+     delete
+        Deletes one or more Cloud Pub/Sub snapshots.
+
+     describe
+        Describes a Cloud Pub/Sub snapshot.
+
+     list
+        Lists all the snapshots in a given project.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha pubsub snapshots
+        $ gcloud beta pubsub snapshots
+

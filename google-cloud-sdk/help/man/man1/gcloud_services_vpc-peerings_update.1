@@ -1,0 +1,101 @@
+
+.TH "GCLOUD_SERVICES_VPC\-PEERINGS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud services vpc\-peerings update \- update a private service connection to a service for a project network
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud services vpc\-peerings update\fR \fB\-\-network\fR=\fINETWORK\fR [\fB\-\-async\fR] [\fB\-\-force\fR] [\fB\-\-ranges\fR=\fIRANGES\fR] [\fB\-\-service\fR=\fISERVICE\fR;\ default="servicenetworking.googleapis.com"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+This command updates a private service connection to a service via a VPC
+network.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-network\fR=\fINETWORK\fR
+The network in the current project to be peered with the service
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Display information about the operation in progress, without waiting for the
+operation to complete.
+
+.TP 2m
+\fB\-\-force\fR
+If specified, the update call will proceed even if the update can be
+destructive.
+
+.TP 2m
+\fB\-\-ranges\fR=\fIRANGES\fR
+The names of IP CIDR ranges for service to use.
+
+.TP 2m
+\fB\-\-service\fR=\fISERVICE\fR; default="servicenetworking.googleapis.com"
+The service to connect to
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To update connection for a network called \f5my\-network\fR on the current
+project to a service called \f5your\-service\fR with IP CIDR ranges
+\f5google\-range\-1,google\-range\-2\fR for the service to use, run:
+
+.RS 2m
+$ gcloud services vpc\-peerings update \-\-network=my\-network \e
+    \-\-service=your\-service \e
+    \-\-ranges=google\-range\-1,google\-range\-2
+.RE
+
+To run the same command asynchronously (non\-blocking), run:
+
+.RS 2m
+$ gcloud services vpc\-peerings update \-\-network=my\-network \e
+    \-\-service=your\-service \e
+    \-\-ranges=google\-range\-1,google\-range\-2 \-\-async
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha services vpc\-peerings update
+$ gcloud beta services vpc\-peerings update
+.RE
+

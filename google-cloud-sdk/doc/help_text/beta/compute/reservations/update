@@ -1,0 +1,56 @@
+NAME
+    gcloud beta compute reservations update - update a Compute Engine
+        reservation
+
+SYNOPSIS
+    gcloud beta compute reservations update (RESERVATION : --zone=ZONE)
+        --vm-count=VM_COUNT [--async] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Update a Compute Engine reservation.
+
+POSITIONAL ARGUMENTS
+     Reservation resource - The name of the reservation to update. The
+     arguments in this group can be used to specify the attributes of this
+     resource. (NOTE) Some attributes are not given arguments in this group but
+     can be set in other ways. To set the [project] attribute: provide the
+     argument [reservation] on the command line with a fully specified name;
+     set the property [core/project]; provide the argument [--project] on the
+     command line. This must be specified.
+
+       RESERVATION
+          ID of the reservation or fully qualified identifier for the
+          reservation. This positional must be specified if any of the other
+          arguments in this group are specified.
+
+       --zone=ZONE
+          The name of the Google Compute Engine zone.
+
+REQUIRED FLAGS
+     --vm-count=VM_COUNT
+        Number of VM instances can be updated. The value of this field must be
+        an int in the range [1, 1000].
+
+OPTIONAL FLAGS
+     --async
+        Display information about the operation in progress, without waiting
+        for the operation to complete.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+API REFERENCE
+    This command uses the compute/beta API. The full documentation for this API
+    can be found at:
+    https://developers.google.com/compute/docs/reference/latest/
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha compute reservations update
+

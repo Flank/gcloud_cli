@@ -56,8 +56,9 @@ LIST COMMAND FLAGS
         Print a list of resource URIs instead of the default output.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -65,21 +66,22 @@ EXAMPLES
     List all subnetworks usable for cluster creation in project my-project.
 
         $ gcloud alpha container subnets list-usable \
-          --project my-project
+          --project=my-project
 
     List all subnetworks existing in project my-shared-host-project usable for
     cluster creation in project my-service-project.
 
         $ gcloud alpha container subnets list-usable \
-           --project my-service-project \
-           --network-project my-shared-host-project
+           --project=my-service-project \
+           --network-project=my-shared-host-project
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you will have to apply for early access and have your projects
     registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    https://cloud.google.com/support/. These variants are also available:
 
+        $ gcloud container subnets list-usable
         $ gcloud beta container subnets list-usable
 

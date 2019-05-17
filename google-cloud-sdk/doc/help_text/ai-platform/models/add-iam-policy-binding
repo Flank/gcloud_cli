@@ -1,0 +1,57 @@
+NAME
+    gcloud ai-platform models add-iam-policy-binding - add IAM policy binding
+        to a model
+
+SYNOPSIS
+    gcloud ai-platform models add-iam-policy-binding MODEL --member=MEMBER
+        --role=ROLE [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Adds IAM policy binding to the given model.
+
+    See https://cloud.google.com/iam/docs/managing-policies for details of
+    policy role and member types.
+
+POSITIONAL ARGUMENTS
+     MODEL
+        Name of the model.
+
+REQUIRED FLAGS
+     --member=MEMBER
+        The member to add the binding for. Should be of the form
+        user|group|serviceAccount:email or domain:domain.
+
+        Examples: user:test-user@gmail.com, group:admins@example.com,
+        serviceAccount:test123@example.domain.com, or
+        domain:example.domain.com.
+
+        Can also be one of the following special values:
+        * allUsers - Special identifier that represents anyone who is on the
+          internet, with or without a Google account.
+        * allAuthenticatedUsers - Special identifier that represents anyone
+          who is authenticated with a Google account or a service account.
+
+     --role=ROLE
+        Define the role of the member.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+EXAMPLES
+    The following command will add an IAM policy binding for the role of
+    'roles/editor' for the user 'test-user@gmail.com' on the model my_model:
+
+        $ gcloud ai-platform models add-iam-policy-binding my_model \
+            --member='user:test-user@gmail.com' \
+            --role='roles/editor'
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha ai-platform models add-iam-policy-binding
+        $ gcloud beta ai-platform models add-iam-policy-binding
+

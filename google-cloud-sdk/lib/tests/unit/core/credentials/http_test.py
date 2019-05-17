@@ -25,6 +25,7 @@ from apitools.base.py import batch
 
 from googlecloudsdk.core import config
 from googlecloudsdk.core import properties
+from googlecloudsdk.core.console import console_attr
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.credentials import http
 from googlecloudsdk.core.credentials import store
@@ -79,7 +80,7 @@ class HttpTestBase(sdk_test_base.SdkBase):
                 fromscript=False):
     template = ('gcloud/{0} command/{1} invocation-id/{2} environment/{3} '
                 'environment-version/{4} interactive/{5} from-script/{8} '
-                'python/{6} {7}')
+                'python/{6} term/xterm {7}')
     # Mocking the platform fragment doesn't seem to work all the time.
     # Use the real platform we are on.
     platform = platforms.Platform.Current().UserAgentFragment()
@@ -108,6 +109,8 @@ class HttpTestBase(sdk_test_base.SdkBase):
     self.StartPatch('platform.python_version').return_value = python_version
     self.StartObjectPatch(console_io, 'IsRunFromShellScript',
                           return_value=False)
+    self.StartObjectPatch(console_attr.ConsoleAttr, 'GetTermIdentifier',
+                          return_value='xterm')
     self.expected_user_agent = self.UserAgent(
         'None', uuid_mock.return_value.hex, python_version, False)
 

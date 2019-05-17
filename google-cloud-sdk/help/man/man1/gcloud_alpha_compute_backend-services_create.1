@@ -11,7 +11,7 @@ gcloud alpha compute backend\-services create \- create a backend service
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute backend\-services create\fR \fIBACKEND_SERVICE_NAME\fR [\fB\-\-affinity\-cookie\-ttl\fR=\fIAFFINITY_COOKIE_TTL\fR] [\fB\-\-no\-cache\-key\-include\-host\fR] [\fB\-\-no\-cache\-key\-include\-protocol\fR] [\fB\-\-no\-cache\-key\-include\-query\-string\fR] [\fB\-\-connection\-drain\-on\-failover\fR] [\fB\-\-connection\-draining\-timeout\fR=\fICONNECTION_DRAINING_TIMEOUT\fR] [\fB\-\-custom\-request\-header\fR=\fICUSTOM_REQUEST_HEADER\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-drop\-traffic\-if\-unhealthy\fR] [\fB\-\-enable\-cdn\fR] [\fB\-\-failover\-ratio\fR=\fIFAILOVER_RATIO\fR] [\fB\-\-health\-checks\fR=\fIHEALTH_CHECK\fR,[...]] [\fB\-\-http\-health\-checks\fR=\fIHTTP_HEALTH_CHECK\fR,[...]] [\fB\-\-https\-health\-checks\fR=\fIHTTPS_HEALTH_CHECK\fR,[...]] [\fB\-\-iap\fR=\fIdisabled\fR|\fIenabled\fR,[\fIoauth2\-client\-id\fR=\fIOAUTH2\-CLIENT\-ID\fR,\fIoauth2\-client\-secret\fR=\fIOAUTH2\-CLIENT\-SECRET\fR]] [\fB\-\-load\-balancing\-scheme\fR=\fILOAD_BALANCING_SCHEME\fR;\ default="EXTERNAL"] [\fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fB\-\-protocol\fR=\fIPROTOCOL\fR] [\fB\-\-session\-affinity\fR=\fISESSION_AFFINITY\fR] [\fB\-\-signed\-url\-cache\-max\-age\fR=\fISIGNED_URL_CACHE_MAX_AGE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="30s"] [\fB\-\-cache\-key\-query\-string\-blacklist\fR=[\fIQUERY_STRING\fR,...]\ |\ \fB\-\-cache\-key\-query\-string\-whitelist\fR=\fIQUERY_STRING\fR,[...]] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fB\-\-global\-health\-checks\fR\ |\ \fB\-\-health\-checks\-region\fR=\fIHEALTH_CHECKS_REGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute backend\-services create\fR \fIBACKEND_SERVICE_NAME\fR [\fB\-\-affinity\-cookie\-ttl\fR=\fIAFFINITY_COOKIE_TTL\fR] [\fB\-\-no\-cache\-key\-include\-host\fR] [\fB\-\-no\-cache\-key\-include\-protocol\fR] [\fB\-\-no\-cache\-key\-include\-query\-string\fR] [\fB\-\-connection\-drain\-on\-failover\fR] [\fB\-\-connection\-draining\-timeout\fR=\fICONNECTION_DRAINING_TIMEOUT\fR] [\fB\-\-custom\-request\-header\fR=\fICUSTOM_REQUEST_HEADER\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-drop\-traffic\-if\-unhealthy\fR] [\fB\-\-enable\-cdn\fR] [\fB\-\-enable\-logging\fR] [\fB\-\-failover\-ratio\fR=\fIFAILOVER_RATIO\fR] [\fB\-\-health\-checks\fR=\fIHEALTH_CHECK\fR,[...]] [\fB\-\-http\-health\-checks\fR=\fIHTTP_HEALTH_CHECK\fR,[...]] [\fB\-\-https\-health\-checks\fR=\fIHTTPS_HEALTH_CHECK\fR,[...]] [\fB\-\-iap\fR=\fIdisabled\fR|\fIenabled\fR,[\fIoauth2\-client\-id\fR=\fIOAUTH2\-CLIENT\-ID\fR,\fIoauth2\-client\-secret\fR=\fIOAUTH2\-CLIENT\-SECRET\fR]] [\fB\-\-load\-balancing\-scheme\fR=\fILOAD_BALANCING_SCHEME\fR;\ default="EXTERNAL"] [\fB\-\-logging\-sample\-rate\fR=\fILOGGING_SAMPLE_RATE\fR] [\fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fB\-\-protocol\fR=\fIPROTOCOL\fR] [\fB\-\-session\-affinity\fR=\fISESSION_AFFINITY\fR] [\fB\-\-signed\-url\-cache\-max\-age\fR=\fISIGNED_URL_CACHE_MAX_AGE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="30s"] [\fB\-\-cache\-key\-query\-string\-blacklist\fR=[\fIQUERY_STRING\fR,...]\ |\ \fB\-\-cache\-key\-query\-string\-whitelist\fR=\fIQUERY_STRING\fR,[...]] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fB\-\-global\-health\-checks\fR\ |\ \fB\-\-health\-checks\-region\fR=\fIHEALTH_CHECKS_REGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -118,6 +118,12 @@ from a backend service at the edge of the network, close to users. Cloud CDN is
 disabled by default.
 
 .TP 2m
+\fB\-\-enable\-logging\fR
+The logging options for the load balancer traffic served by this backend
+service. If logging is enabled, logs will be exported to Stackdriver. Enabled by
+default.
+
+.TP 2m
 \fB\-\-failover\-ratio\fR=\fIFAILOVER_RATIO\fR
 If the ratio of the healthy VMs in the primary backend is at or below this
 number, traffic arriving at the load\-balanced IP will be directed to the
@@ -163,6 +169,14 @@ https://cloud.google.com/iap/ for more information about this feature.
 Specifies if this is internal or external load balancer.
 \fILOAD_BALANCING_SCHEME\fR must be one of: \fBINTERNAL\fR, \fBEXTERNAL\fR,
 \fBINTERNAL_MANAGED\fR, \fBINTERNAL_SELF_MANAGED\fR.
+
+.TP 2m
+\fB\-\-logging\-sample\-rate\fR=\fILOGGING_SAMPLE_RATE\fR
+This field can only be specified if logging is enabled for the backend service.
+The value of the field must be a float in the range [0, 1]. This configures the
+sampling rate of requests to the load balancer where 1.0 means all logged
+requests are reported and 0.0 means no logged requests are reported. The default
+value is 1.0.
 
 .TP 2m
 \fB\-\-port\-name\fR=\fIPORT_NAME\fR
@@ -330,10 +344,11 @@ Alternatively, the region can be stored in the environment variable
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

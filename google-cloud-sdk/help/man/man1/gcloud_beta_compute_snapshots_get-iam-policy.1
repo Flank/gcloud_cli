@@ -31,12 +31,12 @@ details.
 .RS 2m
 .TP 2m
 
-Snapshot resource \- The snapshot for which to display the IAM policy. This
-represents a Cloud resource. (NOTE) Some attributes are not given arguments in
-this group but can be set in other ways. To set the [project] attribute: provide
-the argument [snapshot_name] on the command line with a fully specified name;
-set the property [core/project]; provide the argument [\-\-project] on the
-command line. This must be specified.
+Snapshot resource \- The snapshot to display the IAM policy for. This represents
+a Cloud resource. (NOTE) Some attributes are not given arguments in this group
+but can be set in other ways. To set the [project] attribute: provide the
+argument [snapshot_name] on the command line with a fully specified name; set
+the property [core/project]; provide the argument [\-\-project] on the command
+line. This must be specified.
 
 .RS 2m
 .TP 2m
@@ -86,10 +86,11 @@ flag interacts with other flags that are applied in this order:
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -113,10 +114,11 @@ $ gcloud beta compute snapshots get\-iam\-policy my\-snapshot
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
+$ gcloud compute snapshots get\-iam\-policy
 $ gcloud alpha compute snapshots get\-iam\-policy
 .RE
 

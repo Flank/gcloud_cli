@@ -101,7 +101,7 @@ class FolderIntegrationTest(e2e_base.WithServiceAuth):
     return self.RunFolders('set-iam-policy', resource_id, policy_file_path)
 
   def RunFolders(self, *command):
-    return self.Run(['alpha', 'resource-manager', 'folders'] + list(command))
+    return self.Run(['resource-manager', 'folders'] + list(command))
 
 
 if __name__ == '__main__':

@@ -1,0 +1,482 @@
+title: cloud domains create test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      domains registrations create example.com --registrant-contact-from-file=contact.yaml --whois-privacy=publish-redacted-contact-data
+  - prompt:
+    - message: |
+        Yearly registration price: 12.00 USD
+        Yearly renewal price: 12.00 USD
+    - input: y
+  - progress_tracker:
+    - message: Waiting for [operation-1547215747742-57f2f3d08fc0b-28a25e5f-787d1e14]
+        to complete
+    - status: SUCCESS
+  - stderr: |
+      Created registration [example.com].
+- execute:
+  - command: |
+      domains registrations create example.app --registrant-contact-from-file=contact.yaml --name-servers=ns-cloud-a1.googledomains.com.,ns-cloud-a2.googledomains.com.,ns-cloud-a3.googledomains.com. --async
+  - prompt:
+    - message: Specify WHOIS privacy setting
+    - choices: &id001
+      - PUBLISH_REDACTED_CONTACT_DATA
+      - USE_WHOIS_PRIVACY_PROXY
+    - input: '2'
+  - prompt:
+    - message: |-
+        .app is a secure namespace. You may purchase example.app now but it will require an SSL certificate for website connection.
+    - input: y
+  - prompt:
+    - message: |
+        Yearly registration price: 14.00 USD
+        Yearly renewal price: 14.00 USD
+    - input: y
+- execute:
+  - command: |
+      domains registrations create example.com --registrant-contact-from-file=contact.yaml --validate-only
+  - prompt:
+    - message: Specify WHOIS privacy setting
+    - choices: &id002
+      - PUBLISH_REDACTED_CONTACT_DATA
+      - USE_WHOIS_PRIVACY_PROXY
+    - input: '1'
+  - prompt:
+    - message: |
+        Yearly registration price: 12.00 USD
+        Yearly renewal price: 12.00 USD
+    - input: y
+- execute:
+  - command: |
+      domains registrations create unavailable.com --registrant-contact-from-file=contact.yaml
+  - error: '1: Domain [unavailable.com] is not available for registration: [UNAVAILABLE]'
+- execute:
+  - command: |
+      domains registrations create example.com --registrant-contact-from-file=contact.yaml
+  - prompt:
+    - message: Specify WHOIS privacy setting
+    - choices: &id003
+      - PUBLISH_REDACTED_CONTACT_DATA
+      - USE_WHOIS_PRIVACY_PROXY
+    - input: '1'
+  - prompt:
+    - message: |
+        Yearly registration price: 12.00 USD
+        Yearly renewal price: 12.00 USD
+    - input: n
+  - error: '1: Aborted by user.'
+- execute:
+  - command: |
+      domains registrations create example.com
+  - prompt:
+    - message: Registrant contact information not provided
+    - prompt_string: Do you want to enter it interactively
+    - input: n
+  - error: '1: Registrant contact is required. It can be provided interactively or
+      through --registrant-contact-from-file flag.'
+actions:
+- write_file:
+    path: contact.yaml
+    contents: |
+      email: 'test@example.com'
+      phoneNumber: '+1.1234567890'
+      postalAddress:
+              regionCode: 'US'
+              postalCode: '94043'
+              administrativeArea: 'CA'
+              locality: 'Mountain View'
+              addressLines: ['1600 Amphitheatre Pkwy']
+              recipients: ['Test User']
+- execute_command:
+    command: |
+      domains registrations create example.com --registrant-contact-from-file=contact.yaml --whois-privacy=publish-redacted-contact-data
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha1/projects/fake-project/locations/global/registrations:checkAvailability?alt=json&domainName=example.com
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "availability": {
+                "domainName": "example.com",
+                "available": "AVAILABLE",
+                "registrationPrice": {
+                  "currencyCode": "USD",
+                  "units": "12"
+                },
+                "supportedWhoisPrivacy": [
+                  "PUBLISH_REDACTED_CONTACT_DATA",
+                  "USE_WHOIS_PRIVACY_PROXY"
+                ],
+                "renewalPrice": {
+                  "currencyCode": "USD",
+                  "units": "12"
+                }
+              }
+            }
+    - expect_prompt_continue:
+        message: |
+          Yearly registration price: 12.00 USD
+          Yearly renewal price: 12.00 USD
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha1/projects/fake-project/locations/global/registrations?alt=json&validateOnly=False
+          method: POST
+          headers: {}
+          body:
+            json:
+              domainName: example.com
+              registrationPrice:
+                currencyCode: USD
+                units: '12'
+              renewalPrice:
+                currencyCode: USD
+                units: '12'
+              whoisConfig:
+                privacy: PUBLISH_REDACTED_CONTACT_DATA
+                registrantContact:
+                  email: test@example.com
+                  phoneNumber: '+1.1234567890'
+                  postalAddress:
+                    addressLines:
+                    - 1600 Amphitheatre Pkwy
+                    administrativeArea: CA
+                    locality: Mountain View
+                    postalCode: '94043'
+                    recipients:
+                    - Test User
+                    regionCode: US
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1547215747742-57f2f3d08fc0b-28a25e5f-787d1e14",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.domains.v1alpha1.OperationMetadata",
+                "createTime": "2019-01-11T14:09:08.126406764Z",
+                "target": "projects/fake-project/locations/global/registrations/example.com",
+                "verb": "create",
+                "apiVersion": "v1alpha1"
+              },
+              "done": false
+            }
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha1/projects/fake-project/locations/global/operations/operation-1547215747742-57f2f3d08fc0b-28a25e5f-787d1e14?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1547215747742-57f2f3d08fc0b-28a25e5f-787d1e14",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.domains.v1alpha1.OperationMetadata",
+                "createTime": "2019-01-11T14:09:08.126406764Z",
+                "endTime": "2019-01-11T14:09:15.450771759Z",
+                "target": "projects/fake-project/locations/global/registrations/example.com",
+                "verb": "create",
+                "apiVersion": "v1alpha1"
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.domains.v1alpha1.Registration",
+                "name": "projects/fake-project/locations/global/registrations/example.com",
+                "domainName": "example.com",
+                "createTime": "2019-01-11T14:09:08.068037639Z",
+                "updateTime": "2019-01-11T14:09:08.137325285Z",
+                "expireTime": "2020-01-11T14:09:12Z",
+                "state": "ACTIVE",
+                "dnsConfig": {},
+                "whoisConfig": {
+                  "privacy": "PUBLISH_REDACTED_CONTACT_DATA",
+                  "registrantContact": {
+                    "postalAddress": {
+                      "regionCode": "US",
+                      "postalCode": "94043",
+                      "administrativeArea": "CA",
+                      "locality": "Mountain View",
+                      "addressLines": [
+                        "1600 Amphitheatre Pkwy"
+                      ],
+                      "recipients": [
+                        "Test User"
+                      ]
+                    },
+                    "email": "test@example.com",
+                    "phoneNumber": "+1.1234567890"
+                  }
+                }
+              }
+            }
+
+    - expect_progress_tracker:
+        message: Waiting for [operation-1547215747742-57f2f3d08fc0b-28a25e5f-787d1e14]
+          to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Created registration [example.com].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      domains registrations create example.app --registrant-contact-from-file=contact.yaml --name-servers=ns-cloud-a1.googledomains.com.,ns-cloud-a2.googledomains.com.,ns-cloud-a3.googledomains.com. --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha1/projects/fake-project/locations/global/registrations:checkAvailability?alt=json&domainName=example.app
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+               "availability": {
+                 "domainName": "example.app",
+                 "available": "AVAILABLE",
+                 "registrationPrice": {
+                   "currencyCode": "USD",
+                   "units": "14"
+                 },
+                 "supportedWhoisPrivacy": [
+                   "PUBLISH_REDACTED_CONTACT_DATA",
+                   "USE_WHOIS_PRIVACY_PROXY"
+                 ],
+                 "notices": [
+                   "HSTS_PRELOADED"
+                 ],
+                 "renewalPrice": {
+                   "currencyCode": "USD",
+                   "units": "14"
+                 }
+               }
+             }
+    - expect_prompt_choice:
+        message: Specify WHOIS privacy setting
+        choices: *id001
+        user_input: '2'
+    - expect_prompt_continue:
+        message: |-
+          .app is a secure namespace. You may purchase example.app now but it will require an SSL certificate for website connection.
+        user_input: y
+    - expect_prompt_continue:
+        message: |
+          Yearly registration price: 14.00 USD
+          Yearly renewal price: 14.00 USD
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha1/projects/fake-project/locations/global/registrations?alt=json&validateOnly=False
+          method: POST
+          headers: {}
+          body:
+            json:
+              domainName: example.app
+              registrationPrice:
+                currencyCode: USD
+                units: '14'
+              renewalPrice:
+                currencyCode: USD
+                units: '14'
+              dnsConfig:
+                nameServers:
+                - ns-cloud-a1.googledomains.com.
+                - ns-cloud-a2.googledomains.com.
+                - ns-cloud-a3.googledomains.com.
+              whoisConfig:
+                privacy: USE_WHOIS_PRIVACY_PROXY
+                registrantContact:
+                  email: test@example.com
+                  phoneNumber: '+1.1234567890'
+                  postalAddress:
+                    addressLines:
+                    - 1600 Amphitheatre Pkwy
+                    administrativeArea: CA
+                    locality: Mountain View
+                    postalCode: '94043'
+                    recipients:
+                    - Test User
+                    regionCode: US
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/operations/operation-1547215747742-57f2f3d08fc0b-28a25e5f-787d1e14",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.domains.v1alpha1.OperationMetadata",
+                "createTime": "2019-01-11T14:09:08.126406764Z",
+                "target": "projects/fake-project/locations/global/registrations/example.app",
+                "verb": "create",
+                "apiVersion": "v1alpha1"
+              },
+              "done": false
+            }
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      domains registrations create example.com --registrant-contact-from-file=contact.yaml --validate-only
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha1/projects/fake-project/locations/global/registrations:checkAvailability?alt=json&domainName=example.com
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "availability": {
+                "domainName": "example.com",
+                "available": "AVAILABLE",
+                "registrationPrice": {
+                  "currencyCode": "USD",
+                  "units": "12"
+                },
+                "supportedWhoisPrivacy": [
+                  "PUBLISH_REDACTED_CONTACT_DATA",
+                  "USE_WHOIS_PRIVACY_PROXY"
+                ],
+                "renewalPrice": {
+                  "currencyCode": "USD",
+                  "units": "12"
+                }
+              }
+            }
+    - expect_prompt_choice:
+        message: Specify WHOIS privacy setting
+        choices: *id002
+        user_input: '1'
+    - expect_prompt_continue:
+        message: |
+          Yearly registration price: 12.00 USD
+          Yearly renewal price: 12.00 USD
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha1/projects/fake-project/locations/global/registrations?alt=json&validateOnly=True
+          method: POST
+          headers: {}
+          body:
+            json:
+              domainName: example.com
+              registrationPrice:
+                currencyCode: USD
+                units: '12'
+              renewalPrice:
+                currencyCode: USD
+                units: '12'
+              whoisConfig:
+                registrantContact:
+                  email: test@example.com
+                  phoneNumber: '+1.1234567890'
+                  postalAddress:
+                    addressLines:
+                    - 1600 Amphitheatre Pkwy
+                    administrativeArea: CA
+                    locality: Mountain View
+                    postalCode: '94043'
+                    recipients:
+                    - Test User
+                    regionCode: US
+        return_response:
+          headers:
+            status: '200'
+          body: {}
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      domains registrations create unavailable.com --registrant-contact-from-file=contact.yaml
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha1/projects/fake-project/locations/global/registrations:checkAvailability?alt=json&domainName=unavailable.com
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "availability": {
+                "domainName": "unavailable.com",
+                "available": "UNAVAILABLE"
+              }
+            }
+    - expect_exit:
+        code: 1
+        message: 'Domain [unavailable.com] is not available for registration: [UNAVAILABLE]'
+- execute_command:
+    command: |
+      domains registrations create example.com --registrant-contact-from-file=contact.yaml
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha1/projects/fake-project/locations/global/registrations:checkAvailability?alt=json&domainName=example.com
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "availability": {
+                "domainName": "example.com",
+                "available": "AVAILABLE",
+                "registrationPrice": {
+                  "currencyCode": "USD",
+                  "units": "12"
+                },
+                "supportedWhoisPrivacy": [
+                  "PUBLISH_REDACTED_CONTACT_DATA",
+                  "USE_WHOIS_PRIVACY_PROXY"
+                ],
+                "renewalPrice": {
+                  "currencyCode": "USD",
+                  "units": "12"
+                }
+              }
+            }
+    - expect_prompt_choice:
+        message: Specify WHOIS privacy setting
+        choices: *id003
+        user_input: '1'
+    - expect_prompt_continue:
+        message: |
+          Yearly registration price: 12.00 USD
+          Yearly renewal price: 12.00 USD
+        user_input: n
+    - expect_exit:
+        code: 1
+        message: Aborted by user.
+- execute_command:
+    command: |
+      domains registrations create example.com
+    events:
+    - expect_prompt_continue:
+        message: Registrant contact information not provided
+        prompt_string: Do you want to enter it interactively
+        user_input: n
+    - expect_exit:
+        code: 1
+        message: Registrant contact is required. It can be provided interactively
+          or through --registrant-contact-from-file flag.

@@ -282,7 +282,8 @@ class BaseTest(cli_test_base.CliTestBase, sdk_test_base.WithOutputCapture):
     self.image_alias_expansion_requests = (
         getattr(self, 'image_alias_expansion_requests_' + api, None))
 
-  def GetKeyFileContent(self, include_rsa_encrypted=False, api=None):
+  def GetKeyFileContent(self, include_rsa_encrypted=False, api=None,
+                        machine_image=None):
     if not api:
       api = self.api
     result = """
@@ -309,16 +310,24 @@ projects/my-project/zones/central2-a/disks/wrappedkeydisk",
              "key": "{wrapped_key}",
              "key-type": "rsa-encrypted"}}""".format(
                  api=api, wrapped_key=SAMPLE_WRAPPED_CSEK_KEY)
+    if machine_image:
+      result += """,
+      {{ "uri": "https://www.googleapis.com/compute/{api}/\
+projects/my-project/global/machineImages/machine-image-1",
+                 "key": "aFellowOfInfiniteJestOfMostExcellentFancy01=",
+                 "key-type": "raw"}}""".format(api=api)
     result += """
              ]
     """
     return result
 
-  def WriteKeyFile(self, include_rsa_encrypted=False, api=None):
+  def WriteKeyFile(self, include_rsa_encrypted=False, api=None,
+                   machine_image=None):
     private_key_fname = os.path.join(self.CreateTempDir(), 'key-file.json')
     private_key_file = open(private_key_fname, 'w')
     private_key_file.write(self.GetKeyFileContent(include_rsa_encrypted,
-                                                  api=api))
+                                                  api=api,
+                                                  machine_image=machine_image))
     private_key_file.close()
     return private_key_fname
 
@@ -416,15 +425,20 @@ projects/my-project/zones/central2-a/disks/wrappedkeydisk",
         scope_set, filter_expr, max_results, result, with_implementation)
 
   def MakeAllScopes(self, projects=None, zonal=False, regional=False):
+    return self.MakeAllScopesWithRegistry(resources.REGISTRY, projects, zonal,
+                                          regional)
+
+  def MakeAllScopesWithRegistry(self,
+                                registry,
+                                projects=None,
+                                zonal=False,
+                                regional=False):
     if projects is None:
       projects = [None]
+    params = {'project': properties.VALUES.core.project.Get()}
+    collection = 'compute.projects'
     return lister.AllScopes(
-        projects=[
-            resources.REGISTRY.Parse(
-                p,
-                params={'project': properties.VALUES.core.project.Get()},
-                collection='compute.projects') for p in projects
-        ],
+        projects=[registry.Parse(p, params, collection) for p in projects],
         zonal=zonal,
         regional=regional)
 
@@ -433,28 +447,22 @@ projects/my-project/zones/central2-a/disks/wrappedkeydisk",
       zones = [None]
     if project is None:
       project = properties.VALUES.core.project.Get()
-    return lister.ZoneSet([
-        resources.REGISTRY.Parse(
-            z,
-            params={
-                'project': project,
-                'zone': properties.VALUES.compute.zone.Get()
-            },
-            collection='compute.zones') for z in zones
-    ])
+    params = {
+        'project': properties.VALUES.core.project.Get(),
+        'zone': properties.VALUES.compute.zone.Get()
+    }
+    collection = 'compute.zones'
+    return lister.ZoneSet(
+        [resources.REGISTRY.Parse(z, params, collection) for z in zones])
 
   def MakeGlobalScope(self, projects=None):
     """Make GlobalScope in unit tests environment."""
     if projects is None:
       projects = [None]
-    return lister.GlobalScope([
-        resources.REGISTRY.Parse(
-            p,
-            params={
-                'project': properties.VALUES.core.project.Get,
-            },
-            collection='compute.projects') for p in projects
-    ])
+    params = {'project': properties.VALUES.core.project.Get()}
+    collection = 'compute.projects'
+    return lister.GlobalScope(
+        [resources.REGISTRY.Parse(p, params, collection) for p in projects])
 
 
 class BaseEditTest(BaseTest):

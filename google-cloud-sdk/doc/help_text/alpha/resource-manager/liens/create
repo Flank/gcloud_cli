@@ -10,18 +10,19 @@ DESCRIPTION
 
 REQUIRED FLAGS
      --reason=REASON
-        A human-readable description of why this lien is being applied.
+        Human-readable description of why this lien is being applied.
 
      --restrictions=RESTRICTIONS
-        Comma separated list of IAM permissions to curtail
+        Comma separated list of IAM permissions to curtail.
 
 OPTIONAL FLAGS
      --origin=ORIGIN
-        The originator of for this Lien. Defaults to user identy.
+        Origin of this lien. Defaults to user identity.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

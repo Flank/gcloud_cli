@@ -32,38 +32,43 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
     self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
-    self.regionalized = False
-    self.creates_bucket_if_cloudbuild_disabled = False
     self.image_name = 'my-image'
     self.destination_uri = 'gs://31dd/my-image.tar.gz'
     self.daisy_builder = 'gcr.io/compute-image-tools/daisy:release'
     self.tags = ['gce-daisy', 'gce-daisy-image-export']
 
-  def PrepareDaisyMocks(self, daisy_step, timeout='7200s', log_location=None,
-                        permissions=None, async_flag=False, regionalized=True,
-                        source_disk='source-image.vmdk'):
-    super(ImagesExportTestGA, self).PrepareDaisyMocks(
-        daisy_step, timeout=timeout, log_location=log_location,
-        permissions=permissions, async_flag=async_flag,
-        regionalized=regionalized, source_disk=source_disk, is_import=True)
+  def PrepareDaisyMocksForExport(self, daisy_step, timeout='7200s',
+                                 log_location=None, permissions=None,
+                                 async_flag=False):
+    super(ImagesExportTestGA, self).PrepareDaisyMocksWithRegionalBucket(
+        daisy_step,
+        timeout=timeout,
+        log_location=log_location,
+        permissions=permissions,
+        async_flag=async_flag,
+        is_import=True)
 
-  def GetNetworkStep(self, network=None, subnet=None,
-                     include_zone=True, include_empty_network=False):
+  def GetNetworkStepForExport(self, network=None, subnet=None,
+                              include_zone=True, include_empty_network=False):
     daisy_vars = (
         '-variables=source_image=projects/my-project/global/images/{0},'
-        'destination={1}').format(self.image_name, self.destination_uri)
-    return super(ImagesExportTestGA, self).GetNetworkStep(
+        'destination={1}{2}').format(self.image_name, self.destination_uri,
+                                     '{0}')
+    return self.GetNetworkStep(
         workflow='../workflows/export/image_export.wf.json',
-        daisy_vars=daisy_vars, operation=daisy_utils.ImageOperation.EXPORT,
-        network=network, subnet=subnet, include_zone=include_zone,
+        daisy_vars=daisy_vars,
+        operation=daisy_utils.ImageOperation.EXPORT,
+        regionalized=True,
+        network=network,
+        subnet=subnet,
+        include_zone=include_zone,
         include_empty_network=include_empty_network)
 
   def testCommonCase(self):
-    export_workflow = ('../workflows/export/image_export.wf.json')
+    export_workflow = '../workflows/export/image_export.wf.json'
     daisy_step = self.cloudbuild_v1_messages.BuildStep(
         args=[
-            '-gcs_path=gs://{0}/'.format(
-                self.GetScratchBucketName(regionalized=self.regionalized)),
+            '-gcs_path=gs://{0}/'.format(self.GetScratchBucketNameWithRegion()),
             '-default_timeout={0}'.format(daisy_test_base._DEFAULT_TIMEOUT),
             '-variables=source_image=projects/my-project/global/images/{0},'
             'destination={1}'.format(self.image_name, self.destination_uri),
@@ -72,7 +77,7 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
         name=self.daisy_builder,
     )
 
-    self.PrepareDaisyMocks(daisy_step, regionalized=self.regionalized)
+    self.PrepareDaisyMocksForExport(daisy_step)
 
     self.Run("""
              compute images export --image {0}
@@ -84,11 +89,10 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
         """, normalize_space=True)
 
   def testExportFormat(self):
-    export_workflow = ('../workflows/export/image_export_ext.wf.json')
+    export_workflow = '../workflows/export/image_export_ext.wf.json'
     daisy_step = self.cloudbuild_v1_messages.BuildStep(
         args=[
-            '-gcs_path=gs://{0}/'.format(
-                self.GetScratchBucketName(regionalized=self.regionalized)),
+            '-gcs_path=gs://{0}/'.format(self.GetScratchBucketNameWithRegion()),
             '-default_timeout={0}'.format(daisy_test_base._DEFAULT_TIMEOUT),
             '-variables=source_image=projects/my-project/global/images/{0},'
             'destination={1},format=vmdk'
@@ -98,7 +102,7 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
         name=self.daisy_builder,
     )
 
-    self.PrepareDaisyMocks(daisy_step, regionalized=self.regionalized)
+    self.PrepareDaisyMocksForExport(daisy_step)
 
     self.Run("""
              compute images export --image {0}
@@ -111,20 +115,20 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
 
   def testZoneFlag(self):
     zone = 'us-west1-c'
-    export_workflow = ('../workflows/export/image_export.wf.json')
+    export_workflow = '../workflows/export/image_export.wf.json'
     daisy_step = self.cloudbuild_v1_messages.BuildStep(
-        args=['-zone={0}'.format(zone),
-              '-gcs_path=gs://{0}/'.format(
-                  self.GetScratchBucketName(regionalized=self.regionalized)),
-              '-default_timeout={0}'.format(daisy_test_base._DEFAULT_TIMEOUT),
-              '-variables=source_image=projects/my-project/global/images/{0},'
-              'destination={1}'
-              .format(self.image_name, self.destination_uri),
-              export_workflow,],
+        args=[
+            '-zone={0}'.format(zone),
+            '-gcs_path=gs://{0}/'.format(self.GetScratchBucketNameWithRegion()),
+            '-default_timeout={0}'.format(daisy_test_base._DEFAULT_TIMEOUT),
+            '-variables=source_image=projects/my-project/global/images/{0},'
+            'destination={1}'.format(self.image_name, self.destination_uri),
+            export_workflow,
+        ],
         name=self.daisy_builder,
     )
 
-    self.PrepareDaisyMocks(daisy_step, regionalized=self.regionalized)
+    self.PrepareDaisyMocksForExport(daisy_step)
 
     self.Run("""
              compute images export --image {0}
@@ -157,8 +161,7 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
         response=self.project,
     )
 
-    if self.creates_bucket_if_cloudbuild_disabled:
-      self.PrepareDaisyBucketMocks(regionalized=self.regionalized)
+    self.PrepareDaisyBucketMocksWithRegion()
 
     with self.assertRaisesRegexp(console_io.UnattendedPromptError,
                                  ('This prompt could not be answered because '
@@ -171,11 +174,10 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
     self.AssertErrContains('cloudbuild.googleapis.com')
 
   def testImageProject(self):
-    export_workflow = ('../workflows/export/image_export.wf.json')
+    export_workflow = '../workflows/export/image_export.wf.json'
     daisy_step = self.cloudbuild_v1_messages.BuildStep(
         args=[
-            '-gcs_path=gs://{0}/'.format(
-                self.GetScratchBucketName(regionalized=self.regionalized)),
+            '-gcs_path=gs://{0}/'.format(self.GetScratchBucketNameWithRegion()),
             '-default_timeout={0}'.format(daisy_test_base._DEFAULT_TIMEOUT),
             '-variables=source_image=projects/debian-cloud/global/images/{0},'
             'destination={1}'
@@ -185,7 +187,7 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
         name=self.daisy_builder,
     )
 
-    self.PrepareDaisyMocks(daisy_step, regionalized=self.regionalized)
+    self.PrepareDaisyMocksForExport(daisy_step)
 
     self.Run("""
              compute images export --image {0}
@@ -197,8 +199,9 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
         """, normalize_space=True)
 
   def testNetworkFlag(self):
-    daisy_step = self.GetNetworkStep(network=self.network, include_zone=False)
-    self.PrepareDaisyMocks(daisy_step, regionalized=self.regionalized)
+    daisy_step = self.GetNetworkStepForExport(
+        network=self.network, include_zone=False)
+    self.PrepareDaisyMocksForExport(daisy_step)
 
     self.Run("""
              compute images export --image {0}
@@ -223,19 +226,10 @@ class ImagesExportTestGA(daisy_test_base.DaisyBaseTest):
                compute images export --image {0}
                """.format(self.image_name))
 
-
-class ImagesExportTestBeta(ImagesExportTestGA):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-
-  def SetUp(self):
-    self.regionalized = True
-    self.creates_bucket_if_cloudbuild_disabled = True
-
   def testSubnetFlag(self):
-    daisy_step = self.GetNetworkStep(network=self.network, subnet=self.subnet)
-    self.PrepareDaisyMocks(daisy_step, regionalized=self.regionalized)
+    daisy_step = self.GetNetworkStepForExport(
+        network=self.network, subnet=self.subnet)
+    self.PrepareDaisyMocksForExport(daisy_step)
 
     self.Run("""
              compute images export --image {0} --destination-uri {1}
@@ -248,9 +242,9 @@ class ImagesExportTestBeta(ImagesExportTestGA):
         """, normalize_space=True)
 
   def testSubnetFlagNetworkVariableClearedIfNetworkFlagNotSpecified(self):
-    daisy_step = self.GetNetworkStep(
+    daisy_step = self.GetNetworkStepForExport(
         network='', include_empty_network=True, subnet=self.subnet)
-    self.PrepareDaisyMocks(daisy_step, regionalized=self.regionalized)
+    self.PrepareDaisyMocksForExport(daisy_step)
 
     self.Run("""
              compute images export --image {0} --destination-uri {1}
@@ -271,8 +265,9 @@ class ImagesExportTestBeta(ImagesExportTestGA):
              """.format(self.image_name, self.destination_uri, self.subnet))
 
   def testSubnetFlagZoneAsProperty(self):
-    daisy_step = self.GetNetworkStep(network=self.network, subnet=self.subnet)
-    self.PrepareDaisyMocks(daisy_step, regionalized=self.regionalized)
+    daisy_step = self.GetNetworkStepForExport(
+        network=self.network, subnet=self.subnet)
+    self.PrepareDaisyMocksForExport(daisy_step)
 
     properties.VALUES.compute.zone.Set('my-region-c')
     self.Run("""
@@ -286,9 +281,9 @@ class ImagesExportTestBeta(ImagesExportTestGA):
         """, normalize_space=True)
 
   def testSubnetFlagRegionAsProperty(self):
-    daisy_step = self.GetNetworkStep(
+    daisy_step = self.GetNetworkStepForExport(
         network=self.network, subnet=self.subnet, include_zone=False)
-    self.PrepareDaisyMocks(daisy_step, regionalized=self.regionalized)
+    self.PrepareDaisyMocksForExport(daisy_step)
 
     properties.VALUES.compute.region.Set('my-region')
     self.Run("""
@@ -300,6 +295,12 @@ class ImagesExportTestBeta(ImagesExportTestGA):
     self.AssertOutputContains("""\
         [image-export] output
         """, normalize_space=True)
+
+
+class ImagesExportTestBeta(ImagesExportTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class ImagesExportTestAlpha(ImagesExportTestBeta):

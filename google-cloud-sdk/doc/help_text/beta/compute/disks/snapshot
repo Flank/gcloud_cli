@@ -17,8 +17,8 @@ DESCRIPTION
     snapshots may be managed (listed, deleted, resized etc.) via gcloud compute
     snapshots.
 
-    For best practices regarding managing snapshots, refer to this guide:
-    https://cloud.google.com/compute/docs/disks/create-snapshots#best_practices.
+    Refer to the Snapshot best practices guide.
+    https://cloud.google.com/compute/docs/disks/snapshot-best-practices
 
     gcloud beta compute disks snapshot waits until the operation returns a
     status of READY or FAILED, or reaches the maximum timeout, and returns the
@@ -47,7 +47,7 @@ FLAGS
         Text to describe the snapshots being created.
 
      --guest-flush
-        Create an application consistent snapshot by informing the OS to
+        Create an application-consistent snapshot by informing the OS to
         prepare for the snapshot process. Currently only supported on Windows
         instances using the Volume Shadow Copy Service (VSS).
 
@@ -119,8 +119,9 @@ FLAGS
           CLOUDSDK_COMPUTE_ZONE.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

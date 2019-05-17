@@ -31,7 +31,7 @@ def CreateConnection(project_number, service, network, ranges):
     project_number: The number of the project for which to peer the service.
     service: The name of the service to peer with.
     network: The network in consumer project to peer with.
-    ranges: The IP CIDR ranges for peering service to use.
+    ranges: The names of IP CIDR ranges for peering service to use.
 
   Raises:
     exceptions.CreateConnectionsPermissionDeniedException: when the create
@@ -53,6 +53,43 @@ def CreateConnection(project_number, service, network, ranges):
           reservedPeeringRanges=ranges))
   try:
     return client.services_connections.Create(request)
+  except (apitools_exceptions.HttpForbiddenError,
+          apitools_exceptions.HttpNotFoundError) as e:
+    exceptions.ReraiseError(
+        e, exceptions.CreateConnectionsPermissionDeniedException)
+
+
+def UpdateConnection(project_number, service, network, ranges, force):
+  """Make API call to update a connection a specific service.
+
+  Args:
+    project_number: The number of the project for which to peer the service.
+    service: The name of the service to peer with.
+    network: The network in consumer project to peer with.
+    ranges: The names of IP CIDR ranges for peering service to use.
+    force: update the connection even if the update can be destructive.
+
+  Raises:
+    exceptions.CreateConnectionsPermissionDeniedException: when the create
+        connection API fails.
+    apitools_exceptions.HttpError: Another miscellaneous error with the peering
+        service.
+
+  Returns:
+    The result of the peering operation
+  """
+  client = _GetClientInstance()
+  messages = client.MESSAGES_MODULE
+
+  # the API only takes project number, so we cannot use resource parser.
+  request = messages.ServicenetworkingServicesConnectionsPatchRequest(
+      name='services/%s/connections/-' % service,
+      connection=messages.Connection(
+          network='projects/%s/global/networks/%s' % (project_number, network),
+          reservedPeeringRanges=ranges),
+      force=force)
+  try:
+    return client.services_connections.Patch(request)
   except (apitools_exceptions.HttpForbiddenError,
           apitools_exceptions.HttpNotFoundError) as e:
     exceptions.ReraiseError(
@@ -153,4 +190,4 @@ def WaitOperation(name):
 
 
 def _GetClientInstance():
-  return apis.GetClientInstance('servicenetworking', 'v1beta', no_http=False)
+  return apis.GetClientInstance('servicenetworking', 'v1', no_http=False)

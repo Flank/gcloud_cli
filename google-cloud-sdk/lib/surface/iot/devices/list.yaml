@@ -1,13 +1,16 @@
-- release_tracks: [ALPHA, BETA]
+- release_tracks: [ALPHA, BETA, GA]
 
   help_text:
     brief: List devices.
-    DESCRIPTION: List devices.
+    description: List devices.
 
   request:
     collection: cloudiot.projects.locations.registries.devices
     static_fields:
-      fieldMask: blocked,name
+      fieldMask: blocked,name,gatewayConfig
+    # TODO (b/124063772): Remove this mapping fix once apitools base fix is applied
+    modify_request_hooks:
+    - googlecloudsdk.command_lib.iot.util:RegistriesDevicesListRequestHook
 
   response:
     id_field: name
@@ -40,4 +43,4 @@
 
   output:
     format: table(id, numId, blocked,
-                  gatewayConfig.gatewayType, gatewayConfig.gatewayAuthMethod)
+                  gatewayConfig.gatewayType:optional, gatewayConfig.gatewayAuthMethod:optional)

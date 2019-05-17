@@ -27,7 +27,7 @@ from tests.lib import test_case
 from tests.lib.surface.ml_engine import base
 
 
-class ParseVersionTestBase(object):
+class ParseVersionTestGA(base.MlGaPlatformTestBase):
 
   _VERSION_URL = ('https://ml.googleapis.com/v1/projects/other-project/'
                   'models/other-model/versions/other-version')
@@ -54,16 +54,8 @@ class ParseVersionTestBase(object):
     self.assertEqual(version_ref.SelfLink(), self._VERSION_URL)
 
 
-class ParseVersionGaTest(ParseVersionTestBase, base.MlGaPlatformTestBase):
-
-  def SetUp(self):
-    super(ParseVersionGaTest, self).SetUp()
-
-
-class ParseVersionBetaTest(ParseVersionTestBase, base.MlBetaPlatformTestBase):
-
-  def SetUp(self):
-    super(ParseVersionBetaTest, self).SetUp()
+class ParseVersionTestBeta(base.MlBetaPlatformTestBase, ParseVersionTestGA):
+  pass
 
 
 class WaitForOpMaybeTestBase(object):

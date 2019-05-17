@@ -82,9 +82,23 @@ class JobsWaitUnitTest(jobs_unit_base.JobsUnitTestBase):
   def testWaitJobFailure(self):
     self.ExpectWaitCalls(final_state=self.STATE_ENUM.ERROR)
     with self.AssertRaisesExceptionMatches(
+        exceptions.JobError, 'Job [{0}] failed.'.format(self.JOB_ID)):
+      self.RunDataproc('jobs wait ' + self.JOB_ID)
+    self.AssertErrContains(textwrap.dedent("""\
+      First line of job output.
+      Next line of job output.
+      Yet another line of job output.
+      Last line of job output."""))
+
+  def testSubmitJobFailureWithDetails(self):
+    self.ExpectWaitCalls(
+        final_state=self.STATE_ENUM.ERROR,
+        details='Something bad')
+    with self.AssertRaisesExceptionMatches(
         exceptions.JobError,
-        'Job [{0}] entered state [ERROR] while waiting for [DONE].'.format(
-            self.JOB_ID)):
+        textwrap.dedent("""\
+          Job [{0}] failed with error:
+          Something bad""".format(self.JOB_ID))):
       self.RunDataproc('jobs wait ' + self.JOB_ID)
     self.AssertErrContains(textwrap.dedent("""\
       First line of job output.
@@ -151,7 +165,12 @@ class JobsWaitUnitTestBeta(JobsWaitUnitTest, base.DataprocTestBaseBeta):
 
   def testBeta(self):
     self.assertEqual(self.messages, self._beta_messages)
-    self.assertEqual(self.track, calliope_base.ReleaseTrack.BETA)
+
+
+class JobsWaitUnitTestAlpha(JobsWaitUnitTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

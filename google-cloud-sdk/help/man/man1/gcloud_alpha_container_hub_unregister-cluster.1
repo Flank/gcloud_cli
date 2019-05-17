@@ -1,0 +1,85 @@
+
+.TH "GCLOUD_ALPHA_CONTAINER_HUB_UNREGISTER\-CLUSTER" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha container hub unregister\-cluster \- unregisters a cluster from Google Cloud Platform
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha container hub unregister\-cluster\fR \fB\-\-context\fR=\fICONTEXT\fR [\fB\-\-kubeconfig\-file\fR=\fIKUBECONFIG_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR This command unregisters a cluster referenced from a kubeconfig
+file from Google Cloud Platform. It also removes the Connect agent installation
+from the Cluster.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-context\fR=\fICONTEXT\fR
+The context in the kubeconfig file that specifies the cluster.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-kubeconfig\-file\fR=\fIKUBECONFIG_FILE\fR
+The kubeconfig file containing an entry for the cluster. Defaults to $KUBECONFIG
+if it is set in the environment, otherwise defaults to to $HOME/.kube/config.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+Unregister a cluster referenced from the default kubeconfig file:
+
+.RS 2m
+$ gcloud alpha container hub unregister\-cluster \e
+  \-\-context=my\-cluster\-context
+.RE
+
+Unregister a cluster referenced from a specific kubeconfig file:
+
+.RS 2m
+$ gcloud alpha container hub unregister\-cluster \e
+    \-\-kubeconfig\-file=/home/user/custom_kubeconfig \e
+    \-\-context=my\-cluster\-context
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/.
+

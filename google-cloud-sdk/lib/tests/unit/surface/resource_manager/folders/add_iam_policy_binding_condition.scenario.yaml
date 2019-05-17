@@ -1,0 +1,108 @@
+title: resource-manager folders add-iam-policy-binding scenario test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: resource-manager folders add-iam-policy-binding folder-id --member=user:test@gmail.com
+      --role=roles/non-primitive --condition='expression=expr,title=title,description=descr'
+  - stderr: |
+      Updated IAM policy for folder [folder-id].
+  - stdout: |
+      bindings:
+      - condition:
+          description: descr
+          expression: expr
+          title: title
+        members:
+        - user:oldtest@gmail.com
+        - user:test@gmail.com
+        role: roles/non-primitive
+      etag: etag
+      version: 1
+actions:
+- execute_command:
+    command: resource-manager folders add-iam-policy-binding folder-id --member=user:test@gmail.com
+      --role=roles/non-primitive --condition='expression=expr,title=title,description=descr'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v2/folders/folder-id:getIamPolicy?alt=json
+          method: POST
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "version": 1,
+              "etag": "etag",
+              "bindings": [
+                {
+                  "role": "roles/non-primitive",
+                  "members": ["user:oldtest@gmail.com"],
+                  "condition": {
+                    "expression": "expr",
+                    "title": "title",
+                    "description": "descr"
+                  }
+                }
+              ]
+            }
+    - api_call:
+        expect_request:
+          uri: https://cloudresourcemanager.googleapis.com/v2/folders/folder-id:setIamPolicy?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              policy:
+                bindings:
+                - condition:
+                    description: descr
+                    expression: expr
+                    title: title
+                  members:
+                  - user:oldtest@gmail.com
+                  - user:test@gmail.com
+                  role: roles/non-primitive
+                etag: etag
+                version: 1
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "version": 1,
+              "etag": "etag",
+              "bindings": [
+                {
+                  "role": "roles/non-primitive",
+                  "members": [
+                    "user:oldtest@gmail.com",
+                    "user:test@gmail.com"
+                  ],
+                  "condition": {
+                    "expression": "expr",
+                    "title": "title",
+                    "description": "descr"
+                  }
+                }
+              ]
+            }
+    - expect_stderr: |
+        Updated IAM policy for folder [folder-id].
+    - expect_stdout: |
+        bindings:
+        - condition:
+            description: descr
+            expression: expr
+            title: title
+          members:
+          - user:oldtest@gmail.com
+          - user:test@gmail.com
+          role: roles/non-primitive
+        etag: etag
+        version: 1
+    - expect_exit:
+        code: 0

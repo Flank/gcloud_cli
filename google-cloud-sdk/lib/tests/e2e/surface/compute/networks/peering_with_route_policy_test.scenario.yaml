@@ -1,9 +1,5 @@
 title: test peering with route policy
-release_tracks:
-- ALPHA
-# TODO(b/117964785): add e2e test for "compute networks peerings list-routes" after b/112610241 is
-# fixed.
-
+release_tracks: [BETA, ALPHA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -11,7 +7,7 @@ summary:
       compute networks create $$compute-peering-net1$$ --subnet-mode custom --verbosity none
       --format="value(name)"
   - stderr: |
-      Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$].
+      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$].
   - stdout: |
       $$compute-peering-net1$$
 - execute:
@@ -19,17 +15,30 @@ summary:
       compute networks subnets create $$compute-peering-sub1$$ --network $$compute-peering-net1$$
       --region us-central1 --range 10.1.0.0/16 --format="text(name, network)"
   - stderr: |
-      Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub1$$].
+      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub1$$].
   - stdout: |
       ---
       name:    $$compute-peering-sub1$$
-      network: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
+      network: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
+- execute:
+  - command: |
+      compute routes create $$compute-peering-route1$$ --network $$compute-peering-net1$$
+      --destination-range 90.1.0.0/16 --next-hop-address 10.1.0.100 --format="text(name, network)"
+  - stderr: |+
+      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/routes/$$compute-peering-route1$$].
+      WARNING: Some requests generated warnings:
+       - Next hop ip address '10.1.0.100' is not assigned to the primary IP address of any instance on 'https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$'.  Please ensure that the address is assigned to the primary IP address of an instance on the route's network.
+
+  - stdout: |
+      ---
+      name:    $$compute-peering-route1$$
+      network: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
 - execute:
   - command: |
       compute networks create $$compute-peering-net2$$ --subnet-mode custom --verbosity none
       --format="value(name)"
   - stderr: |
-      Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$].
+      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$].
   - stdout: |
       $$compute-peering-net2$$
 - execute:
@@ -37,106 +46,192 @@ summary:
       compute networks subnets create $$compute-peering-sub2$$ --network $$compute-peering-net2$$
       --region us-central1 --range 10.2.0.0/16 --format="text(name, network)"
   - stderr: |
-      Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub2$$].
+      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub2$$].
   - stdout: |
       ---
       name:    $$compute-peering-sub2$$
-      network: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
+      network: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
+- execute:
+  - command: |
+      compute routes create $$compute-peering-route2$$ --network $$compute-peering-net2$$
+      --destination-range 90.2.0.0/16 --next-hop-address 10.2.0.100 --format="text(name, network)"
+  - stderr: |+
+      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/routes/$$compute-peering-route2$$].
+      WARNING: Some requests generated warnings:
+       - Next hop ip address '10.2.0.100' is not assigned to the primary IP address of any instance on 'https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$'.  Please ensure that the address is assigned to the primary IP address of an instance on the route's network.
+
+  - stdout: |
+      ---
+      name:    $$compute-peering-route2$$
+      network: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
 - execute:
   - command: |
       compute networks peerings create $$compute-peering-peer1$$ --network
       $$compute-peering-net1$$ --peer-network $$compute-peering-net2$$ --auto-create-routes
       --no-export-custom-routes --import-custom-routes
-      --format="text(name,peerings[].autoCreateRoutes,peerings[].name,peerings[].network,peerings[].state)"
+      --format="text(name,peerings[].exchangeSubnetRoutes,peerings[].name,peerings[].network,peerings[].state)"
   - stderr: |
       WARNING: Flag --auto-create-routes is deprecated and will be removed in a future release.
   - stderr: |
-      Updated [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$].
+      Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$].
   - stdout: |
       ---
-      name:                         $$compute-peering-net1$$
-      peerings[0].autoCreateRoutes: True
-      peerings[0].name:             $$compute-peering-peer1$$
-      peerings[0].network:          https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
-      peerings[0].state:            INACTIVE
+      name:                             $$compute-peering-net1$$
+      peerings[0].exchangeSubnetRoutes: True
+      peerings[0].name:                 $$compute-peering-peer1$$
+      peerings[0].network:              https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
+      peerings[0].state:                INACTIVE
 - execute:
   - command: |
       compute networks peerings create $$compute-peering-peer2$$ --network
       $$compute-peering-net2$$ --peer-network $$compute-peering-net1$$ --auto-create-routes
       --export-custom-routes --no-import-custom-routes
-      --format="text(name,peerings[].autoCreateRoutes,peerings[].name,peerings[].network,peerings[].state)"
+      --format="text(name,peerings[].exchangeSubnetRoutes,peerings[].name,peerings[].network,peerings[].state)"
   - stderr: |
       WARNING: Flag --auto-create-routes is deprecated and will be removed in a future release.
   - stderr: |
-      Updated [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$].
+      Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$].
   - stdout: |
       ---
-      name:                         $$compute-peering-net2$$
-      peerings[0].autoCreateRoutes: True
-      peerings[0].name:             $$compute-peering-peer2$$
-      peerings[0].network:          https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
-      peerings[0].state:            ACTIVE
+      name:                             $$compute-peering-net2$$
+      peerings[0].exchangeSubnetRoutes: True
+      peerings[0].name:                 $$compute-peering-peer2$$
+      peerings[0].network:              https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
+      peerings[0].state:                ACTIVE
+- execute:
+  - command: |
+      compute networks peerings list-routes $$compute-peering-peer1$$ --network
+      $$compute-peering-net1$$ --region us-central1 --direction=INCOMING
+  - stdout: |
+      DEST_RANGE   TYPE                  NEXT_HOP_REGION  PRIORITY  STATUS
+      10.2.0.0/16  SUBNET_PEERING_ROUTE  us-central1      1000      accepted
+      90.2.0.0/16  STATIC_PEERING_ROUTE  us-central1      1000      accepted
+- execute:
+  - command: |
+      compute networks peerings list-routes $$compute-peering-peer1$$ --network
+      $$compute-peering-net1$$ --region us-central1 --direction=OUTGOING
+  - stdout: |
+      DEST_RANGE   TYPE                  NEXT_HOP_REGION  PRIORITY  STATUS
+      10.1.0.0/16  SUBNET_PEERING_ROUTE  us-central1      1000      accepted by peer
+- execute:
+  - command: |
+      compute networks peerings list-routes $$compute-peering-peer2$$ --network
+      $$compute-peering-net2$$ --region us-central1 --direction=INCOMING
+  - stdout: |
+      DEST_RANGE   TYPE                  NEXT_HOP_REGION  PRIORITY  STATUS
+      10.1.0.0/16  SUBNET_PEERING_ROUTE  us-central1      1000      accepted
+- execute:
+  - command: |
+      compute networks peerings list-routes $$compute-peering-peer2$$ --network
+      $$compute-peering-net2$$ --region us-central1 --direction=OUTGOING
+  - stdout: |
+      DEST_RANGE   TYPE                  NEXT_HOP_REGION  PRIORITY  STATUS
+      10.2.0.0/16  SUBNET_PEERING_ROUTE  us-central1      1000      accepted by peer
+      90.2.0.0/16  STATIC_PEERING_ROUTE  us-central1      1000      accepted by peer
 - execute:
   - command: |
       compute networks peerings update $$compute-peering-peer1$$ --network
       $$compute-peering-net1$$ --export-custom-routes --no-import-custom-routes
-      --format="text(name,peerings[].autoCreateRoutes,peerings[].name,peerings[].network,peerings[].state)"
+      --format="text(name,peerings[].exchangeSubnetRoutes,peerings[].name,peerings[].network,peerings[].state)"
   - stderr: |
-      Updated [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$].
+      Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$].
   - stdout: |
       ---
-      name:                         $$compute-peering-net1$$
-      peerings[0].autoCreateRoutes: True
-      peerings[0].name:             $$compute-peering-peer1$$
-      peerings[0].network:          https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
-      peerings[0].state:            ACTIVE
+      name:                             $$compute-peering-net1$$
+      peerings[0].exchangeSubnetRoutes: True
+      peerings[0].name:                 $$compute-peering-peer1$$
+      peerings[0].network:              https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
+      peerings[0].state:                ACTIVE
 - execute:
   - command: |
       compute networks peerings update $$compute-peering-peer2$$ --network
       $$compute-peering-net2$$ --no-export-custom-routes --import-custom-routes
-      --format="text(name,peerings[].autoCreateRoutes,peerings[].name,peerings[].network,peerings[].state)"
+      --format="text(name,peerings[].exchangeSubnetRoutes,peerings[].name,peerings[].network,peerings[].state)"
   - stderr: |
-      Updated [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$].
+      Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$].
   - stdout: |
       ---
-      name:                         $$compute-peering-net2$$
-      peerings[0].autoCreateRoutes: True
-      peerings[0].name:             $$compute-peering-peer2$$
-      peerings[0].network:          https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
-      peerings[0].state:            ACTIVE
+      name:                             $$compute-peering-net2$$
+      peerings[0].exchangeSubnetRoutes: True
+      peerings[0].name:                 $$compute-peering-peer2$$
+      peerings[0].network:              https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
+      peerings[0].state:                ACTIVE
+- execute:
+  - command: |
+      compute networks peerings list-routes $$compute-peering-peer1$$ --network
+      $$compute-peering-net1$$ --region us-central1 --direction=INCOMING
+  - stdout: |
+      DEST_RANGE   TYPE                  NEXT_HOP_REGION  PRIORITY  STATUS
+      10.2.0.0/16  SUBNET_PEERING_ROUTE  us-central1      1000      accepted
+- execute:
+  - command: |
+      compute networks peerings list-routes $$compute-peering-peer1$$ --network
+      $$compute-peering-net1$$ --region us-central1 --direction=OUTGOING
+  - stdout: |
+      DEST_RANGE   TYPE                  NEXT_HOP_REGION  PRIORITY  STATUS
+      10.1.0.0/16  SUBNET_PEERING_ROUTE  us-central1      1000      accepted by peer
+      90.1.0.0/16  STATIC_PEERING_ROUTE  us-central1      1000      accepted by peer
+- execute:
+  - command: |
+      compute networks peerings list-routes $$compute-peering-peer2$$ --network
+      $$compute-peering-net2$$ --region us-central1 --direction=INCOMING
+  - stdout: |
+      DEST_RANGE   TYPE                  NEXT_HOP_REGION  PRIORITY  STATUS
+      10.1.0.0/16  SUBNET_PEERING_ROUTE  us-central1      1000      accepted
+      90.1.0.0/16  STATIC_PEERING_ROUTE  us-central1      1000      accepted
+- execute:
+  - command: |
+      compute networks peerings list-routes $$compute-peering-peer2$$ --network
+      $$compute-peering-net2$$ --region us-central1 --direction=OUTGOING
+  - stdout: |
+      DEST_RANGE   TYPE                  NEXT_HOP_REGION  PRIORITY  STATUS
+      10.2.0.0/16  SUBNET_PEERING_ROUTE  us-central1      1000      accepted by peer
+- execute:
+  - command: |
+      compute routes delete $$compute-peering-route1$$ --quiet
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/routes/$$compute-peering-route1$$].
+- execute:
+  - command: |
+      compute routes delete $$compute-peering-route2$$ --quiet
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/routes/$$compute-peering-route2$$].
 - execute:
   - command: |
       compute networks subnets delete $$compute-peering-sub1$$ --region us-central1 --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub1$$].
+      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub1$$].
 - execute:
   - command: |
       compute networks peerings delete $$compute-peering-peer1$$ --quiet
       --network $$compute-peering-net1$$
   - stderr: |
-      Updated [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$].
+      Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$].
 - execute:
   - command: |
       compute networks peerings delete $$compute-peering-peer2$$ --quiet
       --network $$compute-peering-net2$$
   - stderr: |
-      Updated [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$].
+      Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$].
 - execute:
   - command: |
       compute networks subnets delete $$compute-peering-sub2$$ --region us-central1 --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub2$$].
+      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub2$$].
 - execute:
   - command: |
       compute networks delete $$compute-peering-net1$$ --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$].
+      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$].
 - execute:
   - command: |
       compute networks delete $$compute-peering-net2$$ --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$].
+      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$].
 actions:
+- define_reference:
+    reference: compute-uri
+    value: www.googleapis.com/compute
 - generate_resource_id:
     reference: compute-peering-net1
     prefix: compute-peering-net
@@ -155,6 +250,18 @@ actions:
 - generate_resource_id:
     reference: compute-peering-peer2
     prefix: compute-peering-peer
+- generate_resource_id:
+    reference: compute-peering-route1
+    prefix: compute-peering-route
+- generate_resource_id:
+    reference: compute-peering-route2
+    prefix: compute-peering-route
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1
+      BETA: beta
+      ALPHA: alpha
 - execute_command:
     command: |
       compute networks create $$compute-peering-net1$$ --subnet-mode custom --verbosity none
@@ -162,7 +269,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks?alt=json
           method: POST
           headers: {}
           body:
@@ -173,43 +280,47 @@ actions:
                 routingMode: REGIONAL
         return_response:
           headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '692'
             Content-Type: application/json; charset=UTF-8
             status: '200'
           body:
-            id: '2841813045425693757'
-            name: operation-1543953105793-57c37986bb26a-12dd165a-6a9d4918
+            kind: compute#operation
+            id: '4450646582637996219'
+            name: operation-1549538899772-5814c23afc383-c260bbc7-f4856d67
             operationType: insert
-            targetLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
-            targetId: '3823906512211502141'
+            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
+            targetId: '7114912949234411707'
             status: PENDING
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
-            insertTime: '2018-12-04T11:51:46.606-08:00'
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/operations/operation-1543953105793-57c37986bb26a-12dd165a-6a9d4918
-            kind: compute#operation
+            insertTime: '2019-02-07T03:28:20.576-08:00'
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/operations/operation-1549538899772-5814c23afc383-c260bbc7-f4856d67
         poll_operation: true
     - expect_stderr: |
-        Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$].
+        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$?alt=json
           method: GET
           headers: {}
           body: null
         return_response:
           headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '406'
             Content-Type: application/json; charset=UTF-8
-            ETag: bVP8n79DgfzE8yxFi0Xivjk3jNQ=/HBBnYdkwFUEFGBf1E8DKqwBM-UA=
+            ETag: '"IWdqK_0faFUtXjnch3qVGg83rN4=/CwtFhSKanzvvuMiZXyGgjqSVSpo="'
             status: '200'
           body:
-            id: '3823906512211502141'
-            creationTimestamp: '2018-12-04T11:51:46.594-08:00'
+            kind: compute#network
+            id: '7114912949234411707'
+            creationTimestamp: '2019-02-07T03:28:20.570-08:00'
             name: $$compute-peering-net1$$
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
             autoCreateSubnetworks: false
             routingConfig:
               routingMode: REGIONAL
-            kind: compute#network
     - expect_stdout: |
         $$compute-peering-net1$$
     - expect_exit:
@@ -221,63 +332,84 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks?alt=json
           method: POST
           headers: {}
           body:
             json:
               ipCidrRange: 10.1.0.0/16
               name: $$compute-peering-sub1$$
-              network: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
+              network: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
               privateIpGoogleAccess: false
         return_response:
           headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '834'
             Content-Type: application/json; charset=UTF-8
             status: '200'
           body:
-            id: '8513048829848413211'
-            name: operation-1543953139748-57c379a71ce35-e17f976b-f9fb4f0d
+            kind: compute#operation
+            id: '2436962367183104158'
+            name: operation-1549538928141-5814c2560a4b3-2ad1cf05-fc4f592c
             operationType: insert
-            targetLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub1$$
-            targetId: '7305820208267748379'
+            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub1$$
+            targetId: '2507220107931003038'
             status: PENDING
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
-            insertTime: '2018-12-04T11:52:20.958-08:00'
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1543953139748-57c379a71ce35-e17f976b-f9fb4f0d
-            region: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1
-            kind: compute#operation
+            insertTime: '2019-02-07T03:28:49.079-08:00'
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1549538928141-5814c2560a4b3-2ad1cf05-fc4f592c
+            region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
         poll_operation: true
     - expect_stderr: |
-        Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub1$$].
+        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub1$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub1$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub1$$?alt=json
           method: GET
           headers: {}
           body: null
         return_response:
           headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '771'
             Content-Type: application/json; charset=UTF-8
-            ETag: UWPIPa4IW6FdQUDVIpwmN0vmqN0=/YrQTlKenf-mCglnYEjxhb1-q_AU=
+            ETag: '"NgcBg5fpiPanGUL6r0lPf4ofVL4=/iBWEsVmLMm6Sx-G1994een0P3j0="'
             status: '200'
           body:
-            id: '7305820208267748379'
-            creationTimestamp: '2018-12-04T11:52:20.912-08:00'
+            kind: compute#subnetwork
+            id: '2507220107931003038'
+            creationTimestamp: '2019-02-07T03:28:49.070-08:00'
             name: $$compute-peering-sub1$$
-            network: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
+            network: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
             ipCidrRange: 10.1.0.0/16
             gatewayAddress: 10.1.0.1
-            region: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub1$$
+            region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub1$$
             privateIpGoogleAccess: false
-            fingerprint: vRn1rIwEscw=
+            fingerprint: B-bfvb1qCnA=
             allowSubnetCidrRoutesOverlap: false
-            kind: compute#subnetwork
     - expect_stdout: |
         ---
         name:    $$compute-peering-sub1$$
-        network: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
+        network: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute routes create $$compute-peering-route1$$ --network $$compute-peering-net1$$
+      --destination-range 90.1.0.0/16 --next-hop-address 10.1.0.100 --format="text(name, network)"
+    validation_only: true
+    events:
+    - expect_stderr: |+
+        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/routes/$$compute-peering-route1$$].
+        WARNING: Some requests generated warnings:
+         - Next hop ip address '10.1.0.100' is not assigned to the primary IP address of any instance on 'https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$'.  Please ensure that the address is assigned to the primary IP address of an instance on the route's network.
+
+    - expect_stdout: |
+        ---
+        name:    $$compute-peering-route1$$
+        network: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
     - expect_exit:
         code: 0
 - execute_command:
@@ -287,7 +419,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks?alt=json
           method: POST
           headers: {}
           body:
@@ -298,43 +430,47 @@ actions:
                 routingMode: REGIONAL
         return_response:
           headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '692'
             Content-Type: application/json; charset=UTF-8
             status: '200'
           body:
-            id: '3789387580880676324'
-            name: operation-1543953163343-57c379bd9d87b-3d6a5fed-00f4214c
+            kind: compute#operation
+            id: '9086477717497555042'
+            name: operation-1549538956765-5814c271568a4-d1e07cdd-93f6ccbd
             operationType: insert
-            targetLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
-            targetId: '2154971075269322212'
+            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
+            targetId: '5251525140003530850'
             status: PENDING
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
-            insertTime: '2018-12-04T11:52:44.115-08:00'
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/operations/operation-1543953163343-57c379bd9d87b-3d6a5fed-00f4214c
-            kind: compute#operation
+            insertTime: '2019-02-07T03:29:17.485-08:00'
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/operations/operation-1549538956765-5814c271568a4-d1e07cdd-93f6ccbd
         poll_operation: true
     - expect_stderr: |
-        Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$].
+        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$?alt=json
           method: GET
           headers: {}
           body: null
         return_response:
           headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '406'
             Content-Type: application/json; charset=UTF-8
-            ETag: gcZY6t2OOnAIYOGX3AAUoqGzq_0=/G-gEbVZlHbhJxXexWzKx3wPkM6k=
+            ETag: '"ifFLPrk8eyObYRj0JliCWHZRa9Q=/TL5kmXTS_XhhGt8-JBIX_kI20gc="'
             status: '200'
           body:
-            id: '2154971075269322212'
-            creationTimestamp: '2018-12-04T11:52:43.964-08:00'
+            kind: compute#network
+            id: '5251525140003530850'
+            creationTimestamp: '2019-02-07T03:29:17.447-08:00'
             name: $$compute-peering-net2$$
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
             autoCreateSubnetworks: false
             routingConfig:
               routingMode: REGIONAL
-            kind: compute#network
     - expect_stdout: |
         $$compute-peering-net2$$
     - expect_exit:
@@ -346,63 +482,84 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks?alt=json
           method: POST
           headers: {}
           body:
             json:
               ipCidrRange: 10.2.0.0/16
               name: $$compute-peering-sub2$$
-              network: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
+              network: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
               privateIpGoogleAccess: false
         return_response:
           headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '834'
             Content-Type: application/json; charset=UTF-8
             status: '200'
           body:
-            id: '8614042825445303756'
-            name: operation-1543953186547-57c379d3be703-a87279f6-554c308b
+            kind: compute#operation
+            id: '6465512867582027851'
+            name: operation-1549538979784-5814c2874a67f-aaacab48-10d60b68
             operationType: insert
-            targetLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub2$$
-            targetId: '6896994494838433228'
+            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub2$$
+            targetId: '5045656645857814603'
             status: PENDING
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
-            insertTime: '2018-12-04T11:53:07.450-08:00'
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1543953186547-57c379d3be703-a87279f6-554c308b
-            region: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1
-            kind: compute#operation
+            insertTime: '2019-02-07T03:29:40.810-08:00'
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1549538979784-5814c2874a67f-aaacab48-10d60b68
+            region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
         poll_operation: true
     - expect_stderr: |
-        Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub2$$].
+        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub2$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub2$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub2$$?alt=json
           method: GET
           headers: {}
           body: null
         return_response:
           headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '771'
             Content-Type: application/json; charset=UTF-8
-            ETag: 0ljTpSYUxBGv6JREobin8REJVSU=/iicwZ-wLPI0BRvyKJmy-kmag7VI=
+            ETag: '"tfxV8stth5HC7JklJ1dswwmxXQE=/WThydBdpYPLOkUwJuI_UwBnATa0="'
             status: '200'
           body:
-            id: '6896994494838433228'
-            creationTimestamp: '2018-12-04T11:53:07.442-08:00'
+            kind: compute#subnetwork
+            id: '5045656645857814603'
+            creationTimestamp: '2019-02-07T03:29:40.801-08:00'
             name: $$compute-peering-sub2$$
-            network: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
+            network: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
             ipCidrRange: 10.2.0.0/16
             gatewayAddress: 10.2.0.1
-            region: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub2$$
+            region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub2$$
             privateIpGoogleAccess: false
-            fingerprint: _G8WefdjA2E=
+            fingerprint: M0x5bwK0wRg=
             allowSubnetCidrRoutesOverlap: false
-            kind: compute#subnetwork
     - expect_stdout: |
         ---
         name:    $$compute-peering-sub2$$
-        network: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
+        network: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute routes create $$compute-peering-route2$$ --network $$compute-peering-net2$$
+      --destination-range 90.2.0.0/16 --next-hop-address 10.2.0.100 --format="text(name, network)"
+    validation_only: true
+    events:
+    - expect_stderr: |+
+        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/routes/$$compute-peering-route2$$].
+        WARNING: Some requests generated warnings:
+         - Next hop ip address '10.2.0.100' is not assigned to the primary IP address of any instance on 'https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$'.  Please ensure that the address is assigned to the primary IP address of an instance on the route's network.
+
+    - expect_stdout: |
+        ---
+        name:    $$compute-peering-route2$$
+        network: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
     - expect_exit:
         code: 0
 - execute_command:
@@ -410,13 +567,13 @@ actions:
       compute networks peerings create $$compute-peering-peer1$$ --network
       $$compute-peering-net1$$ --peer-network $$compute-peering-net2$$ --auto-create-routes
       --no-export-custom-routes --import-custom-routes
-      --format="text(name,peerings[].autoCreateRoutes,peerings[].name,peerings[].network,peerings[].state)"
+      --format="text(name,peerings[].exchangeSubnetRoutes,peerings[].name,peerings[].network,peerings[].state)"
     events:
     - expect_stderr: |
         WARNING: Flag --auto-create-routes is deprecated and will be removed in a future release.
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$/addPeering?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$/addPeering?alt=json
           method: POST
           headers: {}
           body:
@@ -429,49 +586,54 @@ actions:
                 network: projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
         return_response:
           headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '786'
             Content-Type: application/json; charset=UTF-8
             status: '200'
           body:
-            id: '2575166851326371285'
-            name: operation-1543953210034-57c379ea247a9-0e8fb200-48874cf7
+            kind: compute#operation
+            id: '628284414009387055'
+            name: operation-1549539008343-5814c2a286f38-9ada570e-ee8e8de7
             operationType: addPeering
-            targetLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
-            targetId: '3823906512211502141'
+            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
+            targetId: '7114912949234411707'
             status: DONE
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 100
-            insertTime: '2018-12-04T11:53:30.613-08:00'
-            startTime: '2018-12-04T11:53:30.615-08:00'
-            endTime: '2018-12-04T11:53:30.615-08:00'
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/operations/operation-1543953210034-57c379ea247a9-0e8fb200-48874cf7
-            kind: compute#operation
+            insertTime: '2019-02-07T03:30:09.046-08:00'
+            startTime: '2019-02-07T03:30:09.049-08:00'
+            endTime: '2019-02-07T03:30:09.049-08:00'
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/operations/operation-1549539008343-5814c2a286f38-9ada570e-ee8e8de7
         poll_operation: true
     - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$].
+        Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$?alt=json
           method: GET
           headers: {}
           body: null
         return_response:
           headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '1060'
             Content-Type: application/json; charset=UTF-8
-            ETag: vO-JEm4AcWfXFdb9QH1-RSAsX6w=/b9fnZhIR2mPniJQeBPh8gpOpOyc=
+            ETag: '"saIqyBtAHnZahZD5ZEvJBpEhnfM=/OBuD6NKYUWaWoQRSAm0rbZ3oodM="'
             status: '200'
           body:
-            id: '3823906512211502141'
-            creationTimestamp: '2018-12-04T11:51:46.594-08:00'
+            kind: compute#network
+            id: '7114912949234411707'
+            creationTimestamp: '2019-02-07T03:28:20.570-08:00'
             name: $$compute-peering-net1$$
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
             autoCreateSubnetworks: false
             subnetworks:
-            - https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub1$$
+            - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub1$$
             peerings:
             - name: $$compute-peering-peer1$$
-              network: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
+              network: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
               state: INACTIVE
-              stateDetails: '[2018-12-04T11:53:30.873-08:00]: Waiting for peer network
+              stateDetails: '[2019-02-07T03:30:09.176-08:00]: Waiting for peer network
                 to connect.'
               autoCreateRoutes: true
               exportCustomRoutes: false
@@ -479,14 +641,13 @@ actions:
               exchangeSubnetRoutes: true
             routingConfig:
               routingMode: REGIONAL
-            kind: compute#network
     - expect_stdout: |
         ---
-        name:                         $$compute-peering-net1$$
-        peerings[0].autoCreateRoutes: True
-        peerings[0].name:             $$compute-peering-peer1$$
-        peerings[0].network:          https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
-        peerings[0].state:            INACTIVE
+        name:                             $$compute-peering-net1$$
+        peerings[0].exchangeSubnetRoutes: True
+        peerings[0].name:                 $$compute-peering-peer1$$
+        peerings[0].network:              https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
+        peerings[0].state:                INACTIVE
     - expect_exit:
         code: 0
 - execute_command:
@@ -494,13 +655,13 @@ actions:
       compute networks peerings create $$compute-peering-peer2$$ --network
       $$compute-peering-net2$$ --peer-network $$compute-peering-net1$$ --auto-create-routes
       --export-custom-routes --no-import-custom-routes
-      --format="text(name,peerings[].autoCreateRoutes,peerings[].name,peerings[].network,peerings[].state)"
+      --format="text(name,peerings[].exchangeSubnetRoutes,peerings[].name,peerings[].network,peerings[].state)"
     events:
     - expect_stderr: |
         WARNING: Flag --auto-create-routes is deprecated and will be removed in a future release.
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$/addPeering?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$/addPeering?alt=json
           method: POST
           headers: {}
           body:
@@ -513,72 +674,208 @@ actions:
                 network: projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
         return_response:
           headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '696'
             Content-Type: application/json; charset=UTF-8
             status: '200'
           body:
-            id: '7513150099395667412'
-            name: operation-1543953211418-57c379eb76628-d434c4e3-33e68de9
+            kind: compute#operation
+            id: '7515810801575372845'
+            name: operation-1549539009753-5814c2a3df0d2-d4112e3f-6769dd05
             operationType: addPeering
-            targetLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
-            targetId: '2154971075269322212'
+            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
+            targetId: '5251525140003530850'
             status: PENDING
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
-            insertTime: '2018-12-04T11:53:31.888-08:00'
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/operations/operation-1543953211418-57c379eb76628-d434c4e3-33e68de9
-            kind: compute#operation
+            insertTime: '2019-02-07T03:30:10.763-08:00'
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/operations/operation-1549539009753-5814c2a3df0d2-d4112e3f-6769dd05
         poll_operation: true
     - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$].
+        Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$?alt=json
           method: GET
           headers: {}
           body: null
         return_response:
           headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '1032'
             Content-Type: application/json; charset=UTF-8
-            ETag: MF-ConaDTOrVBGiIa-FHbjkMt0c=/8OxW7eOrWDavc-Q1wTjntudjWzg=
+            ETag: '"O7ot5TWG8IKHKuJ-CFUhC8R8WaQ=/2iBiCVbO3Fh5CUHgLBqJsj2enkU="'
             status: '200'
           body:
-            id: '2154971075269322212'
-            creationTimestamp: '2018-12-04T11:52:43.964-08:00'
+            kind: compute#network
+            id: '5251525140003530850'
+            creationTimestamp: '2019-02-07T03:29:17.447-08:00'
             name: $$compute-peering-net2$$
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
             autoCreateSubnetworks: false
             subnetworks:
-            - https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub2$$
+            - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub2$$
             peerings:
             - name: $$compute-peering-peer2$$
-              network: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
+              network: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
               state: ACTIVE
-              stateDetails: '[2018-12-04T11:53:33.709-08:00]: Connected.'
+              stateDetails: '[2019-02-07T03:30:12.066-08:00]: Connected.'
               autoCreateRoutes: true
               exportCustomRoutes: true
               importCustomRoutes: false
               exchangeSubnetRoutes: true
             routingConfig:
               routingMode: REGIONAL
-            kind: compute#network
     - expect_stdout: |
         ---
-        name:                         $$compute-peering-net2$$
-        peerings[0].autoCreateRoutes: True
-        peerings[0].name:             $$compute-peering-peer2$$
-        peerings[0].network:          https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
-        peerings[0].state:            ACTIVE
+        name:                             $$compute-peering-net2$$
+        peerings[0].exchangeSubnetRoutes: True
+        peerings[0].name:                 $$compute-peering-peer2$$
+        peerings[0].network:              https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
+        peerings[0].state:                ACTIVE
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute networks peerings list-routes $$compute-peering-peer1$$ --network
+      $$compute-peering-net1$$ --region us-central1 --direction=INCOMING
+    events:
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$/listPeeringRoutes?alt=json&direction=INCOMING&maxResults=500&peeringName=$$compute-peering-peer1$$&region=us-central1
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '367'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#exchangedPeeringRoutesList
+            items:
+            - destRange: 10.2.0.0/16
+              type: SUBNET_PEERING_ROUTE
+              nextHopRegion: us-central1
+              priority: 1000
+              imported: true
+            - destRange: 90.2.0.0/16
+              type: STATIC_PEERING_ROUTE
+              nextHopRegion: us-central1
+              priority: 1000
+              imported: true
+    - expect_stdout: |
+        DEST_RANGE   TYPE                  NEXT_HOP_REGION  PRIORITY  STATUS
+        10.2.0.0/16  SUBNET_PEERING_ROUTE  us-central1      1000      accepted
+        90.2.0.0/16  STATIC_PEERING_ROUTE  us-central1      1000      accepted
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute networks peerings list-routes $$compute-peering-peer1$$ --network
+      $$compute-peering-net1$$ --region us-central1 --direction=OUTGOING
+    events:
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$/listPeeringRoutes?alt=json&direction=OUTGOING&maxResults=500&peeringName=$$compute-peering-peer1$$&region=us-central1
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '216'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#exchangedPeeringRoutesList
+            items:
+            - destRange: 10.1.0.0/16
+              type: SUBNET_PEERING_ROUTE
+              nextHopRegion: us-central1
+              priority: 1000
+              imported: true
+    - expect_stdout: |
+        DEST_RANGE   TYPE                  NEXT_HOP_REGION  PRIORITY  STATUS
+        10.1.0.0/16  SUBNET_PEERING_ROUTE  us-central1      1000      accepted by peer
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute networks peerings list-routes $$compute-peering-peer2$$ --network
+      $$compute-peering-net2$$ --region us-central1 --direction=INCOMING
+    events:
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$/listPeeringRoutes?alt=json&direction=INCOMING&maxResults=500&peeringName=$$compute-peering-peer2$$&region=us-central1
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '216'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#exchangedPeeringRoutesList
+            items:
+            - destRange: 10.1.0.0/16
+              type: SUBNET_PEERING_ROUTE
+              nextHopRegion: us-central1
+              priority: 1000
+              imported: true
+    - expect_stdout: |
+        DEST_RANGE   TYPE                  NEXT_HOP_REGION  PRIORITY  STATUS
+        10.1.0.0/16  SUBNET_PEERING_ROUTE  us-central1      1000      accepted
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute networks peerings list-routes $$compute-peering-peer2$$ --network
+      $$compute-peering-net2$$ --region us-central1 --direction=OUTGOING
+    events:
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$/listPeeringRoutes?alt=json&direction=OUTGOING&maxResults=500&peeringName=$$compute-peering-peer2$$&region=us-central1
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '367'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#exchangedPeeringRoutesList
+            items:
+            - destRange: 10.2.0.0/16
+              type: SUBNET_PEERING_ROUTE
+              nextHopRegion: us-central1
+              priority: 1000
+              imported: true
+            - destRange: 90.2.0.0/16
+              type: STATIC_PEERING_ROUTE
+              nextHopRegion: us-central1
+              priority: 1000
+              imported: true
+    - expect_stdout: |
+        DEST_RANGE   TYPE                  NEXT_HOP_REGION  PRIORITY  STATUS
+        10.2.0.0/16  SUBNET_PEERING_ROUTE  us-central1      1000      accepted by peer
+        90.2.0.0/16  STATIC_PEERING_ROUTE  us-central1      1000      accepted by peer
     - expect_exit:
         code: 0
 - execute_command:
     command: |
       compute networks peerings update $$compute-peering-peer1$$ --network
       $$compute-peering-net1$$ --export-custom-routes --no-import-custom-routes
-      --format="text(name,peerings[].autoCreateRoutes,peerings[].name,peerings[].network,peerings[].state)"
+      --format="text(name,peerings[].exchangeSubnetRoutes,peerings[].name,peerings[].network,peerings[].state)"
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$/updatePeering?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$/updatePeering?alt=json
           method: PATCH
           headers: {}
           body:
@@ -589,72 +886,76 @@ actions:
                 name: $$compute-peering-peer1$$
         return_response:
           headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '699'
             Content-Type: application/json; charset=UTF-8
             status: '200'
           body:
-            id: '5170742311309239735'
-            name: operation-1543953239764-57c37a067ee93-97135c80-9597df75
+            kind: compute#operation
+            id: '4925637658831595574'
+            name: operation-1549539033016-5814c2ba0ea73-57846fc2-959b8524
             operationType: updatePeering
-            targetLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
-            targetId: '3823906512211502141'
+            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
+            targetId: '7114912949234411707'
             status: PENDING
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
-            insertTime: '2018-12-04T11:54:00.380-08:00'
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/operations/operation-1543953239764-57c37a067ee93-97135c80-9597df75
-            kind: compute#operation
+            insertTime: '2019-02-07T03:30:33.794-08:00'
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/operations/operation-1549539033016-5814c2ba0ea73-57846fc2-959b8524
         poll_operation: true
     - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$].
+        Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$?alt=json
           method: GET
           headers: {}
           body: null
         return_response:
           headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '1032'
             Content-Type: application/json; charset=UTF-8
-            ETag: KpBvobVBTNL4C3CFlAzw0Fms4is=/UQP4z_WRMLb_w5RpdrnCGiM4j1I=
+            ETag: '"yKHfIauwMFS1DRm6JZ_d6CuqdG8=/gDsYsq0dl8XkQ8DTdnfG0Xboveg="'
             status: '200'
           body:
-            id: '3823906512211502141'
-            creationTimestamp: '2018-12-04T11:51:46.594-08:00'
+            kind: compute#network
+            id: '7114912949234411707'
+            creationTimestamp: '2019-02-07T03:28:20.570-08:00'
             name: $$compute-peering-net1$$
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
             autoCreateSubnetworks: false
             subnetworks:
-            - https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub1$$
+            - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub1$$
             peerings:
             - name: $$compute-peering-peer1$$
-              network: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
+              network: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
               state: ACTIVE
-              stateDetails: '[2018-12-04T11:54:00.825-08:00]: Connected.'
+              stateDetails: '[2019-02-07T03:30:35.140-08:00]: Connected.'
               autoCreateRoutes: true
               exportCustomRoutes: true
               importCustomRoutes: false
               exchangeSubnetRoutes: true
             routingConfig:
               routingMode: REGIONAL
-            kind: compute#network
     - expect_stdout: |
         ---
-        name:                         $$compute-peering-net1$$
-        peerings[0].autoCreateRoutes: True
-        peerings[0].name:             $$compute-peering-peer1$$
-        peerings[0].network:          https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
-        peerings[0].state:            ACTIVE
+        name:                             $$compute-peering-net1$$
+        peerings[0].exchangeSubnetRoutes: True
+        peerings[0].name:                 $$compute-peering-peer1$$
+        peerings[0].network:              https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
+        peerings[0].state:                ACTIVE
     - expect_exit:
         code: 0
 - execute_command:
     command: |
       compute networks peerings update $$compute-peering-peer2$$ --network
       $$compute-peering-net2$$ --no-export-custom-routes --import-custom-routes
-      --format="text(name,peerings[].autoCreateRoutes,peerings[].name,peerings[].network,peerings[].state)"
+      --format="text(name,peerings[].exchangeSubnetRoutes,peerings[].name,peerings[].network,peerings[].state)"
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$/updatePeering?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$/updatePeering?alt=json
           method: PATCH
           headers: {}
           body:
@@ -665,61 +966,217 @@ actions:
                 name: $$compute-peering-peer2$$
         return_response:
           headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '699'
             Content-Type: application/json; charset=UTF-8
             status: '200'
           body:
-            id: '6003479321168799131'
-            name: operation-1543953267905-57c37a2155505-d389bb67-7ebdec30
+            kind: compute#operation
+            id: '1199537492696606724'
+            name: operation-1549539050982-5814c2cb30d7c-37212077-ec8f4998
             operationType: updatePeering
-            targetLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
-            targetId: '2154971075269322212'
+            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
+            targetId: '5251525140003530850'
             status: PENDING
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
-            insertTime: '2018-12-04T11:54:28.327-08:00'
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/operations/operation-1543953267905-57c37a2155505-d389bb67-7ebdec30
-            kind: compute#operation
+            insertTime: '2019-02-07T03:30:51.466-08:00'
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/operations/operation-1549539050982-5814c2cb30d7c-37212077-ec8f4998
         poll_operation: true
     - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$].
+        Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$?alt=json
           method: GET
           headers: {}
           body: null
         return_response:
           headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '1032'
             Content-Type: application/json; charset=UTF-8
-            ETag: 3EOtdTv8yQn8W5uVTDd6LFIowXY=/1AxS9H-CepJ0xEJBBIFsGzrS85A=
+            ETag: '"ya9QilTIvImjUfQRF7rpgCyGUJY=/R5BSJff5kDwwn_w4DH_9-CE5zm0="'
             status: '200'
           body:
-            id: '2154971075269322212'
-            creationTimestamp: '2018-12-04T11:52:43.964-08:00'
+            kind: compute#network
+            id: '5251525140003530850'
+            creationTimestamp: '2019-02-07T03:29:17.447-08:00'
             name: $$compute-peering-net2$$
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
             autoCreateSubnetworks: false
             subnetworks:
-            - https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub2$$
+            - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub2$$
             peerings:
             - name: $$compute-peering-peer2$$
-              network: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
+              network: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
               state: ACTIVE
-              stateDetails: '[2018-12-04T11:54:29.739-08:00]: Connected.'
+              stateDetails: '[2019-02-07T03:30:52.409-08:00]: Connected.'
               autoCreateRoutes: true
               exportCustomRoutes: false
               importCustomRoutes: true
               exchangeSubnetRoutes: true
             routingConfig:
               routingMode: REGIONAL
-            kind: compute#network
     - expect_stdout: |
         ---
-        name:                         $$compute-peering-net2$$
-        peerings[0].autoCreateRoutes: True
-        peerings[0].name:             $$compute-peering-peer2$$
-        peerings[0].network:          https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
-        peerings[0].state:            ACTIVE
+        name:                             $$compute-peering-net2$$
+        peerings[0].exchangeSubnetRoutes: True
+        peerings[0].name:                 $$compute-peering-peer2$$
+        peerings[0].network:              https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$
+        peerings[0].state:                ACTIVE
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute networks peerings list-routes $$compute-peering-peer1$$ --network
+      $$compute-peering-net1$$ --region us-central1 --direction=INCOMING
+    events:
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$/listPeeringRoutes?alt=json&direction=INCOMING&maxResults=500&peeringName=$$compute-peering-peer1$$&region=us-central1
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '216'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#exchangedPeeringRoutesList
+            items:
+            - destRange: 10.2.0.0/16
+              type: SUBNET_PEERING_ROUTE
+              nextHopRegion: us-central1
+              priority: 1000
+              imported: true
+    - expect_stdout: |
+        DEST_RANGE   TYPE                  NEXT_HOP_REGION  PRIORITY  STATUS
+        10.2.0.0/16  SUBNET_PEERING_ROUTE  us-central1      1000      accepted
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute networks peerings list-routes $$compute-peering-peer1$$ --network
+      $$compute-peering-net1$$ --region us-central1 --direction=OUTGOING
+    events:
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$/listPeeringRoutes?alt=json&direction=OUTGOING&maxResults=500&peeringName=$$compute-peering-peer1$$&region=us-central1
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '367'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#exchangedPeeringRoutesList
+            items:
+            - destRange: 10.1.0.0/16
+              type: SUBNET_PEERING_ROUTE
+              nextHopRegion: us-central1
+              priority: 1000
+              imported: true
+            - destRange: 90.1.0.0/16
+              type: STATIC_PEERING_ROUTE
+              nextHopRegion: us-central1
+              priority: 1000
+              imported: true
+    - expect_stdout: |
+        DEST_RANGE   TYPE                  NEXT_HOP_REGION  PRIORITY  STATUS
+        10.1.0.0/16  SUBNET_PEERING_ROUTE  us-central1      1000      accepted by peer
+        90.1.0.0/16  STATIC_PEERING_ROUTE  us-central1      1000      accepted by peer
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute networks peerings list-routes $$compute-peering-peer2$$ --network
+      $$compute-peering-net2$$ --region us-central1 --direction=INCOMING
+    events:
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$/listPeeringRoutes?alt=json&direction=INCOMING&maxResults=500&peeringName=$$compute-peering-peer2$$&region=us-central1
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '367'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#exchangedPeeringRoutesList
+            items:
+            - destRange: 10.1.0.0/16
+              type: SUBNET_PEERING_ROUTE
+              nextHopRegion: us-central1
+              priority: 1000
+              imported: true
+            - destRange: 90.1.0.0/16
+              type: STATIC_PEERING_ROUTE
+              nextHopRegion: us-central1
+              priority: 1000
+              imported: true
+    - expect_stdout: |
+        DEST_RANGE   TYPE                  NEXT_HOP_REGION  PRIORITY  STATUS
+        10.1.0.0/16  SUBNET_PEERING_ROUTE  us-central1      1000      accepted
+        90.1.0.0/16  STATIC_PEERING_ROUTE  us-central1      1000      accepted
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute networks peerings list-routes $$compute-peering-peer2$$ --network
+      $$compute-peering-net2$$ --region us-central1 --direction=OUTGOING
+    events:
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$/listPeeringRoutes?alt=json&direction=OUTGOING&maxResults=500&peeringName=$$compute-peering-peer2$$&region=us-central1
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '216'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#exchangedPeeringRoutesList
+            items:
+            - destRange: 10.2.0.0/16
+              type: SUBNET_PEERING_ROUTE
+              nextHopRegion: us-central1
+              priority: 1000
+              imported: true
+    - expect_stdout: |
+        DEST_RANGE   TYPE                  NEXT_HOP_REGION  PRIORITY  STATUS
+        10.2.0.0/16  SUBNET_PEERING_ROUTE  us-central1      1000      accepted by peer
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute routes delete $$compute-peering-route1$$ --quiet
+    cleanup_for: compute-peering-route1
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/routes/$$compute-peering-route1$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute routes delete $$compute-peering-route2$$ --quiet
+    cleanup_for: compute-peering-route2
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/routes/$$compute-peering-route2$$].
     - expect_exit:
         code: 0
 - execute_command:
@@ -729,7 +1186,7 @@ actions:
     validation_only: true
     events:
     - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub1$$].
+        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub1$$].
     - expect_exit:
         code: 0
 - execute_command:
@@ -740,7 +1197,7 @@ actions:
     cleanup_for: compute-peering-peer1
     events:
     - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$].
+        Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$].
     - expect_exit:
         code: 0
 - execute_command:
@@ -751,7 +1208,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$/removePeering?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$/removePeering?alt=json
           method: POST
           headers: {}
           body:
@@ -759,47 +1216,51 @@ actions:
               name: $$compute-peering-peer2$$
         return_response:
           headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '790'
             Content-Type: application/json; charset=UTF-8
             status: '200'
           body:
-            id: '2488504470106498338'
-            name: operation-1543953357184-57c37a7679d19-3d158bc3-3e47f132
+            kind: compute#operation
+            id: '1290979712955427284'
+            name: operation-1549539131466-5814c317f2290-123f2fab-f190cb2b
             operationType: removePeering
-            targetLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
-            targetId: '2154971075269322212'
+            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
+            targetId: '5251525140003530850'
             status: DONE
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 100
-            insertTime: '2018-12-04T11:55:57.755-08:00'
-            startTime: '2018-12-04T11:55:57.758-08:00'
-            endTime: '2018-12-04T11:55:57.758-08:00'
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/operations/operation-1543953357184-57c37a7679d19-3d158bc3-3e47f132
-            kind: compute#operation
+            insertTime: '2019-02-07T03:32:12.098-08:00'
+            startTime: '2019-02-07T03:32:12.101-08:00'
+            endTime: '2019-02-07T03:32:12.101-08:00'
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/operations/operation-1549539131466-5814c317f2290-123f2fab-f190cb2b
         poll_operation: true
     - expect_stderr: |
-        Updated [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$].
+        Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$?alt=json
           method: GET
           headers: {}
           body: null
         return_response:
           headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '584'
             Content-Type: application/json; charset=UTF-8
-            ETag: anv5GSNCcCPwlakhAgkF2HQpS5g=/DmWUW2J1Kil4Qi7sumWfJrxfXAc=
+            ETag: '"QefdyDhjc-cuwOoBUft3ryJGwU8=/800h772KrdvfvsYY2QmPR7HofBA="'
             status: '200'
           body:
-            id: '2154971075269322212'
-            creationTimestamp: '2018-12-04T11:52:43.964-08:00'
+            kind: compute#network
+            id: '5251525140003530850'
+            creationTimestamp: '2019-02-07T03:29:17.447-08:00'
             name: $$compute-peering-net2$$
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$
             autoCreateSubnetworks: false
             subnetworks:
-            - https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub2$$
+            - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub2$$
             routingConfig:
               routingMode: REGIONAL
-            kind: compute#network
     - expect_exit:
         code: 0
 - execute_command:
@@ -810,7 +1271,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub2$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub2$$?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -835,7 +1296,7 @@ actions:
             region: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1
         poll_operation: true
     - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub2$$].
+        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$compute-peering-sub2$$].
     - expect_exit:
         code: 0
 - execute_command:
@@ -846,7 +1307,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -870,7 +1331,7 @@ actions:
             selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/operations/operation-1543523626754-57bd399799fd7-fe1816ce-7a81a942
         poll_operation: true
     - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$].
+        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$].
     - expect_exit:
         code: 0
 - execute_command:
@@ -880,6 +1341,6 @@ actions:
     cleanup_for: compute-peering-net2
     events:
     - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$].
+        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$].
     - expect_exit:
         code: 0

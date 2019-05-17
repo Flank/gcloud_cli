@@ -1,0 +1,118 @@
+
+.TH "GCLOUD_BETA_RESOURCE\-MANAGER_FOLDERS_ADD\-IAM\-POLICY\-BINDING" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta resource\-manager folders add\-iam\-policy\-binding \- add IAM policy binding for a folder
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta resource\-manager folders add\-iam\-policy\-binding\fR \fIFOLDER\fR \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Adds a policy binding to the IAM policy of a folder, given a folder
+ID and the binding.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Folder resource \- The ID of the folder to add the IAM binding. This represents
+a Cloud resource. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIFOLDER\fR
+ID of the folder or fully qualified identifier for the folder.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-member\fR=\fIMEMBER\fR
+The member to add the binding for. Should be of the form
+\f5user|group|serviceAccount:email\fR or \f5domain:domain\fR.
+
+Examples: \f5user:test\-user@gmail.com\fR, \f5group:admins@example.com\fR,
+\f5serviceAccount:test123@example.domain.com\fR, or
+\f5domain:example.domain.com\fR.
+
+Can also be one of the following special values:
+.RS 2m
+.IP "\(em" 2m
+\f5allUsers\fR \- Special identifier that represents anyone who is on the
+internet, with or without a Google account.
+.IP "\(em" 2m
+\f5allAuthenticatedUsers\fR \- Special identifier that represents anyone who is
+authenticated with a Google account or a service account.
+.RE
+.RE
+.sp
+
+.RS 2m
+.TP 2m
+\fB\-\-role\fR=\fIROLE\fR
+Define the role of the member.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBcloudresourcemanager/v2\fR API. The full documentation
+for this API can be found at: https://cloud.google.com/resource\-manager
+
+
+
+.SH "EXAMPLES"
+
+To add an IAM policy binding for the role of 'roles/editor' for the user
+\'test\-user@gmail.com' on the folder 'folder\-id', run:
+
+.RS 2m
+$ gcloud beta resource\-manager folders add\-iam\-policy\-binding \e
+    folder\-id \-\-member='user:test\-user@gmail.com' \e
+    \-\-role='roles/editor'
+.RE
+
+See https://cloud.google.com/iam/docs/managing\-policies for details of policy
+role and member types.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud resource\-manager folders add\-iam\-policy\-binding
+$ gcloud alpha resource\-manager folders add\-iam\-policy\-binding
+.RE
+

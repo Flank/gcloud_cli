@@ -1,0 +1,204 @@
+
+.TH "GCLOUD_ALPHA_COMPUTE_OS\-CONFIG_PATCH\-JOBS_EXECUTE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha compute os\-config patch\-jobs execute \- execute an OS patch on the specified VM instances
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha compute os\-config patch\-jobs execute\fR \fB\-\-instance\-filter\fR=\fIINSTANCE_FILTER\fR [\fB\-\-apt\-dist\fR] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-dry\-run\fR] [\fB\-\-duration\fR=\fIDURATION\fR] [\fB\-\-reboot\-config\fR=\fIREBOOT_CONFIG\fR] [\fB\-\-retry\fR] [\fB\-\-windows\-classifications\fR=[\fIWINDOWS_CLASSIFICATIONS\fR,...]\ \fB\-\-windows\-excludes\fR=[\fIWINDOWS_EXCLUDES\fR,...]] [\fB\-\-yum\-excludes\fR=[\fIYUM_EXCLUDES\fR,...]\ \fB\-\-yum\-minimal\fR\ \fB\-\-yum\-security\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-instance\-filter\fR=\fIINSTANCE_FILTER\fR
+Filter for selecting the instances to patch. Patching supports the same filter
+mechanisms as \f5gcloud compute instances list\fR, allowing one to patch
+specific instances by name, zone, label, or other criteria.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+
+Settings for machines running Apt:
+
+.RS 2m
+.TP 2m
+\fB\-\-apt\-dist\fR
+If specified, machines running Apt will patch using the command \f5apt\-get
+dist\-upgrade\fR; otherwise the patch will run \f5apt\-get upgrade\fR.
+
+.RE
+.sp
+.TP 2m
+\fB\-\-async\fR
+Display information about the patch job that was started without waiting for it
+to complete.
+
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+Textual description of the patch job.
+
+.TP 2m
+\fB\-\-dry\-run\fR
+Whether to execute this patch job as a dry run. If this patch job is a dry run,
+instances will be contacted, but they will do nothing.
+
+.TP 2m
+\fB\-\-duration\fR=\fIDURATION\fR
+Total duration in which the patch job must complete. If the patch does not
+complete in this time, it will time out, and while some instances may still be
+running the patch, they will not continue to work after they complete their
+current step. See $ gcloud topic datetimes for information on specifying
+absolute time durations.
+
+
+If unspecified, the job will stay active until all instances complete the patch.
+
+.TP 2m
+\fB\-\-reboot\-config\fR=\fIREBOOT_CONFIG\fR
+Post\-patch reboot settings. \fIREBOOT_CONFIG\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBalways\fR
+Always reboot the machine after the update has completed.
+.TP 2m
+\fBdefault\fR
+The agent will decide if a reboot is necessary by checking well known signals
+such as registry keys or '/var/run/reboot\-required'.
+.TP 2m
+\fBnever\fR
+Never reboot the machine after the update has completed.
+.RE
+.sp
+
+
+.TP 2m
+\fB\-\-retry\fR
+Whether to attempt to retry during the duration window if patching fails. If
+omitted, the agent will use its default retry strategy.
+
+.TP 2m
+
+Settings for machines running Windows:
+
+.RS 2m
+.TP 2m
+\fB\-\-windows\-classifications\fR=[\fIWINDOWS_CLASSIFICATIONS\fR,...]
+List of classifications to use to restrict the Windows update. Only patches of
+the given classifications will be applied. If omitted, a default Windows update
+will be performed. For more information on classifications, see:
+https://support.microsoft.com/en\-us/help/824684
+
+\fIWINDOWS_CLASSIFICATIONS\fR must be one of: \fBcritical\fR, \fBsecurity\fR,
+\fBdefinition\fR, \fBdriver\fR, \fBfeature\-pack\fR, \fBservice\-pack\fR,
+\fBtool\fR, \fBupdate\-rollup\fR, \fBupdate\fR.
+
+.TP 2m
+\fB\-\-windows\-excludes\fR=[\fIWINDOWS_EXCLUDES\fR,...]
+Optional list of KBs to exclude from the update operation.
+
+.RE
+.sp
+.TP 2m
+
+Settings for machines running Yum:
+
+.RS 2m
+.TP 2m
+\fB\-\-yum\-excludes\fR=[\fIYUM_EXCLUDES\fR,...]
+Optional list of packages to exclude from updating. If this argument is
+specified, machines running Yum will exclude the given list of packages using
+the Yum \f5\-\-exclude\fR flag.
+
+.TP 2m
+\fB\-\-yum\-minimal\fR
+If specified, machines running Yum will patch using the command \f5yum
+update\-minimal\fR; otherwise the patch will run \f5yum\-update\fR.
+
+.TP 2m
+\fB\-\-yum\-security\fR
+If specified, machines running Yum will append the \f5\-\-security\fR flag to
+the patch command.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To patch all instances in the current project, use \-\-instance\-filter="" (or
+equivalently, \-\-instance\-filter="id=\fB"):
+
+.RS 2m
+$ gcloud alpha compute os\-config patch\-jobs execute \e
+\-\-instance\-filter=""
+.RE
+
+To patch the instances named 'my\-instance1' and 'my\-instance2', run:
+
+.RS 2m
+$ gcloud alpha compute os\-config patch\-jobs execute \e
+\-\-instance\-filter="name=my\-instance\-1 OR name=my\-instance\-2"
+.RE
+
+To patch all instances in the 'us\-central1\-b' and 'europe\-west1\-d' zones,
+run:
+
+.RS 2m
+$ gcloud alpha compute os\-config patch\-jobs execute \e
+\-\-instance\-filter="zone:(us\-central1\-b europe\-west1\-d)"
+.RE
+
+To patch all instances where their 'env' label is 'test', run:
+
+.RS 2m
+$ gcloud alpha compute os\-config patch\-jobs execute \e
+\-\-instance\-filter="labels.env=test"
+.RE
+
+To apply security and critical patches to a Windows instance named
+\'my\-instance', run:
+
+.RS 2m
+$ gcloud alpha compute os\-config patch\-jobs execute \e
+\-\-instance\-filter="name=my\-instance" \e
+\-\-windows\-classifications=SECURITY,CRITICAL
+.RE
+
+
+\fR
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/.
+

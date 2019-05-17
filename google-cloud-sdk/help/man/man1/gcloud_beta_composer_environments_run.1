@@ -52,8 +52,11 @@ Compute Engine region in which to create the environment.
 .sp
 .TP 2m
 \fISUBCOMMAND\fR
-The Airflow CLI subcommand to run. (see
-https://airflow.incubator.apache.org/cli.html)
+The Airflow CLI subcommand to run. Available subcommands include: backfill,
+clear, connections, dag_state, delete_dag, kerberos, list_dags, list_tasks,
+pause, pool, render, run, task_failed_deps, task_state, test, trigger_dag,
+unpause, variables, version, initdb, resetdb, upgradedb (see
+https://airflow.incubator.apache.org/cli.html for more info.)
 
 .TP 2m
 [\-\- \fICMD_ARGS\fR ...]
@@ -71,10 +74,11 @@ gcloud beta composer environments run myenv trigger_dag \-\- some_dag
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

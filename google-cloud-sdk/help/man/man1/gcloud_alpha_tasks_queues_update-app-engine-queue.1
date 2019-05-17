@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha tasks queues update\-app\-engine\-queue \- update an App Engine queue
+gcloud alpha tasks queues update\-app\-engine\-queue \- update a Cloud Tasks queue
 
 
 
@@ -17,14 +17,16 @@ gcloud alpha tasks queues update\-app\-engine\-queue \- update an App Engine que
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR The flags available to this command represent the fields of an App
-Engine queue that are mutable. Attempting to use this command on a different
-type of queue will result in an error.
+\fB(ALPHA)\fR \fB(DEPRECATED)\fR This command is deprecated. Use \f5gcloud alpha
+tasks queues update\fR instead
 
-If you have early access to Cloud Tasks, refer to the following guide for more
-information about the different queue target types:
-https://cloud.google.com/cloud\-tasks/docs/queue\-types. For access, sign up
-here: https://goo.gl/Ya0AZd
+\fB(ALPHA)\fR \fB(DEPRECATED)\fR Update a Cloud Tasks queue.
+
+This command is deprecated. Use \f5gcloud alpha tasks queues update\fR instead
+
+The flags available to this command represent the fields of a queue that are
+mutable. Attempting to use this command on a different type of queue will result
+in an error.
 
 
 
@@ -192,10 +194,27 @@ use the default.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To update a Cloud Tasks queue:
+
+.RS 2m
+$ gcloud alpha tasks queues update\-app\-engine\-queue my\-queue
+  \-\-clear\-max\-attempts \-\-clear\-max\-retry\-duration
+  \-\-clear\-max\-doublings \-\-clear\-min\-backoff
+  \-\-clear\-max\-backoff
+  \-\-clear\-max\-tasks\-dispatched\-per\-second
+  \-\-clear\-max\-concurrent\-tasks
+  \-\-clear\-routing\-override
+.RE
 
 
 

@@ -44,6 +44,9 @@ summary:
       Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/disks/$$disk$$].
 actions:
 - define_reference:
+    reference: compute-uri
+    value: www.googleapis.com/compute
+- define_reference:
     reference: api-version
     track_values:
       GA: v1
@@ -99,7 +102,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images?alt=json&forceCreate=True
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/images?alt=json&forceCreate=True
           method: POST
           headers: {}
           body:
@@ -130,7 +133,7 @@ actions:
         Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/images/$$image$$?alt=json
           method: GET
           headers: {}
           body: null

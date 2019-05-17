@@ -1,0 +1,78 @@
+title: test product list
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: ml vision product-search products list --location=us-east1
+  - stdout: |
+      NAME         LOCATION  DISPLAY_NAME
+      foo-product  us-east1  foo product
+      my-product   us-east1  test-product
+actions:
+- execute_command:
+    command: ml vision product-search products list --location=us-east1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://vision.googleapis.com/v1/projects/fake-project/locations/us-east1/products?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "products": [
+                {
+                  "name": "projects/cloudsdktest/locations/us-east1/products/foo-product",
+                  "displayName": "foo product",
+                  "description": "description",
+                  "productCategory": "toys",
+                  "productLabels": [
+                    {
+                      "key": "k2",
+                      "value": "v4"
+                    },
+                    {
+                      "key": "k2",
+                      "value": "v3"
+                    },
+                    {
+                      "key": "k1",
+                      "value": "v1"
+                    },
+                    {
+                      "key": "k1",
+                      "value": "v2"
+                    }
+                  ]
+                },
+                {
+                  "name": "projects/cloudsdktest/locations/us-east1/products/my-product",
+                  "displayName": "test-product",
+                  "description": "product-desc",
+                  "productCategory": "apparel",
+                  "productLabels": [
+                    {
+                      "key": "a",
+                      "value": "b"
+                    },
+                    {
+                      "key": "a",
+                      "value": "d"
+                    },
+                    {
+                      "key": "c",
+                      "value": "g"
+                    }
+                  ]
+                }
+              ]
+            }
+    - expect_stdout: |
+        NAME         LOCATION  DISPLAY_NAME
+        foo-product  us-east1  foo product
+        my-product   us-east1  test-product
+    - expect_exit:
+        code: 0

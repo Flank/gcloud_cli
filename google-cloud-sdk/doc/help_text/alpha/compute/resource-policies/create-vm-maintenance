@@ -8,10 +8,7 @@ SYNOPSIS
         [--region=REGION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) gcloud alpha compute resource-policies create-vm-maintenance
-    creates a Resource Policy which can be attached to instances and specifies
-    what kind of maintenance operations may be performed and when they can be
-    performed.
+    (ALPHA) Create a Google Compute Engine VM Maintenance Resource Policy.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -21,17 +18,16 @@ REQUIRED FLAGS
      Cycle Frequency Group. This must be specified.
 
        --daily-window
-          Maintenance activity window occurs daily at START_TIME. This flag
+          Maintenance activity window starts daily at START_TIME. This flag
           must be specified if any of the other arguments in this group are
           specified.
 
        --start-time=START_TIME
-          Start time of a four-hour window in which maintenance activity should
-          start in given cadence. Valid choices are 00:00, 04:00, 08:00,12:00,
-          16:00 and 20:00 UTC. See $ gcloud topic datetimes for information on
-          time formats. For example, --start-time="03:00-05" (which gets
-          converted to 08:00 UTC). This flag must be specified if any of the
-          other arguments in this group are specified.
+          Start time of a four-hour window in which maintenance should start in
+          daily cadence. Valid choices are 00:00, 04:00, 08:00,12:00, 16:00 and
+          20:00 UTC. For example, --start-time="03:00-05" (which gets converted
+          to 08:00 UTC). This flag must be specified if any of the other
+          arguments in this group are specified.
 
 OPTIONAL FLAGS
      --description=DESCRIPTION
@@ -58,10 +54,20 @@ OPTIONAL FLAGS
         CLOUDSDK_COMPUTE_REGION.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
+
+EXAMPLES
+    The following command creates a Google Compute Engine VM Maintenance
+    Resource Policy with a daily maintenance activity window that starts at
+    04:00Z.
+
+        $ gcloud alpha compute resource-policies create-vm-maintenance \
+            my-resource-policy --region=REGION --start-time=04:00Z \
+            --daily-window
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

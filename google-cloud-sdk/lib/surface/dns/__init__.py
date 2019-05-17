@@ -53,7 +53,7 @@ class DNS(base.Group):
     $ {command} project-info describe --help
   """
 
-  category = 'Networking'
+  category = base.NETWORKING_CATEGORY
 
   def Filter(self, context, args):
     del context, args

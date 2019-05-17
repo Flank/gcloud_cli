@@ -28,6 +28,7 @@ from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.dataproc import util
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.export import util as export_util
 from googlecloudsdk.core.resource import resource_printer_base
 from tests.lib import sdk_test_base
 from tests.lib.apitools import http_error
@@ -133,6 +134,9 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
     self.StartPatch('googlecloudsdk.api_lib.dataproc.util.GetUniqueId'
                    ).return_value = self.REQUEST_ID
 
+    self.autoscaling_policy_schema_path = export_util.GetSchemaPath(
+        'dataproc', self.api_version, 'AutoscalingPolicy', for_help=False)
+
   def SetOs(self, os):
     platform_patch = self.StartPatch(
         'googlecloudsdk.core.util.platforms.OperatingSystem.Current')
@@ -193,6 +197,11 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
           numInstances=kwargs.get('secondaryWorkerConfigNumInstances', None),
           diskConfig=disk_config)
 
+    endpoint_config = None
+    if 'enableHttpPortAccess' in kwargs:
+      endpoint_config = self.messages.EndpointConfig(
+          enableHttpPortAccess=kwargs.get('enableHttpPortAccess', False))
+
     # Convert from a dict to Python client library version of dict (LabelsValue)
     labels = kwargs.get('labels', None)
     labels_values = None
@@ -218,7 +227,7 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
         return [accelerator_config]
       return []
 
-    return self.messages.Cluster(
+    cluster = self.messages.Cluster(
         clusterName=kwargs.get('clusterName', self.CLUSTER_NAME),
         clusterUuid=kwargs.get('clusterUuid', None),
         labels=labels_values,
@@ -265,6 +274,9 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
                     properties=kwargs.get('properties', None)))),
         projectId=kwargs.get('projectId', self.Project()),
         status=kwargs.get('status', None))
+    if endpoint_config is not None:
+      cluster.config.endpointConfig = endpoint_config
+    return cluster
 
   def MakeRunningCluster(self, **kwargs):
     # Create dict of defaults set by cluster.
@@ -301,6 +313,28 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
     encryption_config.gcePdKmsKeyName = kms_key
     cluster.config.encryptionConfig = encryption_config
 
+  def AddKerberosConfig(self, cluster, **config):
+    security_config = self.messages.SecurityConfig(
+        kerberosConfig=self.messages.KerberosConfig(
+            enableKerberos=config.get('enableKerberos', True),
+            rootPrincipalPasswordUri=config.get(
+                'kerberosRootPrincipalPasswordUri'),
+            kmsKeyUri=config.get('kerberosKmsKeyUri'),
+            kdcDbKeyUri=config.get('kerberosKdcDbKeyUri'),
+            tgtLifetimeHours=config.get('kerberosTgtLifetimeHours'),
+            keystoreUri=config.get('kerberosKeystoreUri'),
+            truststoreUri=config.get('kerberosTruststoreUri'),
+            keystorePasswordUri=config.get('kerberosKeystorePasswordUri'),
+            keyPasswordUri=config.get('kerberosKeyPasswordUri'),
+            truststorePasswordUri=config.get('kerberosTruststorePasswordUri'),
+            crossRealmTrustRealm=config.get('kerberosCrossRealmTrustRealm'),
+            crossRealmTrustKdc=config.get('kerberosCrossRealmTrustKdc'),
+            crossRealmTrustAdminServer=config.get(
+                'kerberosCrossRealmTrustAdminServer'),
+            crossRealmTrustSharedPasswordUri=config.get(
+                'kerberosCrossRealmTrustSharedPasswordUri')))
+    cluster.config.securityConfig = security_config
+
   def AddComponents(self, cluster, components):
     if not cluster.config.softwareConfig:
       cluster.config.softwareConfig = self.messages.SoftwareConfig()
@@ -310,6 +344,10 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
         list(
             map(software_config_cls.OptionalComponentsValueListEntryValuesEnum,
                 components)))
+
+  def AddAutoscalingConfig(self, cluster, autoscaling_policy_uri):
+    cluster.config.autoscalingConfig = self.messages.AutoscalingConfig(
+        policyUri=autoscaling_policy_uri)
 
   def ExpectGetCluster(self, cluster=None, region=None, exception=None):
     if not region:
@@ -411,38 +449,59 @@ class DataprocUnitTestBase(sdk_test_base.WithFakeAuth, base.DataprocTestBase):
         response=response,
         exception=exception)
 
-  def AddAllocationAffinity(self, cluster, allocation_affinity, allocation_key,
-                            allocation_values):
-    if allocation_affinity is not None:
+  def AddReservationAffinity(self, cluster, reservation_affinity,
+                             reservation_key, reservation_values):
+    if reservation_affinity is not None:
       type_msgs = (
-          self.messages.AllocationAffinity.ConsumeAllocationTypeValueValuesEnum)
+          self.messages
+          .ReservationAffinity.ConsumeReservationTypeValueValuesEnum)
 
-      if allocation_affinity == 'none':
-        allocation_type = type_msgs.NO_ALLOCATION
-        allocation_key = None
-        allocation_values = []
-      elif allocation_affinity == 'specific':
-        allocation_type = type_msgs.SPECIFIC_ALLOCATION
-        allocation_values = [allocation_values]
+      if reservation_affinity == 'none':
+        reservation_type = type_msgs.NO_RESERVATION
+        reservation_key = None
+        reservation_values = []
+      elif reservation_affinity == 'specific':
+        reservation_type = type_msgs.SPECIFIC_RESERVATION
+        reservation_values = [reservation_values]
       else:
-        allocation_type = type_msgs.ANY_ALLOCATION
-        allocation_key = None
-        allocation_values = []
+        reservation_type = type_msgs.ANY_RESERVATION
+        reservation_key = None
+        reservation_values = []
 
-      affinity_message = self.messages.AllocationAffinity(
-          consumeAllocationType=allocation_type,
-          key=allocation_key,
-          values=allocation_values)
-      cluster.config.gceClusterConfig.allocationAffinity = affinity_message
+      affinity_message = self.messages.ReservationAffinity(
+          consumeReservationType=reservation_type,
+          key=reservation_key,
+          values=reservation_values)
+      cluster.config.gceClusterConfig.reservationAffinity = affinity_message
+
+  def MakeAutoscalingPolicy(self, project_id, region, policy_id):
+    return self.messages.AutoscalingPolicy(
+        id=policy_id,
+        name='projects/{}/regions/{}/autoscalingPolicies/{}'.format(
+            project_id, region, policy_id),
+        basicAlgorithm=self.messages.BasicAutoscalingAlgorithm(
+            cooldownPeriod='120s',
+            yarnConfig=self.messages.BasicYarnAutoscalingConfig(
+                scaleUpFactor=0.5,
+                scaleDownFactor=0.3,
+                scaleUpMinWorkerFraction=0.2,
+                scaleDownMinWorkerFraction=0.6,
+                gracefulDecommissionTimeout='3600s')),
+        workerConfig=self.messages.InstanceGroupAutoscalingPolicyConfig(
+            maxInstances=100, minInstances=2, weight=1),
+        secondaryWorkerConfig=self.messages
+        .InstanceGroupAutoscalingPolicyConfig(
+            maxInstances=200, minInstances=4, weight=2))
 
 
 class DataprocIAMUnitTestBase(DataprocUnitTestBase):
   """Base test class for all Dataproc IAM unit tests."""
 
-  CLUSTER = 'cluster'
-  JOB = 'job'
-  OPERATION = 'operation'
-  TEMPLATE = 'workflow-template'
+  CLUSTER = 'clusters'
+  JOB = 'jobs'
+  OPERATION = 'operations'
+  TEMPLATE = 'workflow-templates'
+  AUTOSCALING_POLICY = 'autoscaling-policies'
 
   def GetTestIamPolicy(self, clear_fields=None):
     """Creates a test IAM policy.
@@ -482,9 +541,11 @@ class DataprocIAMUnitTestBase(DataprocUnitTestBase):
     elif collection == self.JOB:
       fmt += 'jobs/test-{collection}'
     elif collection == self.OPERATION:
-      fmt += 'operations/test-operation'
+      fmt += 'operations/test-{collection}'
     elif collection == self.TEMPLATE:
       fmt += 'workflowTemplates/test-{collection}'
+    elif collection == self.AUTOSCALING_POLICY:
+      fmt += 'autoscalingPolicies/test-{collection}'
     else:
       raise ValueError('Invalid collection')
 
@@ -499,6 +560,8 @@ class DataprocIAMUnitTestBase(DataprocUnitTestBase):
       return self.mock_client.projects_regions_operations
     elif collection == self.TEMPLATE:
       return self.mock_client.projects_regions_workflowTemplates
+    elif collection == self.AUTOSCALING_POLICY:
+      return self.mock_client.projects_regions_autoscalingPolicies
     else:
       raise ValueError('Invalid collection')
 
@@ -513,6 +576,10 @@ class DataprocIAMUnitTestBase(DataprocUnitTestBase):
       # pylint: disable=line-too-long
       return self.messages.DataprocProjectsRegionsWorkflowTemplatesGetIamPolicyRequest
       # pylint: enable=line-too-long
+    elif collection == self.AUTOSCALING_POLICY:
+      # pylint: disable=line-too-long
+      return self.messages.DataprocProjectsRegionsAutoscalingPoliciesGetIamPolicyRequest
+      # pylint: enable=line-too-long
     else:
       raise ValueError('Invalid collection')
 
@@ -526,6 +593,10 @@ class DataprocIAMUnitTestBase(DataprocUnitTestBase):
     elif collection == self.TEMPLATE:
       # pylint: disable=line-too-long
       return self.messages.DataprocProjectsRegionsWorkflowTemplatesSetIamPolicyRequest
+      # pylint: enable=line-too-long
+    elif collection == self.AUTOSCALING_POLICY:
+      # pylint: disable=line-too-long
+      return self.messages.DataprocProjectsRegionsAutoscalingPoliciesSetIamPolicyRequest
       # pylint: enable=line-too-long
     else:
       raise ValueError('Invalid collection')

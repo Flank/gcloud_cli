@@ -3,7 +3,8 @@ NAME
 
 SYNOPSIS
     gcloud alpha monitoring policies update ALERT_POLICY
-        [--fields=[field,...] | --display-name=DISPLAY_NAME --[no-]enabled
+        [--fields=[field,...] | --combiner=COMBINER --display-name=DISPLAY_NAME
+          --[no-]enabled
           --add-notification-channels=[NOTIFICATION-CHANNELS,...]
           | --clear-notification-channels
           | --remove-notification-channels=[NOTIFICATION-CHANNELS,...]
@@ -55,6 +56,23 @@ FLAGS
 
        Policy Settings. If any of these are specified, they will overwrite
        fields in the --policy or --policy-from-file flags if specified.
+
+         --combiner=COMBINER
+            The combiner for the Alert Policy. COMBINER must be one of:
+
+             AND
+                An incident is created only if all conditions are met
+                simultaneously. This combiner is satisfied if all conditions
+                are met, even if they are met on completely different
+                resources.
+             AND_WITH_MATCHING_RESOURCE
+                Combine conditions using logical AND operator, but unlike the
+                regular AND option, an incident is created only if all
+                conditions are met simultaneously on at least one resource.
+             COMBINE_UNSPECIFIED
+                An unspecified combiner
+             OR
+                An incident is created if any of the listed conditions is met.
 
          --display-name=DISPLAY_NAME
             The display name for the Alert Policy.
@@ -134,8 +152,9 @@ FLAGS
           The path to a JSON or YAML file containing the policy.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

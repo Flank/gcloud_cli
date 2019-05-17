@@ -16,6 +16,9 @@ DESCRIPTION
 TOPICS
     The supplementary help topics are:
 
+     accessibility
+        Reference for Accessibility features.
+
      arg-files
         Supplementary help for arg-files to be used with gcloud firebase test.
 

@@ -20,15 +20,14 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.bigtable import base
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA)
-class UpdateCommandTest(base.BigtableV2TestBase):
+class UpdateCommandTestGA(base.BigtableV2TestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.cmd = ('bigtable clusters update --instance theinstance thecluster '
@@ -42,18 +41,28 @@ class UpdateCommandTest(base.BigtableV2TestBase):
     self.msg = self.msgs.Cluster(name=cluster_ref.RelativeName(),
                                  serveNodes=5)
 
-  def testUpdate(self, track):
-    self.track = track
+  def testUpdate(self):
     self.svc.Expect(request=self.msg, response=self.msgs.Operation())
     self.Run(self.cmd)
     self.AssertOutputEquals('')
     self.AssertErrContains('Update in progress for cluster [thecluster].\n')
 
-  def testErrorResponse(self, track):
-    self.track = track
+  def testErrorResponse(self):
     with self.AssertHttpResponseError(self.svc, self.msg):
       self.Run(self.cmd)
     self.AssertErrContains('Resource not found.')
+
+
+class UpdateCommandTestBeta(UpdateCommandTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class UpdateCommandTestAlpha(UpdateCommandTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

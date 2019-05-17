@@ -37,6 +37,7 @@ class AssertionTests(test_case.TestCase, parameterized.TestCase):
       (assertions.MatchesAssertion('b.*'), 'asdf', False),
       (assertions.MatchesAssertion(''), 'asdf', False),
       (assertions.MatchesAssertion('.*'), 'asdf', True),
+      (assertions.MatchesAssertion('.*'), b'asdf', True),
 
       (assertions.IsNoneAssertion(True), None, True),
       (assertions.IsNoneAssertion(True), 'asdf', False),

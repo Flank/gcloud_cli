@@ -11,7 +11,7 @@ gcloud alpha compute networks subnets create \- define a subnet for a network in
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute networks subnets create\fR \fINAME\fR \fB\-\-network\fR=\fINETWORK\fR \fB\-\-range\fR=\fIRANGE\fR [\fB\-\-aggregation\-interval\fR=\fIAGGREGATION_INTERVAL\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-flow\-logs\fR] [\fB\-\-enable\-private\-ip\-google\-access\fR] [\fB\-\-enable\-private\-ipv6\-access\fR] [\fB\-\-flow\-sampling\fR=\fIFLOW_SAMPLING\fR] [\fB\-\-metadata\fR=\fIMETADATA\fR] [\fB\-\-purpose\fR=\fIPURPOSE\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-role\fR=\fIROLE\fR] [\fB\-\-secondary\-range\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute networks subnets create\fR \fINAME\fR \fB\-\-network\fR=\fINETWORK\fR \fB\-\-range\fR=\fIRANGE\fR [\fB\-\-aggregation\-interval\fR=\fIAGGREGATION_INTERVAL\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-flow\-logs\fR] [\fB\-\-enable\-private\-ip\-google\-access\fR] [\fB\-\-enable\-private\-ipv6\-access\fR] [\fB\-\-flow\-sampling\fR=\fIFLOW_SAMPLING\fR] [\fB\-\-metadata\fR=\fIMETADATA\fR] [\fB\-\-private\-ipv6\-google\-access\-type\fR=\fIPRIVATE_IPV6_GOOGLE_ACCESS_TYPE\fR] [\fB\-\-purpose\fR=\fIPURPOSE\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-role\fR=\fIROLE\fR] [\fB\-\-secondary\-range\fR=\fIPROPERTY\fR=\fIVALUE\fR,[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -57,9 +57,9 @@ Can only be specified if VPC flow logging for this subnetwork is enabled.
 Toggles the aggregation interval for collecting flow logs. Increasing the
 interval time will reduce the amount of generated flow logs for long lasting
 connections. Default is an interval of 5 seconds per connection.
-\fIAGGREGATION_INTERVAL\fR must be one of: \fBinterval\-5\-sec\fR,
-\fBinterval\-30\-sec\fR, \fBinterval\-1\-min\fR, \fBinterval\-5\-min\fR,
-\fBinterval\-10\-min\fR, \fBinterval\-15\-min\fR.
+\fIAGGREGATION_INTERVAL\fR must be one of: \fBinterval\-10\-min\fR,
+\fBinterval\-15\-min\fR, \fBinterval\-1\-min\fR, \fBinterval\-30\-sec\fR,
+\fBinterval\-5\-min\fR, \fBinterval\-5\-sec\fR.
 
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
@@ -92,7 +92,13 @@ logs are reported.
 Can only be specified if VPC flow logging for this subnetwork is enabled.
 Configures whether metadata fields should be added to the reported VPC flow
 logs. Default is to include all metadata. \fIMETADATA\fR must be one of:
-\fBinclude\-all\-metadata\fR, \fBexclude\-all\-metadata\fR.
+\fBexclude\-all\-metadata\fR, \fBinclude\-all\-metadata\fR.
+
+.TP 2m
+\fB\-\-private\-ipv6\-google\-access\-type\fR=\fIPRIVATE_IPV6_GOOGLE_ACCESS_TYPE\fR
+The private IPv6 google access type for the VMs in this subnet.
+\fIPRIVATE_IPV6_GOOGLE_ACCESS_TYPE\fR must be one of: \fBdisable\fR,
+\fBenable\-bidirectional\-access\fR, \fBenable\-outbound\-vm\-access\fR.
 
 .TP 2m
 \fB\-\-purpose\fR=\fIPURPOSE\fR
@@ -175,10 +181,11 @@ range 192.168.64.0/24 with name range1.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

@@ -331,5 +331,38 @@ class IsInstanceV2Test(base.SqlMockTestBeta):
             data.GetV1Instance(self.project, self.instance)))
 
 
+class IsInstanceV1Test(base.SqlMockTestBeta):
+  """Tests instances_util.IsInstanceV1."""
+  project = 'some-project'
+  instance = 'some-instance'
+
+  def testV1MySqlInstance(self):
+    self.assertTrue(
+        instances_util.IsInstanceV1(
+            data.GetV1Instance(self.project, self.instance)))
+
+  def testV2MySqlInstance(self):
+    self.assertFalse(
+        instances_util.IsInstanceV1(
+            data.GetV2Instance(self.project, self.instance)))
+
+  def testPostgresInstance(self):
+    self.assertFalse(
+        instances_util.IsInstanceV1(
+            data.GetPostgresInstance(self.project, self.instance)))
+
+  def testV1TierInstance(self):
+    instance = data.GetV1Instance(self.project, self.instance)
+    instance.backendType = ''
+    instance.settings.tier = 'D0'
+    self.assertTrue(instances_util.IsInstanceV1(instance))
+
+  def testNonV1TierInstance(self):
+    instance = data.GetV2Instance(self.project, self.instance)
+    instance.backendType = ''
+    instance.settings.tier = 'db-n1-standard-1'
+    self.assertFalse(instances_util.IsInstanceV1(instance))
+
+
 if __name__ == '__main__':
   test_case.main()

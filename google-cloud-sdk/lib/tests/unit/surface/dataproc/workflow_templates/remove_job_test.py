@@ -70,5 +70,12 @@ class WorkflowTemplateRemoveJobUnitTest(jobs_unit_base.JobsUnitTestBase,
 
 class WorkflowTemplateRemoveJobUnitTestBeta(WorkflowTemplateRemoveJobUnitTest):
 
-  def SetUp(self):
-    self.SetupForReleaseTrack(calliope.base.ReleaseTrack.BETA)
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.BETA
+
+
+class WorkflowTemplateRemoveJobUnitTestAlpha(
+    WorkflowTemplateRemoveJobUnitTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.ALPHA

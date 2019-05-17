@@ -17,6 +17,9 @@ summary:
       1: Could not fetch resource:
        - The resource 'projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$' was not found
 actions:
+- define_reference:
+    reference: compute-uri
+    value: www.googleapis.com/compute
 - generate_resource_id:
     reference: instance
     prefix: gcloud-compute-missing-machine-type-error
@@ -29,7 +32,7 @@ actions:
           headers: {}
           body: null
           method: GET
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f?alt=json
         return_response:
           headers:
             Cache-Control: private, max-age=0
@@ -53,7 +56,7 @@ actions:
             kind: compute#zone
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing?alt=json
           headers: {}
           method: GET
           body: null
@@ -80,7 +83,7 @@ actions:
             kind: compute#project
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances?alt=json
           headers: {}
           method: POST
           body:
@@ -146,7 +149,7 @@ actions:
           headers: {}
           body: null
           method: DELETE
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
         return_response:
           headers:
             Cache-Control: private, max-age=0

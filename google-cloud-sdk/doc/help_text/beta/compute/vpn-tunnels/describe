@@ -1,6 +1,6 @@
 NAME
     gcloud beta compute vpn-tunnels describe - describe a Google Compute Engine
-        vpn tunnel
+        VPN tunnel
 
 SYNOPSIS
     gcloud beta compute vpn-tunnels describe NAME [--region=REGION]
@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     (BETA) gcloud beta compute vpn-tunnels describe displays all data
-    associated with a Google Compute Engine vpn tunnel in a project.
+    associated with a Google Compute Engine VPN tunnel in a project.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -36,8 +36,9 @@ FLAGS
         CLOUDSDK_COMPUTE_REGION.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

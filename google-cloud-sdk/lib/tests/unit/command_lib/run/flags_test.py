@@ -19,17 +19,21 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import os
+from googlecloudsdk.api_lib.run import k8s_object
+from googlecloudsdk.api_lib.run import service
 from googlecloudsdk.calliope import parser_extensions
 from googlecloudsdk.command_lib.run import exceptions
 from googlecloudsdk.command_lib.run import flags
-from googlecloudsdk.command_lib.run import local_config
 from googlecloudsdk.command_lib.run import resource_args
 from googlecloudsdk.command_lib.run import source_ref
 from googlecloudsdk.core import properties
+from googlecloudsdk.core.util import times
 from tests.lib import cli_test_base
 from tests.lib import parameterized
 from tests.lib import sdk_test_base
+from tests.lib import test_case
 from tests.lib.surface.run import base
+
 import mock
 
 
@@ -76,21 +80,31 @@ class ServerlessFlagsTest(base.ServerlessSurfaceBase, parameterized.TestCase):
       flags.GetService(args)
 
 
-class GetConfigurationChangesTest(cli_test_base.CliTestBase,
+class GetConfigurationChangesTest(base.ServerlessSurfaceBase,
                                   parameterized.TestCase):
 
   def SetUp(self):
     self.args = parser_extensions.Namespace(
         update_env_vars=None, set_env_vars=None, remove_env_vars=None,
-        clear_env_vars=None, concurrency=None)
-    self.config = mock.NonCallableMock(concurrency='SENTINEL',
-                                       deprecated_string_concurrency='SENTINEL')
-    self.metadata = mock.NonCallableMock()
+        clear_env_vars=None, concurrency=None, add_cloudsql_instances=None,
+        remove_cloudsql_instances=None, clear_cloudsql_instances=None,
+        set_cloudsql_instances=None, cpu=None, clear_labels=None,
+        update_labels=None, remove_labels=None)
+    self.service = service.Service.New(
+        self.mock_serverless_client, self.namespace.namespacesId)
+    self.config = self.service.configuration
+    self.metadata = self.service.metadata
 
   def _GetAndApplyChanges(self):
     self.changes = flags.GetConfigurationChanges(self.args)
     for change in self.changes:
       change.AdjustConfiguration(self.config, self.metadata)
+
+  def testCpu(self):
+    self.args.cpu = '1m'
+    self._GetAndApplyChanges()
+    self.assertEquals(len(self.changes), 1)
+    self.assertEquals('1m', self.config.resource_limits['cpu'])
 
   def testConcurrencyEnum(self):
     self.args.concurrency = 'Single'
@@ -107,6 +121,12 @@ class GetConfigurationChangesTest(cli_test_base.CliTestBase,
     self.assertIsNone(self.config.deprecated_string_concurrency)
     self.assertIsNone(self.config.concurrency)
 
+  def testServiceAccount(self):
+    self.args.service_account = 'test@project.iam.gserviceaccount.com'
+    self._GetAndApplyChanges()
+    self.assertEqual(len(self.changes), 1)
+    self.assertEqual(self.config.service_account, self.args.service_account)
+
   @parameterized.parameters(['0', '1', '3'])
   def testConcurrencyNumeric(self, concurrency):
     self.args.concurrency = concurrency
@@ -114,6 +134,52 @@ class GetConfigurationChangesTest(cli_test_base.CliTestBase,
     self.assertEquals(len(self.changes), 1)
     self.assertEquals(self.config.concurrency, int(concurrency))
     self.assertIsNone(self.config.deprecated_string_concurrency)
+
+  def testUpdateLabels(self):
+    self.args.update_labels = {'asdf': 'tyte'}
+    self.args._specified_args['update_labels'] = 'update_labels'
+    self._GetAndApplyChanges()
+    self.assertEqual(len(self.changes), 1)
+    labels = k8s_object.LabelsFromMetadata(self.serverless_messages,
+                                           self.metadata)
+    self.assertEqual(dict(**labels), {'asdf': 'tyte'})
+
+  def testRemoveLabels(self):
+    self.args.remove_labels = ['abc', 'def']
+    self.args._specified_args['remove_labels'] = 'remove_labels'
+    self.service.labels.update({'abc': 'foo', 'def': 'bar', 'ghi': 'baz'})
+    self._GetAndApplyChanges()
+    self.assertEqual(len(self.changes), 1)
+    labels = k8s_object.LabelsFromMetadata(self.serverless_messages,
+                                           self.metadata)
+    self.assertEqual(dict(**labels), {'ghi': 'baz'})
+
+  @parameterized.parameters(['4s', '8m16s'])
+  def testValidTimeoutDuration(self, timeout):
+    self.args.timeout = timeout
+    self._GetAndApplyChanges()
+    self.assertEquals(len(self.changes), 1)
+    self.assertEquals(self.config.timeout,
+                      int(times.ParseDuration(timeout).total_seconds))
+
+  @parameterized.parameters(['2', '5'])
+  def testValidTimeoutNumber(self, timeout):
+    self.args.timeout = timeout
+    self._GetAndApplyChanges()
+    self.assertEquals(len(self.changes), 1)
+    self.assertEquals(self.config.timeout, int(timeout))
+
+  @parameterized.parameters(['2.0', '@^$%4', 'abcd'])
+  def testInvalidTimeoutDurationSyntaxError(self, timeout):
+    self.args.timeout = timeout
+    with self.assertRaises(times.DurationSyntaxError):
+      self._GetAndApplyChanges()
+
+  @parameterized.parameters(['0', '-1'])
+  def testInvalidTimeoutArgError(self, timeout):
+    self.args.timeout = timeout
+    with self.assertRaises(flags.ArgumentError):
+      self._GetAndApplyChanges()
 
   def testValidateClusterNoLocation(self):
     self.args.cluster = 'mycluster'
@@ -129,7 +195,8 @@ class GetConfigurationChangesTest(cli_test_base.CliTestBase,
   def testValidateClusterLocationOnly(self):
     self.args.cluster = None
     self.args.cluster_location = 'mylocation'
-    self.assertIsNone(flags.ValidateClusterArgs(self.args))
+    with self.assertRaises(exceptions.ConfigurationError):
+      flags.ValidateClusterArgs(self.args)
 
   def testValidateNoClusterOrLocation(self):
     self.args.cluster = None
@@ -142,8 +209,6 @@ class GetRegionTest(base.ServerlessBase,
   """Test getting region under different configs and flags."""
 
   def SetUp(self):
-    self.fake_local_config = local_config.LocalConfig(
-        'local-config-service', 'local-config-region')
     properties.VALUES.run.region.Set('serverless-config-region')
     properties.VALUES.compute.region.Set('compute-config-region')
     self.args = parser_extensions.Namespace()
@@ -152,36 +217,80 @@ class GetRegionTest(base.ServerlessBase,
     self.args.region = 'region1'
     self.assertEqual('region1', flags.GetRegion(self.args, prompt=True))
 
-  def testGetFromLocalConfigFile(self):
-    self.StartObjectPatch(
-        flags, 'GetLocalConfig', return_value=self.fake_local_config)
-    self.args.source = '.'
-    self.assertEqual(self.fake_local_config.region, flags.GetRegion(self.args))
-
   def testGetFromServerlessConfig(self):
-    self.StartObjectPatch(flags, 'GetLocalConfig', return_value=None)
     self.assertEqual(
         'serverless-config-region', flags.GetRegion(self.args))
 
   def testGetFromComputeConfig(self):
-    self.StartObjectPatch(flags, 'GetLocalConfig', return_value=None)
     properties.VALUES.run.region.Set(None)
     self.assertEqual('compute-config-region',
                      flags.GetRegion(self.args, prompt=True))
 
   def testGetFromPrompt(self):
-    self.StartObjectPatch(flags, 'GetLocalConfig', return_value=None)
-    properties.VALUES.run.region.Set(None)
-    properties.VALUES.compute.region.Set(None)
+    with mock.patch(
+        'googlecloudsdk.api_lib.run.global_methods.GetServerlessClientInstance',
+        return_value=self.mock_serverless_client):
+      with mock.patch(
+          'googlecloudsdk.api_lib.run.global_methods.ListRegions',
+          return_value=[base.DEFAULT_REGION]):
+        properties.VALUES.run.region.Set(None)
+        properties.VALUES.compute.region.Set(None)
 
-    fake_idx = 0
-    expected_region = flags.REGIONS[fake_idx]
-    self.WriteInput('{}\n'.format(fake_idx+1))
+        fake_idx = 0
+        self.WriteInput('{}\n'.format(fake_idx + 1))
 
-    actual_region = flags.GetRegion(self.args, prompt=True)
-    self.AssertErrContains(
-        'To make this the default region, run '
-        '`gcloud config set run/region {}`'.format(expected_region))
+        expected_region = base.DEFAULT_REGION
+        actual_region = flags.GetRegion(self.args, prompt=True)
+        self.AssertErrContains(
+            'To make this the default region, run '
+            '`gcloud config set run/region {}`'.format(expected_region))
 
-    self.assertEqual(expected_region, actual_region)
+        self.assertEqual(expected_region, actual_region)
 
+
+class ValidationsTest(test_case.TestCase):
+
+  def testVerifyGKEFlagsAllowUnauthenticated(self):
+    with self.assertRaises(exceptions.ConfigurationError):
+      args = mock.Mock()
+      args.allow_unauthenticated = True
+      flags.VerifyGKEFlags(args)
+
+  def testVerifyGKEFlagsServiceAccount(self):
+    with self.assertRaises(exceptions.ConfigurationError):
+      args = mock.Mock()
+      args.service_account = 'test@iam.gserviceaccount.com'
+      flags.VerifyGKEFlags(args)
+
+  def testVerifyOnePlatformFlagsConnectivity(self):
+    with self.assertRaises(exceptions.ConfigurationError):
+      args = mock.Mock()
+      args.connectivity = True
+      flags.VerifyOnePlatformFlags(args)
+
+  def testVerifyOnePlatformFlagsCpu(self):
+    with self.assertRaises(exceptions.ConfigurationError):
+      args = mock.Mock()
+      args.cpu = 2
+      flags.VerifyOnePlatformFlags(args)
+
+
+class ValidateIsGKETest(test_case.TestCase):
+
+  def testTrue(self):
+    args = mock.Mock()
+    args.CONCEPTS.cluster.Parse.return_value = 'Fake Location'
+    self.assertTrue(flags.ValidateIsGKE(args))
+
+  def testFalse(self):
+    args = mock.Mock()
+    args.CONCEPTS.cluster.Parse.return_value = None
+    self.assertFalse(flags.ValidateIsGKE(args))
+
+  def testValidationFails(self):
+    with self.assertRaises(exceptions.ConfigurationError):
+      args = mock.Mock()
+      args.cluster = 'cluster'
+      args.cluster_location = None
+      args.CONCEPTS.cluster.Parse.return_value = None
+      flags.ValidateIsGKE(args)

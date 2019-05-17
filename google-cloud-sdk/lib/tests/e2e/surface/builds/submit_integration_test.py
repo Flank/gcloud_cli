@@ -21,10 +21,16 @@ from __future__ import unicode_literals
 
 import os
 
+from googlecloudsdk.api_lib.storage import storage_api
+from googlecloudsdk.api_lib.storage import storage_util
 from tests.lib import e2e_base
+from tests.lib import e2e_utils
 from tests.lib import test_case
 from tests.lib.sdk_test_base import WithTempCWD
 
+# LINT.IfChange
+RESOURCE_PREFIX = 'cloud-sdk-integration-testing_cloudbuild'
+# LINT.ThenChange(//depot/google3/cloud/sdk/component_build/scripts/resources.yaml)
 CLOUDBUILD_YAML = """
 steps:
 # For ease of debugging, log what files are present.
@@ -47,13 +53,35 @@ steps:
 @test_case.Filters.SkipOnPy3('They are broken', 'b/114743556')
 class SubmitIntegrationTest(e2e_base.WithServiceAuth, WithTempCWD):
 
+  def CreateTempBucket(self):
+    name = next(e2e_utils.GetResourceNameGenerator(prefix=RESOURCE_PREFIX))
+    storage_api.StorageClient().CreateBucketIfNotExists(name, self.Project())
+    return name
+
+  def DeleteTempBucket(self, bucket_name):
+    bucket_ref = storage_util.BucketReference.FromArgument(
+        bucket_name, require_prefix=False)
+    for obj_message in storage_api.StorageClient().ListBucket(bucket_ref):
+      obj_ref = storage_util.ObjectReference.FromMessage(obj_message)
+      storage_api.StorageClient().DeleteObject(obj_ref)
+    storage_api.StorageClient().DeleteBucket(bucket_ref)
+
   def SetUp(self):
+    self.temp_bucket_name = self.CreateTempBucket()
     self.cloudbuild_yaml = self.Touch(
         self.root_path, 'cloudbuild.yaml', CLOUDBUILD_YAML)
 
+  def TearDown(self):
+    self.DeleteTempBucket(self.temp_bucket_name)
+
+  def RunBuildsSubmit(self):
+    self.Run(
+        'builds submit --gcs-log-dir=gs://{0}/'
+        '--gcs-source-staging-dir=gs://{0}/source/ --config={1} {2}'.format(
+            self.temp_bucket_name, self.cloudbuild_yaml, self.root_path))
+
   def testSuccess(self):
-    self.Run('builds submit --config={0} {1}'.format(
-        self.cloudbuild_yaml, self.root_path))
+    self.RunBuildsSubmit()
     self.AssertOutputContains('SUCCESS')
 
   def testRespectingGcloudIgnore(self):
@@ -61,16 +89,14 @@ class SubmitIntegrationTest(e2e_base.WithServiceAuth, WithTempCWD):
                'This file in a subdirectory should not be uploaded with'
                ' my build.')
     self.Touch(self.root_path, '.gcloudignore', 'trash')
-    self.Run('builds submit --config={0} {1}'.format(
-        self.cloudbuild_yaml, self.root_path))
+    self.RunBuildsSubmit()
     self.AssertOutputContains('SUCCESS')
 
   def testDeployRespectingGitIgnore(self):
     self.Touch(os.path.join(self.root_path, 'subdir'), 'trash',
                'This file should not be uploaded with my build.', makedirs=True)
     self.Touch(self.root_path, '.gcloudignore', 'subdir')
-    self.Run('builds submit --config={0} {1}'.format(
-        self.cloudbuild_yaml, self.root_path))
+    self.RunBuildsSubmit()
     self.AssertOutputContains('SUCCESS')
 
   def testDeployTopBotDirRespectingGitIgnore(self):
@@ -80,8 +106,7 @@ class SubmitIntegrationTest(e2e_base.WithServiceAuth, WithTempCWD):
                ' my build.',
                makedirs=True)
     self.Touch(self.root_path, '.gcloudignore', 'topdir/botdir')
-    self.Run('builds submit --config={0} {1}'.format(
-        self.cloudbuild_yaml, self.root_path))
+    self.RunBuildsSubmit()
     self.AssertOutputContains('SUCCESS')
 
 

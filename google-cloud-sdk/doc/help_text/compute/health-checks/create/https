@@ -11,7 +11,8 @@ SYNOPSIS
         [--request-path=REQUEST_PATH; default="/"] [--response=RESPONSE]
         [--timeout=TIMEOUT; default="5s"]
         [--unhealthy-threshold=UNHEALTHY_THRESHOLD; default=2]
-        [--port=PORT; default=80 --port-name=PORT_NAME] [GCLOUD_WIDE_FLAG ...]
+        [--port=PORT; default=80 --port-name=PORT_NAME --use-serving-port]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     gcloud compute health-checks create https is used to create an HTTPS
@@ -86,9 +87,18 @@ FLAGS
           The port name that this health check monitors. By default, this is
           empty.
 
+       --use-serving-port
+          If given, use the "serving port" for health checks:
+
+          + When health checking network endpoints in a Network Endpoint
+            Group, use the port specified with each endpoint.
+          + When health checking other backends, use the port or named port
+            of the backend service.
+
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

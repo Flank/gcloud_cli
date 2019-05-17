@@ -86,7 +86,8 @@ class FirebaseTestIosRunTests(unit_base.IosMockClientTest):
                 xcodeVersion=xcode_version),
             iosTestSetup=self.testing_msgs.IosTestSetup(),
             disableVideoRecording=False,
-            testTimeout=timeout))
+            testTimeout=timeout),
+        flakyTestAttempts=0)
 
   def BuildResponseMatrix(self, request_matrix, m_id, m_state):
     """Build a server-side TestMatrix from a client-side TestMatrix proto."""

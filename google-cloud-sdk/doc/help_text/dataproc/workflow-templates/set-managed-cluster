@@ -17,6 +17,7 @@ SYNOPSIS
         [--num-masters=NUM_MASTERS]
         [--num-preemptible-worker-local-ssds=NUM_PREEMPTIBLE_WORKER_LOCAL_SSDS]
         [--num-worker-local-ssds=NUM_WORKER_LOCAL_SSDS]
+        [--optional-components=[COMPONENT,...]]
         [--preemptible-worker-boot-disk-size=PREEMPTIBLE_WORKER_BOOT_DISK_SIZE]
         [--preemptible-worker-boot-disk-type=PREEMPTIBLE_WORKER_BOOT_DISK_TYPE]
         [--properties=[PREFIX:PROPERTY=VALUE,...]] [--scopes=SCOPE,[SCOPE,...]]
@@ -47,8 +48,8 @@ POSITIONAL ARGUMENTS
           this group are specified.
 
        --region=REGION
-          The Cloud DataProc region for the template. Each Cloud Dataproc
-          region constitutes an independent resource namespace constrained to
+          Cloud Dataproc region for the template. Each Cloud Dataproc region
+          constitutes an independent resource namespace constrained to
           deploying instances into Google Compute Engine zones inside the
           region. The default value of global is a special multi-region
           namespace which is capable of deploying instances into all Google
@@ -69,9 +70,9 @@ FLAGS
         (https://cloud.google.com/compute/docs/private-google-access).
 
      --bucket=BUCKET
-        The Google Cloud Storage bucket to use with the Google Cloud Storage
-        connector. A bucket is auto created when this parameter is not
-        specified.
+        The Google Cloud Storage bucket to use by default to stage job
+        dependencies, miscellaneous config files, and job driver console output
+        when using this cluster.
 
      --cluster-name=CLUSTER_NAME
         The name of the managed dataproc cluster. If unspecified, the workflow
@@ -127,6 +128,13 @@ FLAGS
 
      --num-worker-local-ssds=NUM_WORKER_LOCAL_SSDS
         The number of local SSDs to attach to each worker in a cluster.
+
+     --optional-components=[COMPONENT,...]
+        List of optional components to be installed on cluster machines.
+
+        The following page documents the optional components that can be
+        installed:
+        https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/optional-components.
 
      --preemptible-worker-boot-disk-size=PREEMPTIBLE_WORKER_BOOT_DISK_SIZE
         The size of the boot disk. The value must be a whole number followed by
@@ -325,13 +333,15 @@ FLAGS
             server-specified.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha dataproc workflow-templates set-managed-cluster
         $ gcloud beta dataproc workflow-templates set-managed-cluster
 

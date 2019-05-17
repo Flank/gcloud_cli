@@ -47,17 +47,18 @@ class ListTest(base.DnsMockBetaTest):
     expected_output = util_beta.GetPolicies(
         name_server_config=name_servers,
         networks=test_networks,
-        forwarding=True)
+        forwarding=True,
+        logging=True)
     self.client.policies.List.Expect(
         request=list_request,
         response=self.messages.PoliciesListResponse(policies=expected_output))
     self.Run('dns policies list')
     self.AssertOutputContains(
         """\
-NAME DESCRIPTION FORWARDING ALTERNATE_NAME_SERVERS NETWORKS
-mypolicy0 My policy 0 True 2.0.1.1, 2.0.1.2 default, network1
-mypolicy1 My policy 1 True 2.0.1.1, 2.0.1.2 default, network1
-mypolicy2 My policy 2 True 2.0.1.1, 2.0.1.2 default, network1
+NAME DESCRIPTION FORWARDING LOGGING ALTERNATE_NAME_SERVERS NETWORKS
+mypolicy0 My policy 0 True True 2.0.1.1, 2.0.1.2 default, network1
+mypolicy1 My policy 1 True True 2.0.1.1, 2.0.1.2 default, network1
+mypolicy2 My policy 2 True True 2.0.1.1, 2.0.1.2 default, network1
 """,
         normalize_space=True)
 

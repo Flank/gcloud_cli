@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.tasks import app
 from googlecloudsdk.command_lib.tasks import parsers
@@ -110,6 +111,12 @@ class TasksDescribeTest(test_base.CloudTasksTestBase):
                                                      self.queue_id))
 
     self.AssertErrContains('Requested entity was not found.')
+
+
+class TasksDescribeTestBeta(TasksDescribeTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 if __name__ == '__main__':

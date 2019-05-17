@@ -17,6 +17,7 @@ DESCRIPTION
       o gcloud beta app deploy
       o gcloud beta functions deploy
       o gcloud builds submit
+      o gcloud composer environments storage {dags, data, plugins} import
       o gcloud container builds submit
       o gcloud beta debug source upload
 

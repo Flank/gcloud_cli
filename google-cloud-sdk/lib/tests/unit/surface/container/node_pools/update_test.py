@@ -19,6 +19,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import itertools
+
 from googlecloudsdk.api_lib.container import api_adapter
 from googlecloudsdk.api_lib.container import util as c_util
 from googlecloudsdk.calliope import exceptions
@@ -45,7 +47,7 @@ class UpdateTestGA(base.GATestBase, base.NodePoolsTestBase):
     }
     pool = self._MakeNodePool(**pool_kwargs)
     self.ExpectGetNodePool(pool.name, response=pool, zone=location)
-    self.ExpectUpdateNodePool(
+    self.ExpectSetNodePoolManagement(
         self.NODE_POOL_NAME,
         self.msgs.NodeManagement(
             autoRepair=True,
@@ -91,7 +93,7 @@ Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/{1}
     }
     pool = self._MakeNodePool(**pool_kwargs)
     self.ExpectGetNodePool(pool.name, response=pool)
-    self.ExpectUpdateNodePool(
+    self.ExpectSetNodePoolManagement(
         self.NODE_POOL_NAME,
         self.msgs.NodeManagement(
             autoRepair=False,
@@ -126,7 +128,7 @@ Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-
     }
     pool = self._MakeNodePool(**pool_kwargs)
     self.ExpectGetNodePool(pool.name, response=pool)
-    self.ExpectUpdateNodePool(
+    self.ExpectSetNodePoolManagement(
         self.NODE_POOL_NAME,
         self.msgs.NodeManagement(
             autoRepair=None,
@@ -141,12 +143,10 @@ Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-
     result = self.Run(cmdbase.format(self.NODE_POOL_NAME, self.CLUSTER_NAME))
     self.assertEqual(result.management.autoRepair, None)
     self.assertEqual(result.management.autoUpgrade, True)
-    self.AssertErrContains("""This will enable the autoupgrade feature for \
-nodes. Please see \
-https://cloud.google.com/kubernetes-engine/docs/node-management for more \
-information on node autoupgrades.
-{{"ux": "PROGRESS_TRACKER", "message": "Updating node pool my-pool", "status": "SUCCESS"}}
-Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-central1-f/clusters/my-cluster/nodePools/my-pool].
+    self.AssertErrContains("""{{"ux": "PROGRESS_TRACKER", "message": "Updating \
+node pool my-pool", "status": "SUCCESS"}}
+Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones\
+/us-central1-f/clusters/my-cluster/nodePools/my-pool].
 """.format(self.API_VERSION))
 
   def testDisableAutoUpgrade(self):
@@ -160,7 +160,7 @@ Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-
     }
     pool = self._MakeNodePool(**pool_kwargs)
     self.ExpectGetNodePool(pool.name, response=pool)
-    self.ExpectUpdateNodePool(
+    self.ExpectSetNodePoolManagement(
         self.NODE_POOL_NAME,
         self.msgs.NodeManagement(
             autoRepair=True,
@@ -175,12 +175,10 @@ Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-
     result = self.Run(cmdbase.format(self.NODE_POOL_NAME, self.CLUSTER_NAME))
     self.assertEqual(result.management.autoRepair, True)
     self.assertEqual(result.management.autoUpgrade, False)
-    self.AssertErrContains("""This will disable the autoupgrade feature for \
-nodes. Please see \
-https://cloud.google.com/kubernetes-engine/docs/node-management for more \
-information on node autoupgrades.
-{{"ux": "PROGRESS_TRACKER", "message": "Updating node pool my-pool", "status": "SUCCESS"}}
-Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-central1-f/clusters/my-cluster/nodePools/my-pool].
+    self.AssertErrContains("""{{"ux": "PROGRESS_TRACKER", "message": "Updating \
+node pool my-pool", "status": "SUCCESS"}}
+Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones\
+/us-central1-f/clusters/my-cluster/nodePools/my-pool].
 """.format(self.API_VERSION))
 
   def testEnableAutoUpgradeWithUrlCluster(self):
@@ -194,7 +192,7 @@ Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-
     }
     pool = self._MakeNodePool(**pool_kwargs)
     self.ExpectGetNodePool(pool.name, response=pool)
-    self.ExpectUpdateNodePool(
+    self.ExpectSetNodePoolManagement(
         self.NODE_POOL_NAME,
         self.msgs.NodeManagement(
             autoRepair=None,
@@ -222,18 +220,17 @@ Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-
         cluster_ref.SelfLink()))
     self.assertEqual(result.management.autoRepair, None)
     self.assertEqual(result.management.autoUpgrade, True)
-    self.AssertErrContains("""This will enable the autoupgrade feature for \
-nodes. Please see \
-https://cloud.google.com/kubernetes-engine/docs/node-management for more \
-information on node autoupgrades.
-{{"ux": "PROGRESS_TRACKER", "message": "Updating node pool my-pool", "status": "SUCCESS"}}
-Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-central1-f/clusters/my-cluster/nodePools/my-pool].
+    self.AssertErrContains("""{{"ux": "PROGRESS_TRACKER", "message": "Updating \
+node pool my-pool", "status": "SUCCESS"}}
+Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones\
+/us-central1-f/clusters/my-cluster/nodePools/my-pool].
 """.format(self.API_VERSION))
 
   def testUpdateHttpError(self):
-    pool = self._MakeNodePool(version=self.VERSION)
+    pool = self._MakeNodePool(version=self.VERSION,
+                              management=self.msgs.NodeManagement())
     self.ExpectGetNodePool(pool.name, response=pool)
-    self.ExpectUpdateNodePool(
+    self.ExpectSetNodePoolManagement(
         self.NODE_POOL_NAME,
         self.msgs.NodeManagement(
             autoRepair=None,
@@ -259,6 +256,48 @@ Updated [https://container.googleapis.com/{0}/projects/fake-project-id/zones/us-
 # Mixin class must come in first to have the correct multi-inheritance behavior.
 class UpdateTestBeta(base.BetaTestBase, UpdateTestGA):
   """gcloud Beta track using container v1beta1 API."""
+
+  def testWorkloadMetadataFromNode(self):
+
+    enum = self.messages.WorkloadMetadataConfig.NodeMetadataValueValuesEnum
+    states = [
+        enum.UNSPECIFIED,
+        enum.EXPOSE,
+        enum.SECURE,
+        enum.GKE_METADATA_SERVER,
+    ]
+    state_string_names = {
+        enum.UNSPECIFIED: 'UNSPECIFIED',
+        enum.EXPOSE: 'EXPOSED',
+        enum.SECURE: 'SECURE',
+        enum.GKE_METADATA_SERVER: 'GKE_METADATA_SERVER',
+    }
+
+    for from_state, to_state in itertools.product(states, states):
+
+      pool = self._MakeNodePool(
+          version=self.VERSION,
+          workloadMetadataConfig=self.messages.WorkloadMetadataConfig(
+              nodeMetadata=from_state),
+      )
+
+      self.ExpectUpdateNodePool(
+          self.NODE_POOL_NAME,
+          workload_metadata_config=self.messages.WorkloadMetadataConfig(
+              nodeMetadata=to_state,),
+          response=self._MakeOperation(operationType=self.op_upgrade_nodes))
+      self.ExpectGetOperation(self._MakeNodePoolOperation(status=self.op_done))
+      self.ExpectGetNodePool(pool.name, response=pool)
+
+      command = ('{command_base} update {node_pool} --cluster={cluster} '
+                 '--workload-metadata-from-node={to_state}').format(
+                     command_base=self.node_pools_command_base.format(
+                         self.ZONE),
+                     node_pool=pool.name,
+                     cluster=self.CLUSTER_NAME,
+                     to_state=state_string_names[to_state])
+
+      self.Run(command)
 
   def testEnableAutoscaling(self):
     pool_kwargs = {}

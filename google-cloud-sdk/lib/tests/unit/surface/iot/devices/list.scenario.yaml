@@ -1,0 +1,166 @@
+title: list test
+release_tracks: [ALPHA, BETA, GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - label: Base Case
+  - command: iot devices list --registry my-registry --region us-central1
+  - stdout: |
+      ID                     NUM_ID            BLOCKED  GATEWAY_TYPE  GATEWAY_AUTH_METHOD
+      test-bind-test-device  2679964494889818           NON_GATEWAY
+      test-gateway           2795893337144855           GATEWAY       ASSOCIATION_AND_DEVICE_AUTH_TOKEN
+      test-test1             2714885733853728
+- execute:
+  - label: List_DeviceIds
+  - command: |
+      iot devices list --registry my-registry --device-ids d0,d1
+      --device-num-ids 3,4 --region us-central1
+  - stdout: |
+      ID                     NUM_ID            BLOCKED  GATEWAY_TYPE
+      test-bind-test-device  2679964494889818           NON_GATEWAY
+      test-test1             2714885733853728
+      d0                     2714885733853728
+      d1                     2714885733853728
+- execute:
+  - label: List_GatewayType
+  - command: |
+      iot devices list --registry my-registry --region us-central1 --device-type gateway
+  - stdout: |
+      ID            NUM_ID            BLOCKED  GATEWAY_TYPE  GATEWAY_AUTH_METHOD
+      test-gateway  2795893337144855           GATEWAY       ASSOCIATION_AND_DEVICE_AUTH_TOKEN
+actions:
+- execute_command:
+    label: Base Case
+    command: iot devices list --registry my-registry --region us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudiot.googleapis.com/v1/projects/fake-project/locations/us-central1/registries/my-registry/devices?alt=json&fieldMask=blocked%2Cname%2CgatewayConfig
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "devices": [
+                {
+                  "id": "test-bind-test-device",
+                  "name": "projects/fake-project/locations/us-central1/registries/my-registry/devices/2679964494889818",
+                  "numId": "2679964494889818",
+                  "gatewayConfig": {
+                    "gatewayType": "NON_GATEWAY"
+                  }
+                },
+                {
+                  "id": "test-gateway",
+                  "name": "projects/fake-project/locations/us-central1/registries/my-registry/devices/2795893337144855",
+                  "numId": "2795893337144855",
+                  "gatewayConfig": {
+                    "gatewayType": "GATEWAY",
+                    "gatewayAuthMethod": "ASSOCIATION_AND_DEVICE_AUTH_TOKEN"
+                  }
+                },
+                {
+                  "id": "test-test1",
+                  "name": "projects/fake-project/locations/us-central1/registries/my-registry/devices/2714885733853728",
+                  "numId": "2714885733853728",
+                  "gatewayConfig": {}
+                }
+              ]
+            }
+    - expect_stdout: |
+        ID                     NUM_ID            BLOCKED  GATEWAY_TYPE  GATEWAY_AUTH_METHOD
+        test-bind-test-device  2679964494889818           NON_GATEWAY
+        test-gateway           2795893337144855           GATEWAY       ASSOCIATION_AND_DEVICE_AUTH_TOKEN
+        test-test1             2714885733853728
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: List_DeviceIds
+    command: |
+      iot devices list --registry my-registry --device-ids d0,d1
+      --device-num-ids 3,4 --region us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudiot.googleapis.com/v1/projects/fake-project/locations/us-central1/registries/my-registry/devices?alt=json&deviceIds=d0&deviceIds=d1&deviceNumIds=3&deviceNumIds=4&fieldMask=blocked%2Cname%2CgatewayConfig
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "devices": [
+                {
+                  "id": "test-bind-test-device",
+                  "name": "projects/fake-project/locations/us-central1/registries/my-registry/devices/3",
+                  "numId": "2679964494889818",
+                  "gatewayConfig": {
+                    "gatewayType": "NON_GATEWAY"
+                  }
+                },
+                {
+                  "id": "test-test1",
+                  "name": "projects/fake-project/locations/us-central1/registries/my-registry/devices/4",
+                  "numId": "2714885733853728",
+                  "gatewayConfig": {}
+                },
+                {
+                  "id": "d0",
+                  "name": "projects/fake-project/locations/us-central1/registries/my-registry/devices/2714885733853728",
+                  "numId": "2714885733853728",
+                  "gatewayConfig": {}
+                },
+                {
+                  "id": "d1",
+                  "name": "projects/fake-project/locations/us-central1/registries/my-registry/devices/2714885733853728",
+                  "numId": "2714885733853728",
+                  "gatewayConfig": {}
+                }
+              ]
+            }
+    - expect_stdout: |
+        ID                     NUM_ID            BLOCKED  GATEWAY_TYPE
+        test-bind-test-device  2679964494889818           NON_GATEWAY
+        test-test1             2714885733853728
+        d0                     2714885733853728
+        d1                     2714885733853728
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: List_GatewayType
+    command: |
+      iot devices list --registry my-registry --region us-central1 --device-type gateway
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudiot.googleapis.com/v1/projects/fake-project/locations/us-central1/registries/my-registry/devices?alt=json&fieldMask=blocked%2Cname%2CgatewayConfig&gatewayListOptions.gatewayType=GATEWAY
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+               "devices": [
+                 {
+                   "id": "test-gateway",
+                   "name": "projects/fake-project/locations/us-central1/registries/my-registry/devices/2795893337144855",
+                   "numId": "2795893337144855",
+                   "gatewayConfig": {
+                     "gatewayType": "GATEWAY",
+                     "gatewayAuthMethod": "ASSOCIATION_AND_DEVICE_AUTH_TOKEN"
+                   }
+                 }
+               ]
+             }
+    - expect_stdout: |
+        ID            NUM_ID            BLOCKED  GATEWAY_TYPE  GATEWAY_AUTH_METHOD
+        test-gateway  2795893337144855           GATEWAY       ASSOCIATION_AND_DEVICE_AUTH_TOKEN
+    - expect_exit:
+        code: 0

@@ -1,5 +1,5 @@
 NAME
-    gcloud ml-engine versions describe - describe an existing Cloud ML Engine
+    gcloud ml-engine versions describe - describe an existing AI Platform
         version
 
 SYNOPSIS
@@ -7,7 +7,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Describe an existing Cloud ML Engine version.
+    Describe an existing AI Platform version.
 
 POSITIONAL ARGUMENTS
      VERSION
@@ -18,8 +18,9 @@ REQUIRED FLAGS
         Name of the model.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

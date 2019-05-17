@@ -48,7 +48,7 @@ STAGE_TYPES = (msgs.Role.StageValueValuesEnum)
 
 SERVICE_ACCOUNTS_COLLECTION = 'iam.projects.serviceAccounts'
 
-SERVICE_ACCOUNT_FORMAT = 'table(displayName:label=NAME, email)'
+SERVICE_ACCOUNT_FORMAT = 'table(displayName:label=NAME, email, disabled)'
 SERVICE_ACCOUNT_KEY_FORMAT = """
     table(
         name.scope(keys):label=KEY_ID,
@@ -104,9 +104,10 @@ Examples: `user:test-user@gmail.com`, `group:admins@example.com`,
 `domain:example.domain.com`.
 
 Can also be one of the following special values:
-* `allUsers` - anyone who is on the internet, with or without a Google account.
-* `allAuthenticatedUsers` - anyone who is authenticated with a Google account or
-   a service account.
+* `allUsers` - Special identifier that represents anyone who is on the internet,
+   with or without a Google account.
+* `allAuthenticatedUsers` - Special identifier that represents anyone who is
+   authenticated with a Google account or a service account.
       """
   ).format(verb=verb)
   parser.add_argument('--member', required=required, help=help_str)
@@ -635,6 +636,14 @@ def _PolicyContainsCondition(policy):
   """
   for binding in policy.bindings:
     if binding.condition:
+      return True
+  return False
+
+
+def BindingInPolicy(policy, member, role):
+  """Returns True if policy contains the specified binding."""
+  for binding in policy.bindings:
+    if binding.role == role and member in binding.members:
       return True
   return False
 

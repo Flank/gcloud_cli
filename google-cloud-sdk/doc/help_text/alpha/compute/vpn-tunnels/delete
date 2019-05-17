@@ -1,5 +1,5 @@
 NAME
-    gcloud alpha compute vpn-tunnels delete - delete vpn tunnels
+    gcloud alpha compute vpn-tunnels delete - delete VPN tunnels
 
 SYNOPSIS
     gcloud alpha compute vpn-tunnels delete NAME [NAME ...] [--region=REGION]
@@ -7,7 +7,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute vpn-tunnels delete deletes one or more Google
-    Compute Engine vpn tunnels.
+    Compute Engine VPN tunnels.
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]
@@ -35,8 +35,9 @@ FLAGS
         CLOUDSDK_COMPUTE_REGION.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

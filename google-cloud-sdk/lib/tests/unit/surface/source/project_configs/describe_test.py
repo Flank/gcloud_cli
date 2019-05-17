@@ -19,15 +19,14 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.source import base
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA)
-class ProjectConfigDescribeTest(base.SourceTestBase):
+class ProjectConfigDescribeTestGA(base.SourceTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def _ExpectGetProjectConfig(self, project_name=None):
     project = project_name or self.Project()
@@ -36,15 +35,25 @@ class ProjectConfigDescribeTest(base.SourceTestBase):
             name='projects/{}'.format(project)),
         response=self.messages.ProjectConfig())
 
-  def testDescribe(self, track):
-    self.track = track
+  def testDescribe(self):
     self._ExpectGetProjectConfig()
     self.Run('source project-configs describe')
 
-  def testDescribe_ProjectName(self, track):
-    self.track = track
+  def testDescribe_ProjectName(self):
     self._ExpectGetProjectConfig('my-project')
     self.Run('source project-configs describe --project my-project')
+
+
+class ProjectConfigDescribeTestBeta(ProjectConfigDescribeTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class ProjectConfigDescribeTestAlpha(ProjectConfigDescribeTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

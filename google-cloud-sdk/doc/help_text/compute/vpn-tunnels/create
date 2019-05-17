@@ -7,6 +7,7 @@ SYNOPSIS
         [--description=DESCRIPTION] [--ike-version=IKE_VERSION]
         [--local-traffic-selector=CIDR,[CIDR,...]] [--region=REGION]
         [--remote-traffic-selector=CIDR,[CIDR,...]] [--router=ROUTER]
+        [--router-region=ROUTER_REGION]
         [--target-vpn-gateway-region=TARGET_VPN_GATEWAY_REGION]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -21,18 +22,18 @@ POSITIONAL ARGUMENTS
 
 REQUIRED FLAGS
      --peer-address=PEER_ADDRESS
-        A valid IP-v4 address representing the remote tunnel endpoint
+        Valid IP-v4 address representing the remote tunnel endpoint
 
      --shared-secret=SHARED_SECRET
-        A shared secret consisting of printable characters. Valid arguments
-        match the regular expression [ -~]+
+        Shared secret consisting of printable characters. Valid arguments match
+        the regular expression [ -~]+
 
      --target-vpn-gateway=TARGET_VPN_GATEWAY
-        A reference to a target vpn gateway
+        A reference to a Cloud VPN Classic Target VPN Gateway.
 
 OPTIONAL FLAGS
      --description=DESCRIPTION
-        An optional, textual description for the target VPN tunnel.
+        An optional, textual description for the VPN tunnel.
 
      --ike-version=IKE_VERSION
         Internet Key Exchange protocol version number. Default is 2.
@@ -41,11 +42,12 @@ OPTIONAL FLAGS
      --local-traffic-selector=CIDR,[CIDR,...]
         Traffic selector is an agreement between IKE peers to permit traffic
         through a tunnel if the traffic matches a specified pair of local and
-        remote addresses.
+        remote addresses; this flag can only be specified for Classic VPN
+        tunnels.
 
-        local_traffic_selector allows to configure the local addresses that are
-        permitted. The value should be a comma separated list of CIDR formatted
-        strings. Example: 192.168.0.0/16,10.0.0.0/24.
+        --local-traffic-selector allows to configure the local addresses that
+        are permitted. The value should be a comma separated list of CIDR
+        formatted strings. Example: 192.168.0.0/16,10.0.0.0/24.
 
      --region=REGION
         Region of the VPN Tunnel to create. If not specified, you may be
@@ -70,14 +72,35 @@ OPTIONAL FLAGS
      --remote-traffic-selector=CIDR,[CIDR,...]
         Traffic selector is an agreement between IKE peers to permit traffic
         through a tunnel if the traffic matches a specified pair of local and
-        remote addresses.
+        remote addresses; this flag can only be specified for Classic VPN
+        tunnels.
 
-        remote_traffic_selector allows to configure the remote addresses that
+        --remote-traffic-selector allows to configure the remote addresses that
         are permitted. The value should be a comma separated list of CIDR
         formatted strings. Example: 192.168.0.0/16,10.0.0.0/24.
 
      --router=ROUTER
         The Router to use for dynamic routing.
+
+     --router-region=ROUTER_REGION
+        Region of the router to operate on. If not specified, you may be
+        prompted to select a region.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/region property:
+
+            $ gcloud config set compute/region REGION
+
+        A list of regions can be fetched by running:
+
+            $ gcloud compute regions list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/region
+
+        Alternatively, the region can be stored in the environment variable
+        CLOUDSDK_COMPUTE_REGION.
 
      --target-vpn-gateway-region=TARGET_VPN_GATEWAY_REGION
         Region of the Target VPN Gateway to operate on. Should be the same as
@@ -85,8 +108,9 @@ OPTIONAL FLAGS
         default compute/region property value for this command invocation.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

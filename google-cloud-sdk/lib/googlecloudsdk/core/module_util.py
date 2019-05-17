@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -126,7 +126,7 @@ def ImportPath(path):
   module_file = None
   try:
     module_file, module_path, module_description = imp.find_module(
-        module_name, [module_dir])  # pytype: disable=attribute-error
+        module_name, [module_dir])
     return imp.load_module(
         module_name, module_file, module_path, module_description)
   except ImportError as e:
@@ -142,4 +142,4 @@ def CompileAll(directory):
   # directory could contain unicode chars and py_compile chokes on unicode
   # paths. Using relative paths from within directory works around the problem.
   with files.ChDir(directory):
-    compileall.compile_dir('.', quiet=True)  # pytype: disable=wrong-arg-types
+    compileall.compile_dir('.', quiet=True)

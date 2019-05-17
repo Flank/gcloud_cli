@@ -21,16 +21,12 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.cloudresourcemanager import projects_api
 from googlecloudsdk.api_lib.services import exceptions
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.services import unit_test_base
 import mock
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA)
 class ConnectTest(unit_test_base.SNUnitTestBase):
   """Unit tests for services vpc-peerings connect command."""
   OPERATION_NAME = 'operations/abc.0000000000'
@@ -38,8 +34,10 @@ class ConnectTest(unit_test_base.SNUnitTestBase):
   RANGES = ['google1', 'google2']
   RANGE_ARG = ','.join(RANGES)
 
-  def testConnect(self, track):
-    self.track = track
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def testConnect(self):
     self.ExpectCreateConnection(self.NETWORK, self.RANGES, self.OPERATION_NAME)
     self.ExpectOperation(self.OPERATION_NAME, 3)
     self.SetProjectNumber()
@@ -49,8 +47,7 @@ class ConnectTest(unit_test_base.SNUnitTestBase):
     self.AssertErrContains(self.OPERATION_NAME)
     self.AssertErrContains('finished successfully')
 
-  def testConnectAsync(self, track):
-    self.track = track
+  def testConnectAsync(self):
     self.ExpectCreateConnection(self.NETWORK, self.RANGES, self.OPERATION_NAME)
     self.SetProjectNumber()
 
@@ -60,8 +57,7 @@ class ConnectTest(unit_test_base.SNUnitTestBase):
     self.AssertErrContains(self.OPERATION_NAME)
     self.AssertErrContains('operation is in progress')
 
-  def testConnectAsyncWithDefaultService(self, track):
-    self.track = track
+  def testConnectAsyncWithDefaultService(self):
     self.service = 'servicenetworking.googleapis.com'
     self.ExpectCreateConnection(self.NETWORK, self.RANGES, self.OPERATION_NAME)
     self.SetProjectNumber()
@@ -71,8 +67,7 @@ class ConnectTest(unit_test_base.SNUnitTestBase):
     self.AssertErrContains(self.OPERATION_NAME)
     self.AssertErrContains('operation is in progress')
 
-  def testConnectPermissionDenied(self, track):
-    self.track = track
+  def testConnectPermissionDenied(self):
     server_error = http_error.MakeDetailedHttpError(code=403, message='Error.')
     self.ExpectCreateConnection(
         self.NETWORK, self.RANGES, None, error=server_error)
@@ -89,6 +84,18 @@ class ConnectTest(unit_test_base.SNUnitTestBase):
     p = mock.Mock()
     p.projectNumber = self.PROJECT_NUMBER
     mock_get.return_value = p
+
+
+class ConnectAlphaTest(ConnectTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class ConnectBetaTest(ConnectTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 if __name__ == '__main__':

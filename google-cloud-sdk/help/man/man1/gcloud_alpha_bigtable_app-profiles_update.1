@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha bigtable app\-profiles update \- update a Bigtable app_profile
+gcloud alpha bigtable app\-profiles update \- update a Bigtable app profile
 
 
 
@@ -17,7 +17,7 @@ gcloud alpha bigtable app\-profiles update \- update a Bigtable app_profile
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Update a Bigtable app_profile.
+\fB(ALPHA)\fR Update a Bigtable app profile.
 
 
 
@@ -36,13 +36,13 @@ set the property [core/project]. This must be specified.
 .RS 2m
 .TP 2m
 \fIAPP_PROFILE\fR
-ID of the app\-profile or fully qualified identifier for the app\-profile. This
+ID of the app profile or fully qualified identifier for the app profile. This
 positional must be specified if any of the other arguments in this group are
 specified.
 
 .TP 2m
 \fB\-\-instance\fR=\fIINSTANCE\fR
-The Cloud Bigtable instance for the app\-profile.
+Cloud Bigtable instance for the app profile.
 
 
 .RE
@@ -58,7 +58,7 @@ Return immediately, without waiting for operation to complete.
 
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
-Friendly name of the app\-profile.
+Friendly name of the app profile.
 
 .TP 2m
 \fB\-\-force\fR
@@ -102,10 +102,11 @@ Allow transactional writes with a Single Cluster Routing policy.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -115,9 +116,10 @@ This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you will have to apply for early access and have your projects registered on the
 API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. This variant is also available:
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
+$ gcloud bigtable app\-profiles update
 $ gcloud beta bigtable app\-profiles update
 .RE
 

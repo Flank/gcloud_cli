@@ -32,10 +32,11 @@ here: https://cloud.google.com/filestore/docs/
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -46,15 +47,24 @@ gcloud help\fR for details.
 .RS 2m
 .TP 2m
 \fBinstances\fR
-\fB(BETA)\fR Manage Cloud Filestore instances.
+\fB(BETA)\fR Create and manage Cloud Filestore instances.
 
 .TP 2m
 \fBlocations\fR
-\fB(BETA)\fR List locations where Cloud Filestore is available.
+\fB(BETA)\fR \fB(DEPRECATED)\fR List locations where Cloud Filestore is
+available.
 
 .TP 2m
 \fBoperations\fR
 \fB(BETA)\fR Read and manipulate Cloud Filestore operations.
+
+.TP 2m
+\fBregions\fR
+\fB(BETA)\fR List regions where Cloud Filestore is available.
+
+.TP 2m
+\fBzones\fR
+\fB(BETA)\fR List zones where Cloud Filestore is available.
 
 
 .RE
@@ -62,10 +72,11 @@ gcloud help\fR for details.
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
+$ gcloud filestore
 $ gcloud alpha filestore
 .RE
 

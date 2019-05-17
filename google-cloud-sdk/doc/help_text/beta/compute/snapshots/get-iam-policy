@@ -15,7 +15,7 @@ DESCRIPTION
     policy updates; see $ {parent} set-iam-policy for additional details.
 
 POSITIONAL ARGUMENTS
-     Snapshot resource - The snapshot for which to display the IAM policy. This
+     Snapshot resource - The snapshot to display the IAM policy for. This
      represents a Cloud resource. (NOTE) Some attributes are not given
      arguments in this group but can be set in other ways. To set the [project]
      attribute: provide the argument [snapshot_name] on the command line with a
@@ -52,8 +52,9 @@ LIST COMMAND FLAGS
         applied in this order: --flatten, --sort-by, --filter, --limit.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -68,8 +69,9 @@ EXAMPLES
         $ gcloud beta compute snapshots get-iam-policy my-snapshot
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud compute snapshots get-iam-policy
         $ gcloud alpha compute snapshots get-iam-policy
 

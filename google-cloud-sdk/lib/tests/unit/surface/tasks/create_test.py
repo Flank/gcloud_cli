@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 import os
 
 from apitools.base.py import encoding
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.tasks import app
 from googlecloudsdk.command_lib.tasks import parsers
 from googlecloudsdk.command_lib.util import time_util
@@ -264,6 +265,13 @@ class CreateAppEngineTaskTest(test_base.CloudTasksTestBase):
                            '--header=header:value1 --header=header:value2')
 
     self.assertEqual(actual_task, expected_task)
+
+
+class CreateAppEngineTaskTestBeta(CreateAppEngineTaskTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
 
 if __name__ == '__main__':
   test_case.main()

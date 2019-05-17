@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud ml\-engine models create \- create a new Cloud ML Engine model
+gcloud ml\-engine models create \- create a new AI Platform model
 
 
 
@@ -17,7 +17,7 @@ gcloud ml\-engine models create \- create a new Cloud ML Engine model
 
 .SH "DESCRIPTION"
 
-Create a new Cloud ML Engine model.
+Create a new AI Platform model.
 
 
 
@@ -41,7 +41,9 @@ The description of the model.
 
 .TP 2m
 \fB\-\-enable\-logging\fR
-If set, enables StackDriver Logging for online prediction.
+If set, enables StackDriver Logging for online prediction. These logs are like
+standard server access logs, containing information such as timestamps and
+latency for each request.
 
 .TP 2m
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
@@ -65,10 +67,11 @@ Will soon be required, but defaults to 'us\-central1' for now.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

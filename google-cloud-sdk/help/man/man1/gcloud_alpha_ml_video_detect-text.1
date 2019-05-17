@@ -1,0 +1,119 @@
+
+.TH "GCLOUD_ALPHA_ML_VIDEO_DETECT\-TEXT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha ml video detect\-text \- detect text in videos
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha ml video detect\-text\fR \fIINPUT_PATH\fR [\fB\-\-async\fR] [\fB\-\-language\-hints\fR=[\fILANGUAGE_HINTS\fR,...]] [\fB\-\-output\-uri\fR=\fIOUTPUT_URI\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-segments\fR=[\fISEGMENTS\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Detect text in videos.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIINPUT_PATH\fR
+Path to the video to be analyzed. Must be a local path or a Google Cloud Storage
+URI.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Display information about the operation in progress, without waiting for the
+operation to complete.
+
+.TP 2m
+\fB\-\-language\-hints\fR=[\fILANGUAGE_HINTS\fR,...]
+Language hints can be specified if the languages to be detected are known
+beforehand. It can increase the accuracy of the detection. Language hints must
+be language codes in BCP\-47 format. Automatic language detection is performed
+if no language hints are provided.
+
+.TP 2m
+\fB\-\-output\-uri\fR=\fIOUTPUT_URI\fR
+Location to which the results should be written. Must be a Google Cloud Storage
+URI.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Optional Cloud region where annotation should take place. If no region is
+specified, a region will be determined based on video file location.
+\fIREGION\fR must be one of: \fBasia\-east1\fR, \fBeurope\-west1\fR,
+\fBus\-east1\fR, \fBus\-west1\fR.
+
+.TP 2m
+\fB\-\-segments\fR=[\fISEGMENTS\fR,...]
+Segments from the video which you want to analyze (by default, the entire video
+will be treated as one segment). Must be in the format
+START1:END1[,START2:END2,...] (inclusive). START and END of segments must be a
+properly formatted duration string of the form \f5HhMmSs\fR where:
+
+.RS 2m
+*  H is the number of hours from beginning of video
+*  M is the number of minutes from the beginning of video
+*  S is the number of seconds from the beginning of the video
+.RE
+
+H, M and S can be specified as ints or floats for fractional units (to
+microsecond resolution). Unit chars (e.g. \f5h\fR, \f5m\fR or \f5s\fR) are
+required. Microseconds can be specified using fractional seconds e.g. 0.000569s
+== 569 microseconds.
+
+Examples:
+
+0s:23.554048s,24s:29.528064s
+
+0:1m40s,3m50s:5m10.232265s
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBvideointelligence/v1\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/video\-intelligence/docs/
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. This variant is also available:
+
+.RS 2m
+$ gcloud beta ml video detect\-text
+.RE
+

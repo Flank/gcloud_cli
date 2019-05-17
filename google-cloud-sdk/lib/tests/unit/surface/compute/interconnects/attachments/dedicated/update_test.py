@@ -60,7 +60,32 @@ class InterconnectAttachmentsDedicatedUpdateGaTest(test_base.BaseTest):
     self.CheckInterconnectAttachmentRequest(
         name='my-attachment',
         description='this is my attachment',
+        adminEnabled=False)
+
+  def testUpdateInterconnectAttachmentWithBandwidth(self):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [
+            messages.InterconnectAttachment(
+                name='my-attachment',
+                description='this is my attachment',
+                region='us-central1',
+                adminEnabled=False,
+                bandwidth=messages.InterconnectAttachment
+                .BandwidthValueValuesEnum('BPS_50M')),
+        ],
+    ])
+
+    self.Run('compute interconnects attachments dedicated update my-attachment '
+             '--region us-central1 --description "this is my attachment" '
+             '--no-admin-enabled --bandwidth 50m')
+
+    self.CheckInterconnectAttachmentRequest(
+        name='my-attachment',
+        description='this is my attachment',
         adminEnabled=False,
+        bandwidth=messages.InterconnectAttachment.BandwidthValueValuesEnum(
+            'BPS_50M'),
     )
 
 
@@ -181,3 +206,29 @@ class InterconnectAttachmentsDedicatedUpdateAlphaTest(
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.SelectApi('alpha')
     self.message_version = self.compute_alpha
+
+  def testUpdateInterconnectAttachmentWithBandwidth(self):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [
+            messages.InterconnectAttachment(
+                name='my-attachment',
+                description='this is my attachment',
+                region='us-central1',
+                adminEnabled=False,
+                bandwidth=messages.InterconnectAttachment
+                .BandwidthValueValuesEnum('BPS_50G')),
+        ],
+    ])
+
+    self.Run('compute interconnects attachments dedicated update my-attachment '
+             '--region us-central1 --description "this is my attachment" '
+             '--no-admin-enabled --bandwidth 50g')
+
+    self.CheckInterconnectAttachmentRequest(
+        name='my-attachment',
+        description='this is my attachment',
+        adminEnabled=False,
+        bandwidth=messages.InterconnectAttachment.BandwidthValueValuesEnum(
+            'BPS_50G'),
+    )

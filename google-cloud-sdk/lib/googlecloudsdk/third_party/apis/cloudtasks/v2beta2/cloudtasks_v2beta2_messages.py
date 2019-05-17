@@ -348,10 +348,10 @@ class Binding(_messages.Message):
   r"""Associates `members` with a `role`.
 
   Fields:
-    condition: Unimplemented. The condition that is associated with this
-      binding. NOTE: an unsatisfied condition will not allow user access via
-      current binding. Different bindings, including their conditions, are
-      examined independently.
+    condition: The condition that is associated with this binding. NOTE: An
+      unsatisfied condition will not allow user access via current binding.
+      Different bindings, including their conditions, are examined
+      independently.
     members: Specifies the identities requesting access for a Cloud Platform
       resource. `members` can have the following values:  * `allUsers`: A
       special identifier that represents anyone who is    on the internet;
@@ -363,8 +363,8 @@ class Binding(_messages.Message):
       service    account. For example, `my-other-
       app@appspot.gserviceaccount.com`.  * `group:{emailid}`: An email address
       that represents a Google group.    For example, `admins@example.com`.
-      * `domain:{domain}`: A Google Apps domain name that represents all the
-      users of that domain. For example, `google.com` or `example.com`.
+      * `domain:{domain}`: The G Suite domain (primary) that represents all
+      the    users of that domain. For example, `google.com` or `example.com`.
     role: Role that is assigned to `members`. For example, `roles/viewer`,
       `roles/editor`, or `roles/owner`.
   """
@@ -545,7 +545,7 @@ class CloudtasksProjectsLocationsQueuesPatchRequest(_messages.Message):
       format: `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`  *
       `PROJECT_ID` can contain letters ([A-Za-z]), numbers ([0-9]),    hyphens
       (-), colons (:), or periods (.).    For more information, see
-      [Identifying projects](https://cloud.google.com/resource-manager/docs
+      [Identifying    projects](https://cloud.google.com/resource-manager/docs
       /creating-managing-projects#identifying_projects) * `LOCATION_ID` is the
       canonical ID for the queue's location.    The list of available
       locations can be obtained by calling    ListLocations.    For more
@@ -750,11 +750,10 @@ class CloudtasksProjectsLocationsQueuesTasksListRequest(_messages.Message):
       IAM](https://cloud.google.com/iam/) permission on the Task resource.
 
   Fields:
-    pageSize: Requested page size. Fewer tasks than requested might be
-      returned.  The maximum page size is 1000. If unspecified, the page size
-      will be the maximum. Fewer tasks than requested might be returned, even
-      if more tasks exist; use next_page_token in the response to determine if
-      more tasks exist.
+    pageSize: Maximum page size.  Fewer tasks than requested might be
+      returned, even if more tasks exist; use next_page_token in the response
+      to determine if more tasks exist.  The maximum page size is 1000. If
+      unspecified, the page size will be the maximum.
     pageToken: A token identifying the page of results to return.  To request
       the first page results, page_token must be empty. To request the next
       page of results, page_token must be the value of next_page_token
@@ -1255,7 +1254,7 @@ class Queue(_messages.Message):
       format: `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`  *
       `PROJECT_ID` can contain letters ([A-Za-z]), numbers ([0-9]),    hyphens
       (-), colons (:), or periods (.).    For more information, see
-      [Identifying projects](https://cloud.google.com/resource-manager/docs
+      [Identifying    projects](https://cloud.google.com/resource-manager/docs
       /creating-managing-projects#identifying_projects) * `LOCATION_ID` is the
       canonical ID for the queue's location.    The list of available
       locations can be obtained by calling    ListLocations.    For more
@@ -1284,8 +1283,8 @@ class Queue(_messages.Message):
       cannot be set on individual tasks. * For tasks created using the App
       Engine SDK: the queue-level retry   settings apply to all tasks in the
       queue which do not have retry settings   explicitly set on the task and
-      were created by the App Engine SDK. See   [App Engine documentation](htt
-      ps://cloud.google.com/appengine/docs/standard/python/taskqueue/push
+      were created by the App Engine SDK. See   [App Engine   documentation](h
+      ttps://cloud.google.com/appengine/docs/standard/python/taskqueue/push
       /retrying-tasks).
     state: Output only. The state of the queue.  `state` can only be changed
       by called PauseQueue, ResumeQueue, or uploading [queue.yaml/xml](https:/
@@ -1787,7 +1786,7 @@ class TaskStatus(_messages.Message):
 
   Fields:
     attemptDispatchCount: Output only. The number of attempts dispatched.
-      This count includes tasks which have been dispatched but haven't
+      This count includes attempts which have been dispatched but haven't
       received a response.
     attemptResponseCount: Output only. The number of attempts which have
       received a response.  This field is not calculated for pull tasks.

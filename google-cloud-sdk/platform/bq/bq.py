@@ -65,6 +65,7 @@ import table_formatter
 import bigquery_client
 import bq_auth_flags
 import bq_flags
+import bq_utils
 
 
 flags.ADOPT_module_key_flags(bq_flags)
@@ -81,6 +82,8 @@ TransferConfigReference = (
 TransferRunReference = bigquery_client.ApiClientHelper.TransferRunReference
 TransferLogReference = bigquery_client.ApiClientHelper.TransferLogReference
 NextPageTokenReference = bigquery_client.ApiClientHelper.NextPageTokenReference
+ModelReference = bigquery_client.ApiClientHelper.ModelReference
+RoutineReference = bigquery_client.ApiClientHelper.RoutineReference
 EncryptionServiceAccount = (
     bigquery_client.ApiClientHelper.EncryptionServiceAccount)
 BigqueryClient = bigquery_client.BigqueryClient
@@ -91,6 +94,8 @@ JobIdGeneratorFingerprint = bigquery_client.JobIdGeneratorFingerprint
 ReservationReference = bigquery_client.ApiClientHelper.ReservationReference
 SlotPoolReference = bigquery_client.ApiClientHelper.SlotPoolReference
 ReservationGrantReference = bigquery_client.ApiClientHelper.ReservationGrantReference  # pylint: disable=line-too-long
+ConnectionReference = bigquery_client.ApiClientHelper.ConnectionReference
+
 # pylint: enable=g-bad-name
 
 
@@ -222,71 +227,6 @@ def ValidateAtMostOneSelected(*args):
   return count > 1
 
 
-def _GetBigqueryRcFilename():
-  """Return the name of the bigqueryrc file to use.
-
-  In order, we look for a flag the user specified, an environment
-  variable, and finally the default value for the flag.
-
-  Returns:
-    bigqueryrc filename as a string.
-  """
-  return ((FLAGS['bigqueryrc'].present and FLAGS.bigqueryrc) or
-          os.environ.get('BIGQUERYRC') or FLAGS.bigqueryrc)
-
-
-def _ProcessBigqueryrc():
-  """Updates FLAGS with values found in the bigqueryrc file."""
-  _ProcessBigqueryrcSection(None, FLAGS)
-
-
-def _ProcessBigqueryrcSection(section_name, flag_values):
-  """Read the bigqueryrc file into flag_values for section section_name.
-
-  If section_name evaluates as False, read the global flag settings.
-
-  Raises:
-    UsageError: Unknown flag found.
-  """
-
-  bigqueryrc = _GetBigqueryRcFilename()
-  if not os.path.exists(bigqueryrc):
-    return
-  with open(bigqueryrc) as rcfile:
-    in_section = not section_name
-    for line in rcfile:
-      if line.lstrip().startswith('[') and line.rstrip().endswith(']'):
-        next_section = line.strip()[1:-1]
-        in_section = section_name == next_section
-        continue
-      elif not in_section:
-        continue
-      elif line.lstrip().startswith('#') or not line.strip():
-        continue
-      flag, equalsign, value = line.partition('=')
-      # if no value given, assume stringified boolean true
-      if not equalsign:
-        value = 'true'
-      flag = flag.strip()
-      value = value.strip()
-      while flag.startswith('-'):
-        flag = flag[1:]
-      # We want flags specified at the command line to override
-      # those in the flagfile.
-      if flag not in flag_values:
-        raise app.UsageError(
-            'Unknown flag %s found in bigqueryrc file in section %s' %
-            (flag, section_name if section_name else 'global'))
-      if not flag_values[flag].present:
-        flag_values[flag].Parse(value)
-      else:
-        flag_type = flag_values[flag].Type()
-        if flag_type.startswith('multi'):
-          old_value = getattr(flag_values, flag)
-          flag_values[flag].Parse(value)
-          setattr(flag_values, flag, old_value + getattr(flag_values, flag))
-
-
 def _ConfigureLogging(client):
   try:
     client.ConfigurePythonLogger(FLAGS.apilog)
@@ -302,78 +242,197 @@ def _UseServiceAccount():
              )
 
 
-def _GetServiceAccountCredentialsFromFlags(storage):  # pylint: disable=unused-argument
+class CredentialLoader(object):
+  """Base class for credential loader."""
 
-  if not oauth2client_4_0.client.HAS_OPENSSL:
-    raise app.UsageError(
-        'BigQuery requires OpenSSL to be installed in order to use '
-        'service account credentials. Please install OpenSSL '
-        'and the Python OpenSSL package.')
+  def Load(self):
+    """Loads credential."""
+    cred = self._Load()
+    cred._user_agent = _CLIENT_USER_AGENT  # pylint: disable=protected-access
+    return cred
 
-  key_password = FLAGS.service_account_private_key_password
-  if FLAGS.service_account_private_key_file:
+  def _Load(self):
+    raise NotImplementedError()
+
+
+class CachedCredentialLoader(CredentialLoader):
+  """Base class to add cache capability to credential loader.
+
+  It will attempt to load credential from local cache file first before calling
+  derived class to load credential from source. Once credential is retrieved, it
+  will save to local cache file for future use.
+  """
+
+  def __init__(self, credential_cache_file, read_cache_first=True):
+    """Creates CachedCredentialLoader instance.
+
+    Args:
+      credential_cache_file: path to a local file to cache credential.
+      read_cache_first: whether to load credential from cache first.
+    Raises:
+      BigqueryError: if cache file cannot be created to store credential.
+    """
+    self.credential_cache_file = credential_cache_file
+    self._read_cache_first = read_cache_first
     try:
-      service_account_credentials = (
-          oauth2client_4_0.service_account.ServiceAccountCredentials.
-          from_p12_keyfile(
-              service_account_email=FLAGS.service_account,
-              filename=FLAGS.service_account_private_key_file,
-              scopes=_GetClientScopeFromFlags(),
-              private_key_password=key_password,
-              token_uri=oauth2client_4_0.GOOGLE_TOKEN_URI,
-              revoke_uri=oauth2client_4_0.GOOGLE_REVOKE_URI))
+      self._storage = oauth2client_4_0.file.Storage(credential_cache_file)
+    except OSError as e:
+      raise bigquery_client.BigqueryError(
+          'Cannot create credential file %s: %s' % (credential_cache_file, e))
+    self._verify_storage = False
+
+  @property
+  def storage(self):
+    return self._storage
+
+  def Load(self):
+    cred = self._LoadFromCache() if self._read_cache_first else None
+    if cred:
+      return cred
+
+    cred = super(CachedCredentialLoader, self).Load()
+    if not cred:
+      return None
+
+    # Save credentials to storage now to reuse and also avoid a warning message.
+    self._storage.put(cred)
+
+    if self._verify_storage:
+      # Verify credentials storage is ok now.
+      try:
+        self._storage.get()
+      except BaseException as e:  # pylint: disable=broad-except
+        self._RaiseCredentialsCorrupt(e)
+
+    cred.set_store(self._storage)
+    return cred
+
+  def _LoadFromCache(self):
+    """Loads credential from cache file."""
+    if not os.path.exists(self.credential_cache_file):
+      return None
+
+    try:
+      return self._storage.get()
+    except ImportError as e:
+      # This is a workaround for switching between oauth2client versions.
+      is_v2_storage = (str(e).startswith('No module named oauth2client.'))
+      if is_v2_storage:
+        os.remove(self.credential_cache_file)
+        self._storage = oauth2client_4_0.file.Storage(
+            self.credential_cache_file)
+        self._storage._create_file_if_needed()  # pylint: disable=protected-access
+        # Verify credentials storage is ok now. We don't want to silently
+        # recreate credentials every time, if this didn't work for some reason.
+        self._verify_storage = True
+      return None
+    except BaseException as e:  # pylint: disable=broad-except
+      self._RaiseCredentialsCorrupt(e)
+
+  def _RaiseCredentialsCorrupt(self, e):
+    BigqueryCmd.ProcessError(
+        e,
+        name='GetCredentialsFromFlags',
+        message_prefix=(
+            'Credentials appear corrupt. Please delete the credential file '
+            'and try your command again. You can delete your credential '
+            'file using "bq init --delete_credentials".\n\nIf that does '
+            'not work, you may have encountered a bug in the BigQuery CLI.'))
+    sys.exit(1)
+
+
+class ServiceAccountPrivateKeyLoader(CachedCredentialLoader):
+  """Base class for loading credential from service account."""
+
+  def Load(self):
+    if not oauth2client_4_0.client.HAS_OPENSSL:
+      raise app.UsageError(
+          'BigQuery requires OpenSSL to be installed in order to use '
+          'service account credentials. Please install OpenSSL '
+          'and the Python OpenSSL package.')
+    return super(ServiceAccountPrivateKeyLoader, self).Load()
+
+
+class ServiceAccountPrivateKeyFileLoader(ServiceAccountPrivateKeyLoader):
+  """Credential loader for private key stored in a file."""
+
+  def __init__(self, service_account, file_path, password, *args, **kwargs):
+    """Creates ServiceAccountPrivateKeyFileLoader instance.
+
+    Args:
+      service_account: service account the private key is for.
+      file_path: path to the file containing private key (in P12 format).
+      password: password to uncrypt the private key file.
+      *args: additional arguments to apply to base class.
+      **kwargs: additional keyword arguments to apply to base class.
+    """
+    super(ServiceAccountPrivateKeyFileLoader, self).__init__(*args, **kwargs)
+    self._service_account = service_account
+    self._file_path = file_path
+    self._password = password
+
+  def _Load(self):
+    try:
+      return (oauth2client_4_0.service_account.ServiceAccountCredentials
+              .from_p12_keyfile(
+                  service_account_email=self._service_account,
+                  filename=self._file_path,
+                  scopes=_GetClientScopeFromFlags(),
+                  private_key_password=self._password,
+                  token_uri=oauth2client_4_0.GOOGLE_TOKEN_URI,
+                  revoke_uri=oauth2client_4_0.GOOGLE_REVOKE_URI))
     except IOError as e:
       raise app.UsageError(
           'Service account specified, but private key in file "%s" '
-          'cannot be read:\n%s' % (FLAGS.service_account_private_key_file, e))
-  else:
-    raise app.UsageError('Service account authorization requires the '
-                         'service_account_private_key_file flag to be set.')
-  service_account_credentials._user_agent = _CLIENT_USER_AGENT  # pylint: disable=protected-access
-  return service_account_credentials
-
-
-def _BuildOAuthFlags():
-  parser = argparse.ArgumentParser(
-      description=__doc__,
-      formatter_class=argparse.RawDescriptionHelpFormatter,
-      parents=[oauth2client_4_0.tools.argparser])
-  oauth_flags = parser.parse_args(['--logging_level=ERROR'])
-  oauth_flags.noauth_local_webserver = not FLAGS.auth_local_webserver
-  oauth_flags.auth_host_name = FLAGS.auth_host_name
-  oauth_flags.auth_host_port = FLAGS.auth_host_port
-  return oauth_flags
+          'cannot be read:\n%s' % (self._file_path, e))
 
 
 
 
-def _GetApplicationDefaultCredentialFromFile(filename):
-  """Loads credentials from given application default credential file."""
-  with open(filename) as file_obj:
-    credentials = json.load(file_obj)
 
-  client_scope = _GetClientScopeFromFlags()
-  if credentials['type'] == oauth2client_4_0.client.AUTHORIZED_USER:
-    return Oauth2WithReauthCredentials(
-        access_token=None,
-        client_id=credentials['client_id'],
-        client_secret=credentials['client_secret'],
-        refresh_token=credentials['refresh_token'],
-        token_expiry=None,
-        token_uri=oauth2client_4_0.GOOGLE_TOKEN_URI,
-        user_agent=_CLIENT_USER_AGENT,
-        scopes=client_scope)
-  else:  # Service account
-    credentials['type'] = oauth2client_4_0.client.SERVICE_ACCOUNT
-    service_account_credentials = (
-        oauth2client_4_0.service_account.ServiceAccountCredentials.
-        from_json_keyfile_dict(
-            keyfile_dict=credentials,
-            scopes=client_scope,
-            token_uri=oauth2client_4_0.GOOGLE_TOKEN_URI,
-            revoke_uri=oauth2client_4_0.GOOGLE_REVOKE_URI))
-    service_account_credentials._user_agent = _CLIENT_USER_AGENT  # pylint: disable=protected-access
-    return service_account_credentials
+
+class ApplicationDefaultCredentialFileLoader(CachedCredentialLoader):
+  """Credential loader for application default credential file."""
+
+  def __init__(self, credential_file, *args, **kwargs):
+    """Creates ApplicationDefaultCredentialFileLoader instance.
+
+    Args:
+      credential_file: path to credential file in json format.
+      *args: additional arguments to apply to base class.
+      **kwargs: additional keyword arguments to apply to base class.
+    """
+    super(ApplicationDefaultCredentialFileLoader, self).__init__(
+        *args, **kwargs)
+    self._credential_file = credential_file
+
+  def _Load(self):
+    """Loads credentials from given application default credential file."""
+    with open(self._credential_file) as file_obj:
+      credentials = json.load(file_obj)
+
+    client_scope = _GetClientScopeFromFlags()
+    if credentials['type'] == oauth2client_4_0.client.AUTHORIZED_USER:
+      return Oauth2WithReauthCredentials(
+          access_token=None,
+          client_id=credentials['client_id'],
+          client_secret=credentials['client_secret'],
+          refresh_token=credentials['refresh_token'],
+          token_expiry=None,
+          token_uri=oauth2client_4_0.GOOGLE_TOKEN_URI,
+          user_agent=_CLIENT_USER_AGENT,
+          scopes=client_scope)
+    else:  # Service account
+      credentials['type'] = oauth2client_4_0.client.SERVICE_ACCOUNT
+      service_account_credentials = (
+          oauth2client_4_0.service_account.ServiceAccountCredentials
+          .from_json_keyfile_dict(
+              keyfile_dict=credentials,
+              scopes=client_scope,
+              token_uri=oauth2client_4_0.GOOGLE_TOKEN_URI,
+              revoke_uri=oauth2client_4_0.GOOGLE_REVOKE_URI))
+      service_account_credentials._user_agent = _CLIENT_USER_AGENT  # pylint: disable=protected-access
+      return service_account_credentials
 
 
 def _GetClientScopeFromFlags():
@@ -389,96 +448,48 @@ def _GetCredentialsFromFlags():
   """Returns credentials based on user supplied flags."""
 
 
-  # In the case of a GCE service account, we can skip the entire
-  # process of loading from storage.
   if FLAGS.use_gce_service_account:
+    # In the case of a GCE service account, we can skip the entire
+    # process of loading from storage.
     return oauth2client_4_0.contrib.gce.AppAssertionCredentials()
 
 
   if FLAGS.service_account:
-    credentials_getter = _GetServiceAccountCredentialsFromFlags
-    credential_file = FLAGS.service_account_credential_file
-    if not credential_file:
+    if not FLAGS.service_account_credential_file:
       raise app.UsageError(
           'The flag --service_account_credential_file must be specified '
           'if --service_account is used.')
+
+    if FLAGS.service_account_private_key_file:
+      loader = ServiceAccountPrivateKeyFileLoader(
+          credential_cache_file=FLAGS.service_account_credential_file,
+          read_cache_first=not FLAGS.enable_gdrive,
+          service_account=FLAGS.service_account,
+          file_path=FLAGS.service_account_private_key_file,
+          password=FLAGS.service_account_private_key_password)
+    else:
+      raise app.UsageError('Service account authorization requires '
+                           '--service_account_private_key_file flag to be set.')
   elif FLAGS.application_default_credential_file:
-
-    def credentials_getter(unused_storage):  # pylint: disable=invalid-name
-      return _GetApplicationDefaultCredentialFromFile(
-          FLAGS.application_default_credential_file)
-
-    credential_file = FLAGS.credential_file
-    if not credential_file:
+    if not FLAGS.credential_file:
       raise app.UsageError('The flag --credential_file must be specified if '
                            '--application_default_credential_file is used.')
+    loader = ApplicationDefaultCredentialFileLoader(
+        credential_cache_file=FLAGS.credential_file,
+        read_cache_first=not FLAGS.enable_gdrive,
+        credential_file=FLAGS.application_default_credential_file)
   else:
     raise app.UsageError(
         'bq.py should not be invoked. Use bq command instead.')
 
-  try:
-    storage = oauth2client_4_0.file.Storage(credential_file)
-  except OSError as e:
-    raise bigquery_client.BigqueryError(
-        'Cannot create credential file %s: %s' % (FLAGS.credential_file, e))
+  credentials = loader.Load()
 
-  credentials = None
-  verify_storage = False
-  if os.path.exists(credential_file):
-    try:
-      credentials = storage.get()
-    except ImportError as e:
-      # This is a workaround for switching between oauth2client versions.
-      is_v2_storage = False
-      if str(e).startswith('No module named oauth2client.'):
-        is_v2_storage = True
-      if is_v2_storage and (FLAGS.application_default_credential_file or
-                            FLAGS.service_account):
-        os.remove(credential_file)
-        storage = oauth2client_4_0.file.Storage(credential_file)
-        storage._create_file_if_needed()  # pylint: disable=protected-access
-        # Verify credentials storage is ok now. We don't want to silently
-        # recreate credentials every time, if this didn't work for some reason.
-        verify_storage = True
-    except BaseException as e:  # pylint: disable=broad-except
-      _RaiseCredentialsCorrupt(e)
-
-  if (credentials is None or credentials.invalid or
-      FLAGS.enable_gdrive is not None):
-    # Note that oauth2client.file ensures the file is created with
-    # the correct permissions.
-    credentials = credentials_getter(storage)
-
-
-  # Save credentials to storage now to reuse and also avoid a warning message.
-  if not os.path.exists(credential_file):
-    storage.put(credentials)
-
-  if verify_storage:
-    # Verify credentials storage is ok now.
-    try:
-      storage.get()
-    except BaseException as e:  # pylint: disable=broad-except
-      _RaiseCredentialsCorrupt(e)
 
   if type(credentials) == oauth2client_4_0.client.OAuth2Credentials:  # pylint: disable=unidiomatic-typecheck
     credentials = Oauth2WithReauthCredentials.from_OAuth2Credentials(
         credentials)
 
-  credentials.set_store(storage)
   return credentials
-
-
-def _RaiseCredentialsCorrupt(e):
-  BigqueryCmd.ProcessError(
-      e,
-      name='GetCredentialsFromFlags',
-      message_prefix=(
-          'Credentials appear corrupt. Please delete the credential file '
-          'and try your command again. You can delete your credential '
-          'file using "bq init --delete_credentials".\n\nIf that does '
-          'not work, you may have encountered a bug in the BigQuery CLI.'))
-  sys.exit(1)
 
 
 def _GetFormatterFromFlags(secondary_format='sparse'):
@@ -604,6 +615,20 @@ def _NormalizeFieldDelimiter(field_delimiter):
   return _DELIMITER_MAP.get(key, field_delimiter)
 
 
+def _ValidateHivePartitioningOption(hive_partitioning_mode):
+  """Validates the string provided is one the API accepts.
+
+  Should not receive None as an input, since that will fail the comparison.
+  Args:
+    hive_partitioning_mode: String representing which hive partitioning mode is
+      requested.  Only 'AUTO' and 'STRINGS' are supported.
+  """
+  if hive_partitioning_mode != 'AUTO' and hive_partitioning_mode != 'STRINGS':
+    raise app.UsageError(
+        'Only the following hive partitioning modes are supported: "AUTO" and '
+        '"STRINGS"')
+
+
 
 
 def _ParseLabels(labels):
@@ -664,7 +689,11 @@ class TablePrinter(object):
     """Returns bq-specific formatting of a TIMESTAMP type."""
     try:
       date = datetime.datetime.utcfromtimestamp(float(value))
-      return date.strftime('%Y-%m-%d %H:%M:%S')
+      # Our goal is the equivalent of '%Y-%m-%d %H:%M:%S' via strftime but that
+      # doesn't work for dates with years prior to 1900.  Instead we zero out
+      # fractional seconds then call isoformat with a space separator.
+      date = date.replace(microsecond=0)
+      return date.isoformat(' ')
     except ValueError:
       return '<date out of range for display>'
 
@@ -754,16 +783,22 @@ class Client(object):
   client = None
 
   @staticmethod
-  def Create(**kwds):
-    """Build a new BigqueryClient configured from kwds and FLAGS."""
+  def Create(config_logging=True, **kwds):
+    """Build a new BigqueryClient configured from kwds and FLAGS.
+
+    Args:
+      config_logging: if True, set python logging according to --apilog.
+      **kwds: keyword arguments for creating BigqueryClient.
+    """
 
     def KwdsOrFlags(name):
       return kwds[name] if name in kwds else getattr(FLAGS, name)
 
     # Note that we need to handle possible initialization tasks
     # for the case of being loaded as a library.
-    _ProcessBigqueryrc()
-    _ConfigureLogging(bigquery_client)
+    bq_utils.ProcessBigqueryrc()
+    if config_logging:
+      _ConfigureLogging(bigquery_client)
 
     if FLAGS.httplib2_debuglevel:
       httplib2.debuglevel = FLAGS.httplib2_debuglevel
@@ -1015,8 +1050,9 @@ class BigqueryCmd(NewCmd):
 
     Subclasses will override for any exceptional cases.
     """
-    return not _UseServiceAccount() and not (os.path.exists(
-        _GetBigqueryRcFilename()) or os.path.exists(FLAGS.credential_file))
+    return (not _UseServiceAccount() and
+            not (os.path.exists(bq_utils.GetBigqueryRcFilename()) or
+                 os.path.exists(FLAGS.credential_file)))
 
   def Run(self, argv):
     """Bigquery commands run `init` before themselves if needed."""
@@ -1163,7 +1199,7 @@ class BigqueryCmd(NewCmd):
       print 'Successfully started %s %s' % (self._command_name, reference)
 
   def _ProcessCommandRc(self, fv):
-    _ProcessBigqueryrcSection(self._command_name, fv)
+    bq_utils.ProcessBigqueryrcSection(self._command_name, fv)
 
 
 class _Load(BigqueryCmd):
@@ -1242,7 +1278,7 @@ class _Load(BigqueryCmd):
         '\n DATASTORE_BACKUP'
         '\n AVRO'
         '\n PARQUET'
-        '\n ORC (experimental)',
+        '\n ORC',
         flag_values=fv)
     flags.DEFINE_list(
         'projection_fields', [],
@@ -1327,6 +1363,13 @@ class _Load(BigqueryCmd):
         'If sourceFormat is set to "AVRO", indicates whether to enable '
         'interpreting logical types into their corresponding types '
         '(ie. TIMESTAMP), instead of only using their raw types (ie. INTEGER).',
+        flag_values=fv)
+    flags.DEFINE_string(
+        'hive_partitioning_mode',
+        None,
+        '(experimental) Enables hive partitioning.  AUTO indicates to perform '
+        'automatic type inference.  STRINGS indicates to treat all hive '
+        'partition keys as STRING typed.  No other values are accepted',
         flag_values=fv)
     self._ProcessCommandRc(fv)
 
@@ -1420,6 +1463,9 @@ class _Load(BigqueryCmd):
       }
     if self.use_avro_logical_types is not None:
       opts['use_avro_logical_types'] = self.use_avro_logical_types
+    if self.hive_partitioning_mode is not None:
+      _ValidateHivePartitioningOption(self.hive_partitioning_mode)
+      opts['hive_partitioning_mode'] = self.hive_partitioning_mode
     job = client.Load(table_reference, source, schema=schema, **opts)
     if FLAGS.sync:
       _PrintJobMessages(client.FormatJobInfo(job))
@@ -1427,8 +1473,12 @@ class _Load(BigqueryCmd):
       self.PrintJobStartInfo(job)
 
 
-def _CreateExternalTableDefinition(source_format, source_uris, schema,
-                                   autodetect):
+def _CreateExternalTableDefinition(source_format,
+                                   source_uris,
+                                   schema,
+                                   autodetect,
+                                   ignore_unknown_values=False,
+                                   hive_partitioning_mode=None):
   """Create an external table definition with the given URIs and the schema.
 
   Arguments:
@@ -1448,7 +1498,18 @@ def _CreateExternalTableDefinition(source_format, source_uris, schema,
       For JSON, defaulting to autodetection is safer because the only option
       autodetected is compression. If a schema is passed,
       then the user-supplied schema is used.
-
+    ignore_unknown_values:  Indicates if BigQuery should allow extra values that
+       are not represented in the table schema. If true, the extra values are
+       ignored. If false, records with extra columns are treated as bad records,
+       and if there are too many bad records, an invalid error is returned in
+       the job result. The default value is false.
+       The sourceFormat property determines what BigQuery treats as an
+       extra value:
+         - CSV: Trailing columns
+         - JSON: Named values that don't match any column names.
+    hive_partitioning_mode: Enables hive partitioning.  AUTO indicates to
+       perform automatic type inference.  STRINGS indicates to treat all hive
+       partition keys as STRING typed.  No other values are accepted.
   Returns:
     A python dictionary that contains a external table definition for the given
     format with the most common options set.
@@ -1459,6 +1520,8 @@ def _CreateExternalTableDefinition(source_format, source_uris, schema,
         'NEWLINE_DELIMITED_JSON',
         'DATASTORE_BACKUP',
         'AVRO',
+        'ORC',
+        'PARQUET',
         'GOOGLE_SHEETS'
     ]
 
@@ -1498,7 +1561,11 @@ def _CreateExternalTableDefinition(source_format, source_uris, schema,
                 "skipLeadingRows": 0
             }
         """)
-
+    if ignore_unknown_values:
+      external_table_def['ignoreUnknownValues'] = True
+    if hive_partitioning_mode is not None:
+      _ValidateHivePartitioningOption(hive_partitioning_mode)
+      external_table_def['hivePartitioningMode'] = hive_partitioning_mode
     if schema:
       fields = BigqueryClient.ReadSchema(schema)
       external_table_def['schema'] = {'fields': fields}
@@ -1520,6 +1587,19 @@ class _MakeExternalTableDefinition(BigqueryCmd):
         None,
         'Should schema and format options be autodetected.',
         flag_values=fv)
+    flags.DEFINE_boolean(
+        'ignore_unknown_values',
+        None,
+        'Ignore any values in a row that are not present in the schema.',
+        short_name='i',
+        flag_values=fv)
+    flags.DEFINE_string(
+        'hive_partitioning_mode',
+        None,
+        '(experimental) Enables hive partitioning.  AUTO indicates to perform '
+        'automatic type inference.  STRINGS indicates to treat all hive '
+        'partition keys as STRING typed.  No other values are accepted',
+        flag_values=fv)
     flags.DEFINE_enum(
         'source_format',
         'CSV',
@@ -1528,6 +1608,8 @@ class _MakeExternalTableDefinition(BigqueryCmd):
             'GOOGLE_SHEETS',
             'NEWLINE_DELIMITED_JSON',
             'DATASTORE_BACKUP',
+            'ORC',
+            'PARQUET',
             'AVRO'
         ],
         'Format of source data. Options include:'
@@ -1535,6 +1617,8 @@ class _MakeExternalTableDefinition(BigqueryCmd):
         '\n GOOGLE_SHEETS'
         '\n NEWLINE_DELIMITED_JSON'
         '\n DATASTORE_BACKUP'
+        '\n ORC (experimental)'
+        '\n PARQUET (experimental)'
         '\n AVRO',
         flag_values=fv)
     self._ProcessCommandRc(fv)
@@ -1573,8 +1657,13 @@ class _MakeExternalTableDefinition(BigqueryCmd):
         text schema.
     """
     json.dump(
-        _CreateExternalTableDefinition(self.source_format, source_uris, schema,
-                                       self.autodetect),
+        _CreateExternalTableDefinition(
+            self.source_format,
+            source_uris,
+            schema,
+            self.autodetect,
+            self.ignore_unknown_values,
+            self.hive_partitioning_mode),
         sys.stdout,
         sort_keys=True,
         indent=2)
@@ -1885,17 +1974,23 @@ class _Query(BigqueryCmd):
       elif not FLAGS.sync:
         self.PrintJobStartInfo(job)
       else:
-        fields, rows = client.ReadSchemaAndJobRows(
-            job['jobReference'],
-            start_row=self.start_row,
-            max_rows=self.max_rows)
-        Factory.ClientTablePrinter.GetTablePrinter().PrintTable(fields, rows)
-        # If we are here, the job succeeded, but print warnings if any.
-        _PrintJobMessages(client.FormatJobInfo(job))
+        self._PrintQueryJobResults(client, job)
     if self.destination_schema:
       client.UpdateTable(
           client.GetTableReference(self.destination_table),
           BigqueryClient.ReadSchema(self.destination_schema))
+
+  def _PrintQueryJobResults(self, client, job):
+    printable_job_info = client.FormatJobInfo(job)
+    if not _IsSuccessfulDmlOrDdlJob(printable_job_info):
+      # ReadSchemaAndJobRows can handle failed jobs, but cannot handle
+      # a successful DML job if the destination table is already deleted.
+      # DML and DDL do not have query result, so skip ReadSchemaAndJobRows.
+      fields, rows = client.ReadSchemaAndJobRows(
+          job['jobReference'], start_row=self.start_row, max_rows=self.max_rows)
+      Factory.ClientTablePrinter.GetTablePrinter().PrintTable(fields, rows)
+    # If we are here, the job succeeded, but print warnings if any.
+    _PrintJobMessages(printable_job_info)
 
 
 def _GetExternalDataConfig(file_path_or_simple_spec):
@@ -2219,6 +2314,10 @@ class _List(BigqueryCmd):  # pylint: disable=missing-docstring
         'Show datasets described by this identifier.',
         short_name='d',
         flag_values=fv)
+    flags.DEFINE_boolean(
+        'models', False, 'Show all models.', short_name='m', flag_values=fv)
+    flags.DEFINE_boolean(
+        'routines', False, 'Show all routines.', flag_values=fv)
     flags.DEFINE_string(
         'transfer_location',
         None,
@@ -2304,6 +2403,10 @@ class _List(BigqueryCmd):  # pylint: disable=missing-docstring
         'List all reservation grants for given project/location or '
         'reservation.',
         flag_values=fv)
+    flags.DEFINE_boolean(
+        'connection', None,
+        'List all connections for given project/location',
+        flag_values=fv)
     self._ProcessCommandRc(fv)
 
   def RunWithArgs(self, identifier=''):
@@ -2320,6 +2423,8 @@ class _List(BigqueryCmd):  # pylint: disable=missing-docstring
       bq ls -p -n 1000
       bq ls mydataset
       bq ls -a
+      bq ls -m mydataset
+      bq ls --routines mydataset (requires whitelisting)
       bq ls --filter labels.color:red
       bq ls --filter 'labels.color:red labels.size:*'
       bq ls --transfer_config --transfer_location='us'
@@ -2331,6 +2436,7 @@ class _List(BigqueryCmd):  # pylint: disable=missing-docstring
       bq ls --reservation_grant --project_id=proj --location='us'
       bq ls --reservation_grant --project_id=proj --location='us' --reservation
           <reservation_ref>
+      bq ls --connection --project_id=proj --location=us
     """
 
     # pylint: disable=g-doc-exception
@@ -2395,7 +2501,30 @@ class _List(BigqueryCmd):  # pylint: disable=missing-docstring
           all_users=self.a,
           min_creation_time=self.min_creation_time,
           max_creation_time=self.max_creation_time,
+          page_token=page_token
+      )
+    elif self.m:
+      object_type = ModelReference
+      reference = client.GetDatasetReference(identifier)
+      response = client.ListModels(
+          reference=reference,
+          max_results=self.max_results,
           page_token=page_token)
+      if 'models' in response:
+        results = response['models']
+      if 'nextPageToken' in response:
+        _PrintPageToken(response)
+    elif self.routines:
+      object_type = RoutineReference
+      reference = client.GetDatasetReference(identifier)
+      response = client.ListRoutines(
+          reference=reference,
+          max_results=self.max_results,
+          page_token=page_token)
+      if 'routines' in response:
+        results = response['routines']
+      if 'nextPageToken' in response:
+        _PrintPageToken(response)
     elif self.reservation_grant:
       try:
         if self.reservation:
@@ -2434,19 +2563,35 @@ class _List(BigqueryCmd):  # pylint: disable=missing-docstring
           print 'No slot pools found.'
           results = None
       else:
+        bi_response = None
+        response = []
         object_type = ReservationReference
         reference = client.GetReservationReference(
             identifier, FLAGS.location, ' ')
         try:
+          bi_response = client.ListBiReservations(reference)
+          if 'size' in bi_response:
+            size_in_bytes = long(bi_response['size'])
+            size_in_gbytes = size_in_bytes / (1024 * 1024 * 1024)
+            print 'BI Engine reservation: %sGB' % size_in_gbytes
+        except BaseException as e:
+          if 'was not found' not in e.message and (
+              'is disabled' not in e.message):
+            raise bigquery_client.BigqueryError(
+                "Failed to list reservations '%s': %s" % (identifier, e))
+
+        try:
           response = client.ListReservations(
               reference, self.max_results, self.page_token)
         except BaseException as e:
-          raise bigquery_client.BigqueryError(
-              "Failed to list reservations '%s': %s" % (identifier, e))
+          if 'is disabled' not in e.message:
+            raise bigquery_client.BigqueryError(
+                "Failed to list reservations '%s': %s" % (identifier, e))
         if 'reservations' in response:
           results = response['reservations']
         else:
-          print 'No reservations found.'
+          if bi_response is None:
+            print 'No reservations found.'
       if 'nextPageToken' in response:
         _PrintPageToken(response)
     elif self.transfer_config:
@@ -2510,6 +2655,21 @@ class _List(BigqueryCmd):  # pylint: disable=missing-docstring
         page_token = dict(nextPageToken=list_transfer_log_result[1])
         _PrintPageToken(page_token)
       results = list_transfer_log_result[0]
+    elif self.connection:
+      object_type = ConnectionReference
+      reference = client.GetConnectionReference(identifier=identifier,
+                                                default_location=FLAGS.location,
+                                                default_connection_id=' ')
+      list_connections_results = client.ListConnections(
+          reference,
+          max_results=self.max_results,
+          page_token=self.page_token)
+      if 'connections' in list_connections_results:
+        results = list_connections_results['connections']
+      else:
+        print 'No connections found.'
+      if 'nextPageToken' in list_connections_results:
+        _PrintPageToken(list_connections_results)
     elif self.p or reference is None:
       object_type = ProjectReference
       results = client.ListProjects(
@@ -2590,6 +2750,20 @@ class _Delete(BigqueryCmd):
     flags.DEFINE_boolean(
         'reservation_grant', None, 'Delete a reservation grant.',
         flag_values=fv)
+    flags.DEFINE_boolean(
+        'model',
+        False,
+        'Remove model with this model ID.',
+        short_name='m',
+        flag_values=fv)
+    flags.DEFINE_boolean(
+        'routine',
+        False,
+        'Remove routine with this routine ID.',
+        flag_values=fv)
+    flags.DEFINE_boolean(
+        'connection', None, 'Delete a connection.',
+        flag_values=fv)
     self._ProcessCommandRc(fv)
 
   def RunWithArgs(self, identifier):
@@ -2604,9 +2778,12 @@ class _Delete(BigqueryCmd):
 
     Examples:
       bq rm ds.table
+      bq rm -m ds.model
+      bq rm --routine ds.routine (requires whitelisting)
       bq rm -r -f old_dataset
       bq rm --transfer_config=projects/p/locations/l/transferConfigs/c
       bq rm --reservation_grant --project_id=proj --location=us query_proj_dev
+      bq rm --connection --project_id=proj --location=us con
     """
 
     client = Client.Get()
@@ -2619,6 +2796,10 @@ class _Delete(BigqueryCmd):
 
     if self.t:
       reference = client.GetTableReference(identifier)
+    elif self.m:
+      reference = client.GetModelReference(identifier)
+    elif self.routine:
+      reference = client.GetRoutineReference(identifier)
     elif self.d:
       reference = client.GetDatasetReference(identifier)
     elif self.transfer_config:
@@ -2652,6 +2833,10 @@ class _Delete(BigqueryCmd):
       except BaseException as e:
         raise bigquery_client.BigqueryError(
             "Failed to delete reservation grant '%s': %s" % (identifier, e))
+    elif self.connection:
+      reference = client.GetConnectionReference(
+          identifier=identifier, default_location=FLAGS.location)
+      client.DeleteConnection(reference)
     else:
       reference = client.GetReference(identifier)
       _Typecheck(reference, (DatasetReference, TableReference),
@@ -2660,11 +2845,19 @@ class _Delete(BigqueryCmd):
     if isinstance(reference, TableReference) and self.r:
       raise app.UsageError('Cannot specify -r with %r' % (reference,))
 
+    if isinstance(reference, ModelReference) and self.r:
+      raise app.UsageError('Cannot specify -r with %r' % (reference,))
+
+    if isinstance(reference, RoutineReference) and self.r:
+      raise app.UsageError('Cannot specify -r with %r' % (reference,))
+
     if not self.force:
       if ((isinstance(reference, DatasetReference) and
            client.DatasetExists(reference)) or
           (isinstance(reference, TableReference) and
            client.TableExists(reference)) or
+          (isinstance(reference, ModelReference) and
+           client.ModelExists(reference)) or
           (isinstance(reference, TransferConfigReference) and
            client.TransferExists(reference))):
         if 'y' != _PromptYN('rm: remove %r? (y/N) ' % (reference,)):
@@ -2678,6 +2871,10 @@ class _Delete(BigqueryCmd):
           delete_contents=self.recursive)
     elif isinstance(reference, TableReference):
       client.DeleteTable(reference, ignore_not_found=self.force)
+    elif isinstance(reference, ModelReference):
+      client.DeleteModel(reference, ignore_not_found=self.force)
+    elif isinstance(reference, RoutineReference):
+      client.DeleteRoutine(reference, ignore_not_found=self.force)
     elif isinstance(reference, TransferConfigReference):
       client.DeleteTransferConfig(reference, ignore_not_found=self.force)
 
@@ -2960,9 +3157,44 @@ class _Make(BigqueryCmd):
         'reference/google.protobuf#google.protobuf.Timestamp ',
         flag_values=fv)
     flags.DEFINE_string(
+        'schedule_start_time',
+        None, 'Time to start scheduling transfer runs for the given '
+        'transfer configuration. If empty, the default value for '
+        'the start time will be used to start runs immediately.'
+        'The format for the time stamp is RFC3339 UTC "Zulu". '
+        'Read more: '
+        'https://developers.google.com/protocol-buffers/docs/'
+        'reference/google.protobuf#google.protobuf.Timestamp',
+        flag_values=fv)
+    flags.DEFINE_string(
+        'schedule_end_time',
+        None, 'Time to stop scheduling transfer runs for the given '
+        'transfer configuration. If empty, the default value for '
+        'the end time will be used to schedule runs indefinitely.'
+        'The format for the time stamp is RFC3339 UTC "Zulu". '
+        'Read more: '
+        'https://developers.google.com/protocol-buffers/docs/'
+        'reference/google.protobuf#google.protobuf.Timestamp',
+        flag_values=fv)
+    flags.DEFINE_string(
+        'schedule',
+        None,
+        'Data transfer schedule. If the data source does not support a custom '
+        'schedule, this should be empty. If empty, the default '
+        'value for the data source will be used. The specified times are in '
+        'UTC. Examples of valid format: 1st,3rd monday of month 15:30, '
+        'every wed,fri of jan,jun 13:15, and first sunday of quarter 00:00. '
+        'See more explanation about the format here: '
+        'https://cloud.google.com/appengine/docs/flexible/python/scheduling-jobs-with-cron-yaml#the_schedule_format',  # pylint: disable=line-too-long
+        flag_values=fv)
+    flags.DEFINE_bool(
+        'no_auto_scheduling',
+        False, 'Disables automatic scheduling of data transfer runs for this '
+        'configuration.',
+        flag_values=fv)
+    flags.DEFINE_string(
         'schema',
-        '',
-        'Either a filename or a comma-separated list of fields in the form '
+        '', 'Either a filename or a comma-separated list of fields in the form '
         'name[:type].',
         flag_values=fv)
     flags.DEFINE_string(
@@ -3086,12 +3318,6 @@ class _Make(BigqueryCmd):
         'hierarchies can be specified by separating reservations with a slash.'
         'For example foo/bar/baz.',
         flag_values=fv)
-    flags.DEFINE_boolean(
-        'slot_pool',
-        None,
-        'Creates a slot pool in the specified reservation. You do not need to '
-        'specify a slot pool id, this will be assigned automatically.',
-        flag_values=fv)
     flags.DEFINE_integer(
         'slots',
         0,
@@ -3103,15 +3329,6 @@ class _Make(BigqueryCmd):
         True,
         'If true, any query using this reservation will also be submitted to '
         'the parent reservation.',
-        flag_values=fv)
-    flags.DEFINE_enum(
-        'plan',
-        None, ['ADHOC', 'ONE_DAY', 'THIRTY_DAYS'],
-        'Commitment plan for this slot pool. Plans cannot be deleted before '
-        'their commitment period is over. Options include:'
-        '\n ADHOC'
-        '\n ONE_DAY'
-        '\n THIRTY_DAYS',
         flag_values=fv)
     flags.DEFINE_boolean(
         'reservation_grant',
@@ -3129,6 +3346,28 @@ class _Make(BigqueryCmd):
         'reservation_id', None,
         'Reservation ID used to create reservation grant for. '
         'Used in conjuction with --reservation_grant.',
+        flag_values=fv)
+    flags.DEFINE_boolean(
+        'connection',
+        None,
+        'Create a connection.',
+        flag_values=fv)
+    flags.DEFINE_enum(
+        'connection_type',
+        None,
+        ['CLOUD_SQL'],
+        'Connection type. Valid values:'
+        '\n CLOUD_SQL',
+        flag_values=fv)
+    flags.DEFINE_string(
+        'properties',
+        None,
+        'Connection properties in JSON format',
+        flag_values=fv)
+    flags.DEFINE_string(
+        'connection_credential',
+        None,
+        'Connection credential in JSON format',
         flag_values=fv)
     self._ProcessCommandRc(fv)
 
@@ -3150,10 +3389,17 @@ class _Make(BigqueryCmd):
       bq mk -d --data_location=EU new_dataset
       bq mk --transfer_config --target_dataset=dataset --display_name=name
           -p='{"param":"value"}' --data_source=source
+          --schedule_start_time={schedule_start_time}
+          --schedule_end_time={schedule_end_time}
       bq mk --transfer_run --start_time={start_time} --end_time={end_time}
           projects/p/locations/l/transferConfigs/c
       bq mk ---reservation_grant -project_id=proj --location=us
           --reservation_id=project:us.dev --job_type=QUERY
+      bq mk --connection --connection_type='CLOUD_SQL'
+        --properties='{"instanceId" : "instance",
+        "database" : "db", "type" : "MYSQL" }'
+        --connection_credential='{"username":"u", "password":"p"}'
+        --project_id=proj --location=us new_connection
     """
 
     client = Client.Get()
@@ -3173,19 +3419,7 @@ class _Make(BigqueryCmd):
     elif self.reservation:
       object_info = None
       reference = client.GetReservationReference(identifier, FLAGS.location)
-      if self.slot_pool:
-        try:
-          result = client.CreateSlotPool(reference, self.slots, self.plan)
-        except BaseException as e:
-          raise bigquery_client.BigqueryError(
-              "Failed to create slot pool in '%s': %s" % (identifier, e))
-        if result['done']:
-          object_info = result['response']
-          reference = client.GetSlotPoolReference(
-              path=object_info['name'], default_location=FLAGS.location)
-        else:
-          print 'Slot pool creation is pending: %s' % result['name']
-      else:
+      if True:
         try:
           object_info = client.CreateReservation(reference, self.slots,
                                                  self.use_parent)
@@ -3227,15 +3461,20 @@ class _Make(BigqueryCmd):
       if not credentials and self.data_source != 'loadtesting':
         authorization_code = RetrieveAuthorizationCode(
             reference, self.data_source, transfer_client)
+      schedule_args = bigquery_client.TransferScheduleArgs(
+          schedule=self.schedule,
+          start_time=self.schedule_start_time,
+          end_time=self.schedule_end_time,
+          disable_auto_scheduling=self.no_auto_scheduling)
       transfer_name = client.CreateTransferConfig(
-          reference,
-          self.data_source,
-          self.target_dataset,
-          self.display_name,
-          self.refresh_window_days,
-          self.params,
-          authorization_code,
-      )
+          reference=reference,
+          data_source=self.data_source,
+          target_dataset=self.target_dataset,
+          display_name=self.display_name,
+          refresh_window_days=self.refresh_window_days,
+          params=self.params,
+          authorization_code=authorization_code,
+          schedule_args=schedule_args)
       print(
           'Transfer configuration \'%s\' successfully created.' % transfer_name)
     elif self.transfer_run:
@@ -3258,6 +3497,22 @@ class _Make(BigqueryCmd):
       for result in results:
         formatter.AddDict(result)
       formatter.Print()
+    elif self.connection:
+      reference = client.GetConnectionReference(identifier=identifier,
+                                                default_location=FLAGS.location)
+      if not self.connection_type:
+        raise app.UsageError('Need to specify --connection_type.')
+      if not self.properties:
+        raise app.UsageError('Need to specify --properties')
+      created_connection = client.CreateConnection(
+          reference,
+          self.connection_type,
+          self.properties)
+      if self.connection_credential:
+        path = created_connection['name']
+        reference = client.GetConnectionReference(path=path)
+        client.UpdateConnectionCredential(reference, self.connection_type,
+                                          self.connection_credential)
     elif self.d or not identifier:
       reference = client.GetDatasetReference(identifier)
     else:
@@ -3389,6 +3644,12 @@ class _Update(BigqueryCmd):
         short_name='t',
         flag_values=fv)
     flags.DEFINE_boolean(
+        'model',
+        False,
+        'Updates a model with this model ID.',
+        short_name='m',
+        flag_values=fv)
+    flags.DEFINE_boolean(
         'reservation',
         None,
         'Updates a reservation described by this identifier.',
@@ -3398,6 +3659,12 @@ class _Update(BigqueryCmd):
         None,
         'The number of slots associated with the reservation subtree rooted at '
         'this reservation node.',
+        flag_values=fv)
+    flags.DEFINE_string(
+        'reservation_size',
+        None, 'BI reservation size. Can be specified in bytes '
+        '(--reservation_size=2147483648) or in GB (--reservation_size=2G). '
+        'Minimum 2GB. Use 0 to remove reservation.',
         flag_values=fv)
     flags.DEFINE_boolean(
         'use_parent',
@@ -3437,6 +3704,42 @@ class _Update(BigqueryCmd):
         'update_credentials',
         False,
         'Update the transfer configuration credentials.',
+        flag_values=fv)
+    flags.DEFINE_string(
+        'schedule_start_time',
+        None, 'Time to start scheduling transfer runs for the given '
+        'transfer configuration. If empty, the default value for '
+        'the start time will be used to start runs immediately.'
+        'The format for the time stamp is RFC3339 UTC "Zulu". '
+        'Read more: '
+        'https://developers.google.com/protocol-buffers/docs/'
+        'reference/google.protobuf#google.protobuf.Timestamp',
+        flag_values=fv)
+    flags.DEFINE_string(
+        'schedule_end_time',
+        None, 'Time to stop scheduling transfer runs for the given '
+        'transfer configuration. If empty, the default value for '
+        'the end time will be used to schedule runs indefinitely.'
+        'The format for the time stamp is RFC3339 UTC "Zulu". '
+        'Read more: '
+        'https://developers.google.com/protocol-buffers/docs/'
+        'reference/google.protobuf#google.protobuf.Timestamp',
+        flag_values=fv)
+    flags.DEFINE_string(
+        'schedule',
+        None,
+        'Data transfer schedule. If the data source does not support a custom '
+        'schedule, this should be empty. If empty, the default '
+        'value for the data source will be used. The specified times are in '
+        'UTC. Examples of valid format: 1st,3rd monday of month 15:30, '
+        'every wed,fri of jan,jun 13:15, and first sunday of quarter 00:00. '
+        'See more explanation about the format here: '
+        'https://cloud.google.com/appengine/docs/flexible/python/scheduling-jobs-with-cron-yaml#the_schedule_format',  # pylint: disable=line-too-long
+        flag_values=fv)
+    flags.DEFINE_bool(
+        'no_auto_scheduling',
+        False, 'Disables automatic scheduling of data transfer runs for this '
+        'configuration.',
         flag_values=fv)
     flags.DEFINE_string(
         'schema',
@@ -3551,6 +3854,11 @@ class _Update(BigqueryCmd):
         'Only apply to partitioned table.',
         flag_values=fv)
     flags.DEFINE_string(
+        'connection_credential',
+        None,
+        'Connection credential in JSON format',
+        flag_values=fv)
+    flags.DEFINE_string(
         'range_partitioning',
         None,
         'Enables range partitioning on the table. The format should be '
@@ -3569,6 +3877,7 @@ class _Update(BigqueryCmd):
     Examples:
       bq update --description "Dataset description" existing_dataset
       bq update --description "My table" existing_dataset.existing_table
+      bq update --description "My model" -m existing_dataset.existing_model
       bq update -t existing_dataset.existing_table name:integer,value:string
       bq update --destination_kms_key
           projects/p/locations/l/keyRings/r/cryptoKeys/k
@@ -3580,6 +3889,10 @@ class _Update(BigqueryCmd):
       bq update --transfer_config --target_dataset=dataset
           --refresh_window_days=5 --update_credentials
           projects/p/locations/l/transferConfigs/c
+      bq update --reservation --location=US --project_id=my-project
+          --reservation_size=2G
+      bq update --connection_credential='{"username":"u", "password":"p"}'
+        --location=US --project_id=my-project existing_connection
     """
     client = Client.Get()
     if self.d and self.t:
@@ -3594,21 +3907,37 @@ class _Update(BigqueryCmd):
       reference = client.GetTableReference(identifier)
     elif self.materialized_view:
       reference = client.GetTableReference(identifier)
-    elif self.d or not identifier:
-      reference = client.GetDatasetReference(identifier)
     elif self.reservation:
       try:
-        reference = client.GetReservationReference(identifier, FLAGS.location)
-        object_info = client.UpdateReservation(
-            reference, self.slots, self.use_parent)
-        _PrintObjectInfo(object_info, reference, custom_format='show')
+        if self.reservation_size is not None:
+          reference = client.GetBiReservationReference(FLAGS.location)
+          object_info = client.UpdateBiReservation(reference,
+                                                   self.reservation_size)
+          print object_info
+        else:
+          reference = client.GetReservationReference(identifier, FLAGS.location)
+          object_info = client.UpdateReservation(reference, self.slots,
+                                                 self.use_parent)
+          _PrintObjectInfo(object_info, reference, custom_format='show')
       except BaseException as e:
         raise bigquery_client.BigqueryError(
             "Failed to update reservation '%s': %s" % (identifier, e))
+    elif self.d or not identifier:
+      reference = client.GetDatasetReference(identifier)
+    elif self.m:
+      reference = client.GetModelReference(identifier)
     elif self.transfer_config:
       formatted_identifier = _FormatDataTransferIdentifiers(client, identifier)
       reference = TransferConfigReference(
           transferConfigName=formatted_identifier)
+    elif self.connection_credential:
+      reference = client.GetConnectionReference(identifier=identifier,
+                                                default_location=FLAGS.location)
+      connection = client.GetConnection(reference)
+      if 'cloudSql' in connection:
+        client.UpdateConnectionCredential(reference,
+                                          'CLOUD_SQL',
+                                          self.connection_credential)
     else:
       reference = client.GetReference(identifier)
       _Typecheck(reference, (DatasetReference, TableReference),
@@ -3729,13 +4058,37 @@ class _Update(BigqueryCmd):
           authorization_code = RetrieveAuthorizationCode(
               'projects/' + client.GetProjectReference().projectId,
               current_config['dataSourceId'], client.GetTransferV1ApiClient())
-        client.UpdateTransferConfig(reference, self.target_dataset,
-                                    self.display_name, self.refresh_window_days,
-                                    self.params, authorization_code)
+        schedule_args = bigquery_client.TransferScheduleArgs(
+            schedule=self.schedule,
+            start_time=self.schedule_start_time,
+            end_time=self.schedule_end_time,
+            disable_auto_scheduling=self.no_auto_scheduling)
+        client.UpdateTransferConfig(
+            reference=reference,
+            target_dataset=self.target_dataset,
+            display_name=self.display_name,
+            refresh_window_days=self.refresh_window_days,
+            params=self.params,
+            authorization_code=authorization_code,
+            schedule_args=schedule_args)
         print "Transfer configuration '%s' successfully updated." % (reference,)
       else:
         raise bigquery_client.BigqueryNotFoundError(
             'Not found: %r' % (reference,), {'reason': 'notFound'}, [])
+    elif isinstance(reference, ModelReference):
+      expiration = None
+      if self.expiration:
+        expiration = int(self.expiration + time.time()) * 1000
+      else:
+        expiration = self.expiration  # None or 0
+      client.UpdateModel(
+          reference,
+          description=self.description,
+          expiration=expiration,
+          labels_to_set=labels_to_set,
+          label_keys_to_remove=label_keys_to_remove,
+          etag=self.etag)
+      print "Model '%s' successfully updated." % (reference)
 
 
 def RetrieveAuthorizationCode(reference, data_source, transfer_client):
@@ -3878,6 +4231,17 @@ class _Show(BigqueryCmd):
         'Show information about the particular transfer run.',
         flag_values=fv)
     flags.DEFINE_boolean(
+        'model',
+        False,
+        'Show details of model with this model ID.',
+        short_name='m',
+        flag_values=fv)
+    flags.DEFINE_boolean(
+        'routine',
+        False,
+        'Show the details of a particular routine.',
+        flag_values=fv)
+    flags.DEFINE_boolean(
         'reservation',
         None,
         'Shows details for the reservation described by this identifier.',
@@ -3886,6 +4250,11 @@ class _Show(BigqueryCmd):
         'slot_pool',
         None,
         'Shows details for the slot pool described by this identifier.',
+        flag_values=fv)
+    flags.DEFINE_boolean(
+        'connection',
+        None,
+        'Shows details for the connection described by this identifier.',
         flag_values=fv)
     self._ProcessCommandRc(fv)
 
@@ -3898,9 +4267,12 @@ class _Show(BigqueryCmd):
       bq show [--schema] dataset.table
       bq show [--view] dataset.view
       bq show [--materialized_view] dataset.materialized_view
+      bq show -m ds.model
+      bq show --routine ds.routine (requires whitelisting)
       bq show --transfer_config projects/p/locations/l/transferConfigs/c
       bq show --transfer_run projects/p/locations/l/transferConfigs/c/runs/r
       bq show --encryption_service_account
+      bq show --connection --project_id=project --location=us connection
     """
     # pylint: disable=g-doc-exception
     client = Client.Get()
@@ -3931,6 +4303,10 @@ class _Show(BigqueryCmd):
       formatted_identifier = _FormatDataTransferIdentifiers(client, identifier)
       reference = TransferRunReference(transferRunName=formatted_identifier)
       object_info = client.GetTransferRun(formatted_identifier)
+    elif self.m:
+      reference = client.GetModelReference(identifier)
+    elif self.routine:
+      reference = client.GetRoutineReference(identifier)
     elif self.reservation:
       if self.slot_pool:
         reference = client.GetSlotPoolReference(
@@ -3945,6 +4321,9 @@ class _Show(BigqueryCmd):
       email = object_info['email']
       object_info = {'ServiceAccountID': email}
       reference = EncryptionServiceAccount(serviceAccount='serviceAccount')
+    elif self.connection:
+      reference = client.GetConnectionReference(identifier)
+      object_info = client.GetConnection(reference)
     else:
       reference = client.GetReference(identifier)
     if reference is None:
@@ -3955,6 +4334,12 @@ class _Show(BigqueryCmd):
     _PrintObjectInfo(object_info, reference, custom_format=custom_format)
 
 
+def _IsSuccessfulDmlOrDdlJob(printable_job_info):
+  """Returns True iff the job is successful and is a DML/DDL query job."""
+  return ('Affected Rows' in printable_job_info or
+          'DDL Operation Performed' in printable_job_info)
+
+
 def _PrintJobMessages(printable_job_info):
   """Prints additional info from a job formatted for printing.
 
@@ -3962,6 +4347,9 @@ def _PrintJobMessages(printable_job_info):
 
   If any error/warning does not have a 'message' key, printable_job_info must
   have 'jobReference' identifying the job.
+
+  For DML queries prints number of affected rows.
+  For DDL queries prints the performed operation and the target.
   """
 
   job_ref = '(unknown)'  # Should never be seen, but beats a weird crash.
@@ -3997,6 +4385,26 @@ def _PrintJobMessages(printable_job_info):
         print '%s\n' % message
     if recommend_show:
       print 'Use "bq show -j %s" to view job warnings.' % job_ref
+  elif 'Affected Rows' in printable_job_info:
+    print 'Number of affected rows: %s\n' % printable_job_info['Affected Rows']
+  elif 'DDL Target Table' in printable_job_info:
+    ddl_target_table = printable_job_info['DDL Target Table']
+    project_id = ddl_target_table.get('projectId')
+    dataset_id = ddl_target_table.get('datasetId')
+    table_id = ddl_target_table.get('tableId')
+    op = _DDL_OPERATION_MAP.get(
+        printable_job_info.get('DDL Operation Performed'))
+    if project_id and dataset_id and table_id and op:
+      print '%s %s.%s.%s\n' % (op, project_id, dataset_id, table_id)
+  elif 'DDL Target Routine' in printable_job_info:
+    ddl_target_routine = printable_job_info['DDL Target Routine']
+    project_id = ddl_target_routine.get('projectId')
+    dataset_id = ddl_target_routine.get('datasetId')
+    routine_id = ddl_target_routine.get('routineId')
+    op = _DDL_OPERATION_MAP.get(
+        printable_job_info.get('DDL Operation Performed'))
+    if project_id and dataset_id and routine_id and op:
+      print '%s %s.%s.%s' % (op, project_id, dataset_id, routine_id)
 
 
 def _PrintObjectInfo(object_info, reference, custom_format):
@@ -4594,7 +5002,7 @@ class _Init(BigqueryCmd):
 
   def DeleteCredentials(self):
     """Deletes this user's credential file."""
-    _ProcessBigqueryrc()
+    bq_utils.ProcessBigqueryrc()
     filename = FLAGS.service_account_credential_file or FLAGS.credential_file
     if not os.path.exists(filename):
       print 'Credential file %s does not exist.' % (filename,)
@@ -4610,11 +5018,11 @@ class _Init(BigqueryCmd):
 
   def RunWithArgs(self):
     """Authenticate and create a default .bigqueryrc file."""
-    _ProcessBigqueryrc()
+    bq_utils.ProcessBigqueryrc()
     _ConfigureLogging(bigquery_client)
     if self.delete_credentials:
       return self.DeleteCredentials()
-    bigqueryrc = _GetBigqueryRcFilename()
+    bigqueryrc = bq_utils.GetBigqueryRcFilename()
     # Delete the old one, if it exists.
     print
     print 'Welcome to BigQuery! This script will walk you through the '
@@ -4699,7 +5107,7 @@ class _Init(BigqueryCmd):
 
     print 'BigQuery configuration complete! Type "bq" to get started.'
     print
-    _ProcessBigqueryrc()
+    bq_utils.ProcessBigqueryrc()
     # Destroy the client we created, so that any new client will
     # pick up new flag values.
     Client.Delete()

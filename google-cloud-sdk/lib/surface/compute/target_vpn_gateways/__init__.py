@@ -22,16 +22,17 @@ from googlecloudsdk.calliope import base
 
 
 class TargetVpnGateways(base.Group):
-  """Read and manipulate Google Compute Engine VPN Gateways."""
+  """read and manipulate Classic VPN Gateways."""
 
   # Placeholder to indicate that a detailed_help field exists and should
   # be set outside the class definition.
   detailed_help = None
 
 
-TargetVpnGateways.category = 'Networking'
+TargetVpnGateways.category = base.NETWORKING_CATEGORY
 
 TargetVpnGateways.detailed_help = {
     'brief': (
-        'Read and manipulate Google Compute Engine VPN Gateways'),
+        'read and manipulate Google Compute Engine Classic VPN '
+        'Gateways.'),
 }

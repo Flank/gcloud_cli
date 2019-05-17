@@ -1,0 +1,261 @@
+title: gcloud survey scenario tests
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      survey
+  - stderr: |+
+      Thank you for taking the survey. The response is anonymous and will only be used to improve our product.
+
+      Question 1 of 2:
+
+  - stdout: |2
+        Overall, how satisfied are you with Cloud SDK?
+          [1] Very satisfied
+          [2] Somewhat satisfied
+          [3] Neither satisfied nor dissatisfied
+          [4] Somewhat dissatisfied
+          [5] Very dissatisfied
+  - stderr: |2
+
+      To skip this question, type s; to exit the survey, type x.
+  - prompt:
+    - message: 'Please answer the question by typing the number that corresponds to
+        your answer: '
+    - input: '1'
+  - stderr: |2+
+
+      Question 2 of 2:
+
+  - stdout: |2
+        What are the reasons for the rating you gave? [Please DO NOT enter personal info]
+  - stderr: |2
+
+      To skip this question, type s; to exit the survey, type x.
+  - prompt:
+    - message: 'Please type your answer: '
+    - input: my free text feedback
+  - prompt:
+    - prompt_string: Do you want to submit your response
+    - input: Y
+  - stderr: |
+      Your response is submitted.
+- execute:
+  - command: |
+      survey
+  - stderr: |+
+      Thank you for taking the survey. The response is anonymous and will only be used to improve our product.
+
+      Question 1 of 2:
+
+  - stdout: |2
+        Overall, how satisfied are you with Cloud SDK?
+          [1] Very satisfied
+          [2] Somewhat satisfied
+          [3] Neither satisfied nor dissatisfied
+          [4] Somewhat dissatisfied
+          [5] Very dissatisfied
+  - stderr: |2
+
+      To skip this question, type s; to exit the survey, type x.
+  - prompt:
+    - message: 'Please answer the question by typing the number that corresponds to
+        your answer: '
+    - input: '6'
+  - prompt:
+    - message: 'Answer is invalid, please type a number from 1 to 5: '
+    - input: s
+  - stderr: |+
+      Skipped question 1
+
+      Question 2 of 2:
+
+  - stdout: |2
+        What are the reasons for the rating you gave? [Please DO NOT enter personal info]
+  - stderr: |2
+
+      To skip this question, type s; to exit the survey, type x.
+  - prompt:
+    - message: 'Please type your answer: '
+    - input: x
+  - stderr: |
+      Exited the survey
+- execute:
+  - command: |
+      survey
+  - stderr: |+
+      Thank you for taking the survey. The response is anonymous and will only be used to improve our product.
+
+      Question 1 of 2:
+
+  - stdout: |2
+        Overall, how satisfied are you with Cloud SDK?
+          [1] Very satisfied
+          [2] Somewhat satisfied
+          [3] Neither satisfied nor dissatisfied
+          [4] Somewhat dissatisfied
+          [5] Very dissatisfied
+  - stderr: |2
+
+      To skip this question, type s; to exit the survey, type x.
+  - prompt:
+    - message: 'Please answer the question by typing the number that corresponds to
+        your answer: '
+    - input: '1'
+  - stderr: |2+
+
+      Question 2 of 2:
+
+  - stdout: |2
+        What are the reasons for the rating you gave? [Please DO NOT enter personal info]
+  - stderr: |2
+
+      To skip this question, type s; to exit the survey, type x.
+  - prompt:
+    - message: 'Please type your answer: '
+    - input: my free text feedback
+  - prompt:
+    - prompt_string: Do you want to submit your response
+    - input: n
+  - stderr: |
+      Your response is not recorded.
+actions:
+- execute_command:
+    command: |
+      survey
+    events:
+    - expect_stderr: |+
+        Thank you for taking the survey. The response is anonymous and will only be used to improve our product.
+
+        Question 1 of 2:
+
+    - expect_stdout: |2
+          Overall, how satisfied are you with Cloud SDK?
+            [1] Very satisfied
+            [2] Somewhat satisfied
+            [3] Neither satisfied nor dissatisfied
+            [4] Somewhat dissatisfied
+            [5] Very dissatisfied
+    - expect_stderr: |2
+
+        To skip this question, type s; to exit the survey, type x.
+    - expect_prompt_response:
+        message: 'Please answer the question by typing the number that corresponds
+          to your answer: '
+        user_input: '1'
+    - expect_stderr: |2+
+
+        Question 2 of 2:
+
+    - expect_stdout: |2
+          What are the reasons for the rating you gave? [Please DO NOT enter personal info]
+    - expect_stderr: |2
+
+        To skip this question, type s; to exit the survey, type x.
+    - expect_prompt_response:
+        message: 'Please type your answer: '
+        user_input: my free text feedback
+    - expect_prompt_continue:
+        prompt_string: Do you want to submit your response
+        user_input: Y
+    - api_call:
+        expect_request:
+          uri: https://play.googleapis.com/log
+          method: POST
+          headers: {}
+          body:
+            json:
+              log_source_name: CONCORD
+        return_response:
+          headers:
+            status: '200'
+    - expect_stderr: |
+        Your response is submitted.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      survey
+    events:
+    - expect_stderr: |+
+        Thank you for taking the survey. The response is anonymous and will only be used to improve our product.
+
+        Question 1 of 2:
+
+    - expect_stdout: |2
+          Overall, how satisfied are you with Cloud SDK?
+            [1] Very satisfied
+            [2] Somewhat satisfied
+            [3] Neither satisfied nor dissatisfied
+            [4] Somewhat dissatisfied
+            [5] Very dissatisfied
+    - expect_stderr: |2
+
+        To skip this question, type s; to exit the survey, type x.
+    - expect_prompt_response:
+        message: 'Please answer the question by typing the number that corresponds
+          to your answer: '
+        user_input: '6'
+    - expect_prompt_response:
+        message: 'Answer is invalid, please type a number from 1 to 5: '
+        user_input: s
+    - expect_stderr: |+
+        Skipped question 1
+
+        Question 2 of 2:
+
+    - expect_stdout: |2
+          What are the reasons for the rating you gave? [Please DO NOT enter personal info]
+    - expect_stderr: |2
+
+        To skip this question, type s; to exit the survey, type x.
+    - expect_prompt_response:
+        message: 'Please type your answer: '
+        user_input: x
+    - expect_stderr: |
+        Exited the survey
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      survey
+    events:
+    - expect_stderr: |+
+        Thank you for taking the survey. The response is anonymous and will only be used to improve our product.
+
+        Question 1 of 2:
+
+    - expect_stdout: |2
+          Overall, how satisfied are you with Cloud SDK?
+            [1] Very satisfied
+            [2] Somewhat satisfied
+            [3] Neither satisfied nor dissatisfied
+            [4] Somewhat dissatisfied
+            [5] Very dissatisfied
+    - expect_stderr: |2
+
+        To skip this question, type s; to exit the survey, type x.
+    - expect_prompt_response:
+        message: 'Please answer the question by typing the number that corresponds
+          to your answer: '
+        user_input: '1'
+    - expect_stderr: |2+
+
+        Question 2 of 2:
+
+    - expect_stdout: |2
+          What are the reasons for the rating you gave? [Please DO NOT enter personal info]
+    - expect_stderr: |2
+
+        To skip this question, type s; to exit the survey, type x.
+    - expect_prompt_response:
+        message: 'Please type your answer: '
+        user_input: my free text feedback
+    - expect_prompt_continue:
+        prompt_string: Do you want to submit your response
+        user_input: n
+    - expect_stderr: |
+        Your response is not recorded.
+    - expect_exit:
+        code: 0

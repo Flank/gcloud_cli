@@ -22,9 +22,30 @@ from __future__ import unicode_literals
 import argparse
 
 from googlecloudsdk.calliope import actions as calliope_actions
+from googlecloudsdk.calliope import cli
 from googlecloudsdk.calliope import parser_errors
+from googlecloudsdk.core.document_renderers import render_document
 from tests.lib import sdk_test_base
 from tests.lib.calliope import util
+
+
+class GetCommandMetaDataTest(sdk_test_base.WithLogCapture):
+
+  def SetUp(self):
+    test_data_dir = self.Resource(
+        'tests', 'unit', 'calliope', 'testdata', 'sdk14')
+    loader = cli.CLILoader(
+        name='test',
+        command_root_directory=test_data_dir)
+    self.my_cli = loader.Generate()
+
+  def testGetCommandMetaData(self):
+    command_group = self.my_cli.top_element
+    command = command_group.LoadSubElement('test-command')
+    meta_data = render_document.CommandMetaData(flags=['--bool-flag',
+                                                       '--non-bool-flag'])
+    for flag in meta_data.flags:
+      self.assertIn(flag, calliope_actions.GetCommandMetaData(command).flags)
 
 
 class PreActionHookTest(sdk_test_base.WithLogCapture):

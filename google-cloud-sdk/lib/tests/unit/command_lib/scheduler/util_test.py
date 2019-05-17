@@ -117,6 +117,16 @@ class ResolveNonExistingAppLocationTests(ResolveAppLocationTestBase,
         exception=http_error.MakeHttpError(code=404))
     self.StartObjectPatch(console_io, 'CanPrompt', return_value=True)
 
+  def _ExpectAppEngineListLocationsRequest(self):
+    self.app_engine_client.apps_locations.List.Expect(
+        self.app_engine_messages.AppengineAppsLocationsListRequest(
+            name='apps/'+self.project_id,
+            pageSize=100),
+        self.app_engine_messages.ListLocationsResponse(
+            locations=[
+                self._LocationMessage(self.app_engine_messages, 'us-central'),
+                self._LocationMessage(self.app_engine_messages, 'us-east1')]))
+
   def _ExpectCreateAppRequest(self):
     app_msg = self.app_engine_messages.Application(id=self.project_id,
                                                    locationId='us-central')
@@ -137,6 +147,7 @@ class ResolveNonExistingAppLocationTests(ResolveAppLocationTestBase,
         num_retries=2)
 
   def testResolveLocation_CreateApp(self):
+    self._ExpectAppEngineListLocationsRequest()
     self.WriteInput('y')  # Would you like to create one (Y/n)?
     self.WriteInput('1')  # [1] us-central   (supports standard and flexible)
     self._ExpectCreateAppRequest()
@@ -154,7 +165,6 @@ class ResolveNonExistingAppLocationTests(ResolveAppLocationTestBase,
     self.AssertErrContains('You are creating an app for project [fake-project]')
     self.AssertErrContains(
         'Creating an App Engine application for a project is irreversible')
-    self.AssertErrContains('only those in which the Cloud Scheduler API')
 
   def testResolveLocation_CreateApp_Cancel(self):
     self.WriteInput('n')  # Would you like to create one (Y/n)?
@@ -166,6 +176,7 @@ class ResolveNonExistingAppLocationTests(ResolveAppLocationTestBase,
     self.AssertErrContains('Would you like to create one')
 
   def testResolveLocation_CreateApp_RaceCollision(self):
+    self._ExpectAppEngineListLocationsRequest()
     self.WriteInput('y')  # Would you like to create one (Y/n)?
     self.WriteInput('1')  # [1] us-central   (supports standard and flexible)
     self.app_engine_client.apps.Create.Expect(

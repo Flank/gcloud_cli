@@ -11,7 +11,7 @@ gcloud alpha compute instance\-groups managed instance\-configs update \- update
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute instance\-groups managed instance\-configs update\fR \fINAME\fR \fB\-\-instance\fR=\fIINSTANCE\fR [\fB\-\-force\-instance\-update\fR] [\fB\-\-remove\-stateful\-disks\fR=\fIDEVICE_NAME\fR,[\fIDEVICE_NAME\fR,...]] [\fB\-\-remove\-stateful\-metadata\fR=\fIKEY\fR,[\fIKEY\fR,...]] [\fB\-\-update\-stateful\-disk\fR=[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIsource\fR=\fISOURCE\fR]] [\fB\-\-update\-stateful\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute instance\-groups managed instance\-configs update\fR \fINAME\fR \fB\-\-instance\fR=\fIINSTANCE\fR [\fB\-\-force\-instance\-update\fR] [\fB\-\-remove\-stateful\-disks\fR=\fIDEVICE_NAME\fR,[\fIDEVICE_NAME\fR,...]] [\fB\-\-remove\-stateful\-metadata\fR=\fIKEY\fR,[\fIKEY\fR,...]] [\fB\-\-update\-stateful\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIsource\fR=\fISOURCE\fR]] [\fB\-\-update\-stateful\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -96,7 +96,7 @@ List all stateful metadata keys which should be removed from current instance
 config.
 
 .TP 2m
-\fB\-\-update\-stateful\-disk\fR=[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIsource\fR=\fISOURCE\fR]
+\fB\-\-update\-stateful\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIsource\fR=\fISOURCE\fR]
 Disks considered stateful by the instance group. Usually, the managed instance
 group deletes disks when deleting instances; however, in the case of stateful
 disks, these disks are detached from the deleted instance and attached to new
@@ -129,6 +129,14 @@ under specified \f5device\-name\fR.
 Specifies the mode of the disk to attach. Supported options are \f5ro\fR for
 read\-only and \f5rw\fR for read\-write. If omitted when source is specified,
 \f5rw\fR is used as a default.
+
+.TP 2m
+\fBauto\-delete\fR
+(Optional) Specifies the auto deletion policy of the stateful disk. Supported
+values are 'never' (never delete this disk) and
+\'on\-permanent\-instance\-deletion' (delete the stateful disk when the given
+instance is permanently deleted from the instance group; for example when the
+group is resized down). If omitted, 'never' is used as the default.
 
 .RE
 .sp
@@ -194,10 +202,11 @@ invocation.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

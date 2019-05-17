@@ -45,15 +45,16 @@ class JobsIntegrationTest(e2e_base.DataprocIntegrationTestBase):
   # Location of a script containing "print 'hello world'".
   GCS_PYSPARK_SCRIPT = (
       'gs://dataproc-a63ced4c-fa87-4bea-94a5-4d2f8fbbd783-us/hello_world.py')
+  # Additional args to pass on cluster creation
+  EXTRA_CLUSTER_ARGS = ''
 
   def SetUp(self):
     self.job_id_generator = e2e_utils.GetResourceNameGenerator(
         prefix='gcloud-dataproc-integration')
 
-  @sdk_test_base.Filters.SkipOnPy3('gsutil does not work on py3', 'b/109938541')
   def testAllJobsCommands(self):
     """Run all tests as one test case reuse a cluster when sharded."""
-    self.CreateClusterWithRetries()
+    self.CreateClusterWithRetries(args=self.EXTRA_CLUSTER_ARGS)
     # These two test cases are synchronous, so run them on a fresh cluster not
     # running jobs.
     self.DoTestJobWaiting()
@@ -67,6 +68,8 @@ class JobsIntegrationTest(e2e_base.DataprocIntegrationTestBase):
     self.DoTestSparkJobSubmission()
     self.DoTestSparkSqlJobSubmission()
     self.DoTestSparkRJobSubmission()
+    self.DoTestPrestoJobSubmission()
+
     # Cluster will get deleted in TearDown.
 
   def DoTestHadoopJobSubmission(self):
@@ -157,6 +160,10 @@ class JobsIntegrationTest(e2e_base.DataprocIntegrationTestBase):
   def DoTestSparkRJobSubmission(self):
     pass
 
+  # Presto is only available in beta, so it should not be tested on the GA track
+  def DoTestPrestoJobSubmission(self):
+    pass
+
   def DoTestJobWaiting(self):
     job_id = next(self.job_id_generator)
     result = self.RunDataproc((
@@ -181,7 +188,7 @@ class JobsIntegrationTest(e2e_base.DataprocIntegrationTestBase):
     job_id = next(self.job_id_generator)
     with self.AssertRaisesExceptionMatches(
         exceptions.JobError,
-        'Job [{0}] entered state [ERROR] while waiting for [DONE].'.format(
+        'Job [{0}] failed with error:'.format(
             job_id)):
       self.RunDataproc((
           'jobs submit pig '
@@ -225,6 +232,8 @@ class JobsIntegrationTestBeta(JobsIntegrationTest, base.DataprocTestBaseBeta):
   # Location of an example sparkR main file.
   GCS_SPARK_R_SCRIPT = ('file:///usr/lib/spark/examples/src/main/r/'
                         'data-manipulation.R')
+  # Enable Presto optional component for Presto jobs
+  EXTRA_CLUSTER_ARGS = '--optional-components=PRESTO'
 
   def testBeta(self):
     self.assertEqual(self.messages,
@@ -262,6 +271,17 @@ class JobsIntegrationTestBeta(JobsIntegrationTest, base.DataprocTestBaseBeta):
     self.assertEqual(self.messages.JobStatus.StateValueValuesEnum.PENDING,
                      result.status.state)
     self.assertIsNotNone(result.sparkRJob)
+
+  def DoTestPrestoJobSubmission(self):
+    result = self.RunDataproc((
+        'jobs submit presto '
+        '--cluster {0} '
+        '--async '
+        '--execute "USE hive.default;" '
+    ).format(self.cluster_name))
+    self.assertEqual(self.messages.JobStatus.StateValueValuesEnum.PENDING,
+                     result.status.state)
+    self.assertIsNotNone(result.prestoJob)
 
 
 if __name__ == '__main__':

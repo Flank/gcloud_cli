@@ -20,29 +20,30 @@ from __future__ import unicode_literals
 
 import textwrap
 
-from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
-messages = core_apis.GetMessagesModule('compute', 'v1')
 
+class InstancesDetachDiskTestGA(test_base.BaseTest):
 
-class InstancesDetachDiskTest(test_base.BaseTest):
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+    self.api_version = 'v1'
 
   def SetUp(self):
+    self.SelectApi(self.api_version)
     self.make_requests.side_effect = iter([
-        [messages.Instance(
+        [self.messages.Instance(
             name='my-instance',
             disks=[
-                messages.AttachedDisk(
+                self.messages.AttachedDisk(
                     deviceName='device-1',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=(self.compute_uri + '/projects/'
                             'my-project/zones/us-central1-a/disks/disk-1')),
-                messages.AttachedDisk(
+                self.messages.AttachedDisk(
                     deviceName='device-2',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=(self.compute_uri + '/projects/'
                             'my-project/zones/us-central1-a/disks/disk-2')),
             ])],
 
@@ -57,16 +58,16 @@ class InstancesDetachDiskTest(test_base.BaseTest):
         """)
 
     self.CheckRequests(
-        [(self.compute_v1.instances,
+        [(self.compute.instances,
           'Get',
-          messages.ComputeInstancesGetRequest(
+          self.messages.ComputeInstancesGetRequest(
               instance='my-instance',
               project='my-project',
               zone='us-central1-a'))],
 
-        [(self.compute_v1.instances,
+        [(self.compute.instances,
           'DetachDisk',
-          messages.ComputeInstancesDetachDiskRequest(
+          self.messages.ComputeInstancesDetachDiskRequest(
               deviceName='device-2',
               instance='my-instance',
               project='my-project',
@@ -84,9 +85,9 @@ class InstancesDetachDiskTest(test_base.BaseTest):
           """)
 
     self.CheckRequests(
-        [(self.compute_v1.instances,
+        [(self.compute.instances,
           'Get',
-          messages.ComputeInstancesGetRequest(
+          self.messages.ComputeInstancesGetRequest(
               instance='my-instance',
               project='my-project',
               zone='us-central1-a'))],
@@ -100,16 +101,16 @@ class InstancesDetachDiskTest(test_base.BaseTest):
         """)
 
     self.CheckRequests(
-        [(self.compute_v1.instances,
+        [(self.compute.instances,
           'Get',
-          messages.ComputeInstancesGetRequest(
+          self.messages.ComputeInstancesGetRequest(
               instance='my-instance',
               project='my-project',
               zone='us-central1-a'))],
 
-        [(self.compute_v1.instances,
+        [(self.compute.instances,
           'DetachDisk',
-          messages.ComputeInstancesDetachDiskRequest(
+          self.messages.ComputeInstancesDetachDiskRequest(
               deviceName='device-2',
               instance='my-instance',
               project='my-project',
@@ -127,9 +128,9 @@ class InstancesDetachDiskTest(test_base.BaseTest):
           """)
 
     self.CheckRequests(
-        [(self.compute_v1.instances,
+        [(self.compute.instances,
           'Get',
-          messages.ComputeInstancesGetRequest(
+          self.messages.ComputeInstancesGetRequest(
               instance='my-instance',
               project='my-project',
               zone='us-central1-a'))],
@@ -138,21 +139,21 @@ class InstancesDetachDiskTest(test_base.BaseTest):
   def testUriSupport(self):
     self.Run("""
         compute instances detach-disk
-          https://www.googleapis.com/compute/v1/projects/my-project/zones/us-central1-a/instances/my-instance
-          --disk https://www.googleapis.com/compute/v1/projects/my-project/zones/us-central1-a/disks/disk-2
+          projects/my-project/zones/us-central1-a/instances/my-instance
+          --disk projects/my-project/zones/us-central1-a/disks/disk-2
         """)
 
     self.CheckRequests(
-        [(self.compute_v1.instances,
+        [(self.compute.instances,
           'Get',
-          messages.ComputeInstancesGetRequest(
+          self.messages.ComputeInstancesGetRequest(
               instance='my-instance',
               project='my-project',
               zone='us-central1-a'))],
 
-        [(self.compute_v1.instances,
+        [(self.compute.instances,
           'DetachDisk',
-          messages.ComputeInstancesDetachDiskRequest(
+          self.messages.ComputeInstancesDetachDiskRequest(
               deviceName='device-2',
               instance='my-instance',
               project='my-project',
@@ -164,21 +165,21 @@ class InstancesDetachDiskTest(test_base.BaseTest):
                     return_value=True)
     self.make_requests.side_effect = iter([
         [
-            messages.Instance(name='my-instance', zone='us-central1-a'),
-            messages.Instance(name='my-instance', zone='us-central1-b'),
-            messages.Instance(name='my-instance', zone='us-central2-a'),
+            self.messages.Instance(name='my-instance', zone='us-central1-a'),
+            self.messages.Instance(name='my-instance', zone='us-central1-b'),
+            self.messages.Instance(name='my-instance', zone='us-central2-a'),
         ],
 
-        [messages.Instance(
+        [self.messages.Instance(
             name='my-instance',
             disks=[
-                messages.AttachedDisk(
+                self.messages.AttachedDisk(
                     deviceName='device-1',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=(self.compute_uri + '/projects/'
                             'my-project/zones/us-central1-a/disks/disk-1')),
-                messages.AttachedDisk(
+                self.messages.AttachedDisk(
                     deviceName='device-2',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=(self.compute_uri + '/projects/'
                             'my-project/zones/us-central1-a/disks/disk-2')),
             ])],
 
@@ -198,16 +199,16 @@ class InstancesDetachDiskTest(test_base.BaseTest):
     self.CheckRequests(
         self.FilteredInstanceAggregateListRequest('my-instance'),
 
-        [(self.compute_v1.instances,
+        [(self.compute.instances,
           'Get',
-          messages.ComputeInstancesGetRequest(
+          self.messages.ComputeInstancesGetRequest(
               instance='my-instance',
               project='my-project',
               zone='us-central1-a'))],
 
-        [(self.compute_v1.instances,
+        [(self.compute.instances,
           'DetachDisk',
-          messages.ComputeInstancesDetachDiskRequest(
+          self.messages.ComputeInstancesDetachDiskRequest(
               deviceName='device-2',
               instance='my-instance',
               project='my-project',
@@ -219,16 +220,16 @@ class InstancesDetachDiskTest(test_base.BaseTest):
       _, method, _ = requests[0]
 
       if method == 'Get':
-        yield messages.Instance(
+        yield self.messages.Instance(
             name='my-instance',
             disks=[
-                messages.AttachedDisk(
+                self.messages.AttachedDisk(
                     deviceName='device-1',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=(self.compute_uri + '/projects/'
                             'my-project/zones/us-central1-a/disks/disk-1')),
-                messages.AttachedDisk(
+                self.messages.AttachedDisk(
                     deviceName='device-2',
-                    source=('https://www.googleapis.com/compute/v1/projects/'
+                    source=(self.compute_uri + '/projects/'
                             'my-project/zones/us-central1-a/disks/disk-2')),
             ])
 
@@ -252,16 +253,16 @@ class InstancesDetachDiskTest(test_base.BaseTest):
           """)
 
     self.CheckRequests(
-        [(self.compute_v1.instances,
+        [(self.compute.instances,
           'Get',
-          messages.ComputeInstancesGetRequest(
+          self.messages.ComputeInstancesGetRequest(
               instance='my-instance',
               project='my-project',
               zone='us-central1-a'))],
 
-        [(self.compute_v1.instances,
+        [(self.compute.instances,
           'DetachDisk',
-          messages.ComputeInstancesDetachDiskRequest(
+          self.messages.ComputeInstancesDetachDiskRequest(
               deviceName='device-2',
               instance='my-instance',
               project='my-project',
@@ -269,41 +270,49 @@ class InstancesDetachDiskTest(test_base.BaseTest):
     )
 
 
-def _GetInstanceWithRegionalDiskMessages(messages_, compute_uri):
-  return [messages_.Instance(
-      name='my-instance',
-      disks=[
-          messages_.AttachedDisk(
-              deviceName='device-1',
-              source=(compute_uri + '/projects/'
-                      'my-project/regions/us-central1/disks/disk-1')),
-          messages_.AttachedDisk(
-              deviceName='device-2',
-              source=(compute_uri + '/projects/'
-                      'my-project/regions/us-central1/disks/disk-2')),
-          messages_.AttachedDisk(
-              deviceName='device-4',
-              source=(compute_uri + '/projects/'
-                      'my-project/zones/us-central1-a/disks/disk-4')),
-      ])]
+class InstancesDetachDiskTestBeta(InstancesDetachDiskTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'),
-                          (calliope_base.ReleaseTrack.BETA, 'beta'))
-class InstancesDetachDiskWithRegions(test_base.BaseTest,
-                                     parameterized.TestCase):
+class InstancesDetachDiskTestAlpha(InstancesDetachDiskTestBeta):
 
-  def _SetUp(self, track, api_version):
-    self.SelectApi(api_version)
-    self.track = track
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
+
+
+class InstancesDetachRegionalDiskTestGA(test_base.BaseTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+    self.api_version = 'v1'
+
+  def SetUp(self):
+    self.SelectApi(self.api_version)
     self.make_requests.side_effect = iter([
-        _GetInstanceWithRegionalDiskMessages(self.messages, self.compute_uri),
+        [self.messages.Instance(
+            name='my-instance',
+            disks=[
+                self.messages.AttachedDisk(
+                    deviceName='device-1',
+                    source=(self.compute_uri + '/projects/'
+                            'my-project/regions/us-central1/disks/disk-1')),
+                self.messages.AttachedDisk(
+                    deviceName='device-2',
+                    source=(self.compute_uri + '/projects/'
+                            'my-project/regions/us-central1/disks/disk-2')),
+                self.messages.AttachedDisk(
+                    deviceName='device-4',
+                    source=(self.compute_uri + '/projects/'
+                            'my-project/zones/us-central1-a/disks/disk-4')),
+            ])],
         [],
     ])
 
-  def testWithDeviceThatExists(self, track, api_version):
-    self._SetUp(track, api_version)
+  def testWithDeviceThatExists(self):
     self.Run("""
         compute instances detach-disk my-instance
           --device-name device-2
@@ -328,8 +337,7 @@ class InstancesDetachDiskWithRegions(test_base.BaseTest,
               zone='us-central1-a'))],
     )
 
-  def testWithDeviceThatDoesNotExist(self, track, api_version):
-    self._SetUp(track, api_version)
+  def testWithDeviceThatDoesNotExist(self):
     with self.AssertRaisesToolExceptionRegexp(
         r'No disk with device name \[device-3\] is attached to instance '
         r'\[my-instance\] in zone \[us-central1-a\].'):
@@ -349,8 +357,7 @@ class InstancesDetachDiskWithRegions(test_base.BaseTest,
               zone='us-central1-a'))],
     )
 
-  def testWithDiskThatExists(self, track, api_version):
-    self._SetUp(track, api_version)
+  def testWithDiskThatExists(self):
     self.Run("""
         compute instances detach-disk my-instance
           --disk disk-2
@@ -375,8 +382,7 @@ class InstancesDetachDiskWithRegions(test_base.BaseTest,
               zone='us-central1-a'))],
     )
 
-  def testWithDiskThatDoesNotExist(self, track, api_version):
-    self._SetUp(track, api_version)
+  def testWithDiskThatDoesNotExist(self):
     with self.AssertRaisesToolExceptionRegexp(
         r'Disk \[disk-3\] is not attached to instance \[my-instance\] in zone '
         r'\[us-central1-a\].'):
@@ -397,40 +403,18 @@ class InstancesDetachDiskWithRegions(test_base.BaseTest,
     )
 
 
-class InstancesDetachDiskTestAlpha(test_base.BaseTest):
+class InstancesDetachRegionalDiskTestBeta(InstancesDetachRegionalDiskTestGA):
 
-  def SetUp(self):
-    self.SelectApi('alpha')
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
+
+
+class InstancesDetachRegionalDiskTestAlpha(InstancesDetachRegionalDiskTestBeta):
+
+  def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
-    self.make_requests.side_effect = iter([
-        _GetInstanceWithRegionalDiskMessages(self.messages, self.compute_uri),
-        [],
-    ])
-
-  def testWithZonalDevice(self):
-    """Ensures that `gcloud alpha` can still work with zonal disks."""
-    self.Run("""
-        compute instances detach-disk my-instance
-          --disk disk-4
-          --zone us-central1-a
-        """)
-
-    self.CheckRequests(
-        [(self.compute.instances,
-          'Get',
-          self.messages.ComputeInstancesGetRequest(
-              instance='my-instance',
-              project='my-project',
-              zone='us-central1-a'))],
-
-        [(self.compute.instances,
-          'DetachDisk',
-          self.messages.ComputeInstancesDetachDiskRequest(
-              deviceName='device-4',
-              instance='my-instance',
-              project='my-project',
-              zone='us-central1-a'))],
-    )
+    self.api_version = 'alpha'
 
 
 if __name__ == '__main__':

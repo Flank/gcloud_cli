@@ -11,7 +11,7 @@ gcloud alpha services vpc\-peerings list \- list connections to a service via VP
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha services vpc\-peerings list\fR \fB\-\-network\fR=\fINETWORK\fR [\fB\-\-service\fR=\fISERVICE\fR;\ default="servicenetworking.googleapis.com"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha services vpc\-peerings list\fR \fB\-\-network\fR=\fINETWORK\fR [\fB\-\-service\fR=\fISERVICE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -37,7 +37,7 @@ The network in the current project to list connections with the service
 
 .RS 2m
 .TP 2m
-\fB\-\-service\fR=\fISERVICE\fR; default="servicenetworking.googleapis.com"
+\fB\-\-service\fR=\fISERVICE\fR
 The service to list connections
 
 
@@ -46,10 +46,11 @@ The service to list connections
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -60,7 +61,13 @@ To list connections of a network called \f5my\-network\fR to a service called
 
 .RS 2m
 $ gcloud alpha services vpc\-peerings list \-\-network my\-network \e
-    \-\-service your\-service \e
+    \-\-service your\-service
+.RE
+
+To list connections of a network against all services, run:
+
+.RS 2m
+$ gcloud alpha services vpc\-peerings list \-\-network my\-network
 .RE
 
 
@@ -71,9 +78,10 @@ This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you will have to apply for early access and have your projects registered on the
 API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. This variant is also available:
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
+$ gcloud services vpc\-peerings list
 $ gcloud beta services vpc\-peerings list
 .RE
 

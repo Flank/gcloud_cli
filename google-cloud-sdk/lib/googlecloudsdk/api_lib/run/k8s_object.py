@@ -31,19 +31,32 @@ import six
 REGION_LABEL = 'cloud.googleapis.com/location'
 
 
-def InitializedInstance(msg_cls):
+def InitializedInstance(msg_cls, excluded_fields=None):
   """Produce an instance of msg_cls, with all sub-messages initialized.
 
   Args:
     msg_cls: A message-class to be instantiated.
+    excluded_fields: [str], List of field names to exclude from instantiation.
   Returns:
     An instance of the given class, with all fields initialized blank objects.
   """
+  def Instance(field):
+    if field.repeated:
+      return []
+    return InitializedInstance(field.message_type, excluded_fields)
+
+  def IncludeField(field):
+    if not isinstance(field, messages.MessageField):
+      return False
+
+    if excluded_fields and field.name in excluded_fields:
+      return False
+
+    return True
+
   args = {
-      field.name: ([] if field.repeated else
-                   InitializedInstance(field.message_type))
-      for field in msg_cls.all_fields()
-      if isinstance(field, messages.MessageField)
+      field.name: Instance(field) for field in msg_cls.all_fields()
+      if IncludeField(field)
   }
   return msg_cls(**args)
 
@@ -62,6 +75,8 @@ class KubernetesObject(object):
   """
 
   READY_CONDITION = 'Ready'
+  # Message fields to exclude from instantiation of this object.
+  FIELD_BLACKLIST = []
 
   @classmethod
   def SpecOnly(cls, spec, messages_mod):
@@ -96,7 +111,8 @@ class KubernetesObject(object):
     """
     api_version = '{}/{}'.format(cls.API_CATEGORY, getattr(client, '_VERSION'))
     messages_mod = client.MESSAGES_MODULE
-    ret = InitializedInstance(getattr(messages_mod, cls.KIND))
+    ret = InitializedInstance(getattr(messages_mod, cls.KIND),
+                              cls.FIELD_BLACKLIST)
     try:
       ret.kind = cls.KIND
       ret.apiVersion = api_version
@@ -179,6 +195,11 @@ class KubernetesObject(object):
     return self._m.metadata.resourceVersion
 
   @property
+  def self_link(self):
+    self.AssertFullObject()
+    return self._m.metadata.selfLink.lstrip('/')
+
+  @property
   def region(self):
     self.AssertFullObject()
     return self.labels[REGION_LABEL]
@@ -215,12 +236,7 @@ class KubernetesObject(object):
   @property
   def labels(self):
     self.AssertFullObject()
-    return ListAsDictionaryWrapper(
-        self._m.metadata.labels.additionalProperties,
-        self._messages.ObjectMeta.LabelsValue.AdditionalProperty,
-        key_field='key',
-        value_field='value',
-    )
+    return LabelsFromMetadata(self._messages, self._m.metadata)
 
   @property
   def ready(self):
@@ -266,6 +282,16 @@ def AnnotationsFromMetadata(messages_mod, metadata):
   return ListAsDictionaryWrapper(
       metadata.annotations.additionalProperties,
       messages_mod.ObjectMeta.AnnotationsValue.AdditionalProperty,
+      key_field='key',
+      value_field='value')
+
+
+def LabelsFromMetadata(messages_mod, metadata):
+  if not metadata.labels:
+    metadata.labels = messages_mod.ObjectMeta.LabelsValue()
+  return ListAsDictionaryWrapper(
+      metadata.labels.additionalProperties,
+      messages_mod.ObjectMeta.LabelsValue.AdditionalProperty,
       key_field='key',
       value_field='value')
 

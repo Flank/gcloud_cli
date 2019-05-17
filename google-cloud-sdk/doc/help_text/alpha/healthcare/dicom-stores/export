@@ -1,0 +1,85 @@
+NAME
+    gcloud alpha healthcare dicom-stores export - export a Cloud Healthcare API
+        API DICOM store
+
+SYNOPSIS
+    gcloud alpha healthcare dicom-stores export
+        (DICOM_STORE : --dataset=DATASET --location=LOCATION)
+        [[--bq-table=BQ_TABLE : --overwrite-table]
+          | --gcs-uri-prefix=GCS_URI_PREFIX --mime-type=MIME_TYPE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Export a Cloud Healthcare API API DICOM store.
+
+POSITIONAL ARGUMENTS
+     DicomStore resource - Cloud Healthcare API DICOM store to export. The
+     arguments in this group can be used to specify the attributes of this
+     resource. (NOTE) Some attributes are not given arguments in this group but
+     can be set in other ways. To set the [project] attribute: provide the
+     argument [dicom_store] on the command line with a fully specified name;
+     provide the argument [--project] on the command line; set the property
+     [core/project]. This must be specified.
+
+       DICOM_STORE
+          ID of the dicomStore or fully qualified identifier for the
+          dicomStore. This positional must be specified if any of the other
+          arguments in this group are specified.
+
+       --dataset=DATASET
+          Cloud Healthcare dataset.
+
+       --location=LOCATION
+          Google Cloud location.
+
+FLAGS
+     At most one of these may be specified:
+
+       --bq-table=BQ_TABLE
+          The BigQuery table where the DICOM store should be written. If this
+          table does not exist, a new table with the given name will be
+          created. This flag must be specified if any of the other arguments in
+          this group are specified.
+
+       --overwrite-table
+          If the destination table already exists and this flag is TRUE, the
+          table will be overwritten by the contents of the DICOM store. If the
+          flag is not set and the destination table already exists, the export
+          call returns an error.
+
+       --gcs-uri-prefix=GCS_URI_PREFIX
+          URI for a Google Cloud Storage directory to which result files should
+          be written (for example, gs://bucket-id/path/to/destination/dir). If
+          there is no trailing slash, the service will append one when
+          composing the object path. The user is responsible for creating the
+          Google Cloud Storage bucket referenced in uri_prefix.
+
+       --mime-type=MIME_TYPE
+          'MIME types supported by DICOM spec. Each file will be written in the
+          following format:
+          .../{study_id}/{series_id}/{instance_id}[/{frame_number}].{extension}
+          The frame_number component will exist only for multi-frame instances.
+          Refer to the DICOM conformance statement for permissible MIME types:
+          https://cloud.google.com/healthcare/docs/dicom#wado-rs The following
+          extensions will be used for output files: application/dicom -> .dcm
+          image/jpeg -> .jpg image/png -> .png If unspecified, the instances
+          will be exported in their original DICOM format.'
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+API REFERENCE
+    This command uses the healthcare/v1alpha2 API. The full documentation for
+    this API can be found at: https://cloud.google.com/healthcare
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/.
+

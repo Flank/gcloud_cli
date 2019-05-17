@@ -3,16 +3,16 @@ NAME
         public key on an Attestor
 
 SYNOPSIS
-    gcloud alpha container binauthz attestors public-keys update
-        PUBLIC_KEY_FINGERPRINT --attestor=ATTESTOR [--comment=COMMENT]
-        [--public-key-file=PUBLIC_KEY_FILE] [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha container binauthz attestors public-keys update PUBLIC_KEY_ID
+        --attestor=ATTESTOR [--comment=COMMENT]
+        [--pgp-public-key-file=PGP_PUBLIC_KEY_FILE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Update a public key on an Attestor.
 
 POSITIONAL ARGUMENTS
-     PUBLIC_KEY_FINGERPRINT
-        The fingerprint of the public key to update.
+     PUBLIC_KEY_ID
+        The ID of the public key to update.
 
 REQUIRED FLAGS
      Attestor resource - The attestor on which the public key should be
@@ -29,12 +29,13 @@ OPTIONAL FLAGS
      --comment=COMMENT
         The comment describing the public key.
 
-     --public-key-file=PUBLIC_KEY_FILE
+     --pgp-public-key-file=PGP_PUBLIC_KEY_FILE
         The path to the file containing the new ASCII-armored PGP public key.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

@@ -33,9 +33,10 @@ class MysqlE2ETest(base.MysqlIntegrationTestBase):
     self.DoTestBackupList()
     self.DoTestInstanceOperations()
     self.DoTestConnect()
+    # Test connect again to ensure that the formatting issue doesn't crop up.
+    self.DoTestConnect()
     self.DoTestOperations()
 
-  @test_case.Filters.skip('Failing', 'b/119035730')
   @sdk_test_base.Filters.RunOnlyInBundle
   def testConnectWithProxy(self):
     self.CreateInstance('db-g1-small')
@@ -112,6 +113,7 @@ class PsqlE2ETest(base.PsqlIntegrationTestBase):
     properties.VALUES.core.disable_prompts.Set(True)
     self.CreateInstance('db-g1-small')
 
+  @test_case.Filters.SkipOnMac('Failing', 'b/132271074')
   @test_case.Filters.RunOnlyWithEnv('KOKORO_ROOT', 'Needs to be run with ipv4.')
   def testSQLCommands(self):
     self.DoTestConnect()

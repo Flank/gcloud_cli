@@ -11,7 +11,7 @@ gcloud beta compute instances update \- update a Google Compute Engine virtual m
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute instances update\fR \fIINSTANCE_NAME\fR [\fB\-\-[no\-]deletion\-protection\fR] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-[no\-]shielded\-vm\-integrity\-monitoring\fR] [\fB\-\-shielded\-vm\-learn\-integrity\-policy\fR] [\fB\-\-[no\-]shielded\-vm\-secure\-boot\fR] [\fB\-\-[no\-]shielded\-vm\-vtpm\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute instances update\fR \fIINSTANCE_NAME\fR [\fB\-\-[no\-]deletion\-protection\fR] [\fB\-\-[no\-]enable\-display\-device\fR] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-[no\-]shielded\-integrity\-monitoring\fR] [\fB\-\-shielded\-learn\-integrity\-policy\fR] [\fB\-\-[no\-]shielded\-secure\-boot\fR] [\fB\-\-[no\-]shielded\-vtpm\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -64,6 +64,12 @@ Enables deletion protection for the instance. Use \fB\-\-deletion\-protection\fR
 to enable and \fB\-\-no\-deletion\-protection\fR to disable.
 
 .TP 2m
+\fB\-\-[no\-]enable\-display\-device\fR
+Enable a display device for instances using a Windows image. Use
+\fB\-\-enable\-display\-device\fR to enable and
+\fB\-\-no\-enable\-display\-device\fR to disable.
+
+.TP 2m
 \fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR
 When specified, the VM will be scheduled on host with specified CPU architecture
 or a newer one. To list available CPU platforms in given zone, run:
@@ -81,38 +87,38 @@ You can find more information on\-line:
 https://cloud.google.com/compute/docs/instances/specify\-min\-cpu\-platform
 
 .TP 2m
-\fB\-\-[no\-]shielded\-vm\-integrity\-monitoring\fR
+\fB\-\-[no\-]shielded\-integrity\-monitoring\fR
 Enables monitoring and attestation of the boot integrity of the instance. The
 attestation is performed against the integrity policy baseline. This baseline is
 initially derived from the implicitly trusted boot image when the instance is
 created. This baseline can be updated by using
 \f5\-\-shielded\-vm\-learn\-integrity\-policy\fR. Changes to this setting (via
 the update command) will only take effect after stopping and starting the
-instance. Use \fB\-\-shielded\-vm\-integrity\-monitoring\fR to enable and
-\fB\-\-no\-shielded\-vm\-integrity\-monitoring\fR to disable.
+instance. Use \fB\-\-shielded\-integrity\-monitoring\fR to enable and
+\fB\-\-no\-shielded\-integrity\-monitoring\fR to disable.
 
 .TP 2m
-\fB\-\-shielded\-vm\-learn\-integrity\-policy\fR
+\fB\-\-shielded\-learn\-integrity\-policy\fR
 Causes the instance to re\-learn the integrity policy baseline using the current
 instance configuration. Use this flag after any planned boot\-specific changes
 in the instance configuration, like kernel updates or kernel driver
 installation.
 
 .TP 2m
-\fB\-\-[no\-]shielded\-vm\-secure\-boot\fR
+\fB\-\-[no\-]shielded\-secure\-boot\fR
 The instance will boot with secure boot enabled. Changes to this setting (via
 the update command) will only take effect after stopping and starting the
-instance. Use \fB\-\-shielded\-vm\-secure\-boot\fR to enable and
-\fB\-\-no\-shielded\-vm\-secure\-boot\fR to disable.
+instance. Use \fB\-\-shielded\-secure\-boot\fR to enable and
+\fB\-\-no\-shielded\-secure\-boot\fR to disable.
 
 .TP 2m
-\fB\-\-[no\-]shielded\-vm\-vtpm\fR
+\fB\-\-[no\-]shielded\-vtpm\fR
 The instance will boot with the TPM (Trusted Platform Module) enabled. A TPM is
 a hardware module that can be used for different security operations such as
 remote attestation, encryption and sealing of keys. Changes to this setting (via
 the update command) will only take effect after stopping and starting the
-instance. Use \fB\-\-shielded\-vm\-vtpm\fR to enable and
-\fB\-\-no\-shielded\-vm\-vtpm\fR to disable.
+instance. Use \fB\-\-shielded\-vtpm\fR to enable and
+\fB\-\-no\-shielded\-vtpm\fR to disable.
 
 .TP 2m
 \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
@@ -187,10 +193,11 @@ List of label keys to remove. If a label does not exist it is silently ignored.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

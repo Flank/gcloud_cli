@@ -46,7 +46,8 @@ class CloudPubsubTestBase(e2e_base.WithServiceAuth):
   @contextlib.contextmanager
   def _CreateTopic(self, topic_name):
     try:
-      self.ClearAndRun('topics list')
+      self.ClearAndRun(
+          'topics list --format value(name) --filter {0}'.format(topic_name))
       self.AssertOutputNotContains(topic_name)
 
       topic_ref = util.ParseTopic(topic_name, self.Project())
@@ -56,8 +57,10 @@ class CloudPubsubTestBase(e2e_base.WithServiceAuth):
       yield result
 
       # There is a delay between creation and the resource appearing in list.
-      self.retryer.RetryOnException(
-          self._CheckListContains, ['topics list', topic_name])
+      self.retryer.RetryOnException(self._CheckListContains, [
+          'topics list --format value(name) --filter {0}'.format(topic_name),
+          topic_name
+      ])
     finally:
       self.Run('pubsub topics delete {0}'.format(topic_name))
 
@@ -77,8 +80,10 @@ class CloudPubsubTestBase(e2e_base.WithServiceAuth):
       yield result[0]
 
       # There is a delay between creation and the resource appearing in list.
-      self.retryer.RetryOnException(
-          self._CheckListContains, ['subscriptions list', subscription_name])
+      self.retryer.RetryOnException(self._CheckListContains, [
+          'subscriptions list --format value(name) --filter {0}'.format(
+              subscription_name), subscription_name
+      ])
       self.retryer.RetryOnException(
           self._CheckListContains,
           ['topics list-subscriptions {0}'.format(topic_name),
@@ -89,7 +94,9 @@ class CloudPubsubTestBase(e2e_base.WithServiceAuth):
   @contextlib.contextmanager
   def _CreateSnapshot(self, topic_name, subscription_name, snapshot_name):
     try:
-      self.ClearAndRun('snapshots list')
+      self.ClearAndRun(
+          'snapshots list --format value(name) --filter {0}'.format(
+              snapshot_name))
       self.AssertOutputNotContains(snapshot_name)
 
       self.ClearAndRun('topics list-snapshots {}'.format(topic_name))
@@ -104,8 +111,10 @@ class CloudPubsubTestBase(e2e_base.WithServiceAuth):
       yield result
 
       # There is a delay between creation and the resource appearing in list.
-      self.retryer.RetryOnException(
-          self._CheckListContains, ['snapshots list', snapshot_name])
+      self.retryer.RetryOnException(self._CheckListContains, [
+          'snapshots list --format value(name) --filter {0}'.format(
+              snapshot_name), snapshot_name
+      ])
       self.retryer.RetryOnException(self._CheckListContains, [
           'topics list-snapshots {}'.format(topic_name), snapshot_name])
     finally:

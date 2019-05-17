@@ -27,13 +27,12 @@ import subprocess
 from googlecloudsdk.calliope import cli_tree
 from googlecloudsdk.command_lib.meta import generate_cli_trees
 from googlecloudsdk.command_lib.meta import list_cli_trees
+from googlecloudsdk.core import http
 from googlecloudsdk.core.resource import resource_printer
 from googlecloudsdk.core.util import files
 from tests.lib import calliope_test_base
 from tests.lib import test_case
 from tests.unit.calliope import testdata
-
-import httplib2
 
 
 class _MockResponse(object):
@@ -43,13 +42,10 @@ class _MockResponse(object):
     self.status = status
 
 
-class _MockHttp(object):
-  """httplib2 mock Http object."""
-
-  def request(self, url):
-    if url != 'http://man7.org/linux/man-pages/man1/ls.1.html':
-      return _MockResponse(404), 'Not found.'
-    return _MockResponse(200), _MAN_URL_OUTPUT['ls'].encode('utf-8')
+def _MockHttpResult(url):
+  if url != 'http://man7.org/linux/man-pages/man1/ls.1.html':
+    return _MockResponse(404), 'Not found.'
+  return _MockResponse(200), _MAN_URL_OUTPUT['ls'].encode('utf-8')
 
 
 _BQ_COMMAND_OUTPUT = {
@@ -1380,10 +1376,8 @@ class ManPageCliGeneratorTest(calliope_test_base.CalliopeTestBase):
         files,
         'FindExecutableOnPath',
         side_effect=lambda command, allow_extensions=False: command == 'ls')
-    self.StartObjectPatch(
-        httplib2,
-        'Http',
-        side_effect=_MockHttp)
+    mock_http = self.StartObjectPatch(http, 'HttpClient')
+    mock_http.return_value.request.side_effect = _MockHttpResult
     generate_cli_trees.LoadOrGenerate('ls')
     ls_json = os.path.join(cli_tree_config_dir, 'ls.json')
     self.AssertFileIsGolden(ls_json, __file__, 'ls-url.json')
@@ -1403,10 +1397,8 @@ class ManPageCliGeneratorTest(calliope_test_base.CalliopeTestBase):
         files,
         'FindExecutableOnPath',
         side_effect=lambda command, allow_extensions=False: command == 'grep')
-    self.StartObjectPatch(
-        httplib2,
-        'Http',
-        side_effect=_MockHttp)
+    mock_http = self.StartObjectPatch(http, 'HttpClient')
+    mock_http.return_value.request.side_effect = _MockHttpResult
     tree = generate_cli_trees.LoadOrGenerate('grep', verbose=True)
     self.assertIsNone(tree)
     self.AssertErrContains('Generating the [grep] CLI tree')
@@ -1542,10 +1534,10 @@ class InstalledCliTreesTest(calliope_test_base.CalliopeTestBase):
         ('kubectl', 'data/cli/kubectl.json', False),
     ]
 
-    def _chop(path):
+    def _Chop(path):
       return re.sub('.*/google-cloud-sdk/', '', path)
 
-    actual = [(p.command, _chop(p.path), p.command_installed)
+    actual = [(p.command, _Chop(p.path), p.command_installed)
               for p in list_cli_trees.ListAll()]
     self.assertEqual(expected, actual)
 

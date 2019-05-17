@@ -1,0 +1,95 @@
+NAME
+    gcloud alpha dataproc jobs - submit and manage Google Cloud Dataproc jobs
+
+SYNOPSIS
+    gcloud alpha dataproc jobs GROUP | COMMAND [--region=REGION]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Submit and manage Google Cloud Dataproc jobs.
+
+FLAGS
+     --region=REGION
+        Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
+        independent resource namespace constrained to deploying instances into
+        Compute Engine zones inside the region. The default value of global is
+        a special multi-region namespace which is capable of deploying
+        instances into all Compute Engine zones globally, and is disjoint from
+        other Cloud Dataproc regions. Overrides the default dataproc/region
+        property value for this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+GROUPS
+    GROUP is one of the following:
+
+     submit
+        (ALPHA) Submit Google Cloud Dataproc jobs to execute on a cluster.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     delete
+        (ALPHA) Delete the record of an inactive job.
+
+     describe
+        (ALPHA) View the details of a job.
+
+     get-iam-policy
+        (ALPHA) Get IAM policy for a job.
+
+     kill
+        (ALPHA) Kill an active job.
+
+     list
+        (ALPHA) List jobs in a project.
+
+     set-iam-policy
+        (ALPHA) Set IAM policy for a job.
+
+     update
+        (ALPHA) Update the labels for a job.
+
+     wait
+        (ALPHA) View the output of a job as it runs or after it completes.
+
+EXAMPLES
+    To learn about the types of jobs that can be submitted, run:
+
+        $ gcloud alpha dataproc jobs submit
+
+    To view the output of a job as it runs, run:
+
+        $ gcloud alpha dataproc jobs wait job_id
+
+    To cancel an active job, run:
+
+        $ gcloud alpha dataproc jobs kill job_id
+
+    To view the details of a job, run:
+
+        $ gcloud alpha dataproc jobs describe job_id
+
+    To see the list of all jobs, run:
+
+        $ gcloud alpha dataproc jobs list
+
+    To delete the record of an inactive job, run:
+
+        $ gcloud alpha dataproc jobs delete job_id
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
+
+        $ gcloud dataproc jobs
+        $ gcloud beta dataproc jobs
+

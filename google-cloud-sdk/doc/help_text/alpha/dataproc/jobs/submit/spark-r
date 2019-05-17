@@ -1,0 +1,105 @@
+NAME
+    gcloud alpha dataproc jobs submit spark-r - submit a SparkR job to a
+        cluster
+
+SYNOPSIS
+    gcloud alpha dataproc jobs submit spark-r R_FILE --cluster=CLUSTER
+        [--archives=[ARCHIVE,...]] [--async] [--bucket=BUCKET]
+        [--driver-log-levels=[PACKAGE=LEVEL,...]] [--files=[FILE,...]]
+        [--labels=[KEY=VALUE,...]]
+        [--max-failures-per-hour=MAX_FAILURES_PER_HOUR]
+        [--properties=[PROPERTY=VALUE,...]] [--region=REGION]
+        [GCLOUD_WIDE_FLAG ...] [-- JOB_ARGS ...]
+
+DESCRIPTION
+    (ALPHA) Submit a SparkR job to a cluster.
+
+POSITIONAL ARGUMENTS
+     R_FILE
+        Main .R file to run as the driver.
+
+     [-- JOB_ARGS ...]
+        Arguments to pass to the driver.
+
+        The '--' argument must be specified between gcloud specific args on the
+        left and JOB_ARGS on the right.
+
+REQUIRED FLAGS
+     --cluster=CLUSTER
+        The Dataproc cluster to submit the job to.
+
+OPTIONAL FLAGS
+     --archives=[ARCHIVE,...]
+        Comma separated list of archives to be provided to the job. must be one
+        of the following file formats: .zip, .tar, .tar.gz, or .tgz.
+
+     --async
+        Does not wait for the job to run.
+
+     --bucket=BUCKET
+        The Cloud Storage bucket to stage files in. Defaults to the cluster's
+        configured bucket.
+
+     --driver-log-levels=[PACKAGE=LEVEL,...]
+        List of key value pairs to configure driver logging, where key is a
+        package and value is the log4j log level. For example:
+        root=FATAL,com.example=INFO
+
+     --files=[FILE,...]
+        Comma separated list of files to be provided to the job.
+
+     --labels=[KEY=VALUE,...]
+        List of label KEY=VALUE pairs to add.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
+     --max-failures-per-hour=MAX_FAILURES_PER_HOUR
+        Specifies maximum number of times a job can be restarted in event of
+        failure. Expressed as a per-hour rate. Default is 0 (no failure
+        retries).
+
+     --properties=[PROPERTY=VALUE,...]
+        List of key value pairs to configure SparkR. For a list of available
+        properties, see:
+        https://spark.apache.org/docs/latest/configuration.html#available-properties.
+
+     --region=REGION
+        Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
+        independent resource namespace constrained to deploying instances into
+        Compute Engine zones inside the region. The default value of global is
+        a special multi-region namespace which is capable of deploying
+        instances into all Compute Engine zones globally, and is disjoint from
+        other Cloud Dataproc regions. Overrides the default dataproc/region
+        property value for this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+EXAMPLES
+    To submit a SparkR job with a local script, run:
+
+        $ gcloud alpha dataproc jobs submit spark-r --cluster my_cluster \
+            my_script.R
+
+    To submit a Spark job that runs a script already on the cluster, run:
+
+        $ gcloud alpha dataproc jobs submit spark-r --cluster my_cluster \
+            file:///.../my_script.R \
+            -- gs://my_bucket/data.csv
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. This variant is also available:
+
+        $ gcloud beta dataproc jobs submit spark-r
+

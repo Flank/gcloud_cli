@@ -11,7 +11,7 @@ gcloud alpha compute images deprecate \- manage deprecation status of Google Com
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute images deprecate\fR \fIIMAGE_NAME\fR \fB\-\-state\fR=\fISTATE\fR [\fB\-\-replacement\fR=\fIREPLACEMENT\fR] [\fB\-\-delete\-in\fR=\fIDELETE_IN\fR\ |\ \fB\-\-delete\-on\fR=\fIDELETE_ON\fR] [\fB\-\-obsolete\-in\fR=\fIOBSOLETE_IN\fR\ |\ \fB\-\-obsolete\-on\fR=\fIOBSOLETE_ON\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute images deprecate\fR \fIIMAGE_NAME\fR \fB\-\-state\fR=\fISTATE\fR [\fB\-\-replacement\fR=\fIREPLACEMENT\fR] [\fB\-\-delete\-in\fR=\fIDELETE_IN\fR\ |\ \fB\-\-delete\-on\fR=\fIDELETE_ON\fR] [\fB\-\-deprecate\-in\fR=\fIDEPRECATE_IN\fR\ |\ \fB\-\-deprecate\-on\fR=\fIDEPRECATE_ON\fR] [\fB\-\-obsolete\-in\fR=\fIOBSOLETE_IN\fR\ |\ \fB\-\-obsolete\-on\fR=\fIOBSOLETE_ON\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -114,6 +114,25 @@ At most one of these may be specified:
 
 .RS 2m
 .TP 2m
+\fB\-\-deprecate\-in\fR=\fIDEPRECATE_IN\fR
+Specifies time (in the same format as \fB\-\-delete\-in\fR) until the image will
+be marked DEPRECATED. State will not be changed \- it is only for informational
+purposes. This flag is mutually exclusive with \fB\-\-deprecate\-on\fR.
+
+.TP 2m
+\fB\-\-deprecate\-on\fR=\fIDEPRECATE_ON\fR
+Specifies time (in the same format as \fB\-\-delete\-on\fR) when this image will
+be marked as DEPRECATED. State will not be changed \- it has only informational
+purpose. This flag is mutually exclusive with \fB\-\-deprecate\-in\fR.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
 \fB\-\-obsolete\-in\fR=\fIOBSOLETE_IN\fR
 Specifies time (in the same format as \fB\-\-delete\-in\fR) until the image will
 be marked OBSOLETE. State will not be changed \- it is only for informational
@@ -132,10 +151,11 @@ purpose. This flag is mutually exclusive with \fB\-\-obsolete\-in\fR.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -149,7 +169,8 @@ $ gcloud alpha compute images deprecate IMAGE \-\-state DEPRECATED \e
     \-\-obsolete\-in 1d \-\-delete\-in 2d
 .RE
 
-To un\-deprecate an image called 'IMAGE', use:
+To un\-deprecate an image called 'IMAGE' and clear times for deprecated,
+obsoleted, and deleted, use:
 
 .RS 2m
 $ gcloud alpha compute images deprecate IMAGE \-\-state ACTIVE

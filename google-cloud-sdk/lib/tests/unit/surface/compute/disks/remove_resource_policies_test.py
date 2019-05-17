@@ -19,23 +19,15 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
-from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
 from tests.lib import test_case
-from tests.lib.surface.compute import test_base
+from tests.lib.surface.compute import disks_test_base as test_base
 
 
-class DisksRemoveResourcePoliciesTest(test_base.BaseTest):
+class DisksRemoveResourcePoliciesTest(test_base.TestBase):
 
-  def SetUp(self):
-    self.SelectApi('alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.disk_name = 'my-disk'
-    self.zone = 'central2-a'
-    self.region = 'central2'
-
-    self.reg = resources.REGISTRY.Clone()
-    self.reg.RegisterApiByName('compute', 'alpha')
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def _CheckRemoveRequest(self, policy_names):
     request_cls = self.messages.ComputeDisksRemoveResourcePoliciesRequest
@@ -51,10 +43,7 @@ class DisksRemoveResourcePoliciesTest(test_base.BaseTest):
                     self.Project(), self.region, name)
                 for name in policy_names]))
     self.CheckRequests(
-        [(self.compute_alpha.disks,
-          'RemoveResourcePolicies',
-          remove_request)],
-    )
+        [(self.compute.disks, 'RemoveResourcePolicies', remove_request)],)
 
   def _CheckRegionalRemoveRequest(self, policy_names):
     request_cls = self.messages.ComputeRegionDisksRemoveResourcePoliciesRequest
@@ -70,10 +59,7 @@ class DisksRemoveResourcePoliciesTest(test_base.BaseTest):
                     self.Project(), self.region, name)
                 for name in policy_names]))
     self.CheckRequests(
-        [(self.compute_alpha.regionDisks,
-          'RemoveResourcePolicies',
-          remove_request)],
-    )
+        [(self.compute.regionDisks, 'RemoveResourcePolicies', remove_request)],)
 
   def testRemoveSinglePolicy(self):
     self.Run('compute disks remove-resource-policies {disk} '
@@ -115,6 +101,12 @@ class DisksRemoveResourcePoliciesTest(test_base.BaseTest):
              .format(disk=self.disk_name,
                      region=self.region))
     self._CheckRegionalRemoveRequest(['pol1'])
+
+
+class DisksRemoveResourcePoliciesAlphaTest(DisksRemoveResourcePoliciesTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

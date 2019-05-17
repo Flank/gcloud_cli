@@ -80,9 +80,7 @@ class FirebaseTestAndroidRunTests(unit_base.AndroidMockClientTest):
         androidRoboTest=self.testing_msgs.AndroidRoboTest(
             appApk=self.testing_msgs.FileReference(
                 gcsPath='gs://{rb}/{uo}/{aa}'.format(
-                    rb=self.results_bucket, uo=self.results_dir, aa=APP_APK)),
-            maxDepth=50,
-            maxSteps=-1),
+                    rb=self.results_bucket, uo=self.results_dir, aa=APP_APK))),
         testSetup=self.testing_msgs.TestSetup(
             account=self.testing_msgs.Account(
                 googleAuto=self.testing_msgs.GoogleAuto())),
@@ -118,8 +116,8 @@ class FirebaseTestAndroidRunTests(unit_base.AndroidMockClientTest):
       device_file = self.testing_msgs.DeviceFile(
           obbFile=self.testing_msgs.ObbFile(
               obbFileName=obb_file,
-              obb=self.testing_msgs.
-              FileReference(gcsPath='gs://{rb}/{uo}/{o}'.format(
+              obb=self.testing_msgs
+              .FileReference(gcsPath='gs://{rb}/{uo}/{o}'.format(
                   rb=self.results_bucket, uo=self.results_dir, o=obb_file))))
       spec.testSetup.filesToPush = [device_file]
     return spec
@@ -158,7 +156,8 @@ class FirebaseTestAndroidRunTests(unit_base.AndroidMockClientTest):
                     rb=self.results_bucket, uo=self.results_dir)),
             toolResultsHistory=self.testing_msgs.ToolResultsHistory(
                 projectId=project)),
-        testSpecification=spec)
+        testSpecification=spec,
+        flakyTestAttempts=0)
 
   def BuildResponseMatrix(self, request_matrix, m_id, m_state):
     """Build a server-side TestMatrix from a client-side TestMatrix proto."""
@@ -217,18 +216,18 @@ class FirebaseTestAndroidRunTests(unit_base.AndroidMockClientTest):
                         execution_id=TR_EXECUTION_ID):
     """Set expectations for ToolResults execution history Get/List rpcs."""
     self.tr_client.projects_histories_executions.Get.Expect(
-        request=self.toolresults_msgs.
-        ToolresultsProjectsHistoriesExecutionsGetRequest(
+        request=self.toolresults_msgs
+        .ToolresultsProjectsHistoriesExecutionsGetRequest(
             projectId=PROJECT_ID,
             historyId=history_id,
             executionId=execution_id),
         response=self.toolresults_msgs.Execution(
             outcome=self.toolresults_msgs.Outcome(
-                summary=self.toolresults_msgs.Outcome.SummaryValueValuesEnum.
-                success)))
+                summary=self.toolresults_msgs.Outcome.SummaryValueValuesEnum
+                .success)))
     self.tr_client.projects_histories_executions_steps.List.Expect(
-        request=self.toolresults_msgs.
-        ToolresultsProjectsHistoriesExecutionsStepsListRequest(
+        request=self.toolresults_msgs
+        .ToolresultsProjectsHistoriesExecutionsStepsListRequest(
             projectId=PROJECT_ID,
             historyId=history_id,
             executionId=execution_id,
@@ -238,8 +237,8 @@ class FirebaseTestAndroidRunTests(unit_base.AndroidMockClientTest):
   def ExpectInitializeSettings(self):
     """Expect a call to InitializeSettings rpc if default bucket is used."""
     self.tr_client.projects.InitializeSettings.Expect(
-        request=self.toolresults_msgs.
-        ToolresultsProjectsInitializeSettingsRequest(projectId=PROJECT_ID),
+        request=self.toolresults_msgs
+        .ToolresultsProjectsInitializeSettingsRequest(projectId=PROJECT_ID),
         response=self.toolresults_msgs.ProjectSettings(
             defaultBucket=self.results_bucket, name=''))
 
@@ -266,10 +265,9 @@ class FirebaseTestAndroidRunTests(unit_base.AndroidMockClientTest):
     self.results_bucket = DEFAULT_BUCKET
     self.results_dir = UNIQUE_OBJECT
     self.StartPatch('uuid.uuid4', return_value=uuid.UUID(REQUEST_ID))
-    self.StartPatch(
-        ('googlecloudsdk.api_lib.firebase.test.arg_validate'
-         '._GenerateUniqueGcsObjectName'),
-        return_value=UNIQUE_OBJECT)
+    self.StartPatch(('googlecloudsdk.api_lib.firebase.test.arg_validate'
+                     '._GenerateUniqueGcsObjectName'),
+                    return_value=UNIQUE_OBJECT)
     self.ExpectCatalogGet(fake_catalogs.FakeAndroidCatalog())
     self.StartPatch('os.path.getsize', return_value=APK_SIZE)
     properties.VALUES.test.matrix_status_interval.Set(1)
@@ -394,13 +392,14 @@ class FirebaseTestAndroidRunTests(unit_base.AndroidMockClientTest):
     spec = self.BuildInstrumentationTestSpec()
     # TODO(b/116255948): if fixed, test with more than one key=value pair.
     spec.testSetup.environmentVariables = [
-        self.testing_msgs.EnvironmentVariable(key='size', value='small')]
+        self.testing_msgs.EnvironmentVariable(key='size', value='small')
+    ]
     self.ExpectMatrixCreate(spec, [DEFAULT_DEVICE])
 
     self.Run(commands.ANDROID_TEST_RUN +
              '--app {aa} --test {ta} --environment-variables size=small '
-             '--async --no-auto-google-login --no-use-orchestrator'
-             .format(aa=APP_PATH, ta=TEST_PATH))
+             '--async --no-auto-google-login --no-use-orchestrator'.format(
+                 aa=APP_PATH, ta=TEST_PATH))
 
     self.AssertErrContains('instrumentation test on 1 device(s)')
     self.AssertOutputContains('results will be available at')
@@ -411,10 +410,11 @@ class FirebaseTestAndroidRunTests(unit_base.AndroidMockClientTest):
     spec = self.BuildTestLoopSpec([1, 5, 2], ['group1', 'group2'])
     self.ExpectMatrixCreate(spec, [DEFAULT_DEVICE])
 
-    self.Run('{run} --type=game-loop  --app {aa} '
-             '--async --no-auto-google-login '
-             '--scenario-numbers=1,5,2  --scenario-labels=group1,group2 '
-             .format(run=commands.ANDROID_TEST_RUN, aa=APP_PATH))
+    self.Run(
+        '{run} --type=game-loop  --app {aa} '
+        '--async --no-auto-google-login '
+        '--scenario-numbers=1,5,2  --scenario-labels=group1,group2 '.format(
+            run=commands.ANDROID_TEST_RUN, aa=APP_PATH))
 
     self.AssertErrMatches(r'Upload.*app.apk')
     self.AssertErrContains('[matrix-123] has been created')

@@ -45,6 +45,14 @@ def Create(environment_ref,
            python_version=None,
            image_version=None,
            airflow_executor_type=None,
+           use_ip_aliases=None,
+           cluster_secondary_range_name=None,
+           services_secondary_range_name=None,
+           cluster_ipv4_cidr_block=None,
+           services_ipv4_cidr_block=None,
+           private_environment=None,
+           private_endpoint=None,
+           master_ipv4_cidr=None,
            release_track=base.ReleaseTrack.GA):
   """Calls the Composer Environments.Create method.
 
@@ -73,10 +81,24 @@ def Create(environment_ref,
     disk_size_gb: int, the disk size of node VMs, in GB
     python_version: str or None, major python version to use within created
         environment.
-    image_version: str or None, the desire image for created environment in the
+    image_version: str or None, the desired image for created environment in the
         format of 'composer-(version)-airflow-(version)'
     airflow_executor_type: str or None, the airflow executor type to run task
         instances.
+    use_ip_aliases: bool or None, create env cluster nodes using alias IPs.
+    cluster_secondary_range_name: str or None, the name of secondary range to
+        allocate IP addresses to pods in GKE cluster.
+    services_secondary_range_name: str or None, the name of the secondary range
+        to allocate IP addresses to services in GKE cluster.
+    cluster_ipv4_cidr_block: str or None, the IP address range to allocate IP
+        adresses to pods in GKE cluster.
+    services_ipv4_cidr_block: str or None, the IP address range to allocate IP
+        addresses to services in GKE cluster.
+    private_environment: bool or None, create env cluster nodes with no public
+        IP addresses.
+    private_endpoint: bool or None, managed env cluster using the private IP
+        address of the master API endpoint.
+    master_ipv4_cidr: IPv4 CIDR range to use for the master network.
     release_track: base.ReleaseTrack, the release track of command. Will dictate
         which Composer client library will be used.
 
@@ -124,6 +146,34 @@ def Create(environment_ref,
       config.softwareConfig.airflowExecutorType = ConvertToTypeEnum(
           messages.SoftwareConfig.AirflowExecutorTypeValueValuesEnum,
           airflow_executor_type)
+
+  if use_ip_aliases:
+    is_config_empty = False
+    config.nodeConfig.ipAllocationPolicy = messages.IPAllocationPolicy(
+        useIpAliases=use_ip_aliases,
+        clusterSecondaryRangeName=cluster_secondary_range_name,
+        servicesSecondaryRangeName=services_secondary_range_name,
+        clusterIpv4CidrBlock=cluster_ipv4_cidr_block,
+        servicesIpv4CidrBlock=services_ipv4_cidr_block,
+    )
+
+    if private_environment:
+      # TODO(b/128636528): Restore when API bug is addressed.
+      if master_ipv4_cidr is None:
+        master_ipv4_cidr = '172.16.0.0/28'  # Assigns default value.
+
+      # Adds a PrivateClusterConfig, if necessary.
+      private_cluster_config = None
+      if private_endpoint or master_ipv4_cidr:
+        private_cluster_config = messages.PrivateClusterConfig(
+            enablePrivateEndpoint=private_endpoint,
+            masterIpv4CidrBlock=master_ipv4_cidr)
+
+      config.privateEnvironmentConfig = messages.PrivateEnvironmentConfig(
+          enablePrivateEnvironment=private_environment,
+          privateClusterConfig=private_cluster_config)
+
+  # Builds environment message and attaches the configuration
   environment = messages.Environment(name=environment_ref.RelativeName())
   if not is_config_empty:
     environment.config = config

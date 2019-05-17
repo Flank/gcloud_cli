@@ -7,6 +7,7 @@ SYNOPSIS
         [--no-cache-key-include-host] [--no-cache-key-include-protocol]
         [--no-cache-key-include-query-string]
         [--connection-draining-timeout=CONNECTION_DRAINING_TIMEOUT]
+        [--custom-request-header=CUSTOM_REQUEST_HEADER]
         [--description=DESCRIPTION] [--enable-cdn]
         [--health-checks=HEALTH_CHECK,[...]]
         [--http-health-checks=HTTP_HEALTH_CHECK,[...]]
@@ -73,6 +74,14 @@ FLAGS
         draining. Enable feature by specifying a timeout of up to one hour. If
         the flag is omitted API default value (0s) will be used. See $ gcloud
         topic datetimes for information on duration formats.
+
+     --custom-request-header=CUSTOM_REQUEST_HEADER
+        Specifies a HTTP Header to be added by your load balancer. This flag
+        can be repeated to specify multiple headers. For example:
+
+            $ gcloud compute backend-services create NAME             \
+                --custom-request-header "header-name: value"             \
+                --custom-request-header "another-header:"
 
      --description=DESCRIPTION
         An optional, textual description for the backend service.
@@ -222,8 +231,9 @@ FLAGS
           compute/region property value for this command invocation.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

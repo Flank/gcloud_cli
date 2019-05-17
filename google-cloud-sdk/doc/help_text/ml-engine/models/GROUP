@@ -1,11 +1,11 @@
 NAME
-    gcloud ml-engine models - cloud ML Engine Models commands
+    gcloud ml-engine models - AI Platform Models commands
 
 SYNOPSIS
     gcloud ml-engine models COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    A Cloud ML Engine model is a container representing an ML application or
+    An AI Platform model is a container representing an ML application or
     service. A model may contain multiple versions which act as the
     implementation of the service. See also:
 
@@ -15,8 +15,9 @@ DESCRIPTION
     https://cloud.google.com/ml/docs/concepts/technical-overview#model
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -27,19 +28,19 @@ COMMANDS
         Add IAM policy binding to a model.
 
      create
-        Create a new Cloud ML Engine model.
+        Create a new AI Platform model.
 
      delete
-        Delete an existing Cloud ML Engine model.
+        Delete an existing AI Platform model.
 
      describe
-        Describe an existing Cloud ML Engine model.
+        Describe an existing AI Platform model.
 
      get-iam-policy
         Get the IAM policy for a model.
 
      list
-        List existing Cloud ML Engine models.
+        List existing AI Platform models.
 
      remove-iam-policy-binding
         Remove IAM policy binding from a ML model.
@@ -48,7 +49,7 @@ COMMANDS
         Set the IAM policy for a model.
 
      update
-        Update an existing Cloud ML Engine model.
+        Update an existing AI Platform model.
 
 NOTES
     These variants are also available:

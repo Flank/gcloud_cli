@@ -5,8 +5,9 @@ SYNOPSIS
     gcloud redis instances COMMAND [GCLOUD_WIDE_FLAG ...]
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -21,6 +22,10 @@ COMMANDS
 
      describe
         Show metadata for a Memorystore Redis instance.
+
+     failover
+        Failover a standard tier Cloud Memorystore for Redis instance from the
+        master node to its replica.
 
      list
         List Memorystore Redis instances.

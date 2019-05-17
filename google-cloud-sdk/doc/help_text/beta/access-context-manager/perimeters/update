@@ -14,17 +14,13 @@ SYNOPSIS
           | --set-resources=[RESOURCES,...]]
         [--add-restricted-services=[SERVICE,...] | --clear-restricted-services
           | --remove-restricted-services=[SERVICE,...]
-          | --set-restricted-services=[SERVICE,...]]
-        [--add-unrestricted-services=[SERVICE,...]
-          | --clear-unrestricted-services
-          | --remove-unrestricted-services=[SERVICE,...]
-          | --set-unrestricted-services=[SERVICE,...]] [GCLOUD_WIDE_FLAG ...]
+          | --set-restricted-services=[SERVICE,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Update an existing access zone.
 
 POSITIONAL ARGUMENTS
-     Perimeter resource - The service perimemter to update. The arguments in
+     Perimeter resource - The service perimeter to update. The arguments in
      this group can be used to specify the attributes of this resource. This
      must be specified.
 
@@ -93,9 +89,7 @@ FLAGS
 
      These flags modify the member restricted services of this perimeter. The
      perimeter boundary DOES apply to these services (for example,
-     storage.googleapis.com). A wildcard (*) may be given to denote all
-     services. If unrestricted services are set, restricted services must be a
-     wildcard. At most one of these may be specified:
+     storage.googleapis.com). At most one of these may be specified:
 
        --add-restricted-services=[SERVICE,...]
           Append the given values to the current restricted services.
@@ -110,31 +104,17 @@ FLAGS
           Completely replace the current restricted services with the given
           values.
 
-     These flags modify the member unrestricted services of this perimemter.
-     The perimeter boundary DOES NOT apply to these services (for example,
-     storage.googleapis.com). A wildcard (*) may be given to denote all
-     services. If restricted services are set, unrestricted services must be a
-     wildcard. At most one of these may be specified:
-
-       --add-unrestricted-services=[SERVICE,...]
-          Append the given values to the current unrestricted services.
-
-       --clear-unrestricted-services
-          Empty the current unrestricted services.
-
-       --remove-unrestricted-services=[SERVICE,...]
-          Remove the given values from the current unrestricted services.
-
-       --set-unrestricted-services=[SERVICE,...]
-          Completely replace the current unrestricted services with the given
-          values.
-
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud access-context-manager perimeters update
+        $ gcloud alpha access-context-manager perimeters update
 

@@ -31,8 +31,8 @@ set\-iam\-policy for additional details.
 .RS 2m
 .TP 2m
 
-Disk resource \- The disk for which to display the IAM policy. The arguments in
-this group can be used to specify the attributes of this resource. (NOTE) Some
+Disk resource \- The disk to display the IAM policy for. The arguments in this
+group can be used to specify the attributes of this resource. (NOTE) Some
 attributes are not given arguments in this group but can be set in other ways.
 To set the [project] attribute: provide the argument [disk] on the command line
 with a fully specified name; set the property [core/project]; provide the
@@ -91,10 +91,11 @@ flag interacts with other flags that are applied in this order:
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -111,7 +112,7 @@ https://developers.google.com/compute/docs/reference/latest/
 To print the IAM policy for a given disk, run:
 
 .RS 2m
-$ gcloud alpha compute disks get\-iam\-policy \-\-zone=my\-zone my\-disk
+$ gcloud alpha compute disks get\-iam\-policy my\-disk \-\-zone=my\-zone
 .RE
 
 
@@ -122,9 +123,10 @@ This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you will have to apply for early access and have your projects registered on the
 API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. This variant is also available:
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
+$ gcloud compute disks get\-iam\-policy
 $ gcloud beta compute disks get\-iam\-policy
 .RE
 

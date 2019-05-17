@@ -26,8 +26,11 @@ from apitools.base.py import encoding
 from apitools.base.py import exceptions as apitools_exceptions
 from googlecloudsdk.api_lib.dataproc import exceptions
 from googlecloudsdk.api_lib.dataproc import storage_helpers
+from googlecloudsdk.calliope import arg_parsers
+from googlecloudsdk.command_lib.export import util as export_util
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
+from googlecloudsdk.core import yaml_validator
 from googlecloudsdk.core.console import console_attr
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.console import progress_tracker
@@ -322,6 +325,7 @@ def WaitForJobTermination(dataproc,
                           job,
                           message,
                           goal_state,
+                          error_state=None,
                           stream_driver_log=False,
                           log_poll_period_s=1,
                           dataproc_poll_period_s=10,
@@ -333,6 +337,7 @@ def WaitForJobTermination(dataproc,
     job: The job to wait to finish.
     message: str, message to display to user while polling.
     goal_state: JobStatus.StateValueValuesEnum, the state to define success
+    error_state: JobStatus.StateValueValuesEnum, the state to define failure
     stream_driver_log: bool, Whether to show the Job's driver's output.
     log_poll_period_s: number, delay in seconds between checking on the log.
     dataproc_poll_period_s: number, delay in seconds between requests to
@@ -416,10 +421,8 @@ def WaitForJobTermination(dataproc,
 
   # TODO(b/34836493): Get better test coverage of the next 20 lines.
   state = job.status.state
-  if state is not goal_state and job.status.details:
-    # Just log details, because the state will be in the error message.
-    log.info(job.status.details)
 
+  # goal_state and error_state will always be terminal
   if state in dataproc.terminal_job_states:
     if stream_driver_log:
       if not driver_log_stream:
@@ -428,6 +431,14 @@ def WaitForJobTermination(dataproc,
         log.warning('Job terminated, but output did not finish streaming.')
     if state is goal_state:
       return job
+    if error_state and state is error_state:
+      if job.status.details:
+        raise exceptions.JobError(
+            'Job [{0}] failed with error:\n{1}'.format(
+                job_ref.jobId, job.status.details))
+      raise exceptions.JobError('Job [{0}] failed.'.format(job_ref.jobId))
+    if job.status.details:
+      log.info('Details:\n' + job.status.details)
     raise exceptions.JobError(
         'Job [{0}] entered state [{1}] while waiting for [{2}].'.format(
             job_ref.jobId, state, goal_state))
@@ -504,3 +515,94 @@ def ParseRegion(dataproc):
       },
       collection='dataproc.projects.regions')
   return ref
+
+
+def ReadAutoscalingPolicy(dataproc, policy_id, policy_file_name=None):
+  """Returns autoscaling policy read from YAML file.
+
+  Validates it using the schema for the API version corresponding to the
+  dataproc instance, and backfills necessary fields.
+
+  Args:
+    dataproc: wrapper for dataproc resources, client and messages.
+    policy_id: The autoscaling policy id (last piece of the resource name).
+    policy_file_name: if set, location of the YAML file to read from. Otherwise,
+      reads from stdin.
+
+  Raises:
+    argparse.ArgumentError if duration formats are invalid or out of bounds.
+  """
+  # Read template from YAML file, validate it using the schema for the
+  # API version corresponding to the dataproc instance.
+  data = console_io.ReadFromFileOrStdin(policy_file_name or '-', binary=False)
+  schema_path = export_util.GetSchemaPath(
+      'dataproc', dataproc.api_version, 'AutoscalingPolicy', for_help=False)
+
+  try:
+    policy = export_util.Import(
+        message_type=dataproc.messages.AutoscalingPolicy,
+        stream=data,
+        schema_path=schema_path)
+  except yaml_validator.ValidationError as e:
+    raise exceptions.ValidationError(e.message)
+
+  # Ignore user set id in the file (if any), and overwrite with the policy_ref
+  # provided with this command
+  policy.id = policy_id
+
+  # Similarly, ignore the set resource name. This field is OUTPUT_ONLY, so we
+  # can just clear it.
+  policy.name = None
+
+  # Set duration fields to their seconds values
+  if policy.basicAlgorithm.cooldownPeriod is not None:
+    policy.basicAlgorithm.cooldownPeriod = str(
+        arg_parsers.Duration(lower_bound='2m', upper_bound='1d')(
+            policy.basicAlgorithm.cooldownPeriod)) + 's'
+  if policy.basicAlgorithm.yarnConfig.gracefulDecommissionTimeout is not None:
+    policy.basicAlgorithm.yarnConfig.gracefulDecommissionTimeout = str(
+        arg_parsers.Duration(lower_bound='0s', upper_bound='1d')(
+            policy.basicAlgorithm.yarnConfig.gracefulDecommissionTimeout)) + 's'
+
+  return policy
+
+
+def CreateAutoscalingPolicy(dataproc, name, policy):
+  """Returns the server-resolved policy after creating the given policy.
+
+  Args:
+    dataproc: wrapper for dataproc resources, client and messages.
+    name: The autoscaling policy resource name.
+    policy: The AutoscalingPolicy message to create.
+  """
+  # TODO(b/109837200) make the dataproc discovery doc parameters consistent
+  # Parent() fails for the collection because of projectId/projectsId and
+  # regionId/regionsId inconsistencies.
+  # parent = template_ref.Parent().RelativePath()
+  parent = '/'.join(name.split('/')[0:4])
+
+  request = \
+    dataproc.messages.DataprocProjectsRegionsAutoscalingPoliciesCreateRequest(
+        parent=parent,
+        autoscalingPolicy=policy)
+  policy = dataproc.client.projects_regions_autoscalingPolicies.Create(request)
+  log.status.Print('Created [{0}].'.format(policy.id))
+  return policy
+
+
+def UpdateAutoscalingPolicy(dataproc, name, policy):
+  """Returns the server-resolved policy after updating the given policy.
+
+  Args:
+    dataproc: wrapper for dataproc resources, client and messages.
+    name: The autoscaling policy resource name.
+    policy: The AutoscalingPolicy message to create.
+  """
+  # Though the name field is OUTPUT_ONLY in the API, the Update() method of the
+  # gcloud generated dataproc client expects it to be set.
+  policy.name = name
+
+  policy = \
+    dataproc.client.projects_regions_autoscalingPolicies.Update(policy)
+  log.status.Print('Updated [{0}].'.format(policy.id))
+  return policy

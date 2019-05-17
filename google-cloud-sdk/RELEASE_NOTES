@@ -5,6 +5,989 @@ Copyright 2014-2019 Google Inc. All rights reserved.
 Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
 
 
+## 246.0.0 (2019-05-14)
+
+### Breaking Changes
+
+*   **(Compute Engine)** Removed redundant `--bandwidth` flag values with `bps-` prefix from `gcloud compute interconnects attachments dedicated create`, `gcloud compute interconnects attachments dedicated update`, `gcloud compute interconnects attachments provider create`, and `gcloud compute interconnects attachments provider update` commands. Use matching values without this prefix instead.
+
+
+### Cloud SDK
+
+* Added the `--billing-project` flag to all gcloud commands, for explicitly
+  specifying a project to bill.
+
+### Cloud Functions
+
+* Added `--allow-unauthenticated` flag to `gcloud beta functions deploy`.
+
+
+### Cloud PubSub
+
+*   Promoted `--expiration-period` in `gcloud pubsub subscriptions
+    <create|update>` to GA.
+
+### Cloud Scheduler
+
+* Added attempt-deadline flag to `gcloud beta scheduler jobs create`.
+
+### Cloud Tasks
+
+* Promoted `gcloud tasks` command group to GA.
+
+### Compute Engine
+
+* Added `--accelerator` flag to `gcloud compute instances create-with-container.`
+* Added '--resource-policy' flag to `gcloud beta compute instances create-disk`
+
+### Vision API
+
+* Added `gcloud beta ml vision product-search` command group.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 245.0.0 (2019-05-07)
+
+### Breaking Changes
+
+*   **(Kubernetes Engine)** Removed deprecated `--enable-cloud-endpoints` flag.
+*   **(Kubernetes Engine)** Removed container/new_scopes_behavior property (new_scopes_behavior is now default behavior).
+
+
+### Cloud SDK
+
+* Run `gcloud alpha survey` to help improve the gcloud command-line tool experience by answering a customer satisfaction survey.
+* Reminders for the survey will be made periodically.
+
+### App Engine
+
+* Updated the Java SDK to version 1.9.74.
+  Please visit the following release notes for details:
+  https://cloud.google.com/appengine/docs/java/release-notes
+
+### Cloud Asset Inventory
+
+* Added `--output-path-prefix` flag to `gcloud beta asset export`.
+
+### Cloud Run
+
+*   Fixed `--uri` flag support for `list` commands in `gcloud beta run`.
+*   Cloud SQL flags are now available in beta.
+
+### Cloud Scheduler
+
+* Added `gcloud beta scheduler jobs <pause|resume>` commands.
+
+### Compute Engine
+
+* Promoted `--instance-redistribution-type` flag of
+  `gcloud compute instance-groups managed <create|update>` to beta.
+
+
+### Kubernetes Engine
+
+* Modified `gcloud container clusters create` and `gcloud container node-pools
+  create` to allow simultaneously specifying both `--scopes` and
+  `--service-account` flags.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 244.0.0 (2019-04-30)
+
+### Cloud Scheduler
+
+* Added auth flags to `gcloud beta scheduler jobs create http`.
+
+### Kubernetes Engine
+
+* Promoted `gcloud container subnets list-usable` to GA.
+* Added the `--workload-metadata-from-node` flag to `gcloud beta container
+  node-pools update` for changing the type of metadata server visible to pods
+  running in the nodepool.
+
+### Vision API
+
+* Added `--detect_objects`, `--detect_text_pdf`, `--detect_text_tiff` commands to `gcloud ml vision`.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 243.0.0 (2019-04-23)
+
+### Breaking Changes
+
+*   **(AI Platform)** Renamed `--worker-server-count` flag of
+    `gcloud ml-engine jobs submit training ` to `--worker-count`.
+*   **(App Engine)** Updated `gcloud app repair` to no longer recreate
+    a deleted service account.
+*   **(Cloud Machine Learning Engine)** Deprecated the
+    `gcloud ml-engine` command group. Use `gcloud ai-platform`  instead.
+
+
+### AI Platform
+
+* Added the `gcloud ai-platform` command group to replace `gcloud ml-engine`.
+* Promoted `gcloud ai-platform versions <create|update>` to beta.
+* Added the `--enable-console-logging` flag to `gcloud beta ai-platform models
+  create` to enable logging of stderr and stdout streams for online prediction
+  in Stackdriver Logging.
+
+### Cloud Composer
+
+* Added five new flags to `gcloud beta composer environments create` to support
+  IP alias (a.k.a. VPC-native) for Composer environments:
+    *  `--enable-ip-alias`
+    *  `--cluster-ipv4-cidr`
+    *  `--cluster-secondary-range-name`
+    *  `--services-ipv4-cidr`
+    *  `--services-secondary-range-name`
+
+### Cloud Firestore Emulator
+
+* Released Cloud Firestore Emulator version 1.4.5
+  * Fixed bug for Firestore REST API
+  * Added support to allow secure JWTs with warnings
+
+### Cloud SQL
+
+* Added the `--root-password` flag to `gcloud sql instances create`.
+
+### Cloud Tasks
+
+*   Replaced `gcloud tasks queues <create|update>-app-engine-queue` with
+    `gcloud tasks queues <create|update>` in beta and GA.
+
+### Compute Engine
+
+* Promoted `gcloud compute network-endpoint-groups` command group to GA.
+* Promoted the `--storage-location` and `--labels` flag of
+  `gcloud compute disks snapshot` to GA.
+* Promoted `--network-endpoint-group` and `--network-endpoint-group-zone`
+  flags of `gcloud compute backend-services
+  <add-backend|remove-backend|update-backend>` to GA.
+* Promoted `--max-connections-per-endpoint` and `--max-rate-per-endpoint`
+  flags of `gcloud compute backend-services <add-backend|update-backend>` to GA.
+* Promoted `--use-serving-port` flag of `gcloud compute health-checks
+  <http|https|http2|ssl> create` to GA.
+* Promoted `--custom-request-headers` and `--no-custom-request-headers` flags of
+  `gcloud compute backend-services <create|update>` to GA.
+* Promoted `--no-guest-environment`, `--network`, and `--subnet` flags of `gcloud
+  compute images import` to GA.
+* Changed `--no-guest-environment` to `--guest-environment` flag in `gcloud
+  compute images import`.
+* Promoted `--subnet` flag of `gcloud compute images export` to GA.
+* Promoted feature allowing `gcloud beta compute images <import|export>` to use
+  temporary buckets in the same region as source/destination buckets. This avoids
+  cross-region copying and its associated cost and performance penalty.
+* Promoted `--container-mount-disk-*` flags of
+  `gcloud compute instances <create-with-container|update-container>` to GA.
+* Promoted `--container-mount-disk-*` flags of
+  `gcloud compute instance-templates create-with-container` to GA.
+
+### Kubernetes Engine
+
+* Added `--update-addons=CloudRun=ENABLED|DISABLED` to allow enabling
+  and disabling the Cloud Run on Google Kubernetes Engine add-on for existing
+  GKE clusters.
+* Promoted the `--sandbox` flag of `gcloud container node-pools create` to beta.
+  This flag enables the requested sandbox on all nodes in the node-pool.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 242.0.0 (2019-04-16)
+
+### Breaking Changes
+
+*   **(Cloud Composer)** Deprecated support for the `initdb`, `resetdb`, and `upgradedb` subcommands
+    within `gcloud composer environments run`. Execution of these subcommands
+    can be detrimental to the Airflow metadata of existing Composer
+    environments.
+
+
+### Cloud Data Catalog
+
+* Added the `--lookup-entry` flag to `gcloud beta data-catalog entries update`
+  to update the entry corresponding to the lookup of the given resource.
+
+### Cloud Firestore Emulator
+
+* Release Cloud Firestore Emulator version 1.4.4
+  * Reduced lock contention for multiple writes on a single document
+  * Fix bug where no-op writes were incorrectly updating the updatedAt timestamp
+* Release Cloud Firestore Emulator version 1.4.3
+  * Fixes bug that caused parsing security rules with string literals to fail
+
+### Compute Engine
+
+* Updated `gcloud beta compute <ssh|scp>` to use IAP Tunneling by default
+  if an external interface/IP address is not available and `--internal-ip` has
+  not been specified.
+* Added warning message about the maximum number of nodes that a cluster can have when being created.
+* Added the `--deprecate-in` and `--deprecate-on` flags to `gcloud compute
+  images deprecate` to set informational deprecate times to images.
+
+
+### Identity and Access Management
+
+*   Added the `--description` flag to `gcloud beta iam service-accounts
+    <create|update>`.
+
+### Kubernetes Engine
+
+* Renamed `--size` flag of `gcloud container clusters resize` to `--num-nodes`. `--size` retained as an alias.
+* Disabled node auto-repair and node auto-upgrade by default when
+`--enable-kubernetes-alpha` flag is used to create clusters with Kubernetes
+alpha features enabled. Users may now create alpha clusters without specifying
+`--no-enable-autorepair` or `--no-enable-autoupgrade` flags. However, for
+creating new node pools in an existing alpha cluster, these two flags may still
+be required.
+
+### Miscellaneous
+
+* Fixed a bug in `gcloud config config-helper` which could result in old
+  identity tokens when `--force-auth-refresh` was not present.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 241.0.0 (2019-04-03)
+
+### Breaking Changes
+
+*   **(Cloud Functions)** Modified `gcloud functions deploy` such that the `--runtime` flag needs to be set when deploying a new function.
+
+
+### App Engine
+
+* Updated the Java SDK to version 1.9.73.
+  Please visit the following release notes for details:
+  https://cloud.google.com/appengine/docs/java/release-notes
+* Updated the Python SDK to version 1.9.85.
+  Please visit the following release notes for details:
+  https://cloud.google.com/appengine/docs/python/release-notes
+
+### BigQuery
+
+* Added DML/DDL query results that display the number of affected rows (for DML) and performed operation and target name (for DDL).
+
+### Cloud Asset Inventory
+
+* Promoted `gcloud asset` command group to GA
+
+### Cloud Bigtable
+
+*   Promoted the following to GA:
+    *   `gcloud bigtable app-profiles` command group
+    *   `gcloud bigtable clusters create`
+    *   `gcloud bigtable clusters update`
+    *   `gcloud bigtable clusters delete`
+
+### Cloud Build
+
+*   Added `--network=cloudbuild` to `gcloud builds submit --tag` invocations of
+    `docker build`. This enables access to metadata during Dockerfile `RUN`
+    operations at build time.
+
+### Cloud Composer
+
+* Added three new flags to `gcloud beta composer environments create` to support
+  Private IP Composer environments:
+    *  `--enable-private-environment`
+    *  `--enable-private-endpoint`
+    *  `--master-ipv4-cidr`
+* Added `gcloud beta composer environments list-upgrades` to list all image
+  version upgrades that are supported for a specified environment.
+* Added two mutually exclusive flags to `gcloud beta composer environments
+  update` to allow for in-place environment upgrades:
+    *  `--airflow-version`
+    *  `--image-version`
+
+### Cloud DNS
+
+* Added support for DNS peering in `gcloud beta dns managed-zones`.
+* Added `--enable-logging` flag to `gcloud beta dns policies` to enable query logging.
+
+
+### Cloud Data Catalog
+
+* Added the `gcloud beta data-catalog entries` command group, which provides
+  lookup, describe, and schema update functionality for Cloud Data Catalog
+  entries.
+
+### Cloud Firestore Emulator
+
+* Release Cloud Firestore Emulator version 1.4.2
+  * Adds implementations for BeginTransaction and Rollback
+
+### Cloud Functions
+
+* Added `--service-account` flag to `gcloud functions deploy`.
+* Added `--vpc-connector` flag to `gcloud beta functions deploy`.
+
+### Cloud Memorystore
+
+*   Added `gcloud redis instances failover` which provides the ability to
+    failover a standard tier Cloud Memorystore for Redis instance from the
+    master node to its replica.
+*   Added `--redis-version` flag to `gcloud beta redis instances create` to
+    enable the specification of a preferred Redis version compatibility; this
+    can be either `redis_3_2` or `redis_4_0`.
+*   Modified the `--update-redis-config` flag of `gcloud redis instances update`
+    to accept three additional parameters for Redis 4.0 compatible instances:
+    `activedefrag`, `lfu-decay-time`, `lfu-log-factor`.
+
+### Cloud Pub/Sub
+
+* Added optional flags `--push-auth-service-account` and
+ `--push-auth-token-audience` for defining an authenticated push subscription in
+ `gcloud beta pubsub subscriptions <create|update|modify-push-config>`.
+
+### Cloud Storage
+
+* Updated gsutil component to 4.38.
+
+### Cloud Video Intelligence API
+
+* Added `gcloud beta ml video transcribe-speech|detect-text|detect-object`
+  commands.
+
+### Compute Engine
+
+* Promoted `--logging-aggregation-interval`, `--logging-flow-sampling`, and
+  `--logging-metadata` flags of
+  `gcloud compute networks subnets <create|update>` to beta.
+* Modified `gcloud compute networks subnets update` to support specifying
+  `--logging-aggregation-interval`, `--logging-flow-sampling`, and
+  `--logging-metadata` flags in a single call.
+* Promoted `gcloud compute reservations` command group to beta.
+* Promoted `--reservation` and `--reservation-affinity` of `gcloud compute instance-templates create` to beta.
+* Promoted `--reservation` and `--reservations-from-file` of `gcloud compute commitments create` to beta.
+* Promoted `gcloud compute commitments update-reservations` to beta.
+* Promoted 100G interconnect link type support for `gcloud compute interconnects create` to beta.
+* Deprecated the creation of new legacy network.
+
+### Firebase Test Lab
+
+* Promoted `--num-flaky-test-attempts` flag of `gcloud firebase test
+  <android|ios> run` to GA. This flag specifies how many times to rerun any
+  failed executions.
+
+### Kubernetes Engine
+
+*   Promoted the `--security-group` flag of `gcloud container clusters create`
+    to beta. The flag enables support for Google Groups in Kubernetes RBAC
+    rules.
+*   Added the `--enable-intra-node-visibility` flag to `gcloud beta container
+    clusters create`.
+*   Promoted the `--enable-tpu` flag and the `--tpu-ipv4-cidr` flag of `gcloud
+    container clusters create` to GA. The flags enables support for using Cloud
+    TPU in Google Kubernetes Engine clusters.
+*   Changed the default output formatting for the `gcloud beta container
+    binauthz attestations list` command.
+*   Google Kubernetes Engine kubectl is updated to 1.11.9. Addresses security
+    vulnerability: CVE-2019-1002101.
+*   Updated extra Google Kubernetes Engine kubectl versions:
+    *   kubectl.1.11 (patch 1.11.9)
+    *   kubectl.1.12 (patch 1.12.7)
+    *   kubectl.1.13 (patch 1.13.5)
+    *   kubectl.1.14 (patch 1.14.0)
+*   Removed extra Google Kubernetes Engine kubectl versions, since these
+    versions are vulnerable.
+    *   kubectl.1.9
+    *   kubectl.1.10
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 240.0.0 (2019-03-26)
+
+### Breaking Changes
+
+*   **(Kubernetes Engine)** Enabled node auto-upgrade by default for clusters
+    and node-pools created with `gcloud beta container <clusters|node-pools>
+    create`. To disable manually, **(Kubernetes Engine)** use the
+    `--no-enable-autoupgrade` flag.
+
+
+### Cloud SDK
+
+* Added the `--impersonate-service-account` flag to `gcloud`.
+
+### App Engine
+
+* Fixed a bug which could cause gcloud to incorrectly print `http` URLs for
+  services, when `https` URLs would be more appropriate.
+* Removed 32MB file size limit for second generation runtimes.
+
+### Cloud DNS
+
+* Promoted private zones of the `gcloud dns managed-zones` command group to GA.
+  Use the `--visibility` and `--networks` flags to configure zone visibility.
+
+### Cloud Dataproc
+
+* Added `gcloud beta dataproc <jobs submit|workflow-templates add-job> presto`
+  to enable submitting Presto jobs to a Dataproc cluster and adding Presto jobs
+  to workflow templates, respectively.
+* Added `--enable-component-gateway` flag to `gcloud beta dataproc clusters
+  create` and `gcloud beta dataproc workflow-templates set-managed-cluster`.
+
+### Compute Engine
+
+* Promoted `--failover-ratio`, `--drop-traffic-if-unhealthy`, and
+  `--connection-drain-on-failover` flags of
+  `gcloud compute backend-services <create|update>` to beta.
+* Promoted `--failover` flag of
+  `gcloud compute backend-services <add_backend|update_backend>` to beta.
+* Promoted `gcloud compute instance-groups managed wait-until` command to beta.
+* Promoted `--region` flag of `gcloud compute disks` and related commands to GA.
+* Added `gcloud beta compute external-vpn-gateway` command group to enable reading and manipulating of Compute Engine external VPN gateways.
+* Added `gcloud beta compute vpn-gateway` command group to enable reading and manipulating of Compute Engine VPN gateways.
+* Updated `gcloud beta compute vpn-tunnel` command to enable the creation of HA VPN tunnels.
+
+### Identity and Access Management
+
+* Added a new column, `DISABLED`, to the return table of
+  `gcloud iam service-account list`, which displays the state of the service
+  account listed.
+
+### Kubernetes Engine
+
+* Added the `--release-channel` flag to `gcloud alpha container clusters create`
+  for subscribing a cluster to a release channel.
+* Promoted `--default-max-pods-per-node` flag of `gcloud container clusters create` from Beta to GA.
+* Promoted `--max-pods-per-node` flag of `gcloud container node-pools create` from Beta to GA.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 239.0.0 (2019-03-19)
+
+### Cloud Dataproc
+
+* Added `gcloud beta dataproc autoscaling-policies` command group for managing
+  Cloud Dataproc autoscaling policies. For more information, see:
+  https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/autoscaling
+* Added `--autoscaling-policy` flag to
+  `gcloud beta dataproc clusters <create|update>` and
+  `gcloud beta dataproc workflow-templates set-managed-cluster` to support
+  enabling and disabling autoscaling on Cloud Dataproc clusters with autoscaling
+  policies.
+
+### Cloud Firestore Emulator
+
+* Release Cloud Firestore Emulator version 1.4.1
+  * Fixes bug where an empty CommitRequest was trigger exceptions
+
+### Cloud Resource Manager
+
+* Promoted `resource-manager folders` command group to GA.
+
+### Compute Engine
+
+* Promoted `--bandwidth` flag of `gcloud compute interconnects attachments dedicated <create|update>` to GA.
+* Promoted load_balancing_scheme enum value INTERNAL_SELF_MANAGED to beta in 'gcloud compute forwarding-rules create' and 'gcloud compute backend-services create'.
+* Promoted `gcloud compute instances get-shielded-identity` to GA.
+* Promoted the `--shielded-vtpm`, `--shielded-secure-boot`, and
+  `--shielded-integrity-monitoring` flags of `gcloud compute instances create`
+  to GA.
+* Promoted the `--shielded-vtpm`, `--shielded-secure-boot`, and
+  `--shielded-integrity-monitoring` flags of `gcloud compute instance-templates
+  create` to GA.
+* Promoted the `--shielded-vtpm`, `--shielded-secure-boot`,
+  `--shielded-integrity-monitoring`, and `--shielded-learn-integrity-policy`
+  flags of `gcloud compute instances update` to GA.
+* Removed the deprecated `--shielded-vm-vtpm`, `--shielded-vm-secure-boot`, and
+  `--shielded-vm-integrity-monitoring` flags of `gcloud compute instances
+  create` from alpha and beta.
+* Removed the deprecated `--shielded-vm-vtpm`, `--shielded-vm-secure-boot`, and
+  `--shielded-vm-integrity-monitoring` flags of `gcloud compute
+  instance-templates create` from alpha and beta.
+* Removed the deprecated `--shielded-vm-vtpm`, `--shielded-vm-secure-boot`,
+  `--shielded-vm-integrity-monitoring`, and
+  `--shielded-vm-learn-integrity-policy` flags of `gcloud compute instances
+  update` from alpha and beta.
+
+### Kubernetes Engine
+
+* Update Google Container Engine's kubectl so that it now first attempts
+to match the API server version. If successful, the kubectl will
+delegate to the matching version of kubectl. Otherwise, it defaults
+to execute the current 1.11.7 version of kubectl.
+* Updated extra Google Kubernetes Engine kubectl versions:
+  * kubectl.1.9  (patch 1.9.11)
+  * kubectl.1.10 (patch 1.10.13)
+  * kubectl.1.11 (patch 1.11.8)
+  * kubectl.1.12 (patch 1.12.6)
+  * kubectl.1.13 (patch 1.13.4)
+
+* In June 2019, node auto-upgrade will be enabled by default for newly created
+clusters and node pools. To disable it, use the `--no-enable-autoupgrade` flag.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 238.0.0 (2019-03-12)
+
+### App Engine
+
+* Updated the Python SDK to version 1.9.84.
+  Please visit the following release notes for details:
+  https://cloud.google.com/appengine/docs/python/release-notes
+
+* Added a new field, 'main', to app.yaml. This allows users of the Go
+  second-generation runtimes to specify which package to build. See
+  https://cloud.google.com/appengine/docs/standard/go111/config/appref for more
+  information.
+
+### App Engine Flexible Environment
+
+* Promoted network.session_affinity flag in yaml file to GA.
+
+### Cloud Access Context Manager
+
+*   Promoted the gcloud access-context-manager command group to GA
+*   Removed the unrestricted-services field from alpha and beta, always set to default '*'.
+
+### Cloud Dataproc
+
+* Promoted `--optional-components` of `gcloud dataproc clusters` to GA.
+
+### Cloud Functions
+
+* Promoted `max-instances` and `clear-max-instances` flags of `gcloud functions deploy` to beta.
+
+
+### Cloud Machine Learning Engine
+
+* Promoted `--machine-type` flag of `gcloud ml-engine versions create` command to GA.
+
+### Kubernetes Engine
+
+* Added the `--enable-shielded-containers` flag to `gcloud beta container clusters create`.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 237.0.0 (2019-03-05)
+
+### Cloud SDK
+
+* Fixed issue affecting users overwriting an existing Cloud SDK install via the
+  Windows installer, in which certain gcloud commands crashed with a "gcloud
+  crashed (LayoutException): Multiple definitions for release track" error. This
+  issue can be tracked at <https://issuetracker.google.com/123390310>.
+
+### BigQuery
+
+* Fixes bug in formatting pre-1900 timestamps.
+
+### Cloud Dataproc
+
+* Fixed a bug where several fields were hidden from `gcloud dataproc clusters
+<import|export>` in all release tracks. Note that these fields were always
+available in `gcloud dataproc clusters <create-from-file|describe>`.
+
+### Cloud Storage
+
+* Updated gsutil component to 4.37.
+
+### Compute Engine
+
+* Promoted the `--server-binding` flag of `gcloud compute sole-tenancy
+  node-templates create` to beta.
+* Reduced lower bound for data disk sizes from 10GB to 1GB for
+  `gcloud compute instances create`.
+* Added `resources-accelerator` to `gcloud beta compute commitments create`.
+* Promoted `all` option of `--ports` flag for `gcloud compute forwarding-rules`
+  to GA.
+* Added INSTANCE_TEMPLATE and VERSION_NAME columns to output of `gcloud compute
+  instance-groups managed list-instances`.
+
+### Kubernetes Engine
+
+* Updated Google Kubernetes Engine's kubectl from version 1.10.7 to 1.11.7.
+* Added extra Google Kubernetes Engine kubectl versions:
+  * kubectl.1.9
+  * kubectl.1.10
+  * kubectl.1.11
+  * kubectl.1.12
+  * kubectl.1.13
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 236.0.0 (2019-02-26)
+
+### Cloud SDK
+
+* Modified error handling for `gcloud auth revoke` when revoking a service
+  account token to print a friendly error message with more detailed
+  instructions on how to revoke the token.
+
+### Cloud Asset Inventory
+
+* Added `--folder` flag to `gcloud beta asset export` command.
+
+### Cloud Dataproc
+
+* Added `--kerberos-root-principal-password-uri`, `--kerberos-kms-key`, and
+  `--kerberos-config-file` flags to `gcloud beta dataproc clusters create`
+  and `gcloud beta dataproc workflow-templates set-managed-cluster`.
+
+### Cloud Firestore Emulator
+
+*   Released Cloud Firestore Emulator version 1.4.0:
+    *   Added support for the `debug(...)` function in security rules.
+    *   Simplified security rule evaluation and rule coverage reports.
+
+### Cloud Services
+
+* Promoted `services vpc-peerings` command group to GA.
+
+### Compute Engine
+
+* Removed auto-create-routes column from default output of `gcloud beta compute
+  networks peerings list`.
+* Promoted `--enable-logging` and `--log-filter` flags of
+  `gcloud compute routers nats` to beta.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 235.0.0 (2019-02-19)
+
+### App Engine
+
+* Fixed bug where deleting a service at the same time as deleting an app
+  version in an unrelated service caused deletion of the version to fail.
+* Updated the Python SDK to version 1.9.83.
+  Please visit the following release notes for details:
+  https://cloud.google.com/appengine/docs/python/release-notes
+* Updated the Java SDK to version 1.9.72.
+  Please visit the following release notes for details:
+  https://cloud.google.com/appengine/docs/java/release-notes
+
+### Cloud Composer
+
+*   Promoted `--airflow-version` and `--image-version` flags of
+    `gcloud composer environments create` to GA. These mutually exclusive flags
+    can be used to specify the airflow version or image version used within a
+    created environment.
+
+### Cloud IoT
+
+* Promoted `gcloud iot devices gateways` command group to GA.
+
+### Cloud Key Management Service
+
+* Exposed a new format of Cavium's attestation introduced in Cavium's new 3.2-08 version.
+
+### Compute Engine
+
+* Updated the `gcloud beta compute start-iap-tunnel` command for Cloud IAP TCP
+  Forwarding to listen on both IPv4 and IPv6 for localhost.
+* Updated Windows PuTTY executables to 0.70.
+* Promoted `gcloud compute networks peerings list-routes` command to beta.
+* Modified the output of `gcloud beta compute networks peerings list` to include
+  `IMPORT_CUSTOM_ROUTES`/`EXPORT_CUSTOM_ROUTES` columns.
+* Promoted `--resource-policies` of `gcloud compute disks create` to beta.
+* Promoted `--enable-logging` and `--logging-sample-rate` flags of
+  `gcloud compute backend-services <create|update>` to beta.
+* Promoted `--bandwidth` flag of `gcloud compute interconnects attachments dedicated <create|update>` to beta
+
+### Firebase Test Lab
+
+* Added an `ignore:` option to the `--robo-directives` flag of `gcloud beta firebase test android run` command. This option directs Robo to avoid interactions with a user-defined UI element.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 234.0.0 (2019-02-12)
+
+### Cloud SDK
+
+* Added the `accessibility/screen_reader` property. This property changes
+  some gcloud UX to make output more screen reader friendly. See `gcloud topic
+  accessibility` for more information`.
+  * Accessibility support is still in the early stages, so please report any
+    issues that you would like fixed using `gcloud feedback`.
+
+### Cloud Asset Inventory
+
+* Added `gcloud beta asset` command group to manage the Cloud Asset Inventory.
+
+### Cloud Resource Manager
+
+* Promoted `resource-manager folders` command group to beta
+
+### Cloud Services
+
+* Added `gcloud beta services vpc-peerings` to support updating a connection.
+
+### Cloud Source Repositories
+
+* Promoted `gcloud source project-configs` command group to GA.
+* Promoted `gcloud source repos update` to GA.
+
+### Compute Engine
+
+* Promoted `gcloud beta compute networks subnets <get|set>-iam-policy` and `<add|remove>-iam-policy-bindings` to GA.
+* Promoted the following commands to beta:
+    *   `gcloud compute disks <add|remove-resource-policies>`
+    *   `gcloud compute resource-policies create-snapshot-schedule`
+    *   `gcloud compute resource-policies delete`
+    *   `gcloud compute resource-policies describe`
+    *   `gcloud compute resource-policies list`
+* Promoted `--service-label` flag of `gcloud compute forwarding-rules create`
+  to GA.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 233.0.0 (2019-02-05)
+
+### Cloud Dataflow
+
+* Added numWorkers, network, subnetwork and workerMachineType flags to
+'gcloud beta dataflow jobs run' command
+
+### Cloud Datalab
+
+* Updated the `datalab` component to the 20190116 release.
+  Released changes are documented in its tracking issue at
+        [https://github.com/googledatalab/datalab/issues/2114](https://github.com/googledatalab/datalab/issues/2114).
+
+### Cloud Filestore
+
+* Promoted `gcloud filestore` command group to GA.
+
+### Cloud Firestore Emulator
+
+* Release Cloud Firestore Emulator version 1.3.0
+  *  Added a clearDatabase RPC to delete all data in a database
+  *  Added logging to assist with FIRESTORE_EMULATOR_HOST environment variable
+  *  The getDocument RPC now supports a read_time consistency selector
+  *  Fixed bug related to rule evaluation callbacks
+
+### Cloud Machine Learning Engine
+
+* Added support for custom server configuration to
+  `ml-engine jobs submit training` in beta. Added the following flags:
+  * `--master-machine-type`
+  * `--master-accelerator`
+  * `--master-image-uri`
+  * `--worker-machine-type`
+  * `--worker-count`
+  * `--worker-accelerator`
+  * `--worker-image-uri`
+  * `--parameter-server-machine-type`
+  * `--parameter-server-count`
+  * `--parameter-server-accelerator`
+  * `--parameter-server-image-uri`
+
+### Cloud Pub/Sub
+
+*   Promoted Snapshot & Seek features to GA. These features allow users to
+    create snapshots of subscription backlog state, and later restore that
+    state.
+
+### Cloud SQL
+
+* Fixed `gcloud sql connect` whitelisting issues that resulted from invalid
+  datetime formatting.
+
+### Cloud Storage
+
+
+* Updated gsutil component to 4.36.
+
+### Compute Engine
+
+* Promoted the `--force-attach` flag of `compute instances attach-disk` to GA
+* Added `<get|set>-iam-policy` and `<add|remove>-iam-policy-bindings` to `gcloud beta compute networks subnets`
+* Promoted `gcloud compute instances get-shielded-identity` to beta.
+* Promoted `gcloud compute instance-groups managed update` to GA together with
+  `--health-check`, `--initial-delay` and `--clear-autohealing` flags.
+* Promoted `--initial-delay` and `--health-check` flags of `gcloud compute
+  instance-groups managed create` to GA.
+* Enabled the use of multiple `--network-interface` flags with `gcloud compute
+  <instances|instance-templates> create-with-container` to support using
+  multiple network interfaces.
+* Promoted `gcloud compute instance-groups managed rolling-action` command group
+  to GA.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 232.0.0 (2019-01-29)
+
+### Breaking Changes
+
+*   **(Kubernetes Engine)** Added a warning on cluster and node-pool creation to notify users that
+  modifications on the boot disks of node VMs do not persist across node
+  recreations and must be done using a DaemonSet.
+
+### Cloud SQL
+
+* Rolled back fix to `gcloud sql connect` that seems to be causing additional
+  issues connecting.
+
+### Compute Engine
+
+* Promoted `<get|set>-iam-policy` and `<add|remove>-iam-policy-bindings` to GA
+  in the following command groups:
+    * `gcloud compute disks`
+    * `gcloud compute images`
+    * `gcloud compute instance-templates`
+    * `gcloud compute snapshots`
+* Added '--enable-display-device' to `gcloud beta compute instances
+  <create|update>`
+* Deprecated `gcloud compute instance-groups managed set-autohealing` command.
+  Use `gcloud compute instance-groups managed update` instead.
+
+### Kubernetes Engine
+
+* Promoted the `--database-encryption-key` flag of `gcloud container clusters
+create` to beta. The flag enables support for encryption of Kubernetes Secrets.
+* Modified the `--enable-stackdriver-kubernetes` flag to be a hard requirement
+for `--addons=CloudRun`. The CloudRun-on-GKE add-on depends on Stackdriver
+Kubernetes Monitoring to enrich Kubernetes metadata for logs and metrics.
+* Add `--max-pods-per-node` for `gcloud beta container clusters create`.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 231.0.0 (2019-01-23)
+
+### Breaking Changes
+
+*   **(Cloud SQL)** Updated the error messaging associated with failed long-running operations.
+
+
+### App Engine
+
+
+* Updated the Python SDK to version 1.9.82.
+  Please visit the following release notes for details:
+  https://cloud.google.com/appengine/docs/standard/python/release-notes
+
+### BigQuery
+
+* Added `--ignore_unknown_values` flag to `bq mkdef` command.
+* Added support for BigQuery BI Engine reservations in `bq` cli.
+
+### Cloud Datastore Emulator
+
+* Release Cloud Datastore Emulator version 2.1.0
+  * Implement export/import for emulator. For details, refer to
+    <https://cloud.google.com/datastore/docs/tools/emulator-export-import>.
+
+### Cloud SQL
+
+* Fixed the display of error codes in `gcloud sql operations list`.
+
+### Compute Engine
+
+* Promoted `gcloud compute instance-groups managed update` to beta together with
+  `--health-check`, `--initial-delay` and `--clear-autohealing` flags.
+* Promoted `--hostname` flag of `gcloud compute instances create` to GA.
+* Added `--physical-block-size` flag to `gcloud beta compute disks create`.
+
+### Firebase Test Lab
+
+* Added `--num-flaky-test-attempts` flag to `gcloud beta firebase test android run` and `gcloud beta firebase test ios run` to rerun failed executions multiple times.
+
+### Kubernetes Engine
+
+* Promoted the `--security-group` flag of `gcloud container clusters create` to
+beta. The flag enables support for Google Groups in Kubernetes RBAC rules.
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
+## 230.0.0 (2019-01-15)
+
+### Breaking Changes
+
+*   **(App Engine)** Fixed a bug where symlinked directories were skipped on source upload.
+  Second Generation runtimes and source directories using .gcloudignore now
+  upload the contents of symlinked directories, matching the behavior of First
+  Generation runtimes. To explicitly skip a symlinked directory, add it to
+  .gcloudignore.
+*   **(Cloud Functions)** Fixed a bug where symlinked directories were skipped on source upload.
+  To explicitly skip a symlinked directory, add it to .gcloudignore.
+*   **(Cloud SQL)** Made the flags `--region`, `--gce-zone`, and `--zone` mutually exclusive
+  for the command `gcloud sql instances create`.
+*   **(Cloud SQL)** Deprecated the creation of First Generation Cloud SQL instances, adding a
+  warning and confirmation prompt to `gcloud sql instances create`.
+
+
+### Cloud Build
+
+*   Released `cloud-build-local` v0.5.0; see
+    release notes: <https://github.com/GoogleCloudPlatform/cloud-build-local/releases/tag/v0.5.0>.
+
+### Cloud SQL
+
+* Added the flag `--zone` to `gcloud sql instances create` as an alternative to
+  `--gce-zone`, which is now deprecated.
+* Deprecated First Generation Cloud SQL instances, adding warnings to
+  `gcloud sql instances <describe|patch>`.
+
+### Cloud Scheduler
+
+* Added support for all of App Engine's regions to Cloud Scheduler.
+
+### Compute Engine
+
+* Promoted `<get|set>-iam-policy` and `<add|remove>-iam-policy-bindings` to GA
+  in the following command groups:
+    * `gcloud compute instances`
+    * `gcloud compute sole-tenancy node-templates`
+    * `gcloud compute sole-tenancy node-groups`
+* Promoted `--boot` flag of `gcloud compute instances attach-disk` to GA.
+* Deprecated `--auto-create-routes` flag of `gcloud alpha compute networks
+  peerings create` in Beta.
+* Promoted `gcloud compute networks peerings update` command to Beta.
+* Promoted `import-custom-routes` and `export-custom-routes` flags to Beta
+  in `gcloud compute networks peerings create` command.
+* Deprecated and renamed the following `--shielded-vm-*` flags:
+    * `--shielded-vm-secure-boot` as `--shielded-secure-boot`
+    * `--shielded-vm-vtpm` as `--shielded-vtpm`
+    * `--shielded-vm-integrity-monitoring` as `--shielded-integrity-monitoring`
+    * `--shielded-vm-learn-integrity-policy` as `--shielded-learn-integrity-policy`
+
+
+### Firebase Test Lab
+
+* Deprecated the `--app-package` and `--test-package` flags in `gcloud firebase test android run` commands; the application and test package names will be parsed from the APK manifest by default.
+* Removed three robo test args that were deprecated 6+ months ago: `--max-steps`, `--max-depth`, and `--app-initial-activity`.
+
+
+
+Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
+
+
 ## 229.0.0 (2019-01-08)
 
 ### App Engine
@@ -12,10 +995,10 @@ Subscribe to these release notes at [https://groups.google.com/forum/#!forum/goo
 
 * Updated the Python SDK to version 1.9.81.
   Please visit the following release notes for details:
-  https://cloud.google.com/appengine/docs/python/release-notes
+  <https://cloud.google.com/appengine/docs/standard/python/release-notes>
 * Updated the Java SDK to version 1.9.71.
   Please visit the following release notes for details:
-  https://cloud.google.com/appengine/docs/java/release-notes
+  <https://cloud.google.com/appengine/docs/standard/java/release-notes>
 
 ### BigQuery
 
@@ -95,7 +1078,7 @@ Subscribe to these release notes at [https://groups.google.com/forum/#!forum/goo
 
 * Updated the Java SDK to version 1.9.70.
   Please visit the following release notes for details:
-  https://cloud.google.com/appengine/docs/java/release-notes
+  https://cloud.google.com/appengine/docs/standard/java/release-notes
 
 ### Cloud Composer
 
@@ -163,7 +1146,7 @@ Subscribe to these release notes at [https://groups.google.com/forum/#!forum/goo
 
 * Updated the Java SDK to version 1.9.69.
   Please visit the following release notes for details:
-  https://cloud.google.com/appengine/docs/java/release-notes
+  https://cloud.google.com/appengine/docs/standard/java/release-notes
 
 ### Cloud Bigtable
 
@@ -198,7 +1181,7 @@ Subscribe to these release notes at [https://groups.google.com/forum/#!forum/goo
 * Promoted `--log-level` flag of `gcloud iot <devices|registries>` to GA.
 * Promoted `gcloud iot devices gateways` command group to beta.
 
-### Cloud PubSub
+### Cloud Pub/Sub
 
 * Added support for defining an expiration period for a subscription to
   `gcloud beta pubsub subscriptions`.
@@ -282,7 +1265,7 @@ Subscribe to these release notes at [https://groups.google.com/forum/#!forum/goo
 
 * Updated the Python SDK to version 1.9.80.
   Please visit the following release notes for details:
-  https://cloud.google.com/appengine/docs/python/release-notes
+  https://cloud.google.com/appengine/docs/standard/python/release-notes
 
 ### BigQuery
 
@@ -334,10 +1317,10 @@ Subscribe to these release notes at [https://groups.google.com/forum/#!forum/goo
 
 * Updated the Python SDK to version 1.9.79.
   Please visit the following release notes for details:
-  https://cloud.google.com/appengine/docs/python/release-notes
+  https://cloud.google.com/appengine/docs/standard/python/release-notes
 * Updated the Go SDK to version 1.9.70.
   Please visit the following release notes for details:
-  https://cloud.google.com/appengine/docs/go/release-notes
+  https://cloud.google.com/appengine/docs/standard/go/release-notes
 
 ### Compute Engine
 
@@ -353,11 +1336,11 @@ Subscribe to these release notes at [https://groups.google.com/forum/#!forum/goo
 
 * Updated the Python SDK to version 1.9.78.
   Please visit the following release notes for details:
-  https://cloud.google.com/appengine/docs/python/release-notes
+  https://cloud.google.com/appengine/docs/standard/python/release-notes
 
 * Updated the Java SDK to version 1.9.68.
   Please visit the following release notes for details:
-  https://cloud.google.com/appengine/docs/java/release-notes
+  https://cloud.google.com/appengine/docs/standard/java/release-notes
 
 * Updated the Go SDK to version 1.9.69.
   Fix a bug in windows support for go.mod deployments for the Go 1.11 runtime
@@ -388,7 +1371,7 @@ Subscribe to these release notes at [https://groups.google.com/forum/#!forum/goo
   large.
 * Updated the Java SDK to version 1.9.67.
   Please visit the following release notes for details:
-  https://cloud.google.com/appengine/docs/java/release-notes
+  https://cloud.google.com/appengine/docs/standard/java/release-notes
 
 ### Cloud Build
 
@@ -531,10 +1514,10 @@ Subscribe to these release notes at [https://groups.google.com/forum/#!forum/goo
 
 * Updated the Java SDK to version 1.9.66.
   Please visit the following release notes for details:
-  <https://cloud.google.com/appengine/docs/java/release-notes>
+  <https://cloud.google.com/appengine/docs/standard/java/release-notes>
 * Updated the Python SDK to version 1.9.77.
   Please visit the following release notes for details:
-  <https://cloud.google.com/appengine/docs/python/release-notes>
+  <https://cloud.google.com/appengine/docs/standard/python/release-notes>
 
 ### Cloud Build
 
@@ -587,7 +1570,7 @@ Subscribe to these release notes at [https://groups.google.com/forum/#!forum/goo
 
 * Updated the Python SDK to version 1.9.76.
   Please visit the following release notes for details:
-  <https://cloud.google.com/appengine/docs/python/release-notes>
+  <https://cloud.google.com/appengine/docs/standard/python/release-notes>
 
 ### Compute Engine
 
@@ -692,7 +1675,7 @@ Subscribe to these release notes at [https://groups.google.com/forum/#!forum/goo
 
 * Updated the Java SDK to version 1.9.65.
   Please visit the following release notes for details:
-  https://cloud.google.com/appengine/docs/java/release-notes
+  https://cloud.google.com/appengine/docs/standard/java/release-notes
 
 ### Cloud SQL
 
@@ -726,7 +1709,7 @@ Subscribe to these release notes at [https://groups.google.com/forum/#!forum/goo
 
 * Updated the Go SDK to version 1.9.68.
   Please visit the following release notes for details:
-  https://cloud.google.com/appengine/docs/go/release-notes
+  https://cloud.google.com/appengine/docs/standard/go/release-notes
 
 ### Cloud Bigtable
 
@@ -767,11 +1750,11 @@ Subscribe to these release notes at [https://groups.google.com/forum/#!forum/goo
 
 * Added python 3 support for gcloud app and gcloud domains.
 * Added the `--no-cache` flag to `gcloud beta app deploy` for
-  [Second Generation runtimes](/appengine/docs/standard/appengine-generation),
+  [Second Generation runtimes](/appengine/docs/standard/runtimes),
   to disable the build cache during deployment.
 * Updated the Python SDK to version 1.9.75.
   Please visit the following release notes for details:
-  https://cloud.google.com/appengine/docs/python/release-notes
+  https://cloud.google.com/appengine/docs/standard/python/release-notes
 
 ### Cloud Datalab
 
@@ -901,7 +1884,7 @@ Subscribe to these release notes at [https://groups.google.com/forum/#!forum/goo
 
 * Updated the Python SDK to version 1.9.74.
   Please visit the following release notes for details:
-  <https://cloud.google.com/appengine/docs/python/release-notes>
+  <https://cloud.google.com/appengine/docs/standard/python/release-notes>
 
 ### Cloud Datastore
 
@@ -1085,10 +2068,10 @@ Subscribe to these release notes at [https://groups.google.com/forum/#!forum/goo
 
 * Updated the Go SDK to version 1.9.67.
   Please visit the following release notes for details:
-  <https://cloud.google.com/appengine/docs/go/release-notes>
+  <https://cloud.google.com/appengine/docs/standard/go/release-notes>
 * Updated the Python SDK to version 1.9.73.
   Please visit the following release notes for details:
-  <https://cloud.google.com/appengine/docs/python/release-notes>
+  <https://cloud.google.com/appengine/docs/standard/python/release-notes>
 
 ### Cloud Composer
 
@@ -1148,7 +2131,7 @@ Subscribe to these release notes at [https://groups.google.com/forum/#!forum/goo
 
 * Updated the Python SDK to version 1.9.72.
   Please visit the following release notes for details:
-  <https://cloud.google.com/appengine/docs/python/release-notes>
+  <https://cloud.google.com/appengine/docs/standard/python/release-notes>
 
 ### Cloud Dataproc
 
@@ -1231,10 +2214,10 @@ Subscribe to these release notes at [https://groups.google.com/forum/#!forum/goo
 
 * Updated the Python SDK to version 1.9.71.
   Please visit the following release notes for details:
-  <https://cloud.google.com/appengine/docs/python/release-notes>
+  <https://cloud.google.com/appengine/docs/standard/python/release-notes>
 * Updated the Go SDK to version 1.9.65.
   Please visit the following release notes for details:
-  <https://cloud.google.com/appengine/docs/go/release-notes>
+  <https://cloud.google.com/appengine/docs/standard/go/release-notes>
 
 ### App Engine Flexible Environment
 
@@ -1404,7 +2387,7 @@ Subscribe to these release notes at [https://groups.google.com/forum/#!forum/goo
 
 * Updated the Java SDK to version 1.9.64.
   Please visit the following release notes for details:
-  <https://cloud.google.com/appengine/docs/java/release-notes>
+  <https://cloud.google.com/appengine/docs/standard/java/release-notes>
 
 ### Cloud Endpoints
 
@@ -1523,7 +2506,7 @@ Subscribe to these release notes at [https://groups.google.com/forum/#!forum/goo
 
 * Updated the Python SDK to version 1.9.70.
   Please visit the following release notes for details:
-  <https://cloud.google.com/appengine/docs/python/release-notes>
+  <https://cloud.google.com/appengine/docs/standard/python/release-notes>
 
 ### Cloud Datastore Emulator
 
@@ -1742,7 +2725,7 @@ Subscribe to these release notes at [https://groups.google.com/forum/#!forum/goo
   message about "copying files to App Engine".
 * Updated the Python SDK to version 1.9.69.
   Please visit the following release notes for details:
-  https://cloud.google.com/appengine/docs/python/release-notes
+  https://cloud.google.com/appengine/docs/standard/python/release-notes
 * Added [PyTz version 2017.3](https://pypi.python.org/pypi/pytz/2017.3) to the
   built-in third-party libraries.
 
@@ -1811,14 +2794,14 @@ Subscribe to these release notes at [https://groups.google.com/forum/#!forum/goo
 
 * Updated the Python SDK to version 1.9.68.
   Please visit the following release notes for details:
-  <https://cloud.google.com/appengine/docs/python/release-notes>
+  <https://cloud.google.com/appengine/docs/standard/python/release-notes>
 
 ### App Engine Flexible Environment
 
 * Added deprecation warning in `gcloud app deploy` for apps on the App Engine
 flexible environment using Python version 3.4. For more information about this
 deprecation, see
-<https://cloud.google.com/appengine/docs/deprecations/python34>.
+<https://cloud.google.com/appengine/docs/standard/deprecations/python34>.
 
 ### Cloud DNS
 
@@ -2094,7 +3077,7 @@ Subscribe to these release notes at [https://groups.google.com/forum/#!forum/goo
 
 * Updated the Java SDK to version 1.9.63.
   Please visit the following release notes for details:
-  [https://cloud.google.com/appengine/docs/java/release-notes](https://cloud.google.com/appengine/docs/java/release-notes)
+  [https://cloud.google.com/appengine/docs/standard/java/release-notes](https://cloud.google.com/appengine/docs/standard/java/release-notes)
 
 ### Compute Engine
 
@@ -2142,7 +3125,7 @@ Subscribe to these release notes at [https://groups.google.com/forum/#!forum/goo
    gcloud functions deploy --trigger-event \
    providers/cloud.storage/eventTypes/object.change \
    --trigger-resource <your_bucket_name>
-* **(MODIFIED)** The schema for pub/sub events has changed. `eventId`,
+* **(MODIFIED)** The schema for Pub/Sub events has changed. `eventId`,
   `timestamp`, `resource`, and `eventType` have all been moved inside the
   context property e.g., context.timestamp. All functions deployed using
   `--trigger-topic` flag will use the new schema. To get the legacy behavior,
@@ -2171,7 +3154,7 @@ date, apps will be blocked from deploying until you specify the SSL library
 
 * Updated the Go SDK to version 1.9.63.
   Please visit the following release notes for details:
-  https://cloud.google.com/appengine/docs/go/release-notes
+  https://cloud.google.com/appengine/docs/standard/go/release-notes
 
 ### Cloud Bigtable
 
@@ -2226,7 +3209,7 @@ date, apps will be blocked from deploying until you specify the SSL library
   `gcloud dataproc jobs submit` are now mutually exclusive. The previous usage
   had been deprecated for more than a year.
 *  **(MODIFIED)** Soon changing the default event schema returned by Cloud
-   Functions with a pub/sub trigger(e.g. `--trigger-topic`). The `eventId`,
+   Functions with a Pub/Sub trigger(e.g. `--trigger-topic`). The `eventId`,
    `timestamp`, `eventType`, and `resource` properties will all be moved into
    the `event.context` property.
    *   To opt-in to the new behavior early, run
@@ -2262,7 +3245,7 @@ date, apps will be blocked from deploying until you specify the SSL library
 
 * Updated the Python SDK to version 1.9.67.
   Please visit the following release notes for details:
-  https://cloud.google.com/appengine/docs/python/release-notes
+  https://cloud.google.com/appengine/docs/standard/python/release-notes
 * `gcloud app deploy` can now deploy App Engine Java Standard apps, by providing
   the path to appengine-web.xml.
 * Staging is now supported in appengine-web.xml. Information on staging tags is
@@ -2348,7 +3331,7 @@ date, apps will be blocked from deploying until you specify the SSL library
 
 * Updated the Java SDK to version 1.9.62.
   Please visit the following release notes for details:
-  https://cloud.google.com/appengine/docs/java/release-notes
+  https://cloud.google.com/appengine/docs/standard/java/release-notes
   * Fixed the [issue with missing QuickStartGenerator class](https://issuetracker.google.com/issues/72808542)
 * Changed `gcloud app deploy` to use a new runtime build pipeline to deploy apps for
   Go (in the Flexible Environment). This enables more robust and flexible
@@ -2464,9 +3447,9 @@ date, apps will be blocked from deploying until you specify the SSL library
 
 ### Miscellaneous
 
-* Updated the Pubsub Emulator
-  * Pubsub emulator now spams the console less.
-  * Pubsub emulator properly sets the default value for Subscription.message_retention_duration.
+* Updated the Pub/Sub Emulator
+  * Pub/Sub emulator now spams the console less.
+  * Pub/Sub emulator properly sets the default value for Subscription.message_retention_duration.
 
 
 Subscribe to these release notes at [https://groups.google.com/forum/#!forum/google-cloud-sdk-announce](https://groups.google.com/forum/#!forum/google-cloud-sdk-announce).
@@ -2479,7 +3462,7 @@ Subscribe to these release notes at [https://groups.google.com/forum/#!forum/goo
 
 * Updated the Java SDK to version 1.9.61.
   Please visit the following release notes for details:
-  [https://cloud.google.com/appengine/docs/java/release-notes](https://cloud.google.com/appengine/docs/java/release-notes)
+  [https://cloud.google.com/appengine/docs/standard/java/release-notes](https://cloud.google.com/appengine/docs/standard/java/release-notes)
 
 ### App Engine Flexible Environment
 
@@ -2549,7 +3532,7 @@ labels.
 
 ### Breaking Changes
 
-* **(REMOVED)** Removed support for the format `--scopes=[ACCOUNT=]SCOPE,[[ACCOUNT=]SCOPE,…]]` in `gcloud compute instances <create|create-with-container>` and `gcloud compute instance-templates <create|create-with-container>`. Please use `--scopes=[SCOPE, …]` and `--service-account=ACCOUNT` instead.
+* **(REMOVED)** Removed support for the format `--scopes=[ACCOUNT=]SCOPE,[[ACCOUNT=]SCOPE,...]]` in `gcloud compute instances <create|create-with-container>` and `gcloud compute instance-templates <create|create-with-container>`. Please use `--scopes=[SCOPE, ...]` and `--service-account=ACCOUNT` instead.
 
 *   **(MODIFIED)** Added cautionary 'y/n' prompts to
     `gcloud beta iam roles create`, `gcloud beta iam roles update`, and
@@ -2653,7 +3636,7 @@ labels.
     to the built-in third-party libraries.
 * Updated Java SDK to version 1.9.60.
   Please visit the following release notes for details:
-  https://cloud.google.com/appengine/docs/java/release-notes
+  https://cloud.google.com/appengine/docs/standard/java/release-notes
 * Updated the Go SDK for App Engine to version 1.9.62
   * Includes internal updates for how applications are deployed.
 * Fixed inaccurate warning about "module" in `app.yaml` configuration file
@@ -2744,7 +3727,7 @@ Added support for `.gcloudignore` files to `container builds submit` command.
 
 *  Updated App Engine Python components to 1.9.64.
    Please visit the following release notes for details:
-   <https://cloud.google.com/appengine/docs/python/release-notes>
+   <https://cloud.google.com/appengine/docs/standard/python/release-notes>
 
 ### Cloud Dataproc
 
@@ -2969,7 +3952,7 @@ Added support for `.gcloudignore` files to `container builds submit` command.
 *   Updated components to 1.9.63.
 *   Added deprecation warning in `gcloud app deploy` for Python apps using the
     library `ssl 2.7`. For information about this deprecation, see
-    <https://cloud.google.com/appengine/docs/deprecations/python-ssl-27>.
+    <https://cloud.google.com/appengine/docs/standard/deprecations/python-ssl-27>.
 *   Fixed issue affecting the Go runtime in which `gcloud app deploy` failed at
     finding dependencies that are not required.
 *   Added `--go_debugging` flag to `dev_appserver.py` to enable delve debugging
@@ -3025,7 +4008,7 @@ Added support for `.gcloudignore` files to `container builds submit` command.
 
 *   Components updated to 1.9.59. Please visit the following release notes for
     details:
-    *   Java - https://cloud.google.com/appengine/docs/java/release-notes
+    *   Java - https://cloud.google.com/appengine/docs/standard/java/release-notes
 
 ### Firebase Test Lab
 
@@ -3137,7 +4120,7 @@ Added support for `.gcloudignore` files to `container builds submit` command.
 *   Go 1.8 is now generally available and the default Go runtime.
 *   Google App Engine components have been updated to 1.9.62.
     Please visit the following release notes for details:
-      *   Python - https://cloud.google.com/appengine/docs/python/release-notes
+      *   Python - https://cloud.google.com/appengine/docs/standard/python/release-notes
 
 ### Google Compute Engine
 
@@ -3197,7 +4180,7 @@ Added support for `.gcloudignore` files to `container builds submit` command.
 
 *   Components updated to 1.9.58. Please visit the following release notes
     for details:
-    *   Java - https://cloud.google.com/appengine/docs/java/release-notes
+    *   Java - https://cloud.google.com/appengine/docs/standard/java/release-notes
 
 ### Google Container Engine
 
@@ -3305,7 +4288,7 @@ Added support for `.gcloudignore` files to `container builds submit` command.
 
 *   App Engine components updated to 1.9.61. Please visit the following release
     notes for details:
-    https://cloud.google.com/appengine/docs/python/release-notes
+    https://cloud.google.com/appengine/docs/standard/python/release-notes
 *   The App Engine flexible environment now defaults to Python 3.6 when Python
     3 is requested. To revert to Python 3.5, specify `python_version: 3.5` in
     the `runtime_config` element of your
@@ -3323,11 +4306,11 @@ Added support for `.gcloudignore` files to `container builds submit` command.
     instances network-interfaces update`. Subnetwork secondary ranges can be
     modified using `gcloud beta compute networks subnets update`.
 *   Add `gcloud alpha compute sign-url` for generating Cloud CDN Signed URLs.
-*   Add *--signed-url-cache-max-age* flag to the following alpha commands
+*   Add `--signed-url-cache-max-age` flag to the following alpha commands
     related to Cloud CDN Signed URL:
     *   `gcloud alpha compute backend-buckets create`
     *   `gcloud alpha compute backend-buckets update`
-    *   `gcloud alpha compute backend-services create
+    *   `gcloud alpha compute backend-services create`
     *   `gcloud alpha compute backend-services update`
 *   Add alpha commands for adding and deleting Cloud CDN Signed URL keys to
     backend buckets and services:
@@ -3421,7 +4404,7 @@ Added support for `.gcloudignore` files to `container builds submit` command.
     config to `false`.
 *   Updated App Engine Java components to version 1.9.56. For more details, see
     the release notes at:
-    https://cloud.google.com/appengine/docs/java/release-notes.
+    https://cloud.google.com/appengine/docs/standard/java/release-notes.
 
 ### Google Container Registry
 
@@ -3500,10 +4483,10 @@ Added support for `.gcloudignore` files to `container builds submit` command.
 
 *   Updated App Engine components for Python to version 1.9.60.
     Please visit the release notes for details:
-    <https://cloud.google.com/appengine/docs/python/release-notes>.
+    <https://cloud.google.com/appengine/docs/standard/python/release-notes>.
 *   Updated App Engine components for Java to version 1.9.55.
     Please visit the following release notes for details:
-    <https://cloud.google.com/appengine/docs/java/release-notes>.
+    <https://cloud.google.com/appengine/docs/standard/java/release-notes>.
 *   Improved client-side traffic split validation in `gcloud app services
     set-traffic`.
 *   Promoted `gcloud app ssl-certificates` command group to GA and beta.
@@ -4048,7 +5031,7 @@ disabled on existing clusters via the
 
 *   Google App Engine components updated to 1.9.57. Please visit the following
     release notes for more details:
-    https://cloud.google.com/appengine/docs/python/release-notes.
+    https://cloud.google.com/appengine/docs/standard/python/release-notes.
 *   Added `gcloud beta app update` to support configuring an application's
     feature settings.
 *   `gcloud app deploy` now allows deployments of Go 1.8 apps on App Engine
@@ -4145,10 +5128,10 @@ disabled on existing clusters via the
     and are identical.
 *   Updated App Engine components for Python to version 1.9.55.
     Please visit the release notes for details:
-    <https://cloud.google.com/appengine/docs/python/release-notes>.
+    <https://cloud.google.com/appengine/docs/standard/python/release-notes>.
 *   Updated App Engine components for Java to version 1.9.54.
     Please visit the following release notes for details:
-    <https://cloud.google.com/appengine/docs/java/release-notes>.
+    <https://cloud.google.com/appengine/docs/standard/java/release-notes>.
 *   Added support for deploying Standard Environment Java applications to
     `gcloud beta app deploy`; use either `gcloud beta app deploy
     $APP_DIR/WEB-INF/appengine-web.xml` or `gcloud beta app deploy $APP_DIR`.
@@ -4425,8 +5408,8 @@ disabled on existing clusters via the
 
 *   Google App Engine components have been updated to 1.9.53.
     Please visit the following release notes for details:
-    *   Python: https://cloud.google.com/appengine/docs/python/release-notes
-    *   Java: https://cloud.google.com/appengine/docs/java/release-notes
+    *   Python: https://cloud.google.com/appengine/docs/standard/python/release-notes
+    *   Java: https://cloud.google.com/appengine/docs/standard/java/release-notes
 
 *   The App Engine Flexible environment includes Python 3.6 support (beta).
     To preview this runtime, specify `python_version: 3.6` in the
@@ -4646,7 +5629,7 @@ disabled on existing clusters via the
 
 *    Components updated to 1.9.52.
      *    Please visit the following release notes for details:
-          Python - https://cloud.google.com/appengine/docs/python/release-notes
+          Python - https://cloud.google.com/appengine/docs/standard/python/release-notes
 
 ### Google BiqQuery
 
@@ -4769,8 +5752,8 @@ disabled on existing clusters via the
     App Engine.
 *   Updated Google App Engine components to 1.9.51.
     Please visit the following release notes for details:
-    *    Java - https://cloud.google.com/appengine/docs/java/release-notes
-    *    Python - https://cloud.google.com/appengine/docs/python/release-notes
+    *    Java - https://cloud.google.com/appengine/docs/standard/java/release-notes
+    *    Python - https://cloud.google.com/appengine/docs/standard/python/release-notes
 
 ### Google Cloud Datalab
 
@@ -4889,7 +5872,7 @@ disabled on existing clusters via the
 
 ### Emulators
 
-*   Datastore emulator now defaults to port 8081, and pubsub emulator to 8085.
+*   Datastore emulator now defaults to port 8081, and Pub/Sub emulator to 8085.
 
 
 ## 149.0.0 (2017-03-29)
@@ -5079,7 +6062,7 @@ disabled on existing clusters via the
     entrypoints, to ensure signals are passed through to the application
     process.
 *   Java SDK updated to 1.9.50. For more details, please see
-    *   https://cloud.google.com/appengine/docs/java/release-notes
+    *   https://cloud.google.com/appengine/docs/standard/java/release-notes
 
 ### Google Cloud Bigtable
 
@@ -5231,7 +6214,7 @@ disabled on existing clusters via the
     yaml in the directory so that gcloud can check missing components and prompt
     to install.
 *   Java SDK updated to 1.9.49. For more details, please see
-    *   https://cloud.google.com/appengine/docs/java/release-notes
+    *   https://cloud.google.com/appengine/docs/standard/java/release-notes
 *   `gcloud app logs tail` is now available in GA.
 
 ### Google Cloud Datalab
@@ -5376,20 +6359,20 @@ disabled on existing clusters via the
 * Updated app-engine-go component to the 1.9.50 SDK.
 * Fixed a bug where `gcloud beta app deploy` failed while deploying Go apps.
 * Python SDK updated to 1.9.50. For more details, please see
-  https://cloud.google.com/appengine/docs/python/release-notes
+  https://cloud.google.com/appengine/docs/standard/python/release-notes
 
 ### Google Compute Engine
 
 * Show Cloud OS Images (COS) in 'gcloud compute images list' output.
 * Added beta for 'compute xpn get-xpn-host' and 'compute xpn organizations list-xpn-hosts'.
 
-### Cloud Tools for Powershell
+### Cloud Tools for PowerShell
 
 * Added beta cmdlets for Log Sinks and Log Metrics.
 
 ### Google Cloud Pub/Sub
 
-* The pubsub emulator now adheres to the documented topic and subscription
+* The Pub/Sub emulator now adheres to the documented topic and subscription
 name constraints, including support for '+' and '%25' in names via
 REST.
 
@@ -5550,7 +6533,7 @@ if a file upload is necessary.
 
 ### Emulators
 
-* The pubsub emulator now accepts web-safe Base64 encoded data.
+* The Pub/Sub emulator now accepts web-safe Base64 encoded data.
 
 
 ## 139.0.1 (2017-01-12)
@@ -5729,9 +6712,9 @@ if a file upload is necessary.
 ### Google App Engine
 
 * Java SDK updated to 1.9.48. For more details, please see
-  https://cloud.google.com/appengine/docs/java/release-notes
+  https://cloud.google.com/appengine/docs/standard/java/release-notes
 * Python SDK updated to 1.9.49. For more details, please see
-  https://cloud.google.com/appengine/docs/python/release-notes
+  https://cloud.google.com/appengine/docs/standard/python/release-notes
 * `gcloud app describe` is now GA.
 * Added `gcloud beta app instances delete`, which deletes a specific App Engine
   instance.
@@ -5864,7 +6847,7 @@ if a file upload is necessary.
 
 * Add `--service-label` flag to `gcloud alpha compute forwarding-rules create`.
 
-### Cloud Tools for Powershell
+### Cloud Tools for PowerShell
 
 * Add cmdlets to manage Cloud Storage ACLs.
 
@@ -5932,7 +6915,7 @@ if a file upload is necessary.
 
 * App Engine Java SDK updated to 1.9.46.
   Please visit the following release notes for details:
-  https://cloud.google.com/appengine/docs/java/release-notes
+  https://cloud.google.com/appengine/docs/standard/java/release-notes
 * Added `gcloud app create` command, which creates an App Engine app in the
   current project.
 * Added `gcloud app regions list` command, which lists support for App Engine
@@ -6019,7 +7002,7 @@ The alpha commands will remain, as is, until at least March of 2017.
   the `gcloud alpha container operations cancel` command.  See
   `gcloud alpha container operations cancel --help` for more details.
 
-### Cloud Tools for Powershell
+### Cloud Tools for PowerShell
 
 * Fix a bug where the module is not picking up the active user credentials
   correctly.
@@ -6037,7 +7020,7 @@ The alpha commands will remain, as is, until at least March of 2017.
 
 * App Engine updated to 1.9.45. Java SDK updated to 1.9.44.
   Please visit the following release notes for details:
-  https://cloud.google.com/appengine/docs/java/release-notes
+  https://cloud.google.com/appengine/docs/standard/java/release-notes
 
 * `gcloud config configurations create` will now automatically activate
   specified empty configuration. Use `gcloud config set` to populate its
@@ -6385,7 +7368,7 @@ The alpha commands will remain, as is, until at least March of 2017.
   * Removed `jobs list` --job-name flag.
   * Added `jobs list` --uri flag.
 
-### Cloud Tools for Powershell
+### Cloud Tools for PowerShell
 
 * Add Google Cloud Sql and Google Cloud Dns powershell cmdlets.
 
@@ -6887,8 +7870,8 @@ The alpha commands will remain, as is, until at least March of 2017.
 
 *   Google App Engine components updated to 1.9.38.
     Please visit the following release notes for details:
-    *   Python - https://cloud.google.com/appengine/docs/python/release-notes
-    *   Java - https://cloud.google.com/appengine/docs/java/release-notes
+    *   Python - https://cloud.google.com/appengine/docs/standard/python/release-notes
+    *   Java - https://cloud.google.com/appengine/docs/standard/java/release-notes
 
 *   Added support for Managed VMs instances in
     `gcloud preview app instances enable-debug` and
@@ -6901,7 +7884,7 @@ The alpha commands will remain, as is, until at least March of 2017.
 
 ### Emulators
 
-*   Fixed behavior of pub/sub emulator subscription topic names when their
+*   Fixed behavior of Pub/Sub emulator subscription topic names when their
     respective topics are deleted. They should now be set to `_deleted-topic_`.
 
 
@@ -7079,8 +8062,8 @@ The alpha commands will remain, as is, until at least March of 2017.
 
 *   Google App Engine components updated to 1.9.37.
     * Please visit the following release notes for details:
-      * Python - https://cloud.google.com/appengine/docs/python/release-notes
-      * Java - https://cloud.google.com/appengine/docs/java/release-notes
+      * Python - https://cloud.google.com/appengine/docs/standard/python/release-notes
+      * Java - https://cloud.google.com/appengine/docs/standard/java/release-notes
 *   Fixed issue with failed uploads in gcloud preview app-deploy
     (https://issuetracker.google.com/issues/35906909).
 *   Deprecated --server flag for app commands; its use is unsupported.
@@ -7159,8 +8142,8 @@ The alpha commands will remain, as is, until at least March of 2017.
 
 * Google App Engine components updated to 1.9.36.
  * Please visit the following release notes for details:
-   * Python - https://cloud.google.com/appengine/docs/python/release-notes
-   * Java - https://cloud.google.com/appengine/docs/java/release-notes
+   * Python - https://cloud.google.com/appengine/docs/standard/python/release-notes
+   * Java - https://cloud.google.com/appengine/docs/standard/java/release-notes
 
 ### Deployment Manager
 
@@ -7348,8 +8331,8 @@ The alpha commands will remain, as is, until at least March of 2017.
 
 * Updated Google App Engine components to 1.9.34.
   Please visit the following release notes for details:
-  * Python - https://cloud.google.com/appengine/docs/python/release-notes
-  * Java - https://cloud.google.com/appengine/docs/java/release-notes
+  * Python - https://cloud.google.com/appengine/docs/standard/python/release-notes
+  * Java - https://cloud.google.com/appengine/docs/standard/java/release-notes
 
 ### Google Compute Engine
 
@@ -7379,8 +8362,8 @@ command surface.
 ### Google App Engine
 
 * App Engine components updated to 1.9.34. Please visit
-  <https://cloud.google.com/appengine/docs/python/release-notes> for the Python
-  release notes and <https://cloud.google.com/appengine/docs/java/release-notes>
+  <https://cloud.google.com/appengine/docs/standard/python/release-notes> for the Python
+  release notes and <https://cloud.google.com/appengine/docs/standard/java/release-notes>
   for the Java release notes.
 
 ### Google BigQuery
@@ -7442,9 +8425,9 @@ command surface.
 ### Google App Engine
 
 * App Engine components updated to 1.9.33. Please visit
-  <https://cloud.google.com/appengine/docs/python/release-notes> for the Python
+  <https://cloud.google.com/appengine/docs/standard/python/release-notes> for the Python
   release notes and
-  <https://cloud.google.com/appengine/docs/java/release-notes> for the Java
+  <https://cloud.google.com/appengine/docs/standard/java/release-notes> for the Java
   release notes.
 
 * Added `gcloud preview app browse` command.
@@ -7533,8 +8516,8 @@ command surface.
 
 * Google App Engine components updated to 1.9.32. Please visit the following
   release notes for details:
-  Python - https://cloud.google.com/appengine/docs/python/release-notes
-  Java - https://cloud.google.com/appengine/docs/java/release-notes
+  Python - https://cloud.google.com/appengine/docs/standard/python/release-notes
+  Java - https://cloud.google.com/appengine/docs/standard/java/release-notes
 
 * The `gcloud preview app gen-config` command now offers to automatically update
   the runtime field in app.yaml if necessary.
@@ -7630,8 +8613,8 @@ command surface.
 
 * Google App Engine components updated to 1.9.31. Please visit the following
   release notes for details:
-  Python - https://cloud.google.com/appengine/docs/python/release-notes
-  Java - https://cloud.google.com/appengine/docs/java/release-notes
+  Python - https://cloud.google.com/appengine/docs/standard/python/release-notes
+  Java - https://cloud.google.com/appengine/docs/standard/java/release-notes
 
 * Added `--runtime` flag to `gcloud preview app gen-config` to specify a runtime
   when a directory identifies as multiple runtimes. This flag can be used in
@@ -7834,8 +8817,8 @@ command surface.
 
 * Components updated to 1.9.30.
   Please visit the following release notes for details:
-  * Python - https://cloud.google.com/appengine/docs/python/release-notes
-  * Java - https://cloud.google.com/appengine/docs/java/release-notes
+  * Python - https://cloud.google.com/appengine/docs/standard/python/release-notes
+  * Java - https://cloud.google.com/appengine/docs/standard/java/release-notes
 * Fixed a bug caused by uploading invalid file names for vm: true applications.
 
 ### Compute
@@ -8077,7 +9060,7 @@ command surface.
     but if you experience any issues and would like to revert to the old
     behavior, please run `gcloud config set app/use_appengine_api false`.
 
-    See <https://cloud.google.com/appengine/docs/admin-api/> for more
+    See <https://cloud.google.com/appengine/docs/standard/admin-api/> for more
     information about this API.
 
 *   With `env: 2`, valid python runtimes are `python` and `python-compat`.
@@ -8122,8 +9105,8 @@ command surface.
 
 *   App Engine components updated to 1.9.27. Please see the following release
     notes for details:
-    *   Python: <https://cloud.google.com/appengine/docs/python/release-notes>
-    *   Java: <https://cloud.google.com/appengine/docs/java/release-notes>
+    *   Python: <https://cloud.google.com/appengine/docs/standard/python/release-notes>
+    *   Java: <https://cloud.google.com/appengine/docs/standard/java/release-notes>
 *   The `gcloud preview app deploy` command now requires that users specify or
     omit the runtime: field from app.yaml if a Dockerfile is also specified.
 *   The `gcloud preview app deploy` command now supports the "engines" field in

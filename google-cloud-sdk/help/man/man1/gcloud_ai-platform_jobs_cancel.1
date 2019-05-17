@@ -1,0 +1,55 @@
+
+.TH "GCLOUD_AI\-PLATFORM_JOBS_CANCEL" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud ai\-platform jobs cancel \- cancel a running AI Platform job
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud ai\-platform jobs cancel\fR \fIJOB\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fBgcloud ai\-platform jobs cancel\fR cancels a running AI Platform job. If the
+job is already finished, the command will not perform an operation and exit
+successfully.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIJOB\fR
+Name of the job.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha ai\-platform jobs cancel
+$ gcloud beta ai\-platform jobs cancel
+.RE
+

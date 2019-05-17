@@ -29,7 +29,11 @@ class GetTestGA(base.GATestBase,
   """gcloud GA track using container v1 API."""
 
   def _TestGetNodePool(self, location):
-    pool_kwargs = {'nodeVersion': '1.6.8'}
+    pool_kwargs = {
+        'nodeVersion': '1.6.8',
+        'management': self.messages.NodeManagement(
+            autoRepair=True, autoUpgrade=True)
+    }
     pool = self._MakeNodePool(**pool_kwargs)
     self.ExpectGetNodePool(pool.name, response=pool, zone=location)
 
@@ -47,6 +51,9 @@ class GetTestGA(base.GATestBase,
          'oauthScopes:\n'
          '{scopes}'
          'initialNodeCount: {initialNodeCount}\n'
+         'management:\n'
+         'autoRepair: true\n'
+         'autoUpgrade: true\n'
          'name: {name}\n'
          'version: {version}\\n').format(
              initialNodeCount=self.NUM_NODES,

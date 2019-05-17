@@ -23,6 +23,8 @@ from apitools.base.py import exceptions as api_exceptions
 from googlecloudsdk.api_lib.cloudbuild import logs as cloudbuild_logs
 from tests.lib import e2e_base
 
+import httplib2
+
 TEST_ID = '17c228a2-501d-458e-904e-2f3001ee429f'
 LOG_URL_PATTEN = 'https://storage.googleapis.com/{bucket}/log-{obj}.txt'
 
@@ -175,6 +177,23 @@ class TailingTest(e2e_base.WithMockHttp):
       return
     self.fail('Expected a HttpError')
 
+  def testPollHTTPError(self):
+    self.SetNextException(httplib2.HttpLib2Error('bad stuff'))
+    tailer = cloudbuild_logs.LogTailer('bucket', 'log-build-id.txt')
+    tailer.Poll()  # no error raised
+
+  def testPollHTTPError_IsLast(self):
+    self.SetNextException(httplib2.HttpLib2Error('bad stuff'))
+    tailer = cloudbuild_logs.LogTailer('bucket', 'log-build-id.txt')
+    with self.assertRaisesRegex(api_exceptions.CommunicationError, 'bad stuff'):
+      tailer.Poll(is_last=True)  # the last poll will raise the error
+
+  def testPollNoneHTTPError(self):
+    self.SetNextException(ValueError('bad stuff'))
+    tailer = cloudbuild_logs.LogTailer('bucket', 'log-build-id.txt')
+    with self.assertRaisesRegex(ValueError, 'bad stuff'):
+      tailer.Poll()  # non-HttpLib2Errors are raised
+
 
 class MakeLogTailerTest(e2e_base.WithMockHttp):
   """Test class for _MakeBuildClient's bucket and log object generation."""
@@ -207,4 +226,3 @@ class MakeLogTailerTest(e2e_base.WithMockHttp):
 
     # Test with gs:// in bucket. Should not be possible with a URL
     self._AssertLogTailer(self._makeMockBuildResource('sg-bucketgs://'))
-

@@ -203,7 +203,7 @@ OPTIONAL FLAGS
         Don't wait for the operation to complete.
 
      --master-authorized-networks=NETWORK,[NETWORK,...]
-        The list of CIDR blocks (up to 20) that are allowed to connect to
+        The list of CIDR blocks (up to 50) that are allowed to connect to
         Kubernetes master through HTTPS. Specified in CIDR notation (e.g.
         1.2.3.4/30). Can not be specified unless
         --enable-master-authorized-networks is also specified.
@@ -237,8 +237,9 @@ OPTIONAL FLAGS
           default compute/zone property value for this command invocation.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

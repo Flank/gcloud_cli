@@ -23,10 +23,11 @@ gcloud alpha run configurations \- view and manage your Cloud Run configurations
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -43,28 +44,16 @@ gcloud help\fR for details.
 \fBlist\fR
 \fB(ALPHA)\fR List available Configurations.
 
-.TP 2m
-\fBupdate\fR
-\fB(ALPHA)\fR Update Cloud Run environment variables and other configuration
-settings.
-
 
 .RE
 .sp
 
 .SH "EXAMPLES"
 
-To update one or more env vars:
+To describe the configuration managed by the service foo:
 
 .RS 2m
-$ gcloud alpha run configurations update \e
-    \-\-update\-env\-vars KEY1=VALUE1,KEY2=VALUE2
-.RE
-
-To remove one or more env vars:
-
-.RS 2m
-$ gcloud alpha run configurations update \-\-remove\-env\-vars KEY1,KEY2
+$ gcloud alpha run configurations describe foo
 .RE
 
 
@@ -75,5 +64,9 @@ This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you will have to apply for early access and have your projects registered on the
 API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+https://cloud.google.com/support/. This variant is also available:
+
+.RS 2m
+$ gcloud beta run configurations
+.RE
 

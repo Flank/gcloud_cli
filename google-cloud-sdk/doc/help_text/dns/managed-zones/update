@@ -5,8 +5,9 @@ SYNOPSIS
     gcloud dns managed-zones update ZONE
         [--denial-of-existence=DENIAL_OF_EXISTENCE] [--description=DESCRIPTION]
         [--dnssec-state=DNSSEC_STATE] [--ksk-algorithm=KSK_ALGORITHM]
-        [--ksk-key-length=KSK_KEY_LENGTH] [--update-labels=[KEY=VALUE,...]]
-        [--zsk-algorithm=ZSK_ALGORITHM] [--zsk-key-length=ZSK_KEY_LENGTH]
+        [--ksk-key-length=KSK_KEY_LENGTH] [--networks=[NETWORK,...]]
+        [--update-labels=[KEY=VALUE,...]] [--zsk-algorithm=ZSK_ALGORITHM]
+        [--zsk-key-length=ZSK_KEY_LENGTH]
         [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -49,6 +50,10 @@ FLAGS
      --ksk-key-length=KSK_KEY_LENGTH
         Length of the key-signing key in bits. Requires DNSSEC enabled.
 
+     --networks=[NETWORK,...]
+        List of networks that the zone should be visible in if the zone
+        visibility is [private].
+
      --update-labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to update. If a label exists its value is
         modified, otherwise a new label is created.
@@ -86,8 +91,9 @@ FLAGS
           silently ignored.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

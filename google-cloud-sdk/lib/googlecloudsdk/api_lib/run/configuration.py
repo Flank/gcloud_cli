@@ -86,26 +86,26 @@ class Configuration(k8s_object.KubernetesObject):
         location=value)
 
   def _EnsureResources(self):
-    limits_in_map_val_cls = self._messages.ResourceRequirements.LimitsInMapValue
+    limits_cls = self._messages.ResourceRequirements.LimitsValue
     if self.container.resources is not None:
-      if self.container.resources.limitsInMap is None:
-        self.container.resources.limitsInMap = k8s_object.InitializedInstance(
-            limits_in_map_val_cls)
+      if self.container.resources.limits is None:
+        self.container.resources.limits = k8s_object.InitializedInstance(
+            limits_cls)
         # If we still have the old field set, move it over to the new.
         # But if we had both fields, don't bother changing the limits field.
-        # TODO(b/120158326) Translate the other way when the new format is ready
-        if self.container.resources.limits is not None:
-          for item in self.container.resources.limits.additionalProperties:
-            self.container.resources.limitsInMap.additionalProperties.append(
-                limits_in_map_val_cls.AdditionalProperty(
+        if self.container.resources.limitsInMap is not None:
+          for item in self.container.resources.limitsInMap.additionalProperties:
+            self.container.resources.limits.additionalProperties.append(
+                limits_cls.AdditionalProperty(
                     key=item.key,
-                    value=item.value))
-          self.container.resources.limits = None
-
-      return
+                    value=item.value.string))
     else:
       self.container.resources = k8s_object.InitializedInstance(
           self._messages.ResourceRequirements)
+    # These fields are in the schema due to an error in interperetation of the
+    # Knative spec. We're removing them, so never send any contents for them.
+    self.container.resources.limitsInMap = None
+    self.container.resources.requestsInMap = None
 
   def _EnsureBuild(self):
     if self._m.spec.build:
@@ -135,9 +135,16 @@ class Configuration(k8s_object.KubernetesObject):
     self._EnsureBuild()
     self._m.spec.build.template.name = value
 
+  def _EnsureRevisionMeta(self):
+    revision_meta = self.spec.revisionTemplate.metadata
+    if revision_meta is None:
+      revision_meta = self._messages.ObjectMeta()
+      self.spec.revisionTemplate.metadata = revision_meta
+    return revision_meta
+
   @property
   def revision_labels(self):
-    revision_meta = self.spec.revisionTemplate.metadata
+    revision_meta = self._EnsureRevisionMeta()
     if revision_meta.labels is None:
       revision_meta.labels = self._messages.ObjectMeta.LabelsValue()
     return k8s_object.ListAsDictionaryWrapper(
@@ -149,7 +156,7 @@ class Configuration(k8s_object.KubernetesObject):
 
   @property
   def revision_annotations(self):
-    revision_meta = self.spec.revisionTemplate.metadata
+    revision_meta = revision_meta = self._EnsureRevisionMeta()
     return k8s_object.AnnotationsFromMetadata(self._messages, revision_meta)
 
   @property
@@ -173,8 +180,8 @@ class Configuration(k8s_object.KubernetesObject):
     """The resource limits as a dictionary { resource name: limit}."""
     self._EnsureResources()
     return k8s_object.ListAsDictionaryWrapper(
-        self.container.resources.limitsInMap.additionalProperties,
-        self._messages.ResourceRequirements.LimitsInMapValue.AdditionalProperty,
+        self.container.resources.limits.additionalProperties,
+        self._messages.ResourceRequirements.LimitsValue.AdditionalProperty,
         key_field='key',
         value_field='value',
     )
@@ -204,6 +211,29 @@ class Configuration(k8s_object.KubernetesObject):
   @concurrency.setter
   def concurrency(self, value):
     self.spec.revisionTemplate.spec.containerConcurrency = value
+
+  @property
+  def timeout(self):
+    """The timeout number in the revisionTemplate.
+
+    The lib can accept either a duration format like '1m20s' or integer like
+    '80' to set the timeout. The returned object is an integer value, which
+    assumes second the unit, e.g., 80.
+    """
+    return self.spec.revisionTemplate.spec.timeoutSeconds
+
+  @timeout.setter
+  def timeout(self, value):
+    self.spec.revisionTemplate.spec.timeoutSeconds = value
+
+  @property
+  def service_account(self):
+    """The service account in the revisionTemplate."""
+    return self.spec.revisionTemplate.spec.serviceAccountName
+
+  @service_account.setter
+  def service_account(self, value):
+    self.spec.revisionTemplate.spec.serviceAccountName = value
 
   @property
   def build_template_arguments(self):

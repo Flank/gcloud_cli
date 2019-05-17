@@ -32,7 +32,7 @@ REQUIRED FLAGS
 
 FLAGS
      --artifact-url=ARTIFACT_URL
-        Container URL. May be in the .gcr.io/repository/image format, or may
+        Container URL. May be in the gcr.io/repository/image format, or may
         optionally contain the http or https scheme
 
 LIST COMMAND FLAGS
@@ -65,8 +65,9 @@ LIST COMMAND FLAGS
         Print a list of resource URIs instead of the default output.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

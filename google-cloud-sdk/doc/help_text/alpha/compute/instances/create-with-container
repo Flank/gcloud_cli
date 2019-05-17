@@ -4,7 +4,8 @@ NAME
 
 SYNOPSIS
     gcloud alpha compute instances create-with-container INSTANCE_NAMES
-        [INSTANCE_NAMES ...] [--no-boot-disk-auto-delete]
+        [INSTANCE_NAMES ...] [--accelerator=[count=COUNT],[type=TYPE]]
+        [--no-boot-disk-auto-delete]
         [--boot-disk-device-name=BOOT_DISK_DEVICE_NAME]
         [--boot-disk-size=BOOT_DISK_SIZE] [--boot-disk-type=BOOT_DISK_TYPE]
         [--can-ip-forward] [--container-arg=CONTAINER_ARG]
@@ -64,6 +65,19 @@ POSITIONAL ARGUMENTS
         Names of the instances to create.
 
 FLAGS
+     --accelerator=[count=COUNT],[type=TYPE]
+        Attaches accelerators (e.g. GPUs) to the instances.
+
+         type
+            The specific type (e.g. nvidia-tesla-k80 for nVidia Tesla K80) of
+            accelerator to attach to the instances. Use 'gcloud compute
+            accelerator-types list' to learn about all available accelerator
+            types.
+
+         count
+            Number of accelerators to attach to each instance. The default
+            value is 1.
+
      --boot-disk-auto-delete
         Automatically delete boot disks when their instances are deleted.
         Enabled by default, use --no-boot-disk-auto-delete to disable.
@@ -313,7 +327,7 @@ FLAGS
             If yes, this persistent disk will be automatically deleted when the
             instance is deleted. However, if the disk is later detached from
             the instance, this option won't apply. The default value for this
-            is no.
+            is yes.
 
          scope
             Can be zonal or regional. If zonal, the disk is interpreted as a
@@ -346,8 +360,8 @@ FLAGS
 
          device-name
             Optional. A name that indicates the disk name the guest operating
-            system will see. If omitted, a device name of the form local-ssd-N
-            will be used.
+            system will see. Can only be specified if interface is SCSI. If
+            omitted, a device name of the form local-ssd-N will be used.
 
          interface
             Optional. The kind of disk interface exposed to the VM for this
@@ -417,7 +431,8 @@ FLAGS
      --network-interface=[PROPERTY=VALUE,...]
         Adds a network interface to the instance. Mutually exclusive with any
         of these flags: --address, --network, --network-tier, --subnet,
-        --private-network-ip.
+        --private-network-ip. This flag can be repeated to specify multiple
+        network interfaces.
 
         The following keys are allowed:
          address
@@ -730,8 +745,9 @@ FLAGS
           Create instance without service account
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

@@ -1,11 +1,16 @@
-- release_tracks: [ALPHA, BETA]
+- release_tracks: [GA, ALPHA, BETA]
 
   help_text:
     brief: Show details about an access level.
-    DESCRIPTION: Show details about an access level in a given access policy.
+    description: Show details about an access level in a given access policy.
 
   request:
     collection: accesscontextmanager.accessPolicies.accessLevels
+    api_version: v1
+    BETA:
+      api_version: v1beta
+    ALPHA:
+      api_version: v1beta
 
   arguments:
     resource:

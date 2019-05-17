@@ -17,17 +17,19 @@ gcloud beta app repair \- restores required App Engine features to the current a
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR For example, this command will restore the App Engine service
-account if it has been deleted.
+\fB(BETA)\fR For example, this command will restore the App Engine staging
+bucket if it has been deleted. It will no longer restore the service account,
+instead, the IAM service account undelete API must be used for the purpose.
 
 
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

@@ -8,7 +8,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/ZONE/disks/projects%2Ffake-project%2Fzones%2FZONE%2Fdisks%2Fmy-disk/getIamPolicy?alt=json
+          uri: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/ZONE/disks/my-disk/getIamPolicy?alt=json
           method: GET
           body: null
         return_response:
@@ -32,7 +32,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/ZONE/disks/projects%2Ffake-project%2Fzones%2FZONE%2Fdisks%2Fmy-disk/setIamPolicy?alt=json
+          uri: https://www.googleapis.com/compute/alpha/projects/fake-project/zones/ZONE/disks/my-disk/setIamPolicy?alt=json
           method: POST
           body:
             json:

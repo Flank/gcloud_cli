@@ -5,21 +5,21 @@
 
 .SH "NAME"
 .HP
-gcloud beta ml\-engine versions create \- create a new Cloud ML Engine version
+gcloud beta ml\-engine versions create \- create a new AI Platform version
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta ml\-engine versions create\fR \fIVERSION\fR \fB\-\-model\fR=\fIMODEL\fR [\fB\-\-async\fR] [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-framework\fR=\fIFRAMEWORK\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-origin\fR=\fIORIGIN\fR] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta ml\-engine versions create\fR \fIVERSION\fR \fB\-\-model\fR=\fIMODEL\fR [\fB\-\-async\fR] [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-framework\fR=\fIFRAMEWORK\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-origin\fR=\fIORIGIN\fR] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR] [\fB\-\-package\-uris\fR=[\fIPACKAGE_URI\fR,...]\ \fB\-\-prediction\-class\fR=\fIPREDICTION_CLASS\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Creates a new version of a Cloud ML Engine model.
+\fB(BETA)\fR Creates a new version of an AI Platform model.
 
-For more details on managing ML Engine models and versions see
+For more details on managing AI Platform models and versions see
 https://cloud.google.com/ml\-engine/docs/how\-tos/managing\-models\-jobs
 
 
@@ -106,18 +106,9 @@ numbers.
 .TP 2m
 \fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR
 Type of machine on which to serve the model. Currently only applies to online
-prediction. Currently supported machine_types are:
+prediction. For available machine types, see
+https://cloud.google.com/ml\-engine/docs/tensorflow/online\-predict#machine\-types.
 
-.RS 2m
-.IP "\(em" 2m
-\f5mls1\-c1\-m2\fR \- A virtual machine with 1 core and 2 Gb RAM (default).
-.IP "\(em" 2m
-\f5mls1\-c4\-m2\fR \- A virtual machine with 4 core and 2 Gb RAM.
-.RE
-.RE
-.sp
-
-.RS 2m
 .TP 2m
 \fB\-\-origin\fR=\fIORIGIN\fR
 Location of \f5model/\fR "directory" (as output by
@@ -139,9 +130,8 @@ and above. Python 2.7 works with all supported runtime versions.
 
 .TP 2m
 \fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR
-Google Cloud ML Engine runtime version for this job. Defaults to a stable
-version, which is defined in documentation along with the list of supported
-versions:
+AI Platform runtime version for this job. Defaults to a stable version, which is
+defined in documentation along with the list of supported versions:
 https://cloud.google.com/ml\-engine/docs/tensorflow/runtime\-version\-list
 
 .TP 2m
@@ -151,16 +141,38 @@ Bucket in which to stage training archives.
 Required only if a file upload is necessary (that is, other flags include local
 paths) and no other flags implicitly specify an upload path.
 
+.TP 2m
 
+Configure user code in prediction. AI Platform allows a model to have
+user\-provided prediction code; these options configure that code.
+
+
+
+.RS 2m
+.TP 2m
+\fB\-\-package\-uris\fR=[\fIPACKAGE_URI\fR,...]
+Comma\-separated list of Google Cloud Storage URIs (\f5gs://...\fR) for
+user\-supplied Python packages to use.
+
+.TP 2m
+\fB\-\-prediction\-class\fR=\fIPREDICTION_CLASS\fR
+The fully\-qualified name of the custom prediction class in the package provided
+for custom prediction.
+
+For example, \f5\-\-prediction\-class my_package.SequenceModel\fR.
+
+
+.RE
 .RE
 .sp
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

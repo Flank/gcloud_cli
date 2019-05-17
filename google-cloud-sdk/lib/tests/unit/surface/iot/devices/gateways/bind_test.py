@@ -26,10 +26,10 @@ from tests.lib import test_case
 from tests.lib.surface.cloudiot import base
 
 
-class BindTestBeta(base.CloudIotBase, parameterized.TestCase):
+class BindTestGA(base.CloudIotBase, parameterized.TestCase):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def _ExpectBind(self, device, gateway):
     registry_name = ('projects/{}/'
@@ -105,6 +105,12 @@ class BindTestBeta(base.CloudIotBase, parameterized.TestCase):
          '    --device-region us-central1'
          '    --gateway {}'
          '    --gateway-region us-central1').format(gateway.id))
+
+
+class BindTestBeta(BindTestGA):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class BindTestAlpha(BindTestBeta):

@@ -11,7 +11,7 @@ gcloud container clusters resize \- resizes an existing cluster for running cont
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud container clusters resize\fR \fINAME\fR \fB\-\-size\fR=\fISIZE\fR [\fB\-\-async\fR] [\fB\-\-node\-pool\fR=\fINODE_POOL\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud container clusters resize\fR \fINAME\fR \fB\-\-num\-nodes\fR=\fINUM_NODES\fR, \fB\-\-size\fR=\fINUM_NODES\fR [\fB\-\-async\fR] [\fB\-\-node\-pool\fR=\fINODE_POOL\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -53,7 +53,7 @@ The name of this cluster.
 
 .RS 2m
 .TP 2m
-\fB\-\-size\fR=\fISIZE\fR
+\fB\-\-num\-nodes\fR=\fINUM_NODES\fR, \fB\-\-size\fR=\fINUM_NODES\fR
 Target number of nodes in the cluster.
 
 
@@ -92,10 +92,11 @@ Compute zone (e.g. us\-central1\-a) for the cluster. Overrides the default
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

@@ -1,0 +1,64 @@
+
+.TH "GCLOUD_TASKS_QUEUES_DELETE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud tasks queues delete \- delete a queue
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud tasks queues delete\fR \fIQUEUE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Delete a queue.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIQUEUE\fR
+The queue to delete.
+
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To delete a queue:
+
+.RS 2m
+$ gcloud tasks queues delete my\-queue
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha tasks queues delete
+$ gcloud beta tasks queues delete
+.RE
+

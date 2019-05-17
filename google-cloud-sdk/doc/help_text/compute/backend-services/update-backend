@@ -4,14 +4,18 @@ NAME
 
 SYNOPSIS
     gcloud compute backend-services update-backend BACKEND_SERVICE_NAME
-        --instance-group=INSTANCE_GROUP [--balancing-mode=BALANCING_MODE]
-        [--capacity-scaler=CAPACITY_SCALER] [--description=DESCRIPTION]
-        [--max-utilization=MAX_UTILIZATION] [--global | --region=REGION]
-        [--instance-group-region=INSTANCE_GROUP_REGION
+        ([--instance-group=INSTANCE_GROUP
+          : --instance-group-region=INSTANCE_GROUP_REGION
           | --instance-group-zone=INSTANCE_GROUP_ZONE]
+          | [--network-endpoint-group=NETWORK_ENDPOINT_GROUP
+          : --network-endpoint-group-zone=NETWORK_ENDPOINT_GROUP_ZONE])
+        [--balancing-mode=BALANCING_MODE] [--capacity-scaler=CAPACITY_SCALER]
+        [--description=DESCRIPTION] [--max-utilization=MAX_UTILIZATION]
+        [--global | --region=REGION]
         [--max-connections=MAX_CONNECTIONS
+          | --max-connections-per-endpoint=MAX_CONNECTIONS_PER_ENDPOINT
           | --max-connections-per-instance=MAX_CONNECTIONS_PER_INSTANCE
-          | --max-rate=MAX_RATE
+          | --max-rate=MAX_RATE | --max-rate-per-endpoint=MAX_RATE_PER_ENDPOINT
           | --max-rate-per-instance=MAX_RATE_PER_INSTANCE]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -36,8 +40,85 @@ POSITIONAL ARGUMENTS
         Name of the backend service to operate on.
 
 REQUIRED FLAGS
-     --instance-group=INSTANCE_GROUP
-        Name of the instance group to update the backend service.
+     Exactly one of these must be specified:
+
+       Instance Group
+
+         --instance-group=INSTANCE_GROUP
+            Name of the instance group to update in the backend service. This
+            flag must be specified if any of the other arguments in this group
+            are specified.
+
+         At most one of these may be specified:
+
+           --instance-group-region=INSTANCE_GROUP_REGION
+              Region of the instance group to update in the backend service. If
+              not specified, you may be prompted to select a region.
+
+              To avoid prompting when this flag is omitted, you can set the
+              compute/region property:
+
+                  $ gcloud config set compute/region REGION
+
+              A list of regions can be fetched by running:
+
+                  $ gcloud compute regions list
+
+              To unset the property, run:
+
+                  $ gcloud config unset compute/region
+
+              Alternatively, the region can be stored in the environment
+              variable CLOUDSDK_COMPUTE_REGION.
+
+           --instance-group-zone=INSTANCE_GROUP_ZONE
+              Zone of the instance group to update in the backend service. If
+              not specified and the compute/zone property isn't set, you may be
+              prompted to select a zone.
+
+              To avoid prompting when this flag is omitted, you can set the
+              compute/zone property:
+
+                  $ gcloud config set compute/zone ZONE
+
+              A list of zones can be fetched by running:
+
+                  $ gcloud compute zones list
+
+              To unset the property, run:
+
+                  $ gcloud config unset compute/zone
+
+              Alternatively, the zone can be stored in the environment variable
+              CLOUDSDK_COMPUTE_ZONE.
+
+       Network Endpoint Group
+
+         --network-endpoint-group=NETWORK_ENDPOINT_GROUP
+            Name of the network endpoint group to update in the backend
+            service. This flag must be specified if any of the other arguments
+            in this group are specified.
+
+         --network-endpoint-group-zone=NETWORK_ENDPOINT_GROUP_ZONE
+            Zone of the network endpoint group to update in the backend
+            service. If not specified and the compute/zone property isn't set,
+            you may be prompted to select a zone.
+
+            To avoid prompting when this flag is omitted, you can set the
+            compute/zone property:
+
+                $ gcloud config set compute/zone ZONE
+
+            A list of zones can be fetched by running:
+
+                $ gcloud compute zones list
+
+            To unset the property, run:
+
+                $ gcloud config unset compute/zone
+
+            Alternatively, the zone can be stored in the environment variable
+            CLOUDSDK_COMPUTE_ZONE.
 
 OPTIONAL FLAGS
      --balancing-mode=BALANCING_MODE
@@ -75,7 +156,8 @@ OPTIONAL FLAGS
         Setting this value to 0.0 (0%) drains the backend service. Note that
         draining a backend service only prevents new connections to instances
         in the group. All existing connections are allowed to continue until
-        they close by normal means.
+        they close by normal means. This cannot be used for internal load
+        balancing.
 
      --description=DESCRIPTION
         An optional, textual description for the backend.
@@ -129,52 +211,18 @@ OPTIONAL FLAGS
 
      At most one of these may be specified:
 
-       --instance-group-region=INSTANCE_GROUP_REGION
-          Region of the instance group to update the backend service. If not
-          specified, you may be prompted to select a region.
-
-          To avoid prompting when this flag is omitted, you can set the
-          compute/region property:
-
-              $ gcloud config set compute/region REGION
-
-          A list of regions can be fetched by running:
-
-              $ gcloud compute regions list
-
-          To unset the property, run:
-
-              $ gcloud config unset compute/region
-
-          Alternatively, the region can be stored in the environment variable
-          CLOUDSDK_COMPUTE_REGION.
-
-       --instance-group-zone=INSTANCE_GROUP_ZONE
-          Zone of the instance group to update the backend service. If not
-          specified and the compute/zone property isn't set, you may be
-          prompted to select a zone.
-
-          To avoid prompting when this flag is omitted, you can set the
-          compute/zone property:
-
-              $ gcloud config set compute/zone ZONE
-
-          A list of zones can be fetched by running:
-
-              $ gcloud compute zones list
-
-          To unset the property, run:
-
-              $ gcloud config unset compute/zone
-
-          Alternatively, the zone can be stored in the environment variable
-          CLOUDSDK_COMPUTE_ZONE.
-
-     At most one of these may be specified:
-
        --max-connections=MAX_CONNECTIONS
           Maximum concurrent connections that the backend can handle. Valid for
           instance group and network endpoint group backends.
+
+       --max-connections-per-endpoint=MAX_CONNECTIONS_PER_ENDPOINT
+          Only valid for network endpoint group backends. Defines a maximum
+          number of connections per endpoint if all endpoints are healthy. When
+          one or more endpoints are unhealthy, an effective maximum number of
+          connections per healthy endpoint is calculated by multiplying
+          MAX_CONNECTIONS_PER_ENDPOINT by the number of endpoints in the
+          network endpoint group, then dividing by the number of healthy
+          endpoints.
 
        --max-connections-per-instance=MAX_CONNECTIONS_PER_INSTANCE
           Only valid for instance group backends. Defines a maximum number of
@@ -191,6 +239,15 @@ OPTIONAL FLAGS
           Must not be defined if the backend is a managed instance group using
           autoscaling based on load balancing.
 
+       --max-rate-per-endpoint=MAX_RATE_PER_ENDPOINT
+          Only valid for network endpoint group backends. Defines a maximum
+          number of HTTP requests per second (RPS) per endpoint if all
+          endpoints are healthy. When one or more endpoints are unhealthy, an
+          effective maximum rate per healthy endpoint is calculated by
+          multiplying MAX_RATE_PER_ENDPOINT by the number of endpoints in the
+          network endpoint group, then dividing by the number of healthy
+          endpoints.
+
        --max-rate-per-instance=MAX_RATE_PER_INSTANCE
           Only valid for instance group backends. Defines a maximum number of
           HTTP requests per second (RPS) per instance if all instances in the
@@ -202,8 +259,9 @@ OPTIONAL FLAGS
           that use autoscaling based on load balancing.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

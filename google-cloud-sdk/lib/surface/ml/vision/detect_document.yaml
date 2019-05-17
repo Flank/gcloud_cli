@@ -2,7 +2,7 @@
 
   help_text:
     brief: Detect dense text in an image.
-    DESCRIPTION: |
+    description: |
       Detect dense text in an image, such as books and research reports.
 
       Google Cloud Vision uses OCR (Optical Character Recognition) to analyze text.
@@ -13,6 +13,11 @@
 
       {language_hints}
     language_hints: !COMMON help_text.language_hints
+
+    examples: |
+      To detect dense text in image 'gs://my_bucket/input_file':
+
+        $ {command} gs://my_bucket/input_file
 
   request:
     _COMMON_: request
@@ -34,7 +39,7 @@
 
   help_text:
     brief: Detect dense text in an image.
-    DESCRIPTION: |
+    description: |
       Detect dense text in an image, such as books and research reports.
 
       Google Cloud Vision uses OCR (Optical Character Recognition) to analyze text.
@@ -45,7 +50,10 @@
 
       {language_hints}
     language_hints: !COMMON help_text.language_hints
+    examples: |
+      To detect dense text in image 'gs://my_bucket/input_file':
 
+        $ {command} gs://my_bucket/input_file
   request:
     _COMMON_: request
     static_fields:

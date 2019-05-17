@@ -552,7 +552,7 @@ class MultilineConsoleMessageTest(test_case.TestCase, parameterized.TestCase):
         stream.getvalue())
 
 
-class MultilineConsoleOutputTest(test_case.TestCase):
+class MultilineConsoleOutputTest(test_case.WithOutputCapture):
 
   def SetUp(self):
     self.console_size_mock = self.StartObjectPatch(
@@ -661,6 +661,32 @@ class MultilineConsoleOutputTest(test_case.TestCase):
     mco = multiline.MultilineConsoleOutput(stream)
     with self.assertRaisesRegex(ValueError, 'A message must be passed.'):
       mco.UpdateMessage(None, 'fdsa')
+
+  def testMessageContainsAnsiCodes(self):
+    self.StartEnvPatch({'TERM': 'screen'})
+    self.SetEncoding('utf8')
+    self.console_size = self.SetConsoleSize(20)
+    message = ('This is a line constructed from \x1b[31;1mcolorized\x1b[39;0m '
+               'parts and long enough to be split into \x1b[34;1m'
+               'multiple\x1b[39;0m lines at \x1b[32mwidth=20\x1b[39;0m.')
+    stream = io.StringIO()
+    mco = multiline.MultilineConsoleOutput(stream)
+    mco.AddMessage(message)
+    mco.UpdateConsole()
+    self.assertEqual(
+        '\r' + ' ' * self.console_size + '\r' +
+        'This is a line const\n' +
+        '\r' + ' ' * self.console_size + '\r' +
+        'ructed from \x1b[31;1mcolorize\n' +
+        '\r' + ' ' * self.console_size + '\r' +
+        'd\x1b[39;0m parts and long eno\n' +
+        '\r' + ' ' * self.console_size + '\r' +
+        'ugh to be split into\n' +
+        '\r' + ' ' * self.console_size + '\r' +
+        ' \x1b[34;1mmultiple\x1b[39;0m lines at \x1b[32mw\n' +
+        '\r' + ' ' * self.console_size + '\r' +
+        'idth=20\x1b[39;0m.\n',
+        stream.getvalue())
 
 
 if __name__ == '__main__':

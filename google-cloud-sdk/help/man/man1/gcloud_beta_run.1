@@ -1,0 +1,100 @@
+
+.TH "GCLOUD_BETA_RUN" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta run \- manage your Cloud Run applications
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta run\fR \fIGROUP\fR | \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR The gcloud run command group lets you deploy container images to
+Google Cloud Run.
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBconfigurations\fR
+\fB(BETA)\fR View and manage your Cloud Run configurations.
+
+.TP 2m
+\fBdomain\-mappings\fR
+\fB(BETA)\fR View and manage your Cloud Run domain mappings.
+
+.TP 2m
+\fBrevisions\fR
+\fB(BETA)\fR View and manage your Cloud Run revisions.
+
+.TP 2m
+\fBroutes\fR
+\fB(BETA)\fR View your Cloud Run routes.
+
+.TP 2m
+\fBservices\fR
+\fB(BETA)\fR View and manage your Cloud Run services.
+
+
+.RE
+.sp
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBdeploy\fR
+\fB(BETA)\fR Deploy a container to Cloud Run.
+
+
+.RE
+.sp
+
+.SH "EXAMPLES"
+
+To deploy your container, use the \f5gcloud run deploy\fR command:
+
+.RS 2m
+$ gcloud run deploy <service\-name> \-\-image <image_name>
+.RE
+
+For more information, run:.RS 2m
+$ gcloud run deploy \-\-help
+
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha run
+.RE
+

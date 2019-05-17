@@ -26,10 +26,19 @@ from googlecloudsdk.command_lib.tasks import parsers
 from googlecloudsdk.core import log
 
 
-# TODO(b/64460484): Add descriptions of App Engine vs. pull queues.
-@base.ReleaseTracks(base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
 class CreateAppEngine(base.CreateCommand):
-  """Create and add a task to an App Engine queue."""
+  """Create and add a task that targets App Engine."""
+  detailed_help = {
+      'DESCRIPTION': """\
+          {description}
+          """,
+      'EXAMPLES': """\
+          To create a task:
+
+              $ {command} --queue=my-queue --relative-uri=/handler-path my-task
+         """,
+  }
 
   @staticmethod
   def Args(parser):
@@ -43,7 +52,7 @@ class CreateAppEngine(base.CreateCommand):
     task_ref = parsers.ParseTask(args.task,
                                  queue_ref) if args.task else None
     task_config = parsers.ParseCreateTaskArgs(
-        args, constants.APP_ENGINE_QUEUE, api.messages)
+        args, constants.PUSH_QUEUE, api.messages)
     create_response = tasks_client.Create(
         queue_ref, task_ref,
         schedule_time=task_config.scheduleTime,
@@ -54,7 +63,17 @@ class CreateAppEngine(base.CreateCommand):
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
 class AlphaCreateAppEngine(base.CreateCommand):
-  """Create and add a task to an App Engine queue."""
+  """Create and add a task that targets App Engine."""
+  detailed_help = {
+      'DESCRIPTION': """\
+          {description}
+          """,
+      'EXAMPLES': """\
+          To create a task:
+
+              $ {command} --queue=my-queue --url=/handler-path my-task
+         """,
+  }
 
   @staticmethod
   def Args(parser):
@@ -68,7 +87,7 @@ class AlphaCreateAppEngine(base.CreateCommand):
     task_ref = parsers.ParseTask(args.task,
                                  queue_ref) if args.task else None
     task_config = parsers.ParseCreateTaskArgs(
-        args, constants.APP_ENGINE_QUEUE, api.messages, is_alpha=True)
+        args, constants.PUSH_QUEUE, api.messages, is_alpha=True)
     create_response = tasks_client.Create(
         queue_ref, task_ref,
         schedule_time=task_config.scheduleTime,

@@ -5,13 +5,13 @@ SYNOPSIS
     gcloud compute disks create DISK_NAME [DISK_NAME ...]
         [--csek-key-file=FILE] [--description=DESCRIPTION]
         [--guest-os-features=[GUEST_OS_FEATURE,...]] [--labels=[KEY=VALUE,...]]
-        [--licenses=[LICENSE,...]] [--no-require-csek-key-create] [--size=SIZE]
-        [--type=TYPE] [--zone=ZONE]
+        [--licenses=[LICENSE,...]] [--replica-zones=ZONE,ZONE]
+        [--no-require-csek-key-create] [--size=SIZE] [--type=TYPE]
         [--image-project=IMAGE_PROJECT --image=IMAGE
           | --image-family=IMAGE_FAMILY | --source-snapshot=SOURCE_SNAPSHOT]
         [--kms-key=KMS_KEY : --kms-keyring=KMS_KEYRING
           --kms-location=KMS_LOCATION --kms-project=KMS_PROJECT]
-        [GCLOUD_WIDE_FLAG ...]
+        [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     gcloud compute disks create creates one or more Google Compute Engine
@@ -92,6 +92,12 @@ FLAGS
         added onto the created disks to indicate the licensing and billing
         policies.
 
+     --replica-zones=ZONE,ZONE
+        A comma-separated list of exactly 2 zones that a regional disk will be
+        replicated to. Required when creating regional disk. The zones must be
+        in the same region as specified in the --region flag. See available
+        zones with gcloud compute zones list.
+
      --require-csek-key-create
         Refuse to create resources not protected by a user managed key in the
         key file when --csek-key-file is given. This behavior is enabled by
@@ -116,26 +122,6 @@ FLAGS
         Specifies the type of disk to create. To get a list of available disk
         types, run gcloud compute disk-types list. The default disk type is
         pd-standard.
-
-     --zone=ZONE
-        Zone of the disks to create. If not specified and the compute/zone
-        property isn't set, you may be prompted to select a zone.
-
-        To avoid prompting when this flag is omitted, you can set the
-        compute/zone property:
-
-            $ gcloud config set compute/zone ZONE
-
-        A list of zones can be fetched by running:
-
-            $ gcloud compute zones list
-
-        To unset the property, run:
-
-            $ gcloud config unset compute/zone
-
-        Alternatively, the zone can be stored in the environment variable
-        CLOUDSDK_COMPUTE_ZONE.
 
      --image-project=IMAGE_PROJECT
         The project against which all image and image family references will be
@@ -194,9 +180,52 @@ FLAGS
        --kms-project=KMS_PROJECT
           The Cloud project for the key.
 
+     At most one of these may be specified:
+
+       --region=REGION
+          Region of the disks to create. If not specified, you may be prompted
+          to select a region.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/region property:
+
+              $ gcloud config set compute/region REGION
+
+          A list of regions can be fetched by running:
+
+              $ gcloud compute regions list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/region
+
+          Alternatively, the region can be stored in the environment variable
+          CLOUDSDK_COMPUTE_REGION.
+
+       --zone=ZONE
+          Zone of the disks to create. If not specified and the compute/zone
+          property isn't set, you may be prompted to select a zone.
+
+          To avoid prompting when this flag is omitted, you can set the
+          compute/zone property:
+
+              $ gcloud config set compute/zone ZONE
+
+          A list of zones can be fetched by running:
+
+              $ gcloud compute zones list
+
+          To unset the property, run:
+
+              $ gcloud config unset compute/zone
+
+          Alternatively, the zone can be stored in the environment variable
+          CLOUDSDK_COMPUTE_ZONE.
+
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

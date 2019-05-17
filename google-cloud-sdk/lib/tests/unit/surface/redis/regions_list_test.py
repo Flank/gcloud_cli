@@ -20,20 +20,17 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface import redis_test_base
 from six.moves import range  # pylint: disable=redefined-builtin
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,
-                           calliope_base.ReleaseTrack.BETA,
-                           calliope_base.ReleaseTrack.GA])
-class ListTest(redis_test_base.UnitTestBase):
+class ListTestGA(redis_test_base.UnitTestBase):
 
-  def testList(self, track):
-    self.SetUpForTrack(track)
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def testList(self):
     expected_regions = self._MakeRegions(3)
     self._ExpectList(expected_regions)
 
@@ -43,8 +40,7 @@ class ListTest(redis_test_base.UnitTestBase):
 
     self.assertEqual(actual_regions, expected_regions)
 
-  def testList_Uri(self, track):
-    self.SetUpForTrack(track)
+  def testList_Uri(self):
     expected_regions = self._MakeRegions(3)
     self._ExpectList(expected_regions)
 
@@ -59,8 +55,7 @@ class ListTest(redis_test_base.UnitTestBase):
                    region_name=self.region_relative_name),
         normalize_space=True)
 
-  def testList_CheckFormat(self, track):
-    self.SetUpForTrack(track)
+  def testList_CheckFormat(self):
     expected_regions = self._MakeRegions(3)
     self._ExpectList(expected_regions)
 
@@ -89,6 +84,18 @@ class ListTest(redis_test_base.UnitTestBase):
       region = self.messages.Location(name=name, locationId=location_id)
       regions.append(region)
     return regions
+
+
+class ListTestBeta(ListTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class ListTestAlpha(ListTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

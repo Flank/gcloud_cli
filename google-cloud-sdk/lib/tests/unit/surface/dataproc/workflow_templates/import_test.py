@@ -22,9 +22,9 @@ import copy
 import os
 
 from googlecloudsdk import calliope
+from googlecloudsdk.api_lib.dataproc import exceptions
 from googlecloudsdk.command_lib.export import util as export_util
 from googlecloudsdk.core import properties
-from googlecloudsdk.core import yaml_validator
 from googlecloudsdk.core.util import files
 from tests.lib.surface.dataproc import compute_base
 from tests.lib.surface.dataproc import unit_base
@@ -87,8 +87,7 @@ class WorkflowTemplateImportUnitTest(unit_base.DataprocUnitTestBase,
   def testImportWorkflowTemplatesInvalid(self):
     self.WriteInput('foo: bar')
     with self.AssertRaisesExceptionMatches(
-        yaml_validator.ValidationError,
-        "Additional properties are not allowed "
+        exceptions.ValidationError, "Additional properties are not allowed "
         "('foo' was unexpected)"):
       self.RunDataproc('workflow-templates import {0}'.format(
           self.WORKFLOW_TEMPLATE))
@@ -292,5 +291,11 @@ class WorkflowTemplateImportUnitTest(unit_base.DataprocUnitTestBase,
 
 class WorkflowTemplateImportUnitTestBeta(WorkflowTemplateImportUnitTest):
 
-  def SetUp(self):
-    self.SetupForReleaseTrack(calliope.base.ReleaseTrack.BETA)
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.BETA
+
+
+class WorkflowTemplateImportUnitTestAlpha(WorkflowTemplateImportUnitTest):
+
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.ALPHA

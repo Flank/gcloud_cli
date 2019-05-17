@@ -24,9 +24,9 @@ from tests.lib import test_case
 from tests.lib.surface.container import base
 
 
-class ListUsableTestBeta(base.BetaTestBase, base.SubnetsTestBase,
-                         test_case.WithOutputCapture):
-  """gcloud beta track using container v1beta1 API."""
+class ListUsableTestGA(base.GATestBase, base.SubnetsTestBase,
+                       test_case.WithOutputCapture):
+  """gcloud GA track using container v1beta1 API."""
 
   def testMissingProject(self):
     properties.VALUES.core.project.Set(None)
@@ -142,6 +142,10 @@ fake-project-id us-central1 my-networkC my-subnetC 3.3.3.3/10
 https://www.googleapis.com/compute/v1/projects/fake-project-id/regions/us-central1/subnetworks/my-subnetA
 https://www.googleapis.com/compute/v1/projects/fake-project-id/regions/us-central1/subnetworks/my-subnetB
 """, normalize_space=True)
+
+
+class ListUsableTestBeta(base.BetaTestBase, ListUsableTestGA):
+  """gcloud beta track using container v1beta1 API."""
 
 
 class ListUsableTestAlpha(base.AlphaTestBase, ListUsableTestBeta):

@@ -23,6 +23,7 @@ import datetime
 from googlecloudsdk.api_lib.firebase.test import exceptions
 from googlecloudsdk.api_lib.firebase.test.ios import arg_manager
 from googlecloudsdk.api_lib.firebase.test.ios import catalog_manager
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions as core_exceptions
 from tests.lib import test_case
 from tests.lib.surface.firebase.test.ios import fake_catalogs
@@ -38,7 +39,9 @@ class IosArgsTests(unit_base.IosMockClientTest):
   def testGetSetOfAllTestArgs_OnActualRules(self):
     all_args = arg_manager.AllArgsSet()
     # arg_manager tests include GA and beta args
-    self.assertEquals(set(unit_base.ALL_TEST_RUN_ARGS['beta']), all_args)
+    self.assertEqual(
+        set(unit_base.ALL_TEST_RUN_ARGS[calliope_base.ReleaseTrack.BETA]),
+        all_args)
 
   def testArgNamesInRulesAreInternalNames(self):
     # Verify that ArgRules use internal arg names with underscores, not hyphens

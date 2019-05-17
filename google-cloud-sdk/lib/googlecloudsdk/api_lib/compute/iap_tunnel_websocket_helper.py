@@ -46,10 +46,6 @@ class WebSocketSendError(exceptions.Error):
   pass
 
 
-class WebSocketSendCloseError(exceptions.Error):
-  pass
-
-
 class IapTunnelWebSocketHelper(object):
   """Helper class for common operations on websocket and related metadata."""
 
@@ -63,33 +59,39 @@ class IapTunnelWebSocketHelper(object):
     self._sslopt = {'cert_reqs': ssl.CERT_REQUIRED,
                     'ca_certs': ca_certs}
     if ignore_certs:
-      self._sslopt['cert_reqs'] = ssl.CERT_OPTIONAL
+      self._sslopt['cert_reqs'] = ssl.CERT_NONE
       self._sslopt['check_hostname'] = False
 
     # Disable most of random logging in websocket library itself
     logging.getLogger('websocket').setLevel(logging.CRITICAL)
 
     self._is_closed = False
+    self._error_msg = ''
     self._websocket = websocket.WebSocketApp(
         url, header=headers, on_close=self._OnClose, on_data=self._OnData,
-        on_error=self._OnError)
+        on_error=self._OnError, subprotocols=[utils.SUBPROTOCOL_NAME])
 
   def __del__(self):
     self.Close()
 
-  def Close(self):
+  def Close(self, msg=''):
     """Close the WebSocket."""
     if not self._is_closed:
       try:
         self._websocket.close()
       except:  # pylint: disable=bare-except
         pass
+      if not self._error_msg:
+        self._error_msg = msg
       self._is_closed = True
 
   def IsClosed(self):
     """Check to see if WebSocket has closed."""
     return (self._is_closed or
             (self._receiving_thread and not self._receiving_thread.isAlive()))
+
+  def ErrorMsg(self):
+    return self._error_msg
 
   def Send(self, send_data):
     """Send data on WebSocket connection."""
@@ -113,17 +115,18 @@ class IapTunnelWebSocketHelper(object):
                              tb=tb))
 
   def SendClose(self):
-    """Send WebSocket Close message."""
-    try:
+    """Send WebSocket Close message if possible."""
+    if self._websocket.sock:
       log.debug('CLOSE')
-      self._websocket.sock.send_close()
-    except (EnvironmentError,
-            websocket.WebSocketConnectionClosedException) as e:
-      log.info('Unable to send WebSocket Close message [%s].', str(e))
-      self.Close()
-    except:  # pylint: disable=bare-except
-      log.info('Error during WebSocket send of Close message.', exc_info=True)
-      self.Close()
+      try:
+        self._websocket.sock.send_close()
+      except (EnvironmentError,
+              websocket.WebSocketConnectionClosedException) as e:
+        log.info('Unable to send WebSocket Close message [%s].', str(e))
+        self.Close()
+      except:  # pylint: disable=bare-except
+        log.info('Error during WebSocket send of Close message.', exc_info=True)
+        self.Close()
 
   def StartReceivingThread(self):
     if not self._is_closed:
@@ -132,25 +135,25 @@ class IapTunnelWebSocketHelper(object):
       self._receiving_thread.daemon = True
       self._receiving_thread.start()
 
-  def _OnClose(self, unused_websocket_app, *optional_close_data):
+  def _OnClose(self, close_code, close_reason):
     """Callback for WebSocket Close messages."""
-    if not optional_close_data:
-      # Just a local close event and not an actual Close message.
+
+    if close_code is None and close_reason is None:
+      # This indicates a local close event and not an actual Close message, call
+      # Close() but skip the rest of the processing.
       self.Close()
       return
 
-    # Having optional_close_data present (even if empty) indicates an actual
-    # Close message was received vs the WebSocket just closing for another
-    # reason.
-    log.info('Received WebSocket Close message [%r].', optional_close_data[0])
-    self.Close()
+    close_msg = '%r: %r' % (close_code, close_reason)
+    log.info('Received WebSocket Close message [%s].', close_msg)
+    self.Close(msg=close_msg)
     try:
       self._on_close()
     except (EnvironmentError, exceptions.Error):
       log.info('Error while processing Close message', exc_info=True)
       raise
 
-  def _OnData(self, unused_websocket_app, binary_data, opcode, unused_finished):
+  def _OnData(self, binary_data, opcode, unused_finished):
     """Callback for WebSocket Data messages."""
     log.debug('RECV opcode [%r] data_len [%d] binary_data[:20] [%r]', opcode,
               len(binary_data), binary_data[:20])
@@ -173,13 +176,14 @@ class IapTunnelWebSocketHelper(object):
       self.Close()
       raise
 
-  def _OnError(self, unused_websocket_app, exception_obj):
+  def _OnError(self, exception_obj):
     # Do not call Close() from here as it may generate callbacks in some error
     # conditions that can create a feedback loop with this function.
     if not self._is_closed:
-      log.info('Error during WebSocket processing\n' +
+      log.info('Error during WebSocket processing:\n' +
                ''.join(traceback.format_exception_only(type(exception_obj),
                                                        exception_obj)))
+      self._error_msg = str(exception_obj)
 
   def _ReceiveFromWebSocket(self):
     """Receive data from WebSocket connection."""

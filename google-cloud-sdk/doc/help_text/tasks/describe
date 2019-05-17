@@ -1,0 +1,35 @@
+NAME
+    gcloud tasks describe - show details about a task
+
+SYNOPSIS
+    gcloud tasks describe TASK [--queue=QUEUE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Show details about a task.
+
+POSITIONAL ARGUMENTS
+     TASK
+        The task to describe.
+
+FLAGS
+     --queue=QUEUE
+        The queue the task belongs to.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+EXAMPLES
+    To describe a task:
+
+        $ gcloud tasks describe --queue=my-queue my-task
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha tasks describe
+        $ gcloud beta tasks describe
+

@@ -11,7 +11,7 @@ gcloud compute instance\-templates create\-with\-container \- creates Google Com
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute instance\-templates create\-with\-container\fR \fINAME\fR [\fB\-\-no\-boot\-disk\-auto\-delete\fR] [\fB\-\-boot\-disk\-device\-name\fR=\fIBOOT_DISK_DEVICE_NAME\fR] [\fB\-\-boot\-disk\-size\fR=\fIBOOT_DISK_SIZE\fR] [\fB\-\-boot\-disk\-type\fR=\fIBOOT_DISK_TYPE\fR] [\fB\-\-can\-ip\-forward\fR] [\fB\-\-container\-arg\fR=\fICONTAINER_ARG\fR] [\fB\-\-container\-command\fR=\fICONTAINER_COMMAND\fR] [\fB\-\-container\-env\fR=[\fIKEY\fR=\fIVALUE\fR,\ ...,...]] [\fB\-\-container\-env\-file\fR=\fICONTAINER_ENV_FILE\fR] [\fB\-\-container\-image\fR=\fICONTAINER_IMAGE\fR] [\fB\-\-container\-mount\-host\-path\fR=[\fIhost\-path\fR=\fIHOSTPATH\fR,\fImount\-path\fR=\fIMOUNTPATH\fR[,\fImode\fR=\fIMODE\fR],...]] [\fB\-\-container\-mount\-tmpfs\fR=[\fImount\-path\fR=\fIMOUNTPATH\fR,...]] [\fB\-\-container\-privileged\fR] [\fB\-\-container\-restart\-policy\fR=\fIPOLICY\fR;\ default="always"] [\fB\-\-container\-stdin\fR] [\fB\-\-container\-tty\fR] [\fB\-\-create\-disk\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIboot\fR=\fIBOOT\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIname\fR=\fINAME\fR]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-interface\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-preemptible\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-no\-restart\-on\-failure\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-address\fR=\fIADDRESS\fR\ |\ \fB\-\-no\-address\fR] [\fB\-\-custom\-cpu\fR=\fICUSTOM_CPU\fR\ \fB\-\-custom\-memory\fR=\fICUSTOM_MEMORY\fR\ :\ \fB\-\-custom\-extensions\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR] [\fB\-\-scopes\fR=[\fISCOPE\fR,...]\ |\ \fB\-\-no\-scopes\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-service\-account\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute instance\-templates create\-with\-container\fR \fINAME\fR [\fB\-\-no\-boot\-disk\-auto\-delete\fR] [\fB\-\-boot\-disk\-device\-name\fR=\fIBOOT_DISK_DEVICE_NAME\fR] [\fB\-\-boot\-disk\-size\fR=\fIBOOT_DISK_SIZE\fR] [\fB\-\-boot\-disk\-type\fR=\fIBOOT_DISK_TYPE\fR] [\fB\-\-can\-ip\-forward\fR] [\fB\-\-container\-arg\fR=\fICONTAINER_ARG\fR] [\fB\-\-container\-command\fR=\fICONTAINER_COMMAND\fR] [\fB\-\-container\-env\fR=[\fIKEY\fR=\fIVALUE\fR,\ ...,...]] [\fB\-\-container\-env\-file\fR=\fICONTAINER_ENV_FILE\fR] [\fB\-\-container\-image\fR=\fICONTAINER_IMAGE\fR] [\fB\-\-container\-mount\-disk\fR=[\fImode\fR=\fIMODE\fR],[\fImount\-path\fR=\fIMOUNT\-PATH\fR],[\fIname\fR=\fINAME\fR],[\fIpartition\fR=\fIPARTITION\fR]] [\fB\-\-container\-mount\-host\-path\fR=[\fIhost\-path\fR=\fIHOSTPATH\fR,\fImount\-path\fR=\fIMOUNTPATH\fR[,\fImode\fR=\fIMODE\fR],...]] [\fB\-\-container\-mount\-tmpfs\fR=[\fImount\-path\fR=\fIMOUNTPATH\fR,...]] [\fB\-\-container\-privileged\fR] [\fB\-\-container\-restart\-policy\fR=\fIPOLICY\fR;\ default="always"] [\fB\-\-container\-stdin\fR] [\fB\-\-container\-tty\fR] [\fB\-\-create\-disk\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIboot\fR=\fIBOOT\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIname\fR=\fINAME\fR]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-interface\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-preemptible\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-no\-restart\-on\-failure\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-address\fR=\fIADDRESS\fR\ |\ \fB\-\-no\-address\fR] [\fB\-\-custom\-cpu\fR=\fICUSTOM_CPU\fR\ \fB\-\-custom\-memory\fR=\fICUSTOM_MEMORY\fR\ :\ \fB\-\-custom\-extensions\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR] [\fB\-\-scopes\fR=[\fISCOPE\fR,...]\ |\ \fB\-\-no\-scopes\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-service\-account\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -144,6 +144,37 @@ Full container image name, which should be pulled onto VM instance, eg.
 \f5docker.io/tomcat\fR.
 
 .TP 2m
+\fB\-\-container\-mount\-disk\fR=[\fImode\fR=\fIMODE\fR],[\fImount\-path\fR=\fIMOUNT\-PATH\fR],[\fIname\fR=\fINAME\fR],[\fIpartition\fR=\fIPARTITION\fR]
+Mounts a disk to the specified mount path in the container. Multiple ' flags are
+allowed. Must be used with \f5\-\-disk\fR or \f5\-\-create\-disk\fR.
+
+
+.RS 2m
+.TP 2m
+\fBname\fR
+Name of the disk. If exactly one additional disk is attached to the instance
+using \f5\-\-disk\fR or \f5\-\-create\-disk\fR, specifying disk name here is
+optional. The name of the single additional disk will be used by default.
+
+
+.TP 2m
+\fBmount\-path\fR
+Path on container to mount to. Mount paths with spaces and commas (and other
+special characters) are not supported by this command.
+
+.TP 2m
+\fBpartition\fR
+Optional. The partition of the disk to mount. Multiple partitions of a disk may
+be mounted. May not be used with \-\-create\-disk.
+
+.TP 2m
+\fBmode\fR
+Volume mount mode: \f5rw\fR (read/write) or \f5ro\fR (read\-only). Defaults to
+\f5rw\fR. Fails if the disk mode is \f5ro\fR and volume mount mode is \f5rw\fR.
+
+.RE
+.sp
+.TP 2m
 \fB\-\-container\-mount\-host\-path\fR=[\fIhost\-path\fR=\fIHOSTPATH\fR,\fImount\-path\fR=\fIMOUNTPATH\fR[,\fImode\fR=\fIMODE\fR],...]
 Mounts a volume by using host\-path.
 
@@ -208,7 +239,8 @@ Creates and attaches persistent disks to the instances.
 .TP 2m
 \fBname\fR
 Specifies the name of the disk. This option cannot be specified if more than one
-instance is being created.
+instance is being created. Must specify this option if attaching the disk to a
+container with \f5\-\-container\-mount\-disk\fR.
 
 .TP 2m
 \fBdescription\fR
@@ -218,7 +250,8 @@ Optional textual description for the disk being created.
 \fBmode\fR
 Specifies the mode of the disk. Supported options are \f5\fIro\fR\fR for
 read\-only and \f5\fIrw\fR\fR for read\-write. If omitted, \f5\fIrw\fR\fR is
-used as a default.
+used as a default. It is an error to create a disk in \f5ro\fR mode if attaching
+it to a container with \f5\-\-container\-mount\-disk\fR.
 
 .TP 2m
 \fBimage\fR
@@ -267,8 +300,12 @@ compute disk\-types list. The default disk type is \f5\fIpd\-standard\fR\fR.
 .TP 2m
 \fBdevice\-name\fR
 An optional name that indicates the disk name the guest operating system will
-see. If omitted, a device name of the form \f5persistent\-disk\-N\fR will be
-used.
+see. Must be the same as \f5name\fR if used with
+\f5\-\-container\-mount\-disk\fR. If omitted, a device name of the form
+\f5persistent\-disk\-N\fR will be used. If omitted and used with
+\f5\-\-container\-mount\-disk\fR (where the \f5name\fR of the container mount
+disk is the same as in this flag), a device name equal to disk \f5name\fR will
+be used.
 
 .TP 2m
 \fBauto\-delete\fR
@@ -311,14 +348,18 @@ default value for this is \f5\fIno\fR\fR.
 .TP 2m
 \fBdevice\-name\fR
 An optional name that indicates the disk name the guest operating system will
-see. If omitted, a device name of the form \f5persistent\-disk\-N\fR will be
-used.
+see. Must be the same as \f5name\fR if used with
+\f5\-\-container\-mount\-disk\fR. If omitted, a device name of the form
+\f5persistent\-disk\-N\fR will be used. If omitted and used with
+\f5\-\-container\-mount\-disk\fR (where the \f5name\fR of the container mount
+disk is the same as in this flag), a device name equal to disk \f5name\fR will
+be used.
 
 .TP 2m
 \fBauto\-delete\fR
 If \f5\fIyes\fR\fR, this persistent disk will be automatically deleted when the
 instance is deleted. However, if the disk is later detached from the instance,
-this option won't apply. The default value for this is \f5\fIno\fR\fR.
+this option won't apply. The default value for this is \f5\fIyes\fR\fR.
 
 .RE
 .sp
@@ -414,7 +455,8 @@ neither is specified, this defaults to the "default" network.
 \fB\-\-network\-interface\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]
 Adds a network interface to the instance. Mutually exclusive with any of these
 flags: \fB\-\-address\fR, \fB\-\-network\fR, \fB\-\-network\-tier\fR,
-\fB\-\-subnet\fR, \fB\-\-private\-network\-ip\fR.
+\fB\-\-subnet\fR, \fB\-\-private\-network\-ip\fR. This flag can be repeated to
+specify multiple network interfaces.
 
 The following keys are allowed:
 .RS 2m
@@ -718,10 +760,11 @@ Create instance without service account
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

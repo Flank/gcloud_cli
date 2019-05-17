@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -54,7 +54,6 @@ from googlecloudsdk.core.resource import resource_property
 from googlecloudsdk.core.resource import resource_transform
 from googlecloudsdk.core.resource import table_printer
 from googlecloudsdk.core.resource import yaml_printer
-from googlecloudsdk.core.util import typing  # pylint: disable=unused-import
 
 
 class Error(core_exceptions.Error):
@@ -115,7 +114,7 @@ class MultiPrinter(resource_printer_base.ResourcePrinter):
   def __init__(self, *args, **kwargs):
     super(MultiPrinter, self).__init__(*args, **kwargs)
     # pylint: disable=line-too-long
-    self.columns = []  # type: typing.List[typing.Tuple[resource_projection_spec.ProjectionSpec._Column, resource_printer_base.ResourcePrinter]]
+    self.columns = []
     # pylint: disable=line-too-long
     for col in self.column_attributes.Columns():
       if not col.attribute.subformat:

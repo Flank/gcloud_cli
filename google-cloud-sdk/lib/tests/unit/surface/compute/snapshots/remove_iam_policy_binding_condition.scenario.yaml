@@ -8,7 +8,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/fake-project/global/snapshots/projects%2Ffake-project%2Fglobal%2Fsnapshots%2Fmy-snapshot/getIamPolicy?alt=json
+          uri: https://www.googleapis.com/compute/alpha/projects/fake-project/global/snapshots/my-snapshot/getIamPolicy?alt=json
           method: GET
           body: null
         return_response:
@@ -35,7 +35,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/fake-project/global/snapshots/projects%2Ffake-project%2Fglobal%2Fsnapshots%2Fmy-snapshot/setIamPolicy?alt=json
+          uri: https://www.googleapis.com/compute/alpha/projects/fake-project/global/snapshots/my-snapshot/setIamPolicy?alt=json
           method: POST
           body:
             json:

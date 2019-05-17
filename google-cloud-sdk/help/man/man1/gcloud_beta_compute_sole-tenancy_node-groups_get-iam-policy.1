@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta compute sole\-tenancy node\-groups get\-iam\-policy \- get the IAM Policy for a Google Compute Engine node group
+gcloud beta compute sole\-tenancy node\-groups get\-iam\-policy \- get the IAM policy for a Google Compute Engine node group
 
 
 
@@ -92,10 +92,11 @@ flag interacts with other flags that are applied in this order:
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -113,17 +114,18 @@ To print the IAM policy for a given node group, run:
 
 .RS 2m
 $ gcloud beta compute sole\-tenancy node\-groups get\-iam\-policy \e
-    my\-node\-group
+    my\-node\-group \-\-zone=ZONE
 .RE
 
 
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
+$ gcloud compute sole\-tenancy node\-groups get\-iam\-policy
 $ gcloud alpha compute sole\-tenancy node\-groups get\-iam\-policy
 .RE
 

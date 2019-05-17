@@ -1,0 +1,552 @@
+skip:
+  reason: Failing
+  always: true
+  bug: b/129677907
+title: A test of basic filestore snapshot functionality.
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: filestore instances create $$filestore-test-instance1$$ --zone us-east1-c
+      --tier STANDARD --file-share=name="my_vol",capacity=1TB --network=name=filestore-net
+  - progress_tracker:
+    - message: Waiting for [$$operation-basename$$] to finish
+    - status: SUCCESS
+- execute:
+  - command: filestore snapshots create $$filestore-test-snapshot1$$ --region us-east1
+      --instance $$filestore-test-instance1$$ --instance-zone us-east1-c --file-share="my_vol"
+  - stderr: |
+      Create request issued for: [$$filestore-test-snapshot1$$]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation-basename$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Created snapshot [$$filestore-test-snapshot1$$].
+- execute:
+  - command: filestore snapshots list --region us-east1 --filter 'name:$$filestore-test-snapshot1$$'
+      --format 'table(name,sourceInstance,sourceFileShare,state)'
+  - stdout: |
+      NAME                                          SRC_INSTANCE                                                       SRC_FILE_SHARE  STATE
+      $$filestore-test-snapshot1$$  us-east1-c/instances/$$filestore-test-instance1$$  my_vol          READY
+- execute:
+  - command: filestore snapshots describe '$$filestore-test-snapshot1$$' --region
+      us-east1 --format 'table(name,sourceInstance,sourceFileShare,state)'
+  - stdout: |
+      NAME                                                                                                              SOURCE_INSTANCE                                                                                                     SOURCE_FILE_SHARE  STATE
+      projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/$$filestore-test-snapshot1$$  projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance1$$  my_vol             READY
+- execute:
+  - command: filestore instances restore '$$filestore-test-instance1$$' --zone us-east1-c
+      --source-snapshot '$$filestore-test-snapshot1$$' --file-share my_vol --format
+      "yaml(name,state,tier,fileShares)"
+  - prompt:
+    - message: |
+        You are about to override existing data in [$$filestore-test-instance1$$].
+    - input: y
+  - stderr: |
+      Request issued for: [$$filestore-test-instance1$$]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation-basename$$] to complete
+    - status: SUCCESS
+  - stdout: |
+      fileShares:
+      - capacityGb: '1024'
+        name: my_vol
+        sourceSnapshot: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/$$filestore-test-snapshot1$$
+      name: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance1$$
+      state: READY
+      tier: STANDARD
+- execute:
+  - command: filestore instances create $$filestore-test-instance2$$ --zone us-east1-c
+      --tier STANDARD --network=name=filestore-net --file-share=name=my_vol,capacity=1TB,source-snapshot=$$filestore-test-snapshot1$$
+  - progress_tracker:
+    - message: Waiting for [$$operation-basename$$] to finish
+    - status: SUCCESS
+- execute:
+  - command: filestore instances delete $$filestore-test-instance1$$ --zone us-east1-c
+  - prompt:
+    - message: You are about to delete Cloud Filestore instance projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance1$$.
+        Are you sure?
+    - input: y
+  - progress_tracker:
+    - message: Waiting for [$$operation-basename$$] to finish
+    - status: SUCCESS
+- execute:
+  - command: filestore snapshots delete $$filestore-test-snapshot1$$ --region us-east1
+  - prompt:
+    - message: You are about to delete snapshot [$$filestore-test-snapshot1$$]
+    - input: y
+  - stderr: |
+      Delete request issued for: [$$filestore-test-snapshot1$$]
+  - progress_tracker:
+    - message: Waiting for operation [$$operation-basename$$] to complete
+    - status: SUCCESS
+  - stderr: |
+      Deleted snapshot [$$filestore-test-snapshot1$$].
+- execute:
+  - command: filestore instances delete $$filestore-test-instance2$$ --zone us-east1-c
+  - prompt:
+    - message: You are about to delete Cloud Filestore instance projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance2$$.
+        Are you sure?
+    - input: y
+  - progress_tracker:
+    - message: Waiting for [$$operation-basename$$] to finish
+    - status: SUCCESS
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      ALPHA: v1p1alpha1
+
+- generate_resource_id:
+    reference: filestore-test-instance1
+    prefix: filestore-test-instance
+
+- execute_command:
+    command: filestore instances create $$filestore-test-instance1$$ --zone us-east1-c
+      --tier STANDARD --file-share=name="my_vol",capacity=1TB --network=name=filestore-net
+    events:
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1-c/instances?alt=json&instanceId=$$filestore-test-instance1$$
+          method: POST
+          headers: {}
+          body:
+            json:
+              fileShares:
+              - capacityGb: '1024'
+                name: my_vol
+              networks:
+              - network: filestore-net
+              tier: STANDARD
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '522'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-east1-c/operations/operation-1552501373728-583fde4e4f6b8-5cbcfe41-6a2b677b
+            metadata:
+              '@type': type.googleapis.com/google.cloud.common.OperationMetadata
+              createTime: '2019-03-13T18:22:54.678954546Z'
+              target: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance1$$
+              verb: create
+              cancelRequested: false
+              apiVersion: $$api-version$$
+            done: false
+        poll_operation: true
+    - expect_progress_tracker:
+        message: Waiting for [$$operation-basename$$] to finish
+        status: SUCCESS
+    - expect_exit:
+        code: 0
+- generate_resource_id:
+    reference: filestore-test-snapshot1
+    prefix: filestore-test-snapshot
+
+- execute_command:
+    command: filestore snapshots create $$filestore-test-snapshot1$$ --region us-east1
+      --instance $$filestore-test-instance1$$ --instance-zone us-east1-c --file-share="my_vol"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1/snapshots?alt=json&snapshotId=$$filestore-test-snapshot1$$
+          method: POST
+          headers: {}
+          body:
+            json:
+              sourceFileShare: my_vol
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance1$$
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '518'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-east1/operations/operation-1552501524389-583fdeddfddf4-84acb1f2-6b7a6675
+            metadata:
+              '@type': type.googleapis.com/google.cloud.common.OperationMetadata
+              createTime: '2019-03-13T18:25:24.493238146Z'
+              target: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/$$filestore-test-snapshot1$$
+              verb: create
+              cancelRequested: false
+              apiVersion: $$api-version$$
+            done: false
+        poll_operation: true
+    - expect_stderr: |
+        Create request issued for: [$$filestore-test-snapshot1$$]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation-basename$$] to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/$$filestore-test-snapshot1$$?alt=json
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '368'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/$$filestore-test-snapshot1$$
+            state: READY
+            createTime: '2019-03-13T18:25:24.482381382Z'
+            sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance1$$
+            sourceFileShare: my_vol
+    - expect_stderr: |
+        Created snapshot [$$filestore-test-snapshot1$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: filestore snapshots list --region us-east1 --filter 'name:$$filestore-test-snapshot1$$'
+      --format 'table(name,sourceInstance,sourceFileShare,state)'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1/snapshots?alt=json
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '5185'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            snapshots:
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190302-120441-ijdl
+              state: READY
+              createTime: '2019-03-02T12:04:43.455707101Z'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190302-120113-3q45
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190307-130653-8ako
+              state: READY
+              createTime: '2019-03-07T13:06:55.448612646Z'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190307-130426-iv39
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190301-030857-zofc
+              state: READY
+              createTime: '2019-03-01T03:08:59.719424137Z'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190301-030630-ca1t
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190302-000657-d012
+              state: READY
+              createTime: '2019-03-02T00:06:59.613169396Z'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190302-000427-obga
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190312-233442-0633
+              state: READY
+              createTime: '2019-03-12T23:34:45.053459153Z'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190312-233215-k6is
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190313-182517-aiyg
+              state: READY
+              createTime: '2019-03-13T18:25:17.725779395Z'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190313-182250-rpdn
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190313-182514-juib
+              state: READY
+              createTime: '2019-03-13T18:25:15.194055304Z'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190313-182148-z5dd
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190305-150635-otc4
+              state: READY
+              createTime: '2019-03-05T15:06:37.871936416Z'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190305-150405-01m3
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190313-182512-7x9q
+              state: READY
+              createTime: '2019-03-13T18:25:15.348999782Z'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190313-182243-og2r
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190305-053356-33ce
+              state: READY
+              createTime: '2019-03-05T05:33:56.356002918Z'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190305-053128-r3q4
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190308-220551-xlgj
+              state: READY
+              createTime: '2019-03-08T22:05:52.958114356Z'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190308-220323-irob
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/$$filestore-test-snapshot1$$
+              state: READY
+              createTime: '2019-03-13T18:25:24.482381382Z'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance1$$
+              sourceFileShare: my_vol
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/filestore-test-snapshot-20190310-053429-0h95
+              state: READY
+              createTime: '2019-03-10T05:34:30.253447482Z'
+              sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/filestore-test-instance-20190310-053202-audb
+              sourceFileShare: my_vol
+    - expect_stdout: |
+        NAME                                          SRC_INSTANCE                                                       SRC_FILE_SHARE  STATE
+        $$filestore-test-snapshot1$$  us-east1-c/instances/$$filestore-test-instance1$$  my_vol          READY
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: filestore snapshots describe '$$filestore-test-snapshot1$$' --region
+      us-east1 --format 'table(name,sourceInstance,sourceFileShare,state)'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/$$filestore-test-snapshot1$$?alt=json
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '368'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/$$filestore-test-snapshot1$$
+            state: READY
+            createTime: '2019-03-13T18:25:24.482381382Z'
+            sourceInstance: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance1$$
+            sourceFileShare: my_vol
+    - expect_stdout: |
+        NAME                                                                                                              SOURCE_INSTANCE                                                                                                     SOURCE_FILE_SHARE  STATE
+        projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/$$filestore-test-snapshot1$$  projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance1$$  my_vol             READY
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: filestore instances restore '$$filestore-test-instance1$$' --zone us-east1-c
+      --source-snapshot '$$filestore-test-snapshot1$$' --file-share my_vol --format
+      "yaml(name,state,tier,fileShares)"
+    events:
+    - expect_prompt_continue:
+        message: |
+          You are about to override existing data in [$$filestore-test-instance1$$].
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance1$$:restore?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              fileShare: my_vol
+              sourceSnapshot: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/$$filestore-test-snapshot1$$
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '523'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-east1-c/operations/operation-1552501565385-583fdf0516b9f-c480bf61-2a88946f
+            metadata:
+              '@type': type.googleapis.com/google.cloud.common.OperationMetadata
+              createTime: '2019-03-13T18:26:05.397113488Z'
+              target: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance1$$
+              verb: restore
+              cancelRequested: false
+              apiVersion: $$api-version$$
+            done: false
+        poll_operation: true
+    - expect_stderr: |
+        Request issued for: [$$filestore-test-instance1$$]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation-basename$$] to complete
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance1$$?alt=json
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '616'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance1$$
+            state: READY
+            createTime: '2019-03-13T18:22:54.672879715Z'
+            tier: STANDARD
+            fileShares:
+            - name: my_vol
+              capacityGb: '1024'
+              sourceSnapshot: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/$$filestore-test-snapshot1$$
+            networks:
+            - network: filestore-net
+              reservedIpRange: 10.91.176.128/29
+              ipAddresses:
+              - 10.91.176.130
+    - expect_stdout: |
+        fileShares:
+        - capacityGb: '1024'
+          name: my_vol
+          sourceSnapshot: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/$$filestore-test-snapshot1$$
+        name: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance1$$
+        state: READY
+        tier: STANDARD
+    - expect_exit:
+        code: 0
+- generate_resource_id:
+    reference: filestore-test-instance2
+    prefix: filestore-test-instance
+
+- execute_command:
+    command: filestore instances create $$filestore-test-instance2$$ --zone us-east1-c
+      --tier STANDARD --network=name=filestore-net --file-share=name="my_vol",capacity=1TB,source-snapshot=$$filestore-test-snapshot1$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1-c/instances?alt=json&instanceId=$$filestore-test-instance2$$
+          method: POST
+          headers: {}
+          body:
+            json:
+              fileShares:
+              - capacityGb: '1024'
+                name: my_vol
+                sourceSnapshot: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/$$filestore-test-snapshot1$$
+              networks:
+              - network: filestore-net
+              tier: STANDARD
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '522'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-east1-c/operations/operation-1552501776448-583fdfce5fd38-427d623f-f38e5b8e
+            metadata:
+              '@type': type.googleapis.com/google.cloud.common.OperationMetadata
+              createTime: '2019-03-13T18:29:37.286307729Z'
+              target: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance2$$
+              verb: create
+              cancelRequested: false
+              apiVersion: $$api-version$$
+            done: false
+        poll_operation: true
+    - expect_progress_tracker:
+        message: Waiting for [$$operation-basename$$] to finish
+        status: SUCCESS
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: filestore instances delete $$filestore-test-instance1$$ --zone us-east1-c
+    cleanup_for: filestore-test-instance1
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete Cloud Filestore instance projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance1$$.
+          Are you sure?
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance1$$?alt=json
+          method: DELETE
+          headers: {}
+          body:
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '522'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-east1-c/operations/operation-1552501986419-583fe0969e4de-e9c0f782-b5b0c33c
+            metadata:
+              '@type': type.googleapis.com/google.cloud.common.OperationMetadata
+              createTime: '2019-03-13T18:33:06.433943241Z'
+              target: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance1$$
+              verb: delete
+              cancelRequested: false
+              apiVersion: $$api-version$$
+            done: false
+        poll_operation: true
+    - expect_progress_tracker:
+        message: Waiting for [$$operation-basename$$] to finish
+        status: SUCCESS
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: filestore snapshots delete $$filestore-test-snapshot1$$ --region us-east1
+    cleanup_for: filestore-test-snapshot1
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete snapshot [$$filestore-test-snapshot1$$]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/$$filestore-test-snapshot1$$?alt=json
+          method: DELETE
+          headers: {}
+          body:
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '518'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-east1/operations/operation-1552502063762-583fe0e060d8f-8f221214-59a573bf
+            metadata:
+              '@type': type.googleapis.com/google.cloud.common.OperationMetadata
+              createTime: '2019-03-13T18:34:23.774212777Z'
+              target: projects/cloud-sdk-integration-testing/locations/us-east1/snapshots/$$filestore-test-snapshot1$$
+              verb: delete
+              cancelRequested: false
+              apiVersion: $$api-version$$
+            done: false
+        poll_operation: true
+    - expect_stderr: |
+        Delete request issued for: [$$filestore-test-snapshot1$$]
+    - expect_progress_tracker:
+        message: Waiting for operation [$$operation-basename$$] to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Deleted snapshot [$$filestore-test-snapshot1$$].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: filestore instances delete $$filestore-test-instance2$$ --zone us-east1-c
+    cleanup_for: filestore-test-instance2
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete Cloud Filestore instance projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance2$$.
+          Are you sure?
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://file.googleapis.com/$$api-version$$/projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance2$$?alt=json
+          method: DELETE
+          headers: {}
+          body:
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '522'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-east1-c/operations/operation-1552502072487-583fe0e8b2e22-46ff93e7-aa82da33
+            metadata:
+              '@type': type.googleapis.com/google.cloud.common.OperationMetadata
+              createTime: '2019-03-13T18:34:32.503357887Z'
+              target: projects/cloud-sdk-integration-testing/locations/us-east1-c/instances/$$filestore-test-instance2$$
+              verb: delete
+              cancelRequested: false
+              apiVersion: $$api-version$$
+            done: false
+        poll_operation: true
+    - expect_progress_tracker:
+        message: Waiting for [$$operation-basename$$] to finish
+        status: SUCCESS
+    - expect_exit:
+        code: 0

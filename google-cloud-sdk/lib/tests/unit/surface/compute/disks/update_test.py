@@ -20,15 +20,17 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import disks_labels_test_base
 
 
-class UpdateLabelsTest(disks_labels_test_base.DisksLabelsTestBase):
+class UpdateLabelsTestGA(disks_labels_test_base.DisksLabelsTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
-    self._SetUp(calliope_base.ReleaseTrack.GA)
+    self._SetUp(self.track)
 
   def testUpdateMissingNameOrLabels(self):
     disk_ref = self._GetDiskRef('disk-1', zone='atlanta')
@@ -149,37 +151,7 @@ class UpdateLabelsTest(disks_labels_test_base.DisksLabelsTestBase):
         ))
     self.assertEqual(response, disk)
 
-  def testScopePromptWithZone(self):
-    disk_ref = self._GetDiskRef('disk-1', zone='atlanta')
-    disk = self._MakeDiskProto(disk_ref, labels=[])
-    self._ExpectGetRequest(disk_ref, disk)
-
-    self.StartPatch('googlecloudsdk.core.console.console_io.CanPrompt',
-                    return_value=True)
-    self.StartPatch('googlecloudsdk.api_lib.compute.zones.service.List',
-                    return_value=[
-                        self.messages.Zone(name='atlanta'),
-                        self.messages.Zone(name='charlotte')],
-                   )
-    self.StartPatch('googlecloudsdk.api_lib.compute.regions.service.List',
-                    return_value=[
-                        self.messages.Region(name='georgia')],
-                   )
-    self.WriteInput('1\n')
-    self.Run('compute disks update disk-1 --remove-labels key0')
-    self.AssertErrContains('atlanta')
-    self.AssertErrContains('charlotte')
-    self.AssertErrNotContains('georgia')
-
-
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA)
-class UpdateLabelsTestAlphaBeta(disks_labels_test_base.DisksLabelsTestBase,
-                                parameterized.TestCase):
-
-  def testZonalUpdateValidDisksWithLabelsAndRemoveLabels(self, track):
-    self._SetUp(track)
+  def testZonalUpdateValidDisksWithLabelsAndRemoveLabels(self):
     disk_ref = self._GetDiskRef('disk-1', zone='atlanta')
 
     disk_labels = (('key1', 'value1'), ('key2', 'value2'), ('key3', 'value3'))
@@ -208,8 +180,7 @@ class UpdateLabelsTestAlphaBeta(disks_labels_test_base.DisksLabelsTestBase,
                       for pair in update_labels])))
     self.assertEqual(response, updated_disk)
 
-  def testZonalUpdateValidDisksWithNoUpdate(self, track):
-    self._SetUp(track)
+  def testZonalUpdateValidDisksWithNoUpdate(self):
     disk_ref = self._GetDiskRef('disk-1', zone='atlanta')
 
     disk_labels = (('key1', 'value1'), ('key2', 'value2'), ('key3', 'value3'))
@@ -227,8 +198,7 @@ class UpdateLabelsTestAlphaBeta(disks_labels_test_base.DisksLabelsTestBase,
                       for pair in disk_labels])))
     self.assertEqual(response, disk)
 
-  def testRegionalUpdateValidDisksWithLabelsAndRemoveLabels(self, track):
-    self._SetUp(track)
+  def testRegionalUpdateValidDisksWithLabelsAndRemoveLabels(self):
     disk_ref = self._GetDiskRef('disk-1', region='us-central')
 
     disk_labels = (('key1', 'value1'), ('key2', 'value2'), ('key3', 'value3'))
@@ -257,8 +227,7 @@ class UpdateLabelsTestAlphaBeta(disks_labels_test_base.DisksLabelsTestBase,
                       for pair in update_labels])))
     self.assertEqual(response, updated_disk)
 
-  def testScopePromptWithRegionAndZone(self, track):
-    self._SetUp(track)
+  def testScopePromptWithRegionAndZone(self):
     disk_ref = self._GetDiskRef('disk-1', region='us-central')
     disk = self._MakeDiskProto(disk_ref, labels=[])
     self._ExpectGetRequest(disk_ref, disk)
@@ -279,6 +248,18 @@ class UpdateLabelsTestAlphaBeta(disks_labels_test_base.DisksLabelsTestBase,
     self.AssertErrContains('us-central1')
     self.AssertErrContains('us-central2')
     self.AssertErrContains('us-central')
+
+
+class UpdateLabelsTestBeta(UpdateLabelsTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class UpdateLabelsTestAlpha(UpdateLabelsTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

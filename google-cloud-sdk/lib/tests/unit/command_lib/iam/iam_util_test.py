@@ -371,6 +371,23 @@ class IAMUtilTest(cli_test_base.CliTestBase, parameterized.TestCase):
 
     self.assertEqual(actual_policy, expected_policy)
 
+  def testBindingInPolicy(self):
+    self.assertTrue(
+        iam_util.BindingInPolicy(
+            self.TEST_IAM_POLICY,
+            'user:slick@gmail.com',
+            'roles/owner'))
+    self.assertFalse(
+        iam_util.BindingInPolicy(
+            self.TEST_IAM_POLICY,
+            'user:not_in_policy@gmail.com',
+            'roles/owner'))
+    self.assertFalse(
+        iam_util.BindingInPolicy(
+            self.TEST_IAM_POLICY,
+            'user:slick@gmail.com',
+            'roles/not_owner'))
+
   def testRemoveBindingFromIamPolicy(self):
     parser = argparse.ArgumentParser()
     ai = self.getDummyArgumentInterceptor(parser)

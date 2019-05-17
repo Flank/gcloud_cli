@@ -31,7 +31,7 @@ from googlecloudsdk.command_lib.compute import scope as compute_scope
 from googlecloudsdk.command_lib.compute.instance_groups import flags as instance_groups_flags
 
 
-@base.ReleaseTracks(base.ReleaseTrack.GA)
+@base.ReleaseTracks(base.ReleaseTrack.GA, base.ReleaseTrack.BETA)
 class ListInstances(base.ListCommand):
   """List Google Compute Engine instances present in managed instance group."""
 
@@ -42,6 +42,8 @@ class ListInstances(base.ListCommand):
               instance.scope().segment(0):label=ZONE,
               instanceStatus:label=STATUS,
               currentAction:label=ACTION,
+              version.instanceTemplate.basename():label=INSTANCE_TEMPLATE,
+              version.name:label=VERSION_NAME,
               lastAttempt.errors.errors.map().format(
                 "Error {0}: {1}", code, message).list(separator=", ")
                 :label=LAST_ERROR
@@ -127,8 +129,8 @@ ListInstances.detailed_help = {
 }
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
-class ListInstancesBeta(ListInstances):
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class ListInstancesAlpha(ListInstances):
   """List Google Compute Engine instances present in managed instance group."""
 
   @staticmethod
@@ -137,6 +139,7 @@ class ListInstancesBeta(ListInstances):
         table(instance.basename():label=NAME,
               instance.scope().segment(0):label=ZONE,
               instanceStatus:label=STATUS,
+              instanceHealth[0].detailedHealthState:label=HEALTH_STATE,
               currentAction:label=ACTION,
               version.instanceTemplate.basename():label=INSTANCE_TEMPLATE,
               version.name:label=VERSION_NAME,
@@ -150,4 +153,4 @@ class ListInstancesBeta(ListInstances):
         parser)
 
 
-ListInstancesBeta.detailed_help = ListInstances.detailed_help
+ListInstancesAlpha.detailed_help = ListInstances.detailed_help

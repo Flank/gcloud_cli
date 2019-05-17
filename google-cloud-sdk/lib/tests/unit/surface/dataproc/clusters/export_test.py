@@ -37,8 +37,8 @@ class ClustersExportUnitTest(unit_base.DataprocUnitTestBase,
 
 class ClustersExportUnitTestBeta(ClustersExportUnitTest):
 
-  def SetUp(self):
-    self.SetupForReleaseTrack(calliope.base.ReleaseTrack.BETA)
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.BETA
 
   def testExportClustersToStdOut(self):
     cluster = self.MakeCluster()
@@ -78,6 +78,12 @@ class ClustersExportUnitTestBeta(ClustersExportUnitTest):
     exported_template = export_util.Import(
         message_type=msgs.Cluster, stream=data)
     self.AssertMessagesEqual(expected_output, exported_template)
+
+
+class ClustersExportUnitTestAlpha(ClustersExportUnitTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

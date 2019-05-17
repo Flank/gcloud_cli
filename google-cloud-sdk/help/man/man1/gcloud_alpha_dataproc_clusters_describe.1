@@ -1,0 +1,84 @@
+
+.TH "GCLOUD_ALPHA_DATAPROC_CLUSTERS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha dataproc clusters describe \- view the details of a cluster
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha dataproc clusters describe\fR \fINAME\fR [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR View the details of a cluster.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+The name of the cluster to describe.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
+independent resource namespace constrained to deploying instances into Compute
+Engine zones inside the region. The default value of \f5global\fR is a special
+multi\-region namespace which is capable of deploying instances into all Compute
+Engine zones globally, and is disjoint from other Cloud Dataproc regions.
+Overrides the default \fBdataproc/region\fR property value for this command
+invocation.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To view the details of a cluster, run:
+
+.RS 2m
+$ gcloud alpha dataproc clusters describe my_cluster
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
+
+.RS 2m
+$ gcloud dataproc clusters describe
+$ gcloud beta dataproc clusters describe
+.RE
+

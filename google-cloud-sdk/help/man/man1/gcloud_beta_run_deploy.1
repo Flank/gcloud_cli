@@ -1,0 +1,227 @@
+
+.TH "GCLOUD_BETA_RUN_DEPLOY" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta run deploy \- deploy a container to Cloud Run
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta run deploy\fR [[\fISERVICE\fR]\ \fB\-\-namespace\fR=\fINAMESPACE\fR] [\fB\-\-allow\-unauthenticated\fR] [\fB\-\-async\fR] [\fB\-\-concurrency\fR=\fICONCURRENCY\fR] [\fB\-\-connectivity\fR=\fICONNECTIVITY\fR] [\fB\-\-cpu\fR=\fICPU\fR] [\fB\-\-image\fR=\fIIMAGE\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-add\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]\ |\ \fB\-\-clear\-cloudsql\-instances\fR\ |\ \fB\-\-remove\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]\ |\ \fB\-\-set\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]] [\fB\-\-clear\-env\-vars\fR\ |\ \fB\-\-set\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-env\-vars\fR=[\fIKEY\fR,...]\ \fB\-\-update\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-cluster\fR=\fICLUSTER\fR\ \fB\-\-cluster\-location\fR=\fICLUSTER_LOCATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Deploys container images to Google Cloud Run.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Service resource \- Service to deploy to. The arguments in this group can be
+used to specify the attributes of this resource.
+
+.RS 2m
+.TP 2m
+[\fISERVICE\fR]
+ID of the service or fully qualified identifier for the service.
+
+.TP 2m
+\fB\-\-namespace\fR=\fINAMESPACE\fR
+Specific to Cloud Run on Kubernetes Engine: Kubernetes namespace for the service
+
+
+.RE
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-allow\-unauthenticated\fR
+True to allow unauthenticated access to the service.
+
+.TP 2m
+\fB\-\-async\fR
+True to deploy asynchronously.
+
+.TP 2m
+\fB\-\-concurrency\fR=\fICONCURRENCY\fR
+Set the number of concurrent requests allowed per instance. A concurrency of 0
+or unspecified indicates any number of concurrent requests are allowed. To unset
+this field, provide the special value \f5default\fR.
+
+.TP 2m
+\fB\-\-connectivity\fR=\fICONNECTIVITY\fR
+Defaults to 'external'. If 'external', the service can be invoked through the
+internet, in addition to through the cluster network. Only applicable to Cloud
+Run on Kubernetes Engine. \fICONNECTIVITY\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBexternal\fR
+Visible from outside the cluster.
+.TP 2m
+\fBinternal\fR
+Visible only within the cluster.
+.RE
+.sp
+
+
+.TP 2m
+\fB\-\-cpu\fR=\fICPU\fR
+Set a CPU limit in Kubernetes cpu units. Ex: .5, 500m, 2.
+
+.TP 2m
+\fB\-\-image\fR=\fIIMAGE\fR
+Path to the GCR container to deploy.
+
+.TP 2m
+\fB\-\-memory\fR=\fIMEMORY\fR
+Set a memory limit. Ex: 1Gi, 512Mi.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region in which the resource can be found. Alternatively, set the property
+[run/region].
+
+.TP 2m
+\fB\-\-timeout\fR=\fITIMEOUT\fR
+Set the maximum request execution time (timeout). It is specified as a duration;
+for example, "10m5s" is ten minutes, and five seconds. If you don't specify a
+unit, seconds is assumed. For example, "10" is 10 seconds.
+
+.TP 2m
+
+These flags modify the Cloud SQL instances this Service connects to. You can
+specify a name of a Cloud SQL instance if it's in the same project and region as
+your Cloud Run service; otherwise specify <project>:<region>:<instance> for the
+instance. At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-add\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]
+Append the given values to the current Cloud SQL instances.
+
+.TP 2m
+\fB\-\-clear\-cloudsql\-instances\fR
+Empty the current Cloud SQL instances.
+
+.TP 2m
+\fB\-\-remove\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]
+Remove the given values from the current Cloud SQL instances.
+
+.TP 2m
+\fB\-\-set\-cloudsql\-instances\fR=[\fICLOUDSQL\-INSTANCES\fR,...]
+Completely replace the current Cloud SQL instances with the given values.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-env\-vars\fR
+Remove all environment variables.
+
+.TP 2m
+\fB\-\-set\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of key\-value pairs to set as environment variables. All existing
+environment variables will be removed first.
+
+.TP 2m
+
+Only \-\-update\-env\-vars and \-\-remove\-env\-vars can be used together. If
+both are specified, \-\-remove\-env\-vars will be applied first.
+
+.RS 2m
+.TP 2m
+\fB\-\-remove\-env\-vars\fR=[\fIKEY\fR,...]
+List of environment variables to be removed.
+
+.TP 2m
+\fB\-\-update\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of key\-value pairs to set as environment variables.
+
+.RE
+.RE
+.sp
+.TP 2m
+
+Cluster resource \- Specific to Cloud Run on Kubernetes Engine: Kubernetes
+Engine cluster to connect to. The arguments in this group can be used to specify
+the attributes of this resource. (NOTE) Some attributes are not given arguments
+in this group but can be set in other ways. To set the [project] attribute:
+provide the argument [\-\-cluster] on the command line with a fully specified
+name; set the property [run/cluster] with a fully specified name; specify the
+cluster from a list of available clusters with a fully specified name; provide
+the argument [\-\-project] on the command line; set the property [core/project].
+
+.RS 2m
+.TP 2m
+\fB\-\-cluster\fR=\fICLUSTER\fR
+ID of the cluster or fully qualified identifier for the cluster.
+
+.TP 2m
+\fB\-\-cluster\-location\fR=\fICLUSTER_LOCATION\fR
+Specific to Cloud Run on Kubernetes Engine: Zone in which the cluster is
+located. Alternatively, set the property [run/cluster_location].
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To deploy a container to the service \f5my\-backend\fR on Cloud Run:
+
+.RS 2m
+$ gcloud beta run deploy my\-backend \-\-image gcr.io/my/image
+.RE
+
+You may also omit the service name. Then a prompt will be displayed with a
+suggested default value:
+
+.RS 2m
+$ gcloud beta run deploy \-\-image gcr.io/my/image
+.RE
+
+To deploy to Cloud Run on Kubernetes Engine, you need to specify a cluster:
+
+.RS 2m
+$ gcloud beta run deploy \-\-image gcr.io/my/image \-\-cluster my\-cluster
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha run deploy
+.RE
+

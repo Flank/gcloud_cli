@@ -89,3 +89,8 @@ class WorkflowTemplatesJobSparkRUnitTestBeta(WorkflowTemplatesJobSparkRUnitTest,
         '{1} -- foo --bar baz '.format(self.WORKFLOW_TEMPLATE,
                                        self.R_SCRIPT_URI))
     self.AssertMessagesEqual(expected, result)
+
+
+class WorkflowTemplatesJobSparkRUnitTestAlpha(
+    WorkflowTemplatesJobSparkRUnitTestBeta, base.DataprocTestBaseAlpha):
+  pass

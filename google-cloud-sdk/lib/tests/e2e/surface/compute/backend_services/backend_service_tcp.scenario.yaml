@@ -80,7 +80,9 @@ summary:
 
 
 actions:
-
+- define_reference:
+    reference: compute-uri
+    value: www.googleapis.com/compute
 
 - define_reference:
     reference: api-version
@@ -155,7 +157,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices?alt=json
           method: POST
           headers: {}
           body:
@@ -189,7 +191,7 @@ actions:
         Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -233,7 +235,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$/addInstances?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$/addInstances?alt=json
           method: POST
           headers: {}
           body:
@@ -266,7 +268,7 @@ actions:
         Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instanceGroups/$$ig$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -299,7 +301,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -332,7 +334,7 @@ actions:
               drainingTimeoutSec: 10
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$?alt=json
           method: PUT
           headers: {}
           body:
@@ -379,7 +381,7 @@ actions:
         Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -426,7 +428,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -464,7 +466,7 @@ actions:
               drainingTimeoutSec: 10
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$?alt=json
           method: PUT
           headers: {}
           body:
@@ -513,7 +515,7 @@ actions:
         Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -565,7 +567,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -603,7 +605,7 @@ actions:
               drainingTimeoutSec: 10
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$?alt=json
           method: PUT
           headers: {}
           body:
@@ -651,7 +653,7 @@ actions:
         Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -702,7 +704,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$tcp-bs$$?alt=json
           method: DELETE
           headers: {}
           body: null

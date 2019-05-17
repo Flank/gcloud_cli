@@ -69,7 +69,8 @@ class DataflowMockingTestBase(sdk_test_base.WithFakeAuth, DataflowTestBase):
                    filter=None,
                    page_token=None,
                    next_page_token=None,
-                   location=None):
+                   location=None,
+                   page_size=DEFAULT_PAGE_SIZE):
     req_class = (MESSAGE_MODULE.DataflowProjectsLocationsJobsListRequest)
 
     location = location or DEFAULT_REGION
@@ -80,7 +81,7 @@ class DataflowMockingTestBase(sdk_test_base.WithFakeAuth, DataflowTestBase):
             location=location,
             pageToken=page_token,
             filter=filter or req_class.FilterValueValuesEnum.ALL,
-            pageSize=DEFAULT_PAGE_SIZE,
+            pageSize=page_size,
             view=None),
         response=MESSAGE_MODULE.ListJobsResponse(
             jobs=jobs, nextPageToken=next_page_token))
@@ -91,7 +92,8 @@ class DataflowMockingTestBase(sdk_test_base.WithFakeAuth, DataflowTestBase):
                              jobs,
                              filter=None,
                              page_token=None,
-                             next_page_token=None):
+                             next_page_token=None,
+                             page_size=DEFAULT_PAGE_SIZE):
     req_class = (MESSAGE_MODULE.DataflowProjectsJobsAggregatedRequest)
 
     self.mocked_client.projects_jobs.Aggregated.Expect(
@@ -99,7 +101,7 @@ class DataflowMockingTestBase(sdk_test_base.WithFakeAuth, DataflowTestBase):
             projectId=self.Project(),
             pageToken=page_token,
             filter=filter or req_class.FilterValueValuesEnum.ALL,
-            pageSize=DEFAULT_PAGE_SIZE,
+            pageSize=page_size,
             view=None),
         response=MESSAGE_MODULE.ListJobsResponse(
             jobs=jobs, nextPageToken=next_page_token))
@@ -126,7 +128,11 @@ class DataflowMockingTestBase(sdk_test_base.WithFakeAuth, DataflowTestBase):
                  job_name=None,
                  service_account_email=None,
                  zone=None,
-                 max_workers=None):
+                 max_workers=None,
+                 num_workers=None,
+                 worker_machine_type=None,
+                 network=None,
+                 subnetwork=None):
     run_job_req_body = MESSAGE_MODULE.CreateJobFromTemplateRequest
     run_job_req_class = (
         MESSAGE_MODULE.DataflowProjectsLocationsTemplatesCreateRequest)
@@ -150,6 +156,10 @@ class DataflowMockingTestBase(sdk_test_base.WithFakeAuth, DataflowTestBase):
             serviceAccountEmail=service_account_email,
             zone=zone,
             maxWorkers=max_workers,
+            numWorkers=num_workers,
+            network=network,
+            subnetwork=subnetwork,
+            machineType=worker_machine_type,
         ),
         parameters=additional_properties)
 

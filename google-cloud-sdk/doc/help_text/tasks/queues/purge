@@ -1,0 +1,34 @@
+NAME
+    gcloud tasks queues purge - purge a queue by deleting all of its tasks
+
+SYNOPSIS
+    gcloud tasks queues purge QUEUE [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    This command purges a queue by deleting all of its tasks. Purge operations
+    can take up to one minute to take effect. Tasks might be dispatched before
+    the purge takes effect. A purge is irreversible. All tasks created before
+    this command is run are permanently deleted.
+
+POSITIONAL ARGUMENTS
+     QUEUE
+        The queue to purge.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+EXAMPLES
+    To purge a queue:
+
+        $ gcloud tasks queues purge my-queue
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha tasks queues purge
+        $ gcloud beta tasks queues purge
+

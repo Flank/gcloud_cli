@@ -1,0 +1,68 @@
+
+.TH "GCLOUD_ACCESS\-CONTEXT\-MANAGER_POLICIES_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud access\-context\-manager policies describe \- show details about an access policy
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud access\-context\-manager policies describe\fR [\fIPOLICY\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Show details about a given access policy.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Policy resource \- The access level you want to show details about. This
+represents a Cloud resource.
+
+.RS 2m
+.TP 2m
+[\fIPOLICY\fR]
+ID of the policy or fully qualified identifier for the policy.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBaccesscontextmanager/v1\fR API. The full documentation
+for this API can be found at:
+https://cloud.google.com/access\-context\-manager/docs/reference/rest/
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha access\-context\-manager policies describe
+$ gcloud beta access\-context\-manager policies describe
+.RE
+

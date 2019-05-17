@@ -6,12 +6,14 @@ SYNOPSIS
     gcloud beta app repair [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) For example, this command will restore the App Engine service
-    account if it has been deleted.
+    (BETA) For example, this command will restore the App Engine staging bucket
+    if it has been deleted. It will no longer restore the service account,
+    instead, the IAM service account undelete API must be used for the purpose.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

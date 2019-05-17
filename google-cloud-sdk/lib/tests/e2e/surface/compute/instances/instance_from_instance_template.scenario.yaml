@@ -34,6 +34,9 @@ summary:
       Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$gcloud-compute-test-container$$].
 actions:
 - define_reference:
+    reference: compute-uri
+    value: www.googleapis.com/compute
+- define_reference:
     reference: my-zone
     value: us-central1-f
 - generate_resource_id:
@@ -50,7 +53,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/debian-cloud/global/images/family/debian-9?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/debian-cloud/global/images/family/debian-9?alt=json
           method: GET
           headers: {}
           body: null
@@ -82,7 +85,7 @@ actions:
             kind: compute#image
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates?alt=json
           method: POST
           headers: {}
           body:
@@ -137,7 +140,7 @@ actions:
         Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$instance-from-instance-template$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$instance-from-instance-template$$?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$instance-from-instance-template$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -201,7 +204,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -226,7 +229,7 @@ actions:
             kind: compute#zone
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing?alt=json
           method: GET
           headers: {}
           body: null
@@ -254,7 +257,7 @@ actions:
             kind: compute#project
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances?alt=json&sourceInstanceTemplate=https%3A%2F%2Fwww.googleapis.com%2Fcompute%2Falpha%2Fprojects%2Fcloud-sdk-integration-testing%2Fglobal%2FinstanceTemplates%2F$$instance-from-instance-template$$
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances?alt=json&sourceInstanceTemplate=https%3A%2F%2Fwww.googleapis.com%2Fcompute%2Falpha%2Fprojects%2Fcloud-sdk-integration-testing%2Fglobal%2FinstanceTemplates%2F$$instance-from-instance-template$$
           method: POST
           headers: {}
           body:
@@ -283,7 +286,7 @@ actions:
         Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$gcloud-compute-test$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$gcloud-compute-test$$?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$gcloud-compute-test$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -361,7 +364,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -386,7 +389,7 @@ actions:
             kind: compute#zone
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cos-cloud/global/images?alt=json&maxResults=500
+          uri: https://$$compute-uri$$/alpha/projects/cos-cloud/global/images?alt=json&maxResults=500
           method: GET
           headers: {}
           body: null
@@ -5936,7 +5939,7 @@ actions:
             kind: compute#imageList
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances?alt=json&sourceInstanceTemplate=https%3A%2F%2Fwww.googleapis.com%2Fcompute%2Falpha%2Fprojects%2Fcloud-sdk-integration-testing%2Fglobal%2FinstanceTemplates%2F$$instance-from-instance-template$$
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances?alt=json&sourceInstanceTemplate=https%3A%2F%2Fwww.googleapis.com%2Fcompute%2Falpha%2Fprojects%2Fcloud-sdk-integration-testing%2Fglobal%2FinstanceTemplates%2F$$instance-from-instance-template$$
           method: POST
           headers: {}
           body:
@@ -5986,7 +5989,7 @@ actions:
         Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$gcloud-compute-test-container$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$gcloud-compute-test-container$$?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$gcloud-compute-test-container$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -6085,7 +6088,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$instance-from-instance-template$$?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$instance-from-instance-template$$?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -6116,7 +6119,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$gcloud-compute-test$$?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$gcloud-compute-test$$?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -6149,7 +6152,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$gcloud-compute-test-container$$?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$gcloud-compute-test-container$$?alt=json
           method: DELETE
           headers: {}
           body: null

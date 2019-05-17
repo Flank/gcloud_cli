@@ -1,0 +1,101 @@
+title: cloud domains list test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      domains registrations list
+  - stdout: |
+      DOMAIN           STATE        EXPIRE_TIME
+      example.com      ACTIVE       2019-11-23T11:15:09Z
+      google.com       ACTIVE       2020-01-11T10:12:09Z
+      transferred.com  TRANSFERRED
+actions:
+- execute_command:
+    command: |
+      domains registrations list
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha1/projects/fake-project/locations/global/registrations?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "registrations": [
+                {
+                  "name": "projects/fake-project/locations/global/registrations/example.com",
+                  "domainName": "example.com",
+                  "createTime": "2018-11-23T11:15:04.123212416Z",
+                  "updateTime": "2018-11-28T12:49:34.888985282Z",
+                  "expireTime": "2019-11-23T11:15:09Z",
+                  "state": "ACTIVE",
+                  "dnsConfig": {},
+                  "whoisConfig": {
+                    "privacy": "USE_WHOIS_PRIVACY_PROXY",
+                    "registrantContact": {
+                      "postalAddress": {
+                        "regionCode": "US",
+                        "postalCode": "94043",
+                        "administrativeArea": "CA",
+                        "locality": "Mountain View",
+                        "addressLines": [
+                          "1600 Amphitheatre Pkwy"
+                        ],
+                        "recipients": [
+                          "Test User"
+                        ]
+                      },
+                      "email": "testuser@google.com",
+                      "phoneNumber": "+1.1234567890"
+                    }
+                  }
+                },
+                {
+                  "name": "projects/fake-project/locations/global/registrations/google.com",
+                  "domainName": "google.com",
+                  "createTime": "2019-01-11T10:12:04.123212416Z",
+                  "updateTime": "2019-01-11T10:42:34.888985282Z",
+                  "expireTime": "2020-01-11T10:12:09Z",
+                  "state": "ACTIVE",
+                  "dnsConfig": {},
+                  "whoisConfig": {
+                    "privacy": "PUBLISH_REDACTED_WHOIS_DATA",
+                    "registrantContact": {
+                      "postalAddress": {
+                        "regionCode": "US",
+                        "postalCode": "94043",
+                        "administrativeArea": "CA",
+                        "locality": "Mountain View",
+                        "addressLines": [
+                          "1600 Amphitheatre Pkwy"
+                        ],
+                        "recipients": [
+                          "Test User"
+                        ]
+                      },
+                      "email": "testuser@example.com",
+                      "phoneNumber": "+1.1234567890"
+                    }
+                  }
+                },
+                {
+                  "name": "projects/fake-project/locations/global/registrations/transferred.com",
+                  "domainName": "transferred.com",
+                  "createTime": "2018-11-23T11:15:04.123212416Z",
+                  "updateTime": "2018-11-28T12:49:34.888985282Z",
+                  "state": "TRANSFERRED"
+                }
+              ]
+            }
+    - expect_stdout: |
+        DOMAIN           STATE        EXPIRE_TIME
+        example.com      ACTIVE       2019-11-23T11:15:09Z
+        google.com       ACTIVE       2020-01-11T10:12:09Z
+        transferred.com  TRANSFERRED
+    - expect_exit:
+        code: 0

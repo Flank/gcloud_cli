@@ -286,10 +286,12 @@ class LongRunningRecognizeRequest(_messages.Message):
     audio: *Required* The audio data to be recognized.
     config: *Required* Provides information to the recognizer that specifies
       how to process the request.
+    name: *Optional* The name of the model to use for recognition.
   """
 
   audio = _messages.MessageField('RecognitionAudio', 1)
   config = _messages.MessageField('RecognitionConfig', 2)
+  name = _messages.StringField(3)
 
 
 class LongRunningRecognizeResponse(_messages.Message):
@@ -382,7 +384,8 @@ class Operation(_messages.Message):
       if any.
     name: The server-assigned name, which is only unique within the same
       service that originally returns it. If you use the default HTTP mapping,
-      the `name` should have the format of `operations/some/unique/name`.
+      the `name` should be a resource name ending with
+      `operations/{unique_id}`.
     response: The normal response of the operation in case of success.  If the
       original method returns no data on success, such as `Delete`, the
       response is `google.protobuf.Empty`.  If the original method is standard
@@ -531,7 +534,7 @@ class RecognitionConfig(_messages.Message):
       hypotheses. Note: This is currently offered as an experimental service,
       complimentary to all users. In the future this may be exclusively
       available as a premium feature.
-    enableSeparateRecognitionPerChannel: This needs to be set to 'true'
+    enableSeparateRecognitionPerChannel: This needs to be set to `true`
       explicitly and `audio_channel_count` > 1 to get each channel recognized
       separately. The recognition result will contain a `channel_tag` field to
       state which channel that result belongs to. If this is not true, we will
@@ -588,8 +591,8 @@ class RecognitionConfig(_messages.Message):
       `RecognitionAudio` messages. Valid values are: 8000-48000. 16000 is
       optimal. For best results, set the sampling rate of the audio source to
       16000 Hz. If that's not possible, use the native sample rate of the
-      audio source (instead of re-sampling). This field is optional for `FLAC`
-      and `WAV` audio files and required for all other audio formats. For
+      audio source (instead of re-sampling). This field is optional for FLAC
+      and WAV audio files, but is required for all other audio formats. For
       details, see AudioEncoding.
     speechContexts: *Optional* array of SpeechContext. A means to provide
       context to assist the speech recognition. For more information, see
@@ -642,6 +645,9 @@ class RecognitionConfig(_messages.Message):
         as specified in RFC 5574. In other words, each RTP header is replaced
         with a single byte containing the block length. Only Speex wideband is
         supported. `sample_rate_hertz` must be 16000.
+      MP3: MP3 audio. Support all standard MP3 bitrates (which range from
+        32-320 kbps) If using this encoding, then 'sample_rate_hertz' can be
+        optionally unset if not known.
     """
     ENCODING_UNSPECIFIED = 0
     LINEAR16 = 1
@@ -651,6 +657,7 @@ class RecognitionConfig(_messages.Message):
     AMR_WB = 5
     OGG_OPUS = 6
     SPEEX_WITH_HEADER_BYTE = 7
+    MP3 = 8
 
   alternativeLanguageCodes = _messages.StringField(1, repeated=True)
   audioChannelCount = _messages.IntegerField(2, variant=_messages.Variant.INT32)
@@ -813,10 +820,12 @@ class RecognizeRequest(_messages.Message):
     audio: *Required* The audio data to be recognized.
     config: *Required* Provides information to the recognizer that specifies
       how to process the request.
+    name: *Optional* The name of the model to use for recognition.
   """
 
   audio = _messages.MessageField('RecognitionAudio', 1)
   config = _messages.MessageField('RecognitionConfig', 2)
+  name = _messages.StringField(3)
 
 
 class RecognizeResponse(_messages.Message):
@@ -956,6 +965,18 @@ class SpeechProjectsLocationsDatasetsCreateRequest(_messages.Message):
   parent = _messages.StringField(2, required=True)
 
 
+class SpeechProjectsLocationsDatasetsDeleteRequest(_messages.Message):
+  r"""A SpeechProjectsLocationsDatasetsDeleteRequest object.
+
+  Fields:
+    name: Required. Resource name of the dataset. Has the format :-
+      'projects/{project_number}/locations/{location_id}/datasets/{dataset_id}
+      '
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
 class SpeechProjectsLocationsDatasetsGetRequest(_messages.Message):
   r"""A SpeechProjectsLocationsDatasetsGetRequest object.
 
@@ -1006,6 +1027,20 @@ class SpeechProjectsLocationsDatasetsRefreshDataRequest(_messages.Message):
   refreshDataRequest = _messages.MessageField('RefreshDataRequest', 2)
 
 
+class SpeechProjectsLocationsLogDataRequest(_messages.Message):
+  r"""A SpeechProjectsLocationsLogDataRequest object.
+
+  Fields:
+    bucketName: Optional. Bucket name to delete all logs from. If empty, all
+      logs are deleted.
+    parent: Required. Resource name of the parent. Has the format :-
+      "projects/{project_id}/locations/{location_id}"
+  """
+
+  bucketName = _messages.StringField(1)
+  parent = _messages.StringField(2, required=True)
+
+
 class SpeechProjectsLocationsLogDataStatsListRequest(_messages.Message):
   r"""A SpeechProjectsLocationsLogDataStatsListRequest object.
 
@@ -1032,6 +1067,17 @@ class SpeechProjectsLocationsModelsCreateRequest(_messages.Message):
   model = _messages.MessageField('Model', 1)
   name = _messages.StringField(2)
   parent = _messages.StringField(3, required=True)
+
+
+class SpeechProjectsLocationsModelsDeleteRequest(_messages.Message):
+  r"""A SpeechProjectsLocationsModelsDeleteRequest object.
+
+  Fields:
+    name: Required. Resource name of the model. Has the format :-
+      'projects/{project_id}/locations/{location_id}/models/{model_id}'
+  """
+
+  name = _messages.StringField(1, required=True)
 
 
 class SpeechProjectsLocationsModelsDeployRequest(_messages.Message):
@@ -1079,6 +1125,42 @@ class SpeechProjectsLocationsModelsListRequest(_messages.Message):
   pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
   pageToken = _messages.StringField(3)
   parent = _messages.StringField(4, required=True)
+
+
+class SpeechProjectsLocationsOperationsGetRequest(_messages.Message):
+  r"""A SpeechProjectsLocationsOperationsGetRequest object.
+
+  Fields:
+    name: The name of the operation resource.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class SpeechProjectsLocationsOperationsListRequest(_messages.Message):
+  r"""A SpeechProjectsLocationsOperationsListRequest object.
+
+  Fields:
+    filter: The standard list filter.
+    name: The name of the operation's parent resource.
+    pageSize: The standard list page size.
+    pageToken: The standard list page token.
+  """
+
+  filter = _messages.StringField(1)
+  name = _messages.StringField(2, required=True)
+  pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(4)
+
+
+class SpeechProjectsOperationsManualRecognitionTasksGetRequest(_messages.Message):
+  r"""A SpeechProjectsOperationsManualRecognitionTasksGetRequest object.
+
+  Fields:
+    name: The name of the operation resource.
+  """
+
+  name = _messages.StringField(1, required=True)
 
 
 class SpeechRecognitionAlternative(_messages.Message):

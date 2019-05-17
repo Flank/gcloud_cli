@@ -22,8 +22,7 @@ from googlecloudsdk.api_lib.filestore import filestore_client
 
 
 def GetTestCloudFilestoreInstancesList():
-  messages = filestore_client.GetMessages(
-      filestore_client.FILESTORE_ALPHA_API_VERSION)
+  messages = filestore_client.GetMessages(filestore_client.ALPHA_API_VERSION)
   return [
       messages.Instance(name='Instance1'),
       messages.Instance(name='Instance2'),
@@ -31,6 +30,5 @@ def GetTestCloudFilestoreInstancesList():
 
 
 def GetTestCloudFilestoreInstance():
-  messages = filestore_client.GetMessages(
-      filestore_client.FILESTORE_ALPHA_API_VERSION)
+  messages = filestore_client.GetMessages(filestore_client.ALPHA_API_VERSION)
   return messages.Instance(name='My Cloud Filestore Instance')

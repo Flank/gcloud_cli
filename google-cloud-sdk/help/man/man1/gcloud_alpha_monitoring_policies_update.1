@@ -11,7 +11,7 @@ gcloud alpha monitoring policies update \- updates an alerting policy
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha monitoring policies update\fR \fIALERT_POLICY\fR [\fB\-\-fields\fR=[\fIfield\fR,...]\ |\ \fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR\ \fB\-\-[no\-]enabled\fR\ \fB\-\-add\-notification\-channels\fR=[\fINOTIFICATION\-CHANNELS\fR,...]\ |\ \fB\-\-clear\-notification\-channels\fR\ |\ \fB\-\-remove\-notification\-channels\fR=[\fINOTIFICATION\-CHANNELS\fR,...]\ |\ \fB\-\-set\-notification\-channels\fR=[\fINOTIFICATION\-CHANNELS\fR,...]\ \fB\-\-documentation\-format\fR=\fIDOCUMENTATION_FORMAT\fR\ \fB\-\-documentation\fR=\fIDOCUMENTATION\fR\ |\ \fB\-\-documentation\-from\-file\fR=\fIDOCUMENTATION_FROM_FILE\fR\ \fB\-\-update\-user\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-user\-labels\fR\ |\ \fB\-\-remove\-user\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-policy\fR=\fIPOLICY\fR\ |\ \fB\-\-policy\-from\-file\fR=\fIPOLICY_FROM_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha monitoring policies update\fR \fIALERT_POLICY\fR [\fB\-\-fields\fR=[\fIfield\fR,...]\ |\ \fB\-\-combiner\fR=\fICOMBINER\fR\ \fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR\ \fB\-\-[no\-]enabled\fR\ \fB\-\-add\-notification\-channels\fR=[\fINOTIFICATION\-CHANNELS\fR,...]\ |\ \fB\-\-clear\-notification\-channels\fR\ |\ \fB\-\-remove\-notification\-channels\fR=[\fINOTIFICATION\-CHANNELS\fR,...]\ |\ \fB\-\-set\-notification\-channels\fR=[\fINOTIFICATION\-CHANNELS\fR,...]\ \fB\-\-documentation\-format\fR=\fIDOCUMENTATION_FORMAT\fR\ \fB\-\-documentation\fR=\fIDOCUMENTATION\fR\ |\ \fB\-\-documentation\-from\-file\fR=\fIDOCUMENTATION_FROM_FILE\fR\ \fB\-\-update\-user\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ \fB\-\-clear\-user\-labels\fR\ |\ \fB\-\-remove\-user\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-policy\fR=\fIPOLICY\fR\ |\ \fB\-\-policy\-from\-file\fR=\fIPOLICY_FROM_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -80,6 +80,31 @@ Policy Settings. If any of these are specified, they will overwrite fields in
 the \f5\-\-policy\fR or \f5\-\-policy\-from\-file\fR flags if specified.
 
 .RS 2m
+.TP 2m
+\fB\-\-combiner\fR=\fICOMBINER\fR
+The combiner for the Alert Policy. \fICOMBINER\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBAND\fR
+An incident is created only if all conditions are met simultaneously. This
+combiner is satisfied if all conditions are met, even if they are met on
+completely different resources.
+.TP 2m
+\fBAND_WITH_MATCHING_RESOURCE\fR
+Combine conditions using logical AND operator, but unlike the regular AND
+option, an incident is created only if all conditions are met simultaneously on
+at least one resource.
+.TP 2m
+\fBCOMBINE_UNSPECIFIED\fR
+An unspecified combiner
+.TP 2m
+\fBOR\fR
+An incident is created if any of the listed conditions is met.
+.RE
+.sp
+
+
 .TP 2m
 \fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
 The display name for the Alert Policy.
@@ -207,10 +232,11 @@ The path to a JSON or YAML file containing the policy.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

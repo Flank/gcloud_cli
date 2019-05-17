@@ -486,7 +486,8 @@ class FailedEvent(_messages.Message):
         for serious errors.  HTTP Mapping: 500 Internal Server Error
       UNAVAILABLE: The service is currently unavailable.  This is most likely
         a transient condition, which can be corrected by retrying with a
-        backoff.  See the guidelines above for deciding between
+        backoff. Note that it is not always safe to retry non-idempotent
+        operations.  See the guidelines above for deciding between
         `FAILED_PRECONDITION`, `ABORTED`, and `UNAVAILABLE`.  HTTP Mapping:
         503 Service Unavailable
       DATA_LOSS: Unrecoverable data loss or corruption.  HTTP Mapping: 500
@@ -563,8 +564,8 @@ class GenomicsOperationsListRequest(_messages.Message):
       `projectId = my-project AND labels.color = *` * `projectId = my-project
       AND labels.color = red`
     name: The name of the operation's parent resource.
-    pageSize: The maximum number of results to return. If unspecified,
-      defaults to 256. The maximum value is 2048.
+    pageSize: The maximum number of results to return. The maximum value is
+      256.
     pageToken: The standard list page token.
   """
 
@@ -627,26 +628,6 @@ class GenomicsPipelinesListRequest(_messages.Message):
   pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
   pageToken = _messages.StringField(3)
   projectId = _messages.StringField(4)
-
-
-class ImportReadGroupSetsResponse(_messages.Message):
-  r"""The read group set import response.
-
-  Fields:
-    readGroupSetIds: IDs of the read group sets that were created.
-  """
-
-  readGroupSetIds = _messages.StringField(1, repeated=True)
-
-
-class ImportVariantsResponse(_messages.Message):
-  r"""The variant data import response.
-
-  Fields:
-    callSetIds: IDs of the call sets created during the import.
-  """
-
-  callSetIds = _messages.StringField(1, repeated=True)
 
 
 class ListOperationsResponse(_messages.Message):
@@ -717,9 +698,7 @@ class Operation(_messages.Message):
   Messages:
     MetadataValue: An OperationMetadata or Metadata object. This will always
       be returned with the Operation.
-    ResponseValue: If importing ReadGroupSets, an ImportReadGroupSetsResponse
-      is returned. If importing Variants, an ImportVariantsResponse is
-      returned. For pipelines and exports, an Empty response is returned.
+    ResponseValue: An Empty object.
 
   Fields:
     done: If the value is `false`, it means the operation is still in
@@ -732,9 +711,7 @@ class Operation(_messages.Message):
     name: The server-assigned name, which is only unique within the same
       service that originally returns it. For example&#58; `operations
       /CJHU7Oi_ChDrveSpBRjfuL-qzoWAgEw`
-    response: If importing ReadGroupSets, an ImportReadGroupSetsResponse is
-      returned. If importing Variants, an ImportVariantsResponse is returned.
-      For pipelines and exports, an Empty response is returned.
+    response: An Empty object.
   """
 
   @encoding.MapUnrecognizedFields('additionalProperties')
@@ -765,9 +742,7 @@ class Operation(_messages.Message):
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class ResponseValue(_messages.Message):
-    r"""If importing ReadGroupSets, an ImportReadGroupSetsResponse is
-    returned. If importing Variants, an ImportVariantsResponse is returned.
-    For pipelines and exports, an Empty response is returned.
+    r"""An Empty object.
 
     Messages:
       AdditionalProperty: An additional property for a ResponseValue object.
@@ -1421,7 +1396,8 @@ class SetOperationStatusRequest(_messages.Message):
         for serious errors.  HTTP Mapping: 500 Internal Server Error
       UNAVAILABLE: The service is currently unavailable.  This is most likely
         a transient condition, which can be corrected by retrying with a
-        backoff.  See the guidelines above for deciding between
+        backoff. Note that it is not always safe to retry non-idempotent
+        operations.  See the guidelines above for deciding between
         `FAILED_PRECONDITION`, `ABORTED`, and `UNAVAILABLE`.  HTTP Mapping:
         503 Service Unavailable
       DATA_LOSS: Unrecoverable data loss or corruption.  HTTP Mapping: 500

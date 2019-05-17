@@ -1,0 +1,52 @@
+NAME
+    gcloud alpha dataproc workflow-templates delete - delete a workflow
+        template
+
+SYNOPSIS
+    gcloud alpha dataproc workflow-templates delete
+        (TEMPLATE : --region=REGION) [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Delete a workflow template.
+
+POSITIONAL ARGUMENTS
+     Template resource - The name of the workflow template to delete. The
+     arguments in this group can be used to specify the attributes of this
+     resource. (NOTE) Some attributes are not given arguments in this group but
+     can be set in other ways. To set the [project] attribute: provide the
+     argument [TEMPLATE] on the command line with a fully specified name;
+     provide the argument [--project] on the command line; set the property
+     [core/project]. This must be specified.
+
+       TEMPLATE
+          ID of the template or fully qualified identifier for the template.
+          This positional must be specified if any of the other arguments in
+          this group are specified.
+
+       --region=REGION
+          Cloud Dataproc region for the template. Each Cloud Dataproc region
+          constitutes an independent resource namespace constrained to
+          deploying instances into Google Compute Engine zones inside the
+          region. The default value of global is a special multi-region
+          namespace which is capable of deploying instances into all Google
+          Compute Engine zones globally, and is disjoint from other Cloud
+          Dataproc regions. Overrides the default dataproc/region property
+          value for this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
+
+        $ gcloud dataproc workflow-templates delete
+        $ gcloud beta dataproc workflow-templates delete
+

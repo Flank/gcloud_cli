@@ -1,0 +1,115 @@
+
+.TH "GCLOUD_ALPHA_RUN_DOMAIN\-MAPPINGS_DELETE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha run domain\-mappings delete \- delete domain mappings
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha run domain\-mappings delete\fR (\fB\-\-domain\fR=\fIDOMAIN\fR\ :\ \fB\-\-namespace\fR=\fINAMESPACE\fR) [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-cluster\fR=\fICLUSTER\fR\ \fB\-\-cluster\-location\fR=\fICLUSTER_LOCATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Delete domain mappings.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+DomainMapping resource \- Domain name is the ID of DomainMapping resource. The
+arguments in this group can be used to specify the attributes of this resource.
+This must be specified.
+
+.RS 2m
+.TP 2m
+\fB\-\-domain\fR=\fIDOMAIN\fR
+ID of the DomainMapping or fully qualified identifier for the DomainMapping.
+This flag must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-namespace\fR=\fINAMESPACE\fR
+Specific to Cloud Run on Kubernetes Engine: Kubernetes namespace for the
+DomainMapping
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region in which the resource can be found. Alternatively, set the property
+[run/region].
+
+.TP 2m
+
+Cluster resource \- Specific to Cloud Run on Kubernetes Engine: Kubernetes
+Engine cluster to connect to. The arguments in this group can be used to specify
+the attributes of this resource. (NOTE) Some attributes are not given arguments
+in this group but can be set in other ways. To set the [project] attribute:
+provide the argument [\-\-cluster] on the command line with a fully specified
+name; set the property [run/cluster] with a fully specified name; specify the
+cluster from a list of available clusters with a fully specified name; provide
+the argument [\-\-project] on the command line; set the property [core/project].
+
+.RS 2m
+.TP 2m
+\fB\-\-cluster\fR=\fICLUSTER\fR
+ID of the cluster or fully qualified identifier for the cluster.
+
+.TP 2m
+\fB\-\-cluster\-location\fR=\fICLUSTER_LOCATION\fR
+Specific to Cloud Run on Kubernetes Engine: Zone in which the cluster is
+located. Alternatively, set the property [run/cluster_location].
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To delete a Cloud Run domain mapping, run:
+
+.RS 2m
+$ gcloud alpha run domain\-mappings delete \-\-domain www.example.com
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. This variant is also available:
+
+.RS 2m
+$ gcloud beta run domain\-mappings delete
+.RE
+

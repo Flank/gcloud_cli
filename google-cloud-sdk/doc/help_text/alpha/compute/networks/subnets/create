@@ -8,6 +8,7 @@ SYNOPSIS
         [--description=DESCRIPTION] [--enable-flow-logs]
         [--enable-private-ip-google-access] [--enable-private-ipv6-access]
         [--flow-sampling=FLOW_SAMPLING] [--metadata=METADATA]
+        [--private-ipv6-google-access-type=PRIVATE_IPV6_GOOGLE_ACCESS_TYPE]
         [--purpose=PURPOSE] [--region=REGION] [--role=ROLE]
         [--secondary-range=PROPERTY=VALUE,[...]] [GCLOUD_WIDE_FLAG ...]
 
@@ -32,9 +33,9 @@ OPTIONAL FLAGS
         enabled. Toggles the aggregation interval for collecting flow logs.
         Increasing the interval time will reduce the amount of generated flow
         logs for long lasting connections. Default is an interval of 5 seconds
-        per connection. AGGREGATION_INTERVAL must be one of: interval-5-sec,
-        interval-30-sec, interval-1-min, interval-5-min, interval-10-min,
-        interval-15-min.
+        per connection. AGGREGATION_INTERVAL must be one of: interval-10-min,
+        interval-15-min, interval-1-min, interval-30-sec, interval-5-min,
+        interval-5-sec.
 
      --description=DESCRIPTION
         An optional description of this subnetwork.
@@ -62,7 +63,12 @@ OPTIONAL FLAGS
         Can only be specified if VPC flow logging for this subnetwork is
         enabled. Configures whether metadata fields should be added to the
         reported VPC flow logs. Default is to include all metadata. METADATA
-        must be one of: include-all-metadata, exclude-all-metadata.
+        must be one of: exclude-all-metadata, include-all-metadata.
+
+     --private-ipv6-google-access-type=PRIVATE_IPV6_GOOGLE_ACCESS_TYPE
+        The private IPv6 google access type for the VMs in this subnet.
+        PRIVATE_IPV6_GOOGLE_ACCESS_TYPE must be one of: disable,
+        enable-bidirectional-access, enable-outbound-vm-access.
 
      --purpose=PURPOSE
         The purpose of this subnetwork. PURPOSE must be one of:
@@ -115,8 +121,9 @@ OPTIONAL FLAGS
         * RANGE - IP range in CIDR format.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

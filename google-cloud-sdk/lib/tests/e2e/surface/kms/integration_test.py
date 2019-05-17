@@ -34,14 +34,17 @@ class CryptoKeysTest(base.KmsE2ETestBase, parameterized.TestCase):
   def SetUp(self):
     self.glbl = 'global'
     self.keyring = next(self.keyring_namer)
+    self.keyrings_to_clean = [{'name': self.keyring, 'location': self.glbl}]
     self.RunKms('keyrings', 'create', self.keyring, '--location', self.glbl)
 
   def TearDown(self):
-    self.cleanupCryptoKeyVersionsUnderKeyRing(self.keyring)
+    for keyring in self.keyrings_to_clean:
+      self.cleanupCryptoKeyVersionsUnderKeyRing(keyring['name'],
+                                                keyring['location'])
 
-  def cleanupCryptoKeyVersionsUnderKeyRing(self, keyring_id):
+  def cleanupCryptoKeyVersionsUnderKeyRing(self, keyring_id, location):
     keys = self.RunKms('keys', 'list', '--keyring', keyring_id, '--location',
-                       self.glbl, '--limit', '50', '--no-user-output-enabled')
+                       location, '--limit', '50', '--no-user-output-enabled')
     for ck in keys:
       self.cleanupCryptoKeyVersionsUnderKey(ck.name)
 
@@ -341,11 +344,12 @@ class CryptoKeysTest(base.KmsE2ETestBase, parameterized.TestCase):
                                        ck))
     self.AssertOutputContains('k1: v1')
 
-  @test_case.Filters.skip('Failing', 'b/112178502')
   def testEncryptDecryptWithHsmKey(self):
     kr = next(self.keyring_namer)
     # Right now creating hsm keys is only supported in us-east1 and us-west1.
-    self.RunKms('keyrings', 'create', kr, '--location', 'us-east1')
+    hsm_location = 'us-east1'
+    self.RunKms('keyrings', 'create', kr, '--location', hsm_location)
+    self.keyrings_to_clean.append({'name': kr, 'location': hsm_location})
     ck = next(self.cryptokey_namer)
     self.RunKmsAlpha('keys', 'create', ck, '--keyring', kr, '--location',
                      'us-east1', '--purpose', 'encryption',

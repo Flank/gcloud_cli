@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -64,6 +64,7 @@ class HttplibConnectionHandler(urllib.request.HTTPHandler,
     return self.do_open(build, req)
 
 
+# TODO(b/120992538) Use urllib3 when PROXY/USE_URLLIB3_VIA_SHIM
 def urlopen(req, data=None, timeout=60):
   """Helper function that mimics urllib2.urlopen, but adds proxy information."""
 

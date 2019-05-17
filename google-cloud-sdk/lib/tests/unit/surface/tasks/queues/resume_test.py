@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.tasks import app
 from googlecloudsdk.command_lib.tasks import constants
@@ -84,6 +85,12 @@ class QueuesResumeTest(test_base.CloudTasksTestBase):
 
     self.AssertErrContains(constants.QUEUE_MANAGEMENT_WARNING)
     self.AssertErrContains('Requested entity was not found.')
+
+
+class QueuesResumeTestBeta(QueuesResumeTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 if __name__ == '__main__':

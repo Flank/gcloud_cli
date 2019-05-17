@@ -8,26 +8,30 @@ SYNOPSIS
         [--allow-route-overlap] [--async]
         [--cluster-ipv4-cidr=CLUSTER_IPV4_CIDR]
         [--cluster-secondary-range-name=NAME]
-        [--cluster-version=CLUSTER_VERSION]
         [--create-subnetwork=[KEY=VALUE,...]]
         [--default-max-pods-per-node=DEFAULT_MAX_PODS_PER_NODE]
         [--disk-size=DISK_SIZE] [--disk-type=DISK_TYPE] [--enable-autorepair]
-        [--enable-autoupgrade] [--enable-binauthz] [--no-enable-cloud-logging]
-        [--no-enable-cloud-monitoring] [--enable-ip-alias]
+        [--no-enable-autoupgrade] [--enable-binauthz]
+        [--no-enable-cloud-logging] [--no-enable-cloud-monitoring]
+        [--enable-intra-node-visibility] [--enable-ip-alias]
         [--enable-kubernetes-alpha] [--enable-legacy-authorization]
         [--enable-network-policy] [--enable-pod-security-policy]
         [--enable-stackdriver-kubernetes] [--enable-vertical-pod-autoscaling]
         [--image-type=IMAGE_TYPE] [--issue-client-certificate]
         [--istio-config=[auth=MTLS_PERMISSIVE,...]] [--labels=[KEY=VALUE,...]]
+        [--linux-sysctls=KEY=VALUE,[KEY=VALUE,...]]
         [--machine-type=MACHINE_TYPE, -m MACHINE_TYPE]
         [--maintenance-window=MAINTENANCE_WINDOW]
         [--max-nodes-per-pool=MAX_NODES_PER_POOL]
+        [--max-pods-per-node=MAX_PODS_PER_NODE]
+        [--max-surge-upgrade=MAX_SURGE_UPGRADE]
+        [--max-unavailable-upgrade=MAX_UNAVAILABLE_UPGRADE; default=1]
         [--metadata=KEY=VALUE,[KEY=VALUE,...]]
         [--metadata-from-file=KEY=LOCAL_FILE_PATH,[...]]
         [--min-cpu-platform=PLATFORM] [--network=NETWORK]
         [--node-labels=[NODE_LABEL,...]] [--node-pool-name=NODE_POOL_NAME]
-        [--node-taints=[NODE_TAINT,...]] [--node-version=NODE_VERSION]
-        [--num-nodes=NUM_NODES; default=3] [--preemptible]
+        [--node-taints=[NODE_TAINT,...]] [--num-nodes=NUM_NODES; default=3]
+        [--preemptible] [--security-group=SECURITY_GROUP]
         [--services-ipv4-cidr=CIDR] [--services-secondary-range-name=NAME]
         [--subnetwork=SUBNETWORK] [--tags=TAG,[TAG,...]]
         [--workload-metadata-from-node=WORKLOAD_METADATA_FROM_NODE]
@@ -47,7 +51,8 @@ SYNOPSIS
           --master-authorized-networks=NETWORK,[NETWORK,...]]
         [--enable-network-egress-metering
           --resource-usage-bigquery-dataset=RESOURCE_USAGE_BIGQUERY_DATASET]
-        [--enable-private-endpoint --enable-private-nodes
+        [--enable-peering-route-sharing --enable-private-endpoint
+          --enable-private-nodes
           --master-ipv4-cidr=MASTER_IPV4_CIDR --private-cluster]
         [--enable-tpu --enable-tpu-service-networking | --tpu-ipv4-cidr=CIDR]
         [--local-ssd-count=LOCAL_SSD_COUNT
@@ -56,10 +61,12 @@ SYNOPSIS
         [--password=PASSWORD --enable-basic-auth
           | --username=USERNAME, -u USERNAME]
         [--region=REGION | --zone=ZONE, -z ZONE]
+        [--release-channel=CHANNEL
+          | --cluster-version=CLUSTER_VERSION --node-version=NODE_VERSION]
+        [--scopes=[SCOPE,...];
+          default="gke-default" --service-account=SERVICE_ACCOUNT]
         [--security-profile=SECURITY_PROFILE
-          --no-security-profile-runtime-rules]
-        [--service-account=SERVICE_ACCOUNT | --no-enable-cloud-endpoints
-          --scopes=[SCOPE,...]; default="gke-default"] [GCLOUD_WIDE_FLAG ...]
+          --no-security-profile-runtime-rules] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Create a cluster for running containers.
@@ -93,7 +100,7 @@ FLAGS
         are additional Kubernetes cluster components. Addons specified by this
         flag will be enabled. The others will be disabled. ADDON must be one
         of: HttpLoadBalancing, HorizontalPodAutoscaling, KubernetesDashboard,
-        Istio, NetworkPolicy, CloudRun.
+        Istio, NetworkPolicy, CloudRun, NodeLocalDNS.
 
      --allow-route-overlap
         Allows the provided cluster CIDRs to overlap with existing routes that
@@ -120,15 +127,6 @@ FLAGS
 
         Must be used in conjunction with '--enable-ip-alias'. Cannot be used
         with --create-subnetwork.
-
-     --cluster-version=CLUSTER_VERSION
-        The Kubernetes version to use for the master and nodes. Defaults to
-        server-specified.
-
-        The default Kubernetes version is available using the following
-        command.
-
-            $ gcloud container get-server-config
 
      --create-subnetwork=[KEY=VALUE,...]
         Create a new subnetwork for the cluster. The name and range of the
@@ -202,8 +200,10 @@ FLAGS
             $ gcloud alpha container clusters create example-cluster \
                 --enable-autoupgrade
 
-        See https://cloud.google.com/kubernetes-engine/docs/node-management for
-        more info.
+        See https://cloud.google.com/kubernetes-engine/docs/node-auto-upgrades
+        for more info.
+
+        Enabled by default, use --no-enable-autoupgrade to disable.
 
      --enable-binauthz
         Enable Binary Authorization for this cluster.
@@ -217,6 +217,17 @@ FLAGS
         Monitoring API. VM metrics will be collected by Google Compute Engine
         regardless of this setting. Enabled by default, use
         --no-enable-cloud-monitoring to disable.
+
+     --enable-intra-node-visibility
+        Enable Intra-node visibility for this cluster.
+
+        Enabling intra-node visibility makes your intra-node pod to pod traffic
+        visible to the networking fabric. With this feature, you can use VPC
+        flow logging or other VPC features for intra-node traffic.
+
+        This is a beta feature, enabling it on existing cluster causes the
+        cluster master and the cluster nodes to restart, which might cause
+        disruption.
 
      --enable-ip-alias
         Enable use of alias IPs
@@ -299,6 +310,16 @@ FLAGS
             $ gcloud alpha container clusters create example-cluster \
                 --labels=label_a=value1,label_b=,label_c=value3
 
+     --linux-sysctls=KEY=VALUE,[KEY=VALUE,...]
+        Linux kernel parameters to be applied to all nodes in the new cluster's
+        default node pool as well as the pods running on the nodes.
+
+        Example:
+
+            $ gcloud alpha container clusters create example-cluster \
+                --linux-sysctls="net.core.somaxconn=1024,net.ipv4.tcp_rmem=4096\
+             87380 6291456"
+
      --machine-type=MACHINE_TYPE, -m MACHINE_TYPE
         The type of machine to use for nodes. Defaults to n1-standard-1. The
         list of predefined machine types is available using the following
@@ -331,6 +352,40 @@ FLAGS
         that each node pool contains less than --max-nodes-per-pool nodes.
         Defaults to 1000 nodes, but can be set as low as 100 nodes per pool on
         initial create.
+
+     --max-pods-per-node=MAX_PODS_PER_NODE
+        The max number of pods per node for this node pool.
+
+        This flag sets the maximum number of pods that can be run at the same
+        time on a node. This will override the value given with
+        --default-max-pods-per-node flag set at the cluster level.
+
+        Must be used in conjunction with '--enable-ip-alias'.
+
+     --max-surge-upgrade=MAX_SURGE_UPGRADE
+        Number of extra (surge) nodes to be created on each upgrade of a node
+        pool.
+
+        Specifies the number of extra (surge) nodes to be created during this
+        node pool's upgrades. For example, running the following command will
+        result in creating an extra node each time the node pool is upgraded:
+
+            $ gcloud alpha container clusters create example-cluster \
+                --max-surge-upgrade 1
+
+     --max-unavailable-upgrade=MAX_UNAVAILABLE_UPGRADE; default=1
+        Number of nodes that can be unavailable at the same time on each
+        upgrade of a node pool.
+
+        Specifies the number of nodes that can be unavailable at the same time
+        while this node pool is being upgraded. For example, running the
+        following command will result in having 3 nodes being upgraded in
+        parallel (1 + 2), but keeping always at least 3 (5 - 2) available each
+        time the node pool is upgraded:
+
+            $ gcloud alpha container clusters create example-cluster \
+               --num-nodes=5 --max-surge-upgrade 1      \
+               --max-unavailable-upgrade=2
 
      --metadata=KEY=VALUE,[KEY=VALUE,...]
         Compute Engine metadata to be made available to the guest operating
@@ -434,14 +489,6 @@ FLAGS
         To read more about node-taints, see
         https://cloud.google.com/kubernetes-engine/docs/node-taints.
 
-     --node-version=NODE_VERSION
-        The Kubernetes version to use for nodes. Defaults to server-specified.
-
-        The default Kubernetes version is available using the following
-        command.
-
-            $ gcloud container get-server-config
-
      --num-nodes=NUM_NODES; default=3
         The number of nodes to be created in each of the cluster's zones.
 
@@ -455,6 +502,17 @@ FLAGS
         preemptible VM instances. See
         https://cloud.google.com/kubernetes-engine/docs/preemptible-vm for more
         information on how to use Preemptible VMs with Kubernetes Engine.
+
+     --security-group=SECURITY_GROUP
+        The name of the RBAC security group for use with Google security groups
+        in Kubernetes RBAC
+        (https://kubernetes.io/docs/reference/access-authn-authz/rbac/).
+
+        To include group membership as part of the claims issued by Google
+        during authentication, a group must be designated as a security group
+        by including it as a direct member of this group.
+
+        If unspecified, no groups will be returned for use with RBAC.
 
      --services-ipv4-cidr=CIDR
         Set the IP range for the services IPs.
@@ -498,19 +556,27 @@ FLAGS
         for examples.
 
      --workload-metadata-from-node=WORKLOAD_METADATA_FROM_NODE
-        Sets the node metadata option for workload metadata configuration. This
-        feature is scheduled to be deprecated in the future and later removed.
+        Type of metadata server available to pods running in the nodepool.
         WORKLOAD_METADATA_FROM_NODE must be one of:
 
          EXPOSED
-            Exposes all VM metadata to workloads.
+            Pods running in this nodepool have access to the node's underlying
+            Compute Engine Metadata Server.
+         GKE_METADATA_SERVER
+            Run the Kubernetes Engine Metadata Server on this node. The
+            Kubernetes Engine Metadata Server exposes a metadata API to
+            workloads that is compatible with the V1 Compute Metadata APIs
+            exposed by the Compute Engine and App Engine Metadata Servers. This
+            feature can only be enabled if Workload Identity is enabled at the
+            cluster level.
          SECURE
-            Prevents workloads not in hostNetwork from accessing certain VM
+            Prevents pods not in hostNetwork from accessing certain VM
             metadata, specifically kube-env, which contains Kubelet
             credentials, and the instance identity token. This is a temporary
             security solution available while the bootstrapping process for
             cluster nodes is being redesigned with significant security
-            improvements.
+            improvements. This feature is scheduled to be deprecated in the
+            future and later removed.
          UNSPECIFIED
             Chooses the default.
 
@@ -589,18 +655,29 @@ FLAGS
 
          --autoprovisioning-config-file=AUTOPROVISIONING_CONFIG_FILE
             Path of the JSON/YAML file which contains information about the
-            cluster's autoscaling configuration. Currently it only contains a
-            list of resource limits of the cluster.
+            cluster's node autoprovisioning configuration. Currently it
+            contains a list of resource limits and identity defaults for
+            autoprovisioning.
 
-            Each resource limits definition contains three fields:
-            resourceType, maximum and minimum. Resource type can be "cpu",
-            "memory" or an accelerator (e.g. "nvidia-tesla-k80" for nVidia
-            Tesla K80). Use gcloud compute accelerator-types list to learn
-            about available accelerator types. Maximum is the maximum allowed
-            amount with the unit of the resource. Minimum is the minimum
-            allowed amount with the unit of the resource.
+            Resource limits are specified in the field 'resourceLimits'. Each
+            resource limits definition contains three fields: resourceType,
+            maximum and minimum. Resource type can be "cpu", "memory" or an
+            accelerator (e.g. "nvidia-tesla-k80" for nVidia Tesla K80). Use
+            gcloud compute accelerator-types list to learn about available
+            accelerator types. Maximum is the maximum allowed amount with the
+            unit of the resource. Minimum is the minimum allowed amount with
+            the unit of the resource.
 
-         Flags to configure resource limits:
+            Identity default contains at most one of the below fields:
+            serviceAccount: The Google Cloud Platform Service Account to be
+            used by node VMs in autoprovisioined node pools. If not specified,
+            the project default service account is used. scopes: A list of
+            scopes be used by node instances in autoprovisioined node pools.
+            Multiple scopes can be specified, separated by commas. For
+            information on defaults, look at:
+            https://cloud.google.com/sdk/gcloud/reference/container/clusters/create#--scopes
+
+         Flags to configure autoprovisioned nodes
 
            --max-cpu=MAX_CPU
               Maximum number of cores in the cluster.
@@ -699,7 +776,7 @@ FLAGS
           master through HTTPS.
 
        --master-authorized-networks=NETWORK,[NETWORK,...]
-          The list of CIDR blocks (up to 20) that are allowed to connect to
+          The list of CIDR blocks (up to 50) that are allowed to connect to
           Kubernetes master through HTTPS. Specified in CIDR notation (e.g.
           1.2.3.4/30). Can not be specified unless
           --enable-master-authorized-networks is also specified.
@@ -731,6 +808,11 @@ FLAGS
 
      Private Clusters
 
+       --enable-peering-route-sharing
+          Enable custom route sharing between the master and node VPCs, which
+          ensures clients running in networks connected via a Cloud Router,
+          VPN, or Interconnect can reach the API server.
+
        --enable-private-endpoint
           Cluster is managed using the private IP address of the master API
           endpoint.
@@ -755,8 +837,7 @@ FLAGS
        --enable-tpu
           Enable Cloud TPUs for this cluster.
 
-          Can not be specified unless --enable-kubernetes-alpha and
-          --enable-ip-alias are also specified.
+          Can not be specified unless --enable-ip-alias is also specified.
 
        At most one of these may be specified:
 
@@ -858,52 +939,44 @@ FLAGS
           Compute zone (e.g. us-central1-a) for the cluster. Overrides the
           default compute/zone property value for this command invocation.
 
-     Flags for Security Profile:
+     --release-channel cannot be specified if --cluster-version or
+     --node-version are specified. At most one of these may be specified:
 
-       --security-profile=SECURITY_PROFILE
-          Name and version of the security profile to be applied to the
-          cluster.
+       --release-channel=CHANNEL
+          Release channel a cluster is subscribed to.
 
-          Example:
+          When a cluster is subscribed to a release channel, Google maintains
+          both the master version and the node version. Node auto-upgrade
+          defaults to true and cannot be disabled. Updates to version related
+          fields (e.g. --cluster-version) return an error.
 
-              $ gcloud alpha container clusters create example-cluster \
-                  --security-profile=default-1.0-gke.0
+          CHANNEL must be (currently only one value is supported):
 
-       --security-profile-runtime-rules
-          Apply runtime rules in the specified security profile to the cluster.
-          When enabled (by default), a security profile controller and webhook
-          are deployed on the cluster to enforce the runtime rules. If
-          --no-security-profile-runtime-rules is specified to disable this
-          feature, only bootstrapping rules are applied, and no security
-          profile controller or webhook are installed. Enabled by default, use
-          --no-security-profile-runtime-rules to disable.
+           rapid
+              'rapid' channel clusters are the first to receive the latest
+              releases of Kubernetes and other components.
 
-     Options to specify the node identity. At most one of these may be
-     specified:
+       --cluster-version=CLUSTER_VERSION
+          The Kubernetes version to use for the master and nodes. Defaults to
+          server-specified.
 
-       --service-account=SERVICE_ACCOUNT
-          The Google Cloud Platform Service Account to be used by the node VMs.
-          If a service account is specified, the cloud-platform and
-          userinfo.email scopes are used. If no Service Account is specified,
-          the project default service account is used.
+          The default Kubernetes version is available using the following
+          command.
+
+              $ gcloud container get-server-config
+
+       --node-version=NODE_VERSION
+          The Kubernetes version to use for nodes. Defaults to
+          server-specified.
+
+          The default Kubernetes version is available using the following
+          command.
+
+              $ gcloud container get-server-config
+
+     Options to specify the node identity.
 
        Scopes options.
-
-         --enable-cloud-endpoints
-            (REMOVED) Automatically enable Google Cloud Endpoints to take
-            advantage of API management features by adding service-control and
-            service-management scopes.
-
-            If --no-enable-cloud-endpoints is set, remove service-control and
-            service-management scopes, even if they are implicitly (via
-            default) or explicitly set via --scopes.
-
-            --[no-]enable-cloud-endpoints is not allowed if
-            container/new_scopes_behavior property is set to true.
-
-            Flag --[no-]enable-cloud-endpoints has been removed.
-
-            Enabled by default, use --no-enable-cloud-endpoints to disable.
 
          --scopes=[SCOPE,...]; default="gke-default"
             Specifies scopes for the node instances. Examples:
@@ -917,20 +990,9 @@ FLAGS
             Multiple SCOPEs can be specified, separated by commas.
             logging-write and/or monitoring are added unless Cloud Logging
             and/or Cloud Monitoring are disabled (see --enable-cloud-logging
-            and --enable-cloud-monitoring for more information).
-
-            Unless container/new_scopes_behavior property is true, compute-rw
-            and storage-ro are always added, even if not explicitly specified,
-            and --enable-cloud-endpoints (by default) adds service-control and
-            service-management scopes.
-
-            If container/new_scopes_behavior property is true, none of the
-            above scopes are added (though storage-ro, service-control, and
-            service-management are all included in the default scopes. In a
-            future release, this will be the default behavior.
-
-            SCOPE can be either the full URI of the scope or an alias. default
-            scopes are assigned to all instances. Available aliases are:
+            and --enable-cloud-monitoring for more information). SCOPE can be
+            either the full URI of the scope or an alias. default scopes are
+            assigned to all instances. Available aliases are:
 
               Alias                  URI
               bigquery               https://www.googleapis.com/auth/bigquery
@@ -974,9 +1036,36 @@ FLAGS
             https://www.googleapis.com/auth/sqlservice.admin or sql-admin to
             manage your Google SQL Service instances.
 
+       --service-account=SERVICE_ACCOUNT
+          The Google Cloud Platform Service Account to be used by the node VMs.
+          If a service account is specified, the cloud-platform and
+          userinfo.email scopes are used. If no Service Account is specified,
+          the project default service account is used.
+
+     Flags for Security Profile:
+
+       --security-profile=SECURITY_PROFILE
+          Name and version of the security profile to be applied to the
+          cluster.
+
+          Example:
+
+              $ gcloud alpha container clusters create example-cluster \
+                  --security-profile=default-1.0-gke.0
+
+       --security-profile-runtime-rules
+          Apply runtime rules in the specified security profile to the cluster.
+          When enabled (by default), a security profile controller and webhook
+          are deployed on the cluster to enforce the runtime rules. If
+          --no-security-profile-runtime-rules is specified to disable this
+          feature, only bootstrapping rules are applied, and no security
+          profile controller or webhook are installed. Enabled by default, use
+          --no-security-profile-runtime-rules to disable.
+
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

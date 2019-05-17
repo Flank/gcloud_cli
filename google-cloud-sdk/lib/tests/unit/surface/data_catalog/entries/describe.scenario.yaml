@@ -1,0 +1,45 @@
+title: Data Catalog describe entry scenario test.
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: data-catalog entries describe entry1 --entry-group=@pubsub --location=global
+  - stdout: |
+      linkedResource: //pubsub.googleapis.com/projects/fake-project/topics/topic1
+      name: projects/fake-project/locations/global/entryGroups/@pubsub/entries/cHJvamVjdHMvY2xvdWRzZGt0ZXN0L3RvcGljcy9jZ2xvdWNoLXRlc3Qz
+      sourceSystemTimestamps:
+        createTime: '2019-03-27T19:31:43.757Z'
+        expireTime: '1970-01-01T00:00:00Z'
+        updateTime: '2019-03-27T19:31:43.757Z'
+actions:
+- execute_command:
+    command: data-catalog entries describe entry1 --entry-group=@pubsub --location=global
+    events:
+    - api_call:
+        expect_request:
+          uri: https://datacatalog.googleapis.com/v1beta1/projects/fake-project/locations/global/entryGroups/@pubsub/entries/entry1?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/entryGroups/@pubsub/entries/cHJvamVjdHMvY2xvdWRzZGt0ZXN0L3RvcGljcy9jZ2xvdWNoLXRlc3Qz",
+              "sourceSystemTimestamps": {
+                "createTime": "2019-03-27T19:31:43.757Z",
+                "updateTime": "2019-03-27T19:31:43.757Z",
+                "expireTime": "1970-01-01T00:00:00Z"
+              },
+              "linkedResource": "//pubsub.googleapis.com/projects/fake-project/topics/topic1"
+            }
+    - expect_stdout: |
+        linkedResource: //pubsub.googleapis.com/projects/fake-project/topics/topic1
+        name: projects/fake-project/locations/global/entryGroups/@pubsub/entries/cHJvamVjdHMvY2xvdWRzZGt0ZXN0L3RvcGljcy9jZ2xvdWNoLXRlc3Qz
+        sourceSystemTimestamps:
+          createTime: '2019-03-27T19:31:43.757Z'
+          expireTime: '1970-01-01T00:00:00Z'
+          updateTime: '2019-03-27T19:31:43.757Z'
+    - expect_exit:
+        code: 0

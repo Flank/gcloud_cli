@@ -45,6 +45,9 @@ summary:
       Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/instanceTemplates/$$template1$$].
 
 actions:
+- define_reference:
+    reference: compute-uri
+    value: www.googleapis.com/compute
 - generate_resource_id:
     reference: template1
     prefix: mig-regional
@@ -72,7 +75,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers?alt=json
           method: POST
           headers: {}
           body:
@@ -109,7 +112,7 @@ actions:
         Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -146,7 +149,7 @@ actions:
             selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroupManagers/$$manager$$
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups?alt=json&maxResults=500
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups?alt=json&maxResults=500
           method: GET
           headers: {}
           body: null
@@ -202,7 +205,7 @@ actions:
             selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/instanceGroups
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/autoscalers?alt=json&maxResults=500
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/regions/us-central1/autoscalers?alt=json&maxResults=500
           method: GET
           headers: {}
           body: null

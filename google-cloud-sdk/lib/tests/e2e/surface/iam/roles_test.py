@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ from tests.lib.surface.iam import e2e_test_base
 # enabled on the current project.
 class RolesTest(e2e_test_base.CustomRolesBaseTest):
 
-  @test_case.Filters.skip('Failing', 'b/116627522')
   def testRoles(self):
     self.SetRole()
     self.SetPermissions('buckets')
@@ -43,7 +42,7 @@ class RolesTest(e2e_test_base.CustomRolesBaseTest):
     self.DeleteRole()
     self.UndeleteRole()
 
-  @test_case.Filters.skip('Failing', 'b/116627522')
+  @test_case.Filters.skip('Failing', 'b/132247210')
   def testListTestablePermissions(self):
     self.SetPermissions('buckets')
     self.ClearOutputs()
@@ -63,10 +62,10 @@ class RolesTest(e2e_test_base.CustomRolesBaseTest):
         'iam roles create {role} --project {project} --permissions '
         '{permissions}'
     )
+    self.requires_cleanup = True
     self.AssertErrContains('Created role [{0}].\n'.format(self.role))
     self.AssertErrContainsPermissionsWarning()
     self.AssertOutputContainsRole(self.role)
-    self.requires_cleanup = True
 
   def DescribeRole(self):
     self.ClearOutputs()
@@ -97,9 +96,9 @@ class RolesTest(e2e_test_base.CustomRolesBaseTest):
                  source=self.role,
                  project=self.Project(),
                  destination=self.copied_role))
+    self.requires_cleanup_copied_role = True
     self.AssertErrContainsPermissionsWarning()
     self.AssertOutputContainsRole(self.copied_role)
-    self.requires_cleanup_copied_role = True
 
   def ListGrantableRolesRoleAndCopiedRole(self):
     self.ClearOutputs()
@@ -114,16 +113,16 @@ class RolesTest(e2e_test_base.CustomRolesBaseTest):
     self.ClearOutputs()
     self.Run('iam roles delete {role} --project {project}'.format(
         role=self.delete_undelete_tests_role, project=self.Project()))
+    self.requires_recover_deleted_role = True
     self.AssertOutputContains('deleted: true')
     self.AssertOutputContains(self.delete_undelete_tests_role)
-    self.requires_recover_deleted_role = True
 
   def UndeleteRole(self):
     self.ClearOutputs()
     self.Run('iam roles undelete {role} --project {project}'.format(
         role=self.delete_undelete_tests_role, project=self.Project()))
-    self.AssertOutputContains(self.delete_undelete_tests_role)
     self.requires_recover_deleted_role = False
+    self.AssertOutputContains(self.delete_undelete_tests_role)
 
 if __name__ == '__main__':
   e2e_test_base.main()

@@ -20,6 +20,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.core import http
 from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
 from tests.lib import parameterized
@@ -30,16 +31,14 @@ from tests.lib.surface.services import unit_test_base
 import httplib2
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class ListTest(unit_test_base.SUUnitTestBase):
+class ListTestGA(unit_test_base.SUUnitTestBase):
   """Unit tests for services list command."""
   OPERATION_NAME = 'operations/abc.0000000000'
 
-  def testList(self, track):
-    self.track = track
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def testList(self):
     self.ExpectListServicesCall()
 
     self.Run('services list --available')
@@ -52,6 +51,18 @@ service-name.googleapis.com
         normalize_space=True)
 
 
+class ListTestBeta(ListTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class ListTestAlpha(ListTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+
 # DO NOT REMOVE THIS TEST.
 # The services API should always use gcloud's shared quota.
 class QuotaHeaderTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth,
@@ -60,9 +71,12 @@ class QuotaHeaderTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth,
 
   def SetUp(self):
     properties.VALUES.core.project.Set('foo')
-    self.request_mock = self.StartObjectPatch(
-        httplib2.Http, 'request',
-        return_value=(httplib2.Response({'status': 200}), b''))
+    mock_http_client = self.StartObjectPatch(http, 'Http')
+    mock_http_client.return_value.request.return_value = \
+      (httplib2.Response({
+          'status': 200
+      }), b'')
+    self.request_mock = mock_http_client.return_value.request
 
   @parameterized.parameters(
       (None, 'beta', None),

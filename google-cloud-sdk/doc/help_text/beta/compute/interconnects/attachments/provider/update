@@ -23,8 +23,7 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --bandwidth=BANDWIDTH
-        Provisioned capacity of the attachment in bits/s. BANDWIDTH must be one
-        of:
+        Provisioned capacity of the attachment. BANDWIDTH must be one of:
 
          50m
             50 Mbit/s
@@ -45,26 +44,6 @@ FLAGS
          5g
             5 Gbit/s
          10g
-            10 Gbit/s
-         bps-50m
-            50 Mbit/s
-         bps-100m
-            100 Mbit/s
-         bps-200m
-            200 Mbit/s
-         bps-300m
-            300 Mbit/s
-         bps-400m
-            400 Mbit/s
-         bps-500m
-            500 Mbit/s
-         bps-1g
-            1 Gbit/s
-         bps-2g
-            2 Gbit/s
-         bps-5g
-            5 Gbit/s
-         bps-10g
             10 Gbit/s
 
      --description=DESCRIPTION
@@ -136,8 +115,9 @@ FLAGS
           values.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

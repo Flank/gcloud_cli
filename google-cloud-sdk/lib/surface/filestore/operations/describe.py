@@ -21,19 +21,21 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.filestore import filestore_client
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.filestore import flags
+from googlecloudsdk.command_lib.filestore.instances import flags as instances_flags
 from googlecloudsdk.command_lib.util.concepts import concept_parsers
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA)
-class DescribeBeta(base.DescribeCommand):
+@base.ReleaseTracks(base.ReleaseTrack.GA)
+class Describe(base.DescribeCommand):
   """Describe a Cloud Filestore operation."""
 
-  _API_VERSION = filestore_client.FILESTORE_API_VERSION
+  _API_VERSION = filestore_client.V1_API_VERSION
 
   @staticmethod
   def Args(parser):
     concept_parsers.ConceptParser([flags.GetOperationPresentationSpec(
         'The operation to describe.')]).AddToParser(parser)
+    instances_flags.AddLocationArg(parser)
     parser.display_info.AddFormat('default')
 
   def Run(self, args):
@@ -43,14 +45,21 @@ class DescribeBeta(base.DescribeCommand):
     return client.GetOperation(operation_ref)
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class DescribeAlpha(DescribeBeta):
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class DescribeBeta(Describe):
   """Describe a Cloud Filestore operation."""
 
-  _API_VERSION = filestore_client.FILESTORE_ALPHA_API_VERSION
+  _API_VERSION = filestore_client.BETA_API_VERSION
 
 
-DescribeBeta.detailed_help = {
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class DescribeAlpha(Describe):
+  """Describe a Cloud Filestore operation."""
+
+  _API_VERSION = filestore_client.ALPHA_API_VERSION
+
+
+Describe.detailed_help = {
     'DESCRIPTION': 'Describe a Cloud Filestore operation.',
     'EXAMPLES': """\
 The following command shows the details for the Cloud Filestore operation

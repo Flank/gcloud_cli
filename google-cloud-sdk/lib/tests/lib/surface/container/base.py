@@ -49,7 +49,7 @@ class Error(Exception):
   pass
 
 
-class UnexpectedCallException(Error):
+class UnexpectedCallExceptionError(Error):
   """For unexpected calls to mocked functions."""
 
 NOT_FOUND_ERROR = http_error.MakeHttpError(404, 'not found')
@@ -295,6 +295,8 @@ class TestBase(cli_test_base.CliTestBase):
         resourceLabels=kwargs.get('labels'),
         maintenancePolicy=kwargs.get('maintenancePolicy'),
         privateClusterConfig=kwargs.get('privateClusterConfig'),
+        defaultMaxPodsConstraint=kwargs.get('defaultMaxPodsConstraint'),
+        enableTpu=kwargs.get('enableTpu'),
     )
     if kwargs.get('conditions'):
       c.conditions.extend(kwargs.get('conditions'))
@@ -353,8 +355,20 @@ class TestBase(cli_test_base.CliTestBase):
         ),
         instanceGroupUrls=kwargs.get('instanceGroupUrls', []),
         autoscaling=kwargs.get('autoscaling'),
-        management=kwargs.get('management'),
+        management=(kwargs.get('management') if 'management' in kwargs
+                    else self._MakeDefaultNodeManagement()),
+        maxPodsConstraint=kwargs.get('maxPodsConstraint'),
     )
+
+  # Creates a default node management adaptive to release tracks.
+  # Autorepair default value is True for default image config.
+  # Autoupgrade default value is None for GA, True for alpha and beta.
+  # TODO(b/128547638) remove the release checking hack once we promote the new
+  # autoupgrade default value to GA
+  def _MakeDefaultNodeManagement(self, auto_repair=True):
+    auto_upgrade = None if self.API_VERSION == 'v1' else True
+    return self.messages.NodeManagement(autoRepair=auto_repair,
+                                        autoUpgrade=auto_upgrade)
 
   def _MakeIPAllocationPolicy(self, **kwargs):
     policy = self.messages.IPAllocationPolicy()
@@ -382,6 +396,8 @@ class TestBase(cli_test_base.CliTestBase):
 
   def _MakePrivateClusterConfig(self, **kwargs):
     config = self.messages.PrivateClusterConfig()
+    if 'enablePeeringRouteSharing' in kwargs:
+      config.enablePeeringRouteSharing = kwargs['enablePeeringRouteSharing']
     if 'enablePrivateNodes' in kwargs:
       config.enablePrivateNodes = kwargs['enablePrivateNodes']
     if 'enablePrivateEndpoint' in kwargs:
@@ -431,6 +447,14 @@ class TestBase(cli_test_base.CliTestBase):
     if pool_name:
       igm += '-' + pool_name
     return self.INSTANCE_GROUP_URL.format(project, zone, igm)
+
+  def _MakeUpgradeSettings(self, **kwargs):
+    settings = self.messages.UpgradeSettings()
+    if 'maxSurge' in kwargs:
+      settings.maxSurge = kwargs['maxSurge']
+    if 'maxUnavailable' in kwargs:
+      settings.maxUnavailable = kwargs['maxUnavailable']
+    return settings
 
   def ExpectGetCluster(self, cluster, exception=None, zone=None):
     raise NotImplementedError('ExpectGetCluster is not overridden')
@@ -484,9 +508,17 @@ class TestBase(cli_test_base.CliTestBase):
                            exception=None, zone=None):
     raise NotImplementedError('ExpectDeleteNodePool is not overridden')
 
+  def ExpectSetNodePoolManagement(self,
+                                  node_pool_name,
+                                  node_management,
+                                  response=None,
+                                  exception=None,
+                                  zone=None):
+    raise NotImplementedError('ExpectSetNodePoolManagement is not overridden')
+
   def ExpectUpdateNodePool(self,
                            node_pool_name,
-                           node_management,
+                           workload_metadata_from_node=None,
                            response=None,
                            exception=None,
                            zone=None):
@@ -560,7 +592,6 @@ class GATestBase(TestBase):
 
   # Sort the scopes to assert equality of the lists
   _DEFAULT_SCOPES = sorted([
-      'gke-version-default',
       'https://www.googleapis.com/auth/devstorage.read_only',
       'https://www.googleapis.com/auth/logging.write',
       'https://www.googleapis.com/auth/monitoring',
@@ -672,12 +703,12 @@ class GATestBase(TestBase):
         response=response,
         exception=exception)
 
-  def ExpectUpdateNodePool(self,
-                           node_pool_name,
-                           node_management,
-                           response=None,
-                           exception=None,
-                           zone=None):
+  def ExpectSetNodePoolManagement(self,
+                                  node_pool_name,
+                                  node_management,
+                                  response=None,
+                                  exception=None,
+                                  zone=None):
     if not zone:
       zone = self.ZONE
     (self.mocked_client.projects_locations_clusters_nodePools.
@@ -689,10 +720,24 @@ class GATestBase(TestBase):
          response=response,
          exception=exception))
 
-  def ExpectListNodePools(self,
-                          response=None,
-                          exception=None,
-                          zone=None):
+  def ExpectUpdateNodePool(self,
+                           node_pool_name,
+                           workload_metadata_config,
+                           response=None,
+                           exception=None,
+                           zone=None):
+    if not zone:
+      zone = self.ZONE
+    msg = self.messages.UpdateNodePoolRequest(
+        name=api_adapter.ProjectLocationClusterNodePool(self.PROJECT_ID, zone,
+                                                        self.CLUSTER_NAME,
+                                                        node_pool_name),
+        workloadMetadataConfig=workload_metadata_config,
+    )
+    self.mocked_client.projects_locations_clusters_nodePools.Update.Expect(
+        msg, response=response, exception=exception)
+
+  def ExpectListNodePools(self, response=None, exception=None, zone=None):
     if not zone:
       zone = self.ZONE
     self.mocked_client.projects_locations_clusters_nodePools.List.Expect(
@@ -879,6 +924,40 @@ class GATestBase(TestBase):
         response=response,
         exception=exception)
 
+  def _MakeUsableSubnetworkSecondaryRange(self, **kwargs):
+    return self.messages.UsableSubnetworkSecondaryRange(
+        rangeName=kwargs.get('rangeName'),
+        ipCidrRange=kwargs.get('ipCidrRange'),
+        status=kwargs.get('status'))
+
+  def _MakeUsableSubnet(self, **kwargs):
+    network = resources.REGISTRY.Create(
+        'compute.networks',
+        project=self.PROJECT_ID,
+        network=kwargs.get('network'))
+    subnetwork = resources.REGISTRY.Create(
+        'compute.subnetworks',
+        project=self.PROJECT_ID,
+        region=self.REGION,
+        subnetwork=kwargs.get('subnetwork'))
+    return self.messages.UsableSubnetwork(
+        subnetwork=subnetwork.RelativeName(),
+        network=network.RelativeName(),
+        ipCidrRange=kwargs.get('ipCidrRange'),
+        secondaryIpRanges=kwargs.get('secondaryIpRanges', []),
+        statusMessage=kwargs.get('statusMessage'))
+
+  def _MakeListUsableSubnetworksResponse(self, subnets):
+    return self.messages.ListUsableSubnetworksResponse(subnetworks=subnets)
+
+  def _ExpectListUsableSubnets(self, response, exception=None):
+    req = self.messages.ContainerProjectsAggregatedUsableSubnetworksListRequest(
+        parent=self.PROJECT_REF.RelativeName(), pageSize=500, filter='')
+    if exception:
+      response = None
+    self.mocked_client.projects_aggregated_usableSubnetworks.List.Expect(
+        req, response=response, exception=exception)
+
 
 class BetaTestBase(GATestBase):
   """Mixin class for testing v1beta1."""
@@ -900,18 +979,21 @@ class BetaTestBase(GATestBase):
   def _MakeCluster(self, **kwargs):
     cluster = GATestBase._MakeCluster(self, **kwargs)
     cluster.binaryAuthorization = kwargs.get('binaryAuthorization')
-    cluster.enableTpu = kwargs.get('enableTpu')
     cluster.autoscaling = kwargs.get('clusterAutoscaling')
     cluster.verticalPodAutoscaling = kwargs.get('verticalPodAutoscaling')
-    cluster.defaultMaxPodsConstraint = kwargs.get('defaultMaxPodsConstraint')
+    cluster.shieldedNodes = kwargs.get('shieldedNodes')
+    if kwargs.get('databaseEncryptionKey'):
+      cluster.databaseEncryption = self.messages.DatabaseEncryption(
+          keyName=kwargs.get('databaseEncryptionKey'),
+          state=self.messages.DatabaseEncryption.StateValueValuesEnum.ENCRYPTED)
     return cluster
 
   def _MakeNodePool(self, **kwargs):
     node_pool = GATestBase._MakeNodePool(self, **kwargs)
     node_pool.config.workloadMetadataConfig = kwargs.get(
         'workloadMetadataConfig')
-    node_pool.maxPodsConstraint = kwargs.get('maxPodsConstraint')
     node_pool.config.metadata = kwargs.get('metadata')
+    node_pool.config.sandboxConfig = kwargs.get('sandboxConfig')
     return node_pool
 
   def _MakeIPAllocationPolicy(self, **kwargs):
@@ -971,11 +1053,11 @@ class AlphaTestBase(BetaTestBase):
 
   def _MakeCluster(self, **kwargs):
     cluster = super(AlphaTestBase, self)._MakeCluster(**kwargs)
-    cluster.enableTpu = kwargs.get('enableTpu')
     if kwargs.get('databaseEncryptionKey'):
       cluster.databaseEncryption = self.messages.DatabaseEncryption(
           keyName=kwargs.get('databaseEncryptionKey'),
           state=self.messages.DatabaseEncryption.StateValueValuesEnum.ENCRYPTED)
+    cluster.releaseChannel = kwargs.get('releaseChannel')
     return cluster
 
   def _MakeNodePool(self, **kwargs):
@@ -985,7 +1067,8 @@ class AlphaTestBase(BetaTestBase):
           'localSsdVolumeConfigs')
     node_pool.config.sandboxConfig = kwargs.get('sandboxConfig')
     node_pool.config.nodeGroup = kwargs.get('nodeGroup')
-
+    node_pool.upgradeSettings = kwargs.get('upgradeSettings')
+    node_pool.config.linuxNodeConfig = kwargs.get('linuxNodeConfig')
     return node_pool
 
 

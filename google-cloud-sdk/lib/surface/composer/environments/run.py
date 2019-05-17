@@ -26,9 +26,16 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.composer import resource_args
 from googlecloudsdk.command_lib.composer import util as command_util
 from googlecloudsdk.core import log
+from googlecloudsdk.core.console import console_io
 
 WORKER_POD_SUBSTR = 'worker'
 WORKER_CONTAINER = 'airflow-worker'
+DEPRECATION_WARNING = ('Because Cloud Composer manages the Airflow metadata '
+                       'database for your environment, support for the Airflow '
+                       '`{}` subcommand is being deprecated. '
+                       'To avoid issues related to Airflow metadata, we '
+                       'recommend that you do not use this subcommand unless '
+                       'you understand the outcome.')
 
 
 class Run(base.Command):
@@ -60,8 +67,10 @@ class Run(base.Command):
         'subcommand',
         metavar='SUBCOMMAND',
         choices=command_util.SUBCOMMAND_WHITELIST,
-        help='The Airflow CLI subcommand to run. (see '
-        'https://airflow.incubator.apache.org/cli.html)')
+        help=('The Airflow CLI subcommand to run. Available subcommands '
+              'include: {} (see https://airflow.incubator.apache.org/cli.html '
+              'for more info.)').format(
+                  ', '.join(command_util.SUBCOMMAND_WHITELIST)))
     parser.add_argument(
         'cmd_args',
         metavar='CMD_ARGS',
@@ -80,12 +89,22 @@ class Run(base.Command):
       args: argparse.Namespace, An object that contains the values for the
         arguments specified in the .Args() method.
     """
-    prompting_subcommands = ['resetdb', 'delete_dag']
+    prompting_subcommands = ['delete_dag']
     if args.subcommand in prompting_subcommands and set(
         args.cmd_args).isdisjoint({'-y', '--yes'}):
       args.cmd_args.append('--yes')
 
+  def DeprecationWarningPrompt(self, args):
+    response = True
+    if args.subcommand in command_util.SUBCOMMAND_DEPRECATION:
+      response = console_io.PromptContinue(
+          message=DEPRECATION_WARNING.format(args.subcommand),
+          default=False, cancel_on_no=True)
+    return response
+
   def Run(self, args):
+    self.DeprecationWarningPrompt(args)
+
     running_state = (
         api_util.GetMessagesModule(release_track=self.ReleaseTrack())
         .Environment.StateValueValuesEnum.RUNNING)
@@ -103,7 +122,14 @@ class Run(base.Command):
     cluster_location_id = command_util.ExtractGkeClusterLocationId(env_obj)
 
     with command_util.TemporaryKubeconfig(cluster_location_id, cluster_id):
-      pod = command_util.GetGkePod(pod_substr=WORKER_POD_SUBSTR)
+      kubectl_ns = command_util.FetchKubectlNamespace(
+          env_obj.config.softwareConfig.imageVersion)
+      pod = command_util.GetGkePod(
+          pod_substr=WORKER_POD_SUBSTR, kubectl_namespace=kubectl_ns)
+
+      log.status.Print(
+          'Executing within the following kubectl namespace: {}'.format(
+              kubectl_ns))
 
       self.BypassConfirmationPrompt(args)
       kubectl_args = [
@@ -112,4 +138,7 @@ class Run(base.Command):
       if args.cmd_args:
         # Add '--' to the argument list so kubectl won't eat the command args.
         kubectl_args.extend(['--'] + args.cmd_args)
-      command_util.RunKubectlCommand(kubectl_args, out_func=log.status.Print)
+
+      command_util.RunKubectlCommand(
+          command_util.AddKubectlNamespace(kubectl_ns, kubectl_args),
+          out_func=log.status.Print)

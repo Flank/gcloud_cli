@@ -11,7 +11,7 @@ gcloud alpha \- alpha versions of gcloud commands
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha\fR \fIGROUP\fR | \fICOMMAND\fR [\fB\-\-account\fR=\fIACCOUNT\fR] [\fB\-\-configuration\fR=\fICONFIGURATION\fR] [\fB\-\-flags\-file\fR=\fIYAML_FILE\fR] [\fB\-\-flatten\fR=[\fIKEY\fR,...]] [\fB\-\-format\fR=\fIFORMAT\fR] [\fB\-\-help\fR] [\fB\-\-project\fR=\fIPROJECT_ID\fR] [\fB\-\-quiet\fR,\ \fB\-q\fR] [\fB\-\-verbosity\fR=\fIVERBOSITY\fR;\ default="warning"] [\fB\-\-version\fR,\ \fB\-v\fR] [\fB\-h\fR] [\fB\-\-log\-http\fR] [\fB\-\-trace\-token\fR=\fITRACE_TOKEN\fR] [\fB\-\-no\-user\-output\-enabled\fR]
+\f5gcloud alpha\fR \fIGROUP\fR | \fICOMMAND\fR [\fB\-\-account\fR=\fIACCOUNT\fR] [\fB\-\-billing\-project\fR=\fIBILLING_PROJECT\fR] [\fB\-\-configuration\fR=\fICONFIGURATION\fR] [\fB\-\-flags\-file\fR=\fIYAML_FILE\fR] [\fB\-\-flatten\fR=[\fIKEY\fR,...]] [\fB\-\-format\fR=\fIFORMAT\fR] [\fB\-\-help\fR] [\fB\-\-project\fR=\fIPROJECT_ID\fR] [\fB\-\-quiet\fR,\ \fB\-q\fR] [\fB\-\-verbosity\fR=\fIVERBOSITY\fR;\ default="warning"] [\fB\-\-version\fR,\ \fB\-v\fR] [\fB\-h\fR] [\fB\-\-impersonate\-service\-account\fR=\fISERVICE_ACCOUNT_EMAIL\fR] [\fB\-\-log\-http\fR] [\fB\-\-trace\-token\fR=\fITRACE_TOKEN\fR] [\fB\-\-no\-user\-output\-enabled\fR]
 
 
 
@@ -28,6 +28,15 @@ gcloud alpha \- alpha versions of gcloud commands
 \fB\-\-account\fR=\fIACCOUNT\fR
 Google Cloud Platform user account to use for invocation. Overrides the default
 \fBcore/account\fR property value for this command invocation.
+
+.TP 2m
+\fB\-\-billing\-project\fR=\fIBILLING_PROJECT\fR
+The Google Cloud Platform project that will be charged quota for operations
+performed in gcloud. If you need to operate on one project, but need quota
+against a different project, you can use this flag to specify the billing
+project. If both \f5billing/quota_project\fR and \f5\-\-billing\-project\fR are
+specified, \f5\-\-billing\-project\fR takes precedence. Run \f5$ gcloud config
+set \-\-help\fR to see more information about \f5billing/quota_project\fR.
 
 .TP 2m
 \fB\-\-configuration\fR=\fICONFIGURATION\fR
@@ -108,6 +117,18 @@ Print a summary help and exit.
 
 .RS 2m
 .TP 2m
+\fB\-\-impersonate\-service\-account\fR=\fISERVICE_ACCOUNT_EMAIL\fR
+For this gcloud invocation, all API requests will be made as the given service
+account instead of the currently selected account. This is done without needing
+to create, download, and activate a key for the account. In order to perform
+operations as the service account, your currently selected account must have an
+IAM role that includes the iam.serviceAccounts.getAccessToken permission for the
+service account. The roles/iam.serviceAccountTokenCreator role has this
+permission or you may create a custom role. Overrides the default
+\fBauth/impersonate_service_account\fR property value for this command
+invocation.
+
+.TP 2m
 \fB\-\-log\-http\fR
 Log all HTTP server requests and responses to stderr. Overrides the default
 \fBcore/log_http\fR property value for this command invocation.
@@ -134,12 +155,20 @@ Print user intended output to the console. Overrides the default
 
 .RS 2m
 .TP 2m
+\fBaccess\-context\-manager\fR
+\fB(ALPHA)\fR Manage Access Context Manager resources.
+
+.TP 2m
+\fBai\-platform\fR
+\fB(ALPHA)\fR Manage AI Platform jobs and models.
+
+.TP 2m
 \fBapp\fR
 \fB(ALPHA)\fR Manage your App Engine deployments.
 
 .TP 2m
 \fBasset\fR
-\fB(ALPHA)\fR Manage CloudAsset.
+\fB(ALPHA)\fR Manage the Cloud Asset Inventory.
 
 .TP 2m
 \fBauth\fR
@@ -182,8 +211,16 @@ Print user intended output to the console. Overrides the default
 \fB(ALPHA)\fR Deploy and manage clusters of machines for running containers.
 
 .TP 2m
+\fBdata\-catalog\fR
+\fB(ALPHA)\fR Manage Cloud Data Catalog resources.
+
+.TP 2m
 \fBdataflow\fR
 \fB(ALPHA)\fR Read and manipulate Google Dataflow resources.
+
+.TP 2m
+\fBdataproc\fR
+\fB(ALPHA)\fR Create and manage Google Cloud Dataproc clusters and jobs.
 
 .TP 2m
 \fBdatastore\fR
@@ -194,8 +231,16 @@ Print user intended output to the console. Overrides the default
 \fB(ALPHA)\fR Manage deployments of cloud resources.
 
 .TP 2m
+\fBdialogflow\fR
+\fB(ALPHA)\fR Interact with and manage Dialogflow agents, entities, and intents.
+
+.TP 2m
 \fBdlp\fR
 \fB(ALPHA)\fR Manage sensitive data with Cloud Data Loss Prevention.
+
+.TP 2m
+\fBdomains\fR
+\fB(ALPHA)\fR Manage domains for your Google Cloud projects.
 
 .TP 2m
 \fBemulators\fR
@@ -223,11 +268,19 @@ Print user intended output to the console. Overrides the default
 
 .TP 2m
 \fBgenomics\fR
-\fB(ALPHA)\fR Manage Genomics resources using version 1 of the API.
+\fB(ALPHA)\fR Manage Genomics resources.
+
+.TP 2m
+\fBhealthcare\fR
+\fB(ALPHA)\fR Manage Cloud Healthcare resources.
 
 .TP 2m
 \fBiam\fR
 \fB(ALPHA)\fR Manage IAM service accounts and keys.
+
+.TP 2m
+\fBiap\fR
+\fB(ALPHA)\fR Manage IAP policies.
 
 .TP 2m
 \fBiot\fR
@@ -238,12 +291,16 @@ Print user intended output to the console. Overrides the default
 \fB(ALPHA)\fR Manage cryptographic keys in the cloud.
 
 .TP 2m
+\fBlogging\fR
+\fB(ALPHA)\fR Manage Stackdriver Logging.
+
+.TP 2m
 \fBml\fR
 \fB(ALPHA)\fR Use Google Cloud machine learning capabilities.
 
 .TP 2m
 \fBml\-engine\fR
-\fB(ALPHA)\fR Manage Cloud ML Engine jobs and models.
+\fB(ALPHA)\fR Manage AI Platform jobs and models.
 
 .TP 2m
 \fBmonitoring\fR
@@ -260,7 +317,7 @@ channels.
 
 .TP 2m
 \fBpubsub\fR
-\fB(ALPHA)\fR Manage Cloud Pub/Sub topics and subscriptions.
+\fB(ALPHA)\fR Manage Cloud Pub/Sub topics, subscriptions, and snapshots.
 
 .TP 2m
 \fBredis\fR
@@ -281,6 +338,10 @@ channels.
 .TP 2m
 \fBrun\fR
 \fB(ALPHA)\fR Manage your Cloud Run applications.
+
+.TP 2m
+\fBscc\fR
+\fB(ALPHA)\fR Manage Cloud SCC resources.
 
 .TP 2m
 \fBscheduler\fR
@@ -306,6 +367,10 @@ channels.
 \fBtasks\fR
 \fB(ALPHA)\fR Manage Cloud Tasks queues and tasks.
 
+.TP 2m
+\fBweb\-security\-scanner\fR
+\fB(ALPHA)\fR Manage Cloud Web Security Scanner resources.
+
 
 .RE
 .sp
@@ -330,6 +395,10 @@ channels.
 .TP 2m
 \fBsearch\-help\fR
 \fB(ALPHA)\fR \fB(DEPRECATED)\fR Search the help text of gcloud commands.
+
+.TP 2m
+\fBsurvey\fR
+\fB(ALPHA)\fR Invoke a customer satisfaction survey for Cloud SDK.
 
 
 .RE

@@ -1,6 +1,5 @@
 NAME
-    gcloud beta ml-engine versions create - create a new Cloud ML Engine
-        version
+    gcloud beta ml-engine versions create - create a new AI Platform version
 
 SYNOPSIS
     gcloud beta ml-engine versions create VERSION --model=MODEL [--async]
@@ -8,12 +7,13 @@ SYNOPSIS
         [--labels=[KEY=VALUE,...]] [--machine-type=MACHINE_TYPE]
         [--origin=ORIGIN] [--python-version=PYTHON_VERSION]
         [--runtime-version=RUNTIME_VERSION] [--staging-bucket=STAGING_BUCKET]
+        [--package-uris=[PACKAGE_URI,...] --prediction-class=PREDICTION_CLASS]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Creates a new version of a Cloud ML Engine model.
+    (BETA) Creates a new version of an AI Platform model.
 
-    For more details on managing ML Engine models and versions see
+    For more details on managing AI Platform models and versions see
     https://cloud.google.com/ml-engine/docs/how-tos/managing-models-jobs
 
 POSITIONAL ARGUMENTS
@@ -76,10 +76,8 @@ OPTIONAL FLAGS
 
      --machine-type=MACHINE_TYPE
         Type of machine on which to serve the model. Currently only applies to
-        online prediction. Currently supported machine_types are:
-
-        * mls1-c1-m2 - A virtual machine with 1 core and 2 Gb RAM (default).
-        * mls1-c4-m2 - A virtual machine with 4 core and 2 Gb RAM.
+        online prediction. For available machine types, see
+        https://cloud.google.com/ml-engine/docs/tensorflow/online-predict#machine-types.
 
      --origin=ORIGIN
         Location of model/ "directory" (as output by
@@ -99,9 +97,9 @@ OPTIONAL FLAGS
         versions.
 
      --runtime-version=RUNTIME_VERSION
-        Google Cloud ML Engine runtime version for this job. Defaults to a
-        stable version, which is defined in documentation along with the list
-        of supported versions:
+        AI Platform runtime version for this job. Defaults to a stable version,
+        which is defined in documentation along with the list of supported
+        versions:
         https://cloud.google.com/ml-engine/docs/tensorflow/runtime-version-list
 
      --staging-bucket=STAGING_BUCKET
@@ -111,9 +109,23 @@ OPTIONAL FLAGS
         include local paths) and no other flags implicitly specify an upload
         path.
 
+     Configure user code in prediction. AI Platform allows a model to have
+     user-provided prediction code; these options configure that code.
+
+       --package-uris=[PACKAGE_URI,...]
+          Comma-separated list of Google Cloud Storage URIs (gs://...) for
+          user-supplied Python packages to use.
+
+       --prediction-class=PREDICTION_CLASS
+          The fully-qualified name of the custom prediction class in the
+          package provided for custom prediction.
+
+          For example, --prediction-class my_package.SequenceModel.
+
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

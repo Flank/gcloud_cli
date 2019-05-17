@@ -3,7 +3,7 @@ summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: |
-      ml video detect-labels gs://do-not-delete-ml-video-test/chicago.mp4
+      ml video detect-labels gs://do-not-delete-ml-video-test/toy.mp4
       --format="value(@type)"
   - progress_tracker:
     - message: Waiting for operation [$$operation-id$$] to complete
@@ -14,7 +14,7 @@ actions:
 - execute_command:
     # basic test that the right kind of response is returned
     command: |
-      ml video detect-labels gs://do-not-delete-ml-video-test/chicago.mp4
+      ml video detect-labels gs://do-not-delete-ml-video-test/toy.mp4
       --format="value(@type)"
     events:
     - api_call:
@@ -26,7 +26,7 @@ actions:
             json:
               features:
               - LABEL_DETECTION
-              inputUri: gs://do-not-delete-ml-video-test/chicago.mp4
+              inputUri: gs://do-not-delete-ml-video-test/toy.mp4
               videoContext:
                 labelDetectionConfig:
                   labelDetectionMode: SHOT_MODE
@@ -37,7 +37,7 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: us-west1.9223047107198260101
+            name: us-east1.6600132925222558946
         expect_response:
           extract_references:
           - field: name
@@ -53,410 +53,101 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '19485'
+            content-length: '4398'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: us-west1.9223047107198260101
+            name: us-east1.6600132925222558946
             metadata:
               '@type': type.googleapis.com/google.cloud.videointelligence.v1.AnnotateVideoProgress
               annotationProgress:
-              - inputUri: /do-not-delete-ml-video-test/chicago.mp4
+              - inputUri: /do-not-delete-ml-video-test/toy.mp4
                 progressPercent: 100
-                startTime: '2018-11-19T17:44:23.617087Z'
-                updateTime: '2018-11-19T17:46:14.873672Z'
+                startTime: '2019-05-02T13:36:32.587583Z'
+                updateTime: '2019-05-02T13:38:15.670638Z'
             done: true
             response:
               '@type': type.googleapis.com/google.cloud.videointelligence.v1.AnnotateVideoResponse
               annotationResults:
-              - inputUri: /do-not-delete-ml-video-test/chicago.mp4
+              - inputUri: /do-not-delete-ml-video-test/toy.mp4
                 segmentLabelAnnotations:
                 - entity:
-                    entityId: /m/07yv9
-                    description: vehicle
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 38.757872s
-                    confidence: 0.97699463
-                - entity:
-                    entityId: /m/01n32
-                    description: city
+                    entityId: /m/06fgw
+                    description: robot
                     languageCode: en-US
                   categoryEntities:
-                  - entityId: /m/043rvww
-                    description: geographical feature
+                  - entityId: /m/07c1v
+                    description: technology
+                    languageCode: en-US
+                  - entityId: /m/0dkw5
+                    description: machine
                     languageCode: en-US
                   segments:
                   - segment:
                       startTimeOffset: 0s
-                      endTimeOffset: 38.757872s
-                    confidence: 0.3942462
+                      endTimeOffset: 5.500s
+                    confidence: 0.3247936
                 - entity:
-                    entityId: /m/039jbq
-                    description: urban area
+                    entityId: /m/0138tl
+                    description: toy
+                    languageCode: en-US
+                  segments:
+                  - segment:
+                      startTimeOffset: 0s
+                      endTimeOffset: 5.500s
+                    confidence: 0.9385783
+                - entity:
+                    entityId: /m/04ndr
+                    description: lego
                     languageCode: en-US
                   categoryEntities:
-                  - entityId: /m/01n32
-                    description: city
+                  - entityId: /m/0138tl
+                    description: toy
                     languageCode: en-US
                   segments:
                   - segment:
                       startTimeOffset: 0s
-                      endTimeOffset: 38.757872s
-                    confidence: 0.9233776
-                - entity:
-                    entityId: /m/01bjv
-                    description: bus
-                    languageCode: en-US
-                  categoryEntities:
-                  - entityId: /m/07yv9
-                    description: vehicle
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 38.757872s
-                    confidence: 0.8127107
-                - entity:
-                    entityId: /m/017kvv
-                    description: infrastructure
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 38.757872s
-                    confidence: 0.3066565
-                - entity:
-                    entityId: /m/012f08
-                    description: motor vehicle
-                    languageCode: en-US
-                  categoryEntities:
-                  - entityId: /m/07yv9
-                    description: vehicle
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 38.757872s
-                    confidence: 0.8935156
-                - entity:
-                    entityId: /m/01prls
-                    description: land vehicle
-                    languageCode: en-US
-                  categoryEntities:
-                  - entityId: /m/07yv9
-                    description: vehicle
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 38.757872s
-                    confidence: 0.6614419
-                - entity:
-                    entityId: /m/01c8br
-                    description: street
-                    languageCode: en-US
-                  categoryEntities:
-                  - entityId: /m/06gfj
-                    description: road
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 38.757872s
-                    confidence: 0.9725432
-                - entity:
-                    entityId: /m/01l7t2
-                    description: downtown
-                    languageCode: en-US
-                  categoryEntities:
-                  - entityId: /m/01n32
-                    description: city
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 38.757872s
-                    confidence: 0.90624005
-                - entity:
-                    entityId: /m/056mk
-                    description: metropolis
-                    languageCode: en-US
-                  categoryEntities:
-                  - entityId: /m/01n32
-                    description: city
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 38.757872s
-                    confidence: 0.46621707
-                - entity:
-                    entityId: /m/0btp2
-                    description: traffic
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 38.757872s
-                    confidence: 0.84467137
-                - entity:
-                    entityId: /m/07bsy
-                    description: transport
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 38.757872s
-                    confidence: 0.81231534
-                - entity:
-                    entityId: /m/033j3c
-                    description: lane
-                    languageCode: en-US
-                  categoryEntities:
-                  - entityId: /m/06gfj
-                    description: road
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 38.757872s
-                    confidence: 0.57994354
-                - entity:
-                    entityId: /m/0k4j
-                    description: car
-                    languageCode: en-US
-                  categoryEntities:
-                  - entityId: /m/07yv9
-                    description: vehicle
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 38.757872s
-                    confidence: 0.7634389
-                - entity:
-                    entityId: /m/0hr8
-                    description: asphalt
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 38.757872s
-                    confidence: 0.32051912
-                - entity:
-                    entityId: /m/0j_s4
-                    description: metropolitan area
-                    languageCode: en-US
-                  categoryEntities:
-                  - entityId: /m/01n32
-                    description: city
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 38.757872s
-                    confidence: 0.915208
-                - entity:
-                    entityId: /m/06gfj
-                    description: road
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 38.757872s
-                    confidence: 0.8779934
+                      endTimeOffset: 5.500s
+                    confidence: 0.925718
                 shotLabelAnnotations:
                 - entity:
-                    entityId: /m/07yv9
-                    description: vehicle
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 38.757872s
-                    confidence: 0.97699463
-                - entity:
-                    entityId: /m/01n32
-                    description: city
+                    entityId: /m/06fgw
+                    description: robot
                     languageCode: en-US
                   categoryEntities:
-                  - entityId: /m/043rvww
-                    description: geographical feature
+                  - entityId: /m/07c1v
+                    description: technology
+                    languageCode: en-US
+                  - entityId: /m/0dkw5
+                    description: machine
                     languageCode: en-US
                   segments:
                   - segment:
                       startTimeOffset: 0s
-                      endTimeOffset: 38.757872s
-                    confidence: 0.3942462
+                      endTimeOffset: 5.500s
+                    confidence: 0.3247936
                 - entity:
-                    entityId: /m/039jbq
-                    description: urban area
+                    entityId: /m/0138tl
+                    description: toy
+                    languageCode: en-US
+                  segments:
+                  - segment:
+                      startTimeOffset: 0s
+                      endTimeOffset: 5.500s
+                    confidence: 0.9382157
+                - entity:
+                    entityId: /m/04ndr
+                    description: lego
                     languageCode: en-US
                   categoryEntities:
-                  - entityId: /m/01n32
-                    description: city
+                  - entityId: /m/0138tl
+                    description: toy
                     languageCode: en-US
                   segments:
                   - segment:
                       startTimeOffset: 0s
-                      endTimeOffset: 38.757872s
-                    confidence: 0.9211553
-                - entity:
-                    entityId: /m/01bjv
-                    description: bus
-                    languageCode: en-US
-                  categoryEntities:
-                  - entityId: /m/07yv9
-                    description: vehicle
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 38.757872s
-                    confidence: 0.8127107
-                - entity:
-                    entityId: /m/017kvv
-                    description: infrastructure
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 38.757872s
-                    confidence: 0.3066565
-                - entity:
-                    entityId: /m/012f08
-                    description: motor vehicle
-                    languageCode: en-US
-                  categoryEntities:
-                  - entityId: /m/07yv9
-                    description: vehicle
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 38.757872s
-                    confidence: 0.8935156
-                - entity:
-                    entityId: /m/01prls
-                    description: land vehicle
-                    languageCode: en-US
-                  categoryEntities:
-                  - entityId: /m/07yv9
-                    description: vehicle
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 38.757872s
-                    confidence: 0.6614419
-                - entity:
-                    entityId: /m/01c8br
-                    description: street
-                    languageCode: en-US
-                  categoryEntities:
-                  - entityId: /m/06gfj
-                    description: road
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 38.757872s
-                    confidence: 0.9717109
-                - entity:
-                    entityId: /m/01l7t2
-                    description: downtown
-                    languageCode: en-US
-                  categoryEntities:
-                  - entityId: /m/01n32
-                    description: city
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 38.757872s
-                    confidence: 0.90624005
-                - entity:
-                    entityId: /m/056mk
-                    description: metropolis
-                    languageCode: en-US
-                  categoryEntities:
-                  - entityId: /m/01n32
-                    description: city
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 38.757872s
-                    confidence: 0.46621707
-                - entity:
-                    entityId: /m/0btp2
-                    description: traffic
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 38.757872s
-                    confidence: 0.84467137
-                - entity:
-                    entityId: /m/07bsy
-                    description: transport
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 38.757872s
-                    confidence: 0.81231534
-                - entity:
-                    entityId: /m/033j3c
-                    description: lane
-                    languageCode: en-US
-                  categoryEntities:
-                  - entityId: /m/06gfj
-                    description: road
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 38.757872s
-                    confidence: 0.57994354
-                - entity:
-                    entityId: /m/0k4j
-                    description: car
-                    languageCode: en-US
-                  categoryEntities:
-                  - entityId: /m/07yv9
-                    description: vehicle
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 38.757872s
-                    confidence: 0.7634389
-                - entity:
-                    entityId: /m/0j_s4
-                    description: metropolitan area
-                    languageCode: en-US
-                  categoryEntities:
-                  - entityId: /m/01n32
-                    description: city
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 38.757872s
-                    confidence: 0.9085734
-                - entity:
-                    entityId: /m/06gfj
-                    description: road
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 38.757872s
-                    confidence: 0.86698586
+                      endTimeOffset: 5.500s
+                    confidence: 0.925718
         repeatable: true
     - expect_progress_tracker:
         message: Waiting for operation [$$operation-id$$] to complete

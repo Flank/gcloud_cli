@@ -28,6 +28,7 @@ from tests.lib import test_case
 from tests.lib.surface.compute import e2e_test_base
 
 
+@test_case.Filters.skipAlways('Leaking resources', 'b/126521287')
 class NetworkEndpointGroupsTest(e2e_test_base.BaseTest):
   """Network endpoint groups tests."""
 
@@ -45,9 +46,9 @@ class NetworkEndpointGroupsTest(e2e_test_base.BaseTest):
                                                self.SUBNET_RANGE))
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
     self.registry = resources.REGISTRY.Clone()
-    self.registry.RegisterApiByName('compute', 'beta')
+    self.registry.RegisterApiByName('compute', 'v1')
     self.SetupCommon()
 
   def _GetResourceName(self):
@@ -105,7 +106,6 @@ class NetworkEndpointGroupsTest(e2e_test_base.BaseTest):
       self.Run('compute network-endpoint-groups delete {0} --zone {1} '
                '--quiet'.format(neg_name, self.zone))
 
-  @test_case.Filters.skip('Failing', 'b/113648290')
   def testNetworkEndpointGroups(self):
     health_check_name = self._GetResourceName()
     with self._CreateHealthCheck(health_check_name), \
@@ -147,7 +147,18 @@ class NetworkEndpointGroupsTest(e2e_test_base.BaseTest):
         self.network_name, 'networks', scope=e2e_test_base.GLOBAL)
 
 
-class NetworkEndpointGroupsAlphaTest(NetworkEndpointGroupsTest):
+@test_case.Filters.skipAlways('Leaking resources', 'b/126521287')
+class NetworkEndpointGroupsBetaTest(NetworkEndpointGroupsTest):
+  """Network endpoint groups alpha tests."""
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.registry = resources.REGISTRY.Clone()
+    self.registry.RegisterApiByName('compute', 'beta')
+    self.SetupCommon()
+
+
+class NetworkEndpointGroupsAlphaTest(NetworkEndpointGroupsBetaTest):
   """Network endpoint groups alpha tests."""
 
   def SetUp(self):

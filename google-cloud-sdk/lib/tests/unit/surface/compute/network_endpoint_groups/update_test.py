@@ -33,10 +33,10 @@ class NetworkEndpointGroupsCreateTest(sdk_test_base.WithFakeAuth,
                                       waiter_test_base.Base):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.client = mock.Client(core_apis.GetClientClass('compute', 'beta'))
+    self.track = calliope_base.ReleaseTrack.GA
+    self.client = mock.Client(core_apis.GetClientClass('compute', 'v1'))
     self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'beta')
+    self.resources.RegisterApiByName('compute', 'v1')
     self.client.Mock()
     self.messages = self.client.MESSAGES_MODULE
     self.addCleanup(self.client.Unmock)
@@ -49,9 +49,8 @@ class NetworkEndpointGroupsCreateTest(sdk_test_base.WithFakeAuth,
     return self.messages.Operation(
         name=operation_name,
         status=status,
-        selfLink='https://www.googleapis.com/compute/alpha/projects/{0}/zones/'
-                 '{1}/operations/{2}'.format(
-                     self.Project(), self.zone, operation_name),
+        selfLink='https://www.googleapis.com/compute/v1/projects/{0}/zones/'
+        '{1}/operations/{2}'.format(self.Project(), self.zone, operation_name),
         targetLink=resource_uri)
 
   def _ExpectAttachEndpoints(self, endpoints, operation_suffix='X'):
@@ -88,9 +87,9 @@ class NetworkEndpointGroupsCreateTest(sdk_test_base.WithFakeAuth,
 
   def _ExpectPollAndGet(self, operation_suffix='X'):
     neg_name = 'my-neg'
-    neg_uri = ('https://www.googleapis.com/compute/beta/projects/{0}/zones/'
-               '{1}/networkEndpointGroups/{2}'.format(
-                   self.Project(), self.zone, neg_name))
+    neg_uri = ('https://www.googleapis.com/compute/v1/projects/{0}/zones/'
+               '{1}/networkEndpointGroups/{2}'.format(self.Project(), self.zone,
+                                                      neg_name))
     self.client.zoneOperations.Get.Expect(
         self.messages.ComputeZoneOperationsGetRequest(
             operation='operation-' + operation_suffix,

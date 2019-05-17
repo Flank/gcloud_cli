@@ -104,21 +104,21 @@ duration formats.
 
 .TP 2m
 \fB\-\-log\-filter\fR=\fILOG_FILTER\fR
-Specify a filter for logs exported to stackdriver. This can be one of the
-following: ERRORS_ONLY \- export logs for connection failures only.
-TRANSLATIONS_ONLY \- export logs for successful connections only. Without a
-filter, logs (if enabled) will be exported for all connections handled by this
-NAT.
+Filter for logs exported to stackdriver.
+
+The default is ALL.
 
 If logging is not enabled, filter settings will be persisted but will have no
-effect. Use \-\-[no\-]enable\-logging to enable and disable logging.
+effect.
 
-To clear the filter, use $ gcloud alpha compute routers nats update MY\-NAT \e
-\-\-clear\-log\-filter \-\-router ROUTER \-\-region REGION
+Use \-\-[no\-]enable\-logging to enable and disable logging.
 
 \fILOG_FILTER\fR must be one of:
 
 .RS 2m
+.TP 2m
+\fBALL\fR
+Export logs for all connections handled by this NAT.
 .TP 2m
 \fBERRORS_ONLY\fR
 Export logs for connection failures only.
@@ -181,10 +181,11 @@ duration formats.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

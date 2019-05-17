@@ -10,8 +10,9 @@ DESCRIPTION
     (BETA) Read and manipulate Google Compute Engine managed instance groups.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -59,7 +60,7 @@ COMMANDS
         (BETA) Set managed instance group size.
 
      set-autohealing
-        (BETA) Set autohealing policy for managed instance group.
+        (BETA) (DEPRECATED) Set autohealing policy for managed instance group.
 
      set-autoscaling
         (BETA) Set autoscaling parameters of a managed instance group.
@@ -76,8 +77,15 @@ COMMANDS
      stop-autoscaling
         (BETA) Stop autoscaling a managed instance group.
 
+     update
+        (BETA) Update Google Compute Engine managed instance groups.
+
+     wait-until
+        (BETA) Wait until managed instance group reaches desired state.
+
      wait-until-stable
-        (BETA) Waits until state of managed instance group is stable.
+        (BETA) (DEPRECATED) Waits until state of managed instance group is
+        stable.
 
 NOTES
     This command is currently in BETA and may change without notice. These

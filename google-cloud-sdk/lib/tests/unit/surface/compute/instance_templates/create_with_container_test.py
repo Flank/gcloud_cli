@@ -339,6 +339,72 @@ class InstanceTemplatesCreateFromContainerTest(
               project='my-project',
           ))],)
 
+  def testMultipleNetworkInterfaceCards(self):
+    m = self.messages
+    self.Run("""
+        compute instance-templates create-with-container it-1
+          --network-interface network=default,address=
+          --network-interface network=some-net,address=8.8.8.8
+          --network-interface subnet=some-subnet
+          --region central1
+          --container-image=gcr.io/my-docker/test-image
+        """)
+    self.CheckRequests(
+        self.cos_images_list_request,
+        [(self.compute.instanceTemplates,
+          'Insert',
+          m.ComputeInstanceTemplatesInsertRequest(
+              instanceTemplate=m.InstanceTemplate(
+                  name='it-1',
+                  properties=m.InstanceProperties(
+                      canIpForward=False,
+                      disks=[self.default_attached_disk],
+                      labels=self.default_labels,
+                      machineType=self.default_machine_type,
+                      metadata=self.default_metadata,
+                      networkInterfaces=[
+                          m.NetworkInterface(
+                              accessConfigs=[
+                                  m.AccessConfig(
+                                      name='external-nat',
+                                      type=(m.AccessConfig.TypeValueValuesEnum
+                                            .ONE_TO_ONE_NAT))
+                              ],
+                              network='{0}/projects/my-project/global/networks/'
+                                      'default'.format(self.compute_uri)),
+                          m.NetworkInterface(
+                              accessConfigs=[
+                                  m.AccessConfig(
+                                      name='external-nat',
+                                      natIP='8.8.8.8',
+                                      type=(m.AccessConfig.TypeValueValuesEnum
+                                            .ONE_TO_ONE_NAT))
+                              ],
+                              network='{0}/projects/my-project/global/networks/'
+                                      'some-net'.format(self.compute_uri)),
+                          m.NetworkInterface(
+                              subnetwork='{0}/projects/my-project/regions/'
+                                         'central1/subnetworks/'
+                                         'some-subnet'.format(self.compute_uri))
+                      ],
+                      scheduling=m.Scheduling(automaticRestart=True),
+                      serviceAccounts=[self.default_service_account],
+                      tags=self.default_tags)
+              ),
+              project='my-project'))],)
+
+  def testMultiNicFlagAndOneNicFlag(self):
+    with self.AssertRaisesToolExceptionRegexp(
+        r'^arguments not allowed simultaneously: --network-interface, all of '
+        r'the following: --address, --network$'):
+      self.Run("""
+          compute instance-templates create-with-container it-1
+            --network-interface ''
+            --address 8.8.8.8
+            --network net
+            --container-image=gcr.io/my-docker/test-image
+          """)
+
   def testCreateScopeOptions(self):
     m = self.messages
     self.Run("""

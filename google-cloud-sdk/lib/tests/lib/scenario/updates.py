@@ -63,7 +63,6 @@ class Mode(enum.Enum):
         os.environ, UPDATE_MODES_ENV_VAR, '').upper().split(' ') if m}
     if 'ALL' in modes:
       return Mode._All()
-    # TODO(b/79161265): This should not be a pytype error.
     members = set(cls.__members__)
     unknown = modes - members
     if unknown:
@@ -71,7 +70,6 @@ class Mode(enum.Enum):
           'Unknown update mode values: [{}]. '
           'Valid values are: [{}]'
           .format(', '.join(unknown), ', '.join(m.name for m in cls._All())))
-    # pytype: disable=not-indexable
     return [cls[m] for m in modes]
 
   @classmethod

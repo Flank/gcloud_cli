@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.resource_manager import exceptions
 from googlecloudsdk.api_lib.resource_manager import folders
 from googlecloudsdk.api_lib.resource_manager import operations
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from tests.lib import test_case
 from tests.lib.surface.resource_manager import testbase
@@ -96,6 +97,18 @@ class FoldersMoveTest(testbase.FoldersUnitTestBase):
     return self.RunFolders('move',
                            folders.FolderNameToId(self.TEST_FOLDER.name),
                            *all_args)
+
+
+class FoldersMoveAlphaTest(FoldersMoveTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class FoldersMoveBetaTest(FoldersMoveTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 if __name__ == '__main__':

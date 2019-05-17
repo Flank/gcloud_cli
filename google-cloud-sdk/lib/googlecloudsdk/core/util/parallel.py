@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -74,7 +74,7 @@ class InvalidStateException(Exception):
 
 
 @six.add_metaclass(abc.ABCMeta)
-class BasePool(object):  # pytype: disable=ignored-abstractmethod
+class BasePool(object):
   """Base class for parallel pools.
 
   Provides a limited subset of the multiprocessing.Pool API.
@@ -136,7 +136,7 @@ class BasePool(object):  # pytype: disable=ignored-abstractmethod
 
 
 @six.add_metaclass(abc.ABCMeta)
-class BaseFuture(object):  # pytype: disable=ignored-abstractmethod
+class BaseFuture(object):
   """A future object containing a value that may not be available yet."""
 
   def Get(self):

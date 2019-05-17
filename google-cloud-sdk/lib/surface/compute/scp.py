@@ -30,8 +30,8 @@ _DETAILED_HELP = {
               'virtual machines via scp.'),
     'DESCRIPTION': """
 *{command}* securely copies files between a virtual machine instance and your
-local machine using the scp command. **This command does not work for Windows
-VMs.**
+local machine using the scp command.
+*This command does not work for Windows VMs.*
 
 In order to set up a successful transfer, follow these guidelines:
 *   Prefix remote file names with the virtual machine instance
@@ -93,7 +93,7 @@ def _Args(parser):
 class ScpGA(base.Command):
   """Copy files to and from Google Compute Engine virtual machines via scp."""
 
-  category = 'Tools'
+  category = base.TOOLS_CATEGORY
 
   @staticmethod
   def Args(parser):
@@ -155,7 +155,7 @@ class ScpBeta(ScpGA):
         [](https://cloud.google.com/compute/docs/instances/connecting-advanced#sshbetweeninstances).
         """)
 
-    iap_tunnel.AddConnectionHelperArgs(parser, mutex_scope)
+    iap_tunnel.AddSshTunnelArgs(parser, mutex_scope)
 
   def Run(self, args):
     """See scp_utils.BaseScpCommand.Run."""

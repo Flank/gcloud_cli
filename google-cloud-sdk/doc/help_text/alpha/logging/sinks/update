@@ -1,0 +1,80 @@
+NAME
+    gcloud alpha logging sinks update - updates a sink
+
+SYNOPSIS
+    gcloud alpha logging sinks update SINK_NAME [DESTINATION]
+        [--log-filter=LOG_FILTER]
+        [--billing-account=BILLING_ACCOUNT_ID | --folder=FOLDER_ID
+          | --organization=ORGANIZATION_ID]
+        [--dlp-deidentify-template=DLP_DEIDENTIFY_TEMPLATE
+          --dlp-inspect-template=DLP_INSPECT_TEMPLATE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Changes the [destination] or --log-filter associated with a sink.
+    The new destination must already exist and Stackdriver Logging must have
+    permission to write to it. Log entries are exported to the new destination
+    immediately.
+
+POSITIONAL ARGUMENTS
+     SINK_NAME
+        The name of the sink to update.
+
+     [DESTINATION]
+        A new destination for the sink. If omitted, the sink's existing
+        destination is unchanged.
+
+FLAGS
+     --log-filter=LOG_FILTER
+        A new filter expression for the sink. If omitted, the sink's existing
+        filter (if any) is unchanged.
+
+     At most one of these may be specified:
+
+       --billing-account=BILLING_ACCOUNT_ID
+          Update a sink associated with this billing account.
+
+       --folder=FOLDER_ID
+          Update a sink associated with this folder.
+
+       --organization=ORGANIZATION_ID
+          Update a sink associated with this organization.
+
+     Settings for Cloud DLP enabled sinks. If any of these arguments are
+     omitted they are unchanged.
+
+       --dlp-deidentify-template=DLP_DEIDENTIFY_TEMPLATE
+          Relative path to a Cloud DLP de-identification template resource. For
+          example "projects/my-project/deidentifyTemplates/my-template" or
+          "organizations/my-org/deidentifyTemplates/my-template".
+
+       --dlp-inspect-template=DLP_INSPECT_TEMPLATE
+          Relative path to a Cloud DLP inspection template resource. For
+          example "projects/my-project/inspectTemplates/my-template" or
+          "organizations/my-org/inspectTemplates/my-template".
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+EXAMPLES
+    To only update a sink filter, run:
+
+        $ gcloud alpha logging sinks update my-sink \
+            --log-filter='severity>=ERROR'
+
+    Detailed information about filters can be found at:
+    https://cloud.google.com/logging/docs/view/advanced_filters
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
+
+        $ gcloud logging sinks update
+        $ gcloud beta logging sinks update
+

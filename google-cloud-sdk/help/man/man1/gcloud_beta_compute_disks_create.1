@@ -11,7 +11,7 @@ gcloud beta compute disks create \- create Google Compute Engine persistent disk
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute disks create\fR \fIDISK_NAME\fR [\fIDISK_NAME\fR\ ...] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-guest\-os\-features\fR=[\fIGUEST_OS_FEATURE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-licenses\fR=[\fILICENSE\fR,...]] [\fB\-\-replica\-zones\fR=\fIZONE\fR,\fIZONE\fR] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-size\fR=\fISIZE\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR] [\fB\-\-kms\-key\fR=\fIKMS_KEY\fR\ :\ \fB\-\-kms\-keyring\fR=\fIKMS_KEYRING\fR\ \fB\-\-kms\-location\fR=\fIKMS_LOCATION\fR\ \fB\-\-kms\-project\fR=\fIKMS_PROJECT\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute disks create\fR \fIDISK_NAME\fR [\fIDISK_NAME\fR\ ...] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-guest\-os\-features\fR=[\fIGUEST_OS_FEATURE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-licenses\fR=[\fILICENSE\fR,...]] [\fB\-\-physical\-block\-size\fR=\fIPHYSICAL_BLOCK_SIZE\fR;\ default="4096"] [\fB\-\-replica\-zones\fR=\fIZONE\fR,\fIZONE\fR] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-resource\-policies\fR=[\fIRESOURCE_POLICY\fR,...]] [\fB\-\-size\fR=\fISIZE\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR] [\fB\-\-kms\-key\fR=\fIKMS_KEY\fR\ :\ \fB\-\-kms\-keyring\fR=\fIKMS_KEYRING\fR\ \fB\-\-kms\-location\fR=\fIKMS_LOCATION\fR\ \fB\-\-kms\-project\fR=\fIKMS_PROJECT\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -124,6 +124,12 @@ A list of URIs to license resources. The provided licenses will be added onto
 the created disks to indicate the licensing and billing policies.
 
 .TP 2m
+\fB\-\-physical\-block\-size\fR=\fIPHYSICAL_BLOCK_SIZE\fR; default="4096"
+Physical block size of the persistent disk in bytes. Valid values are
+4096(default) and 16384. \fIPHYSICAL_BLOCK_SIZE\fR must be one of: \fB4096\fR,
+\fB16384\fR.
+
+.TP 2m
 \fB\-\-replica\-zones\fR=\fIZONE\fR,\fIZONE\fR
 A comma\-separated list of exactly 2 zones that a regional disk will be
 replicated to. Required when creating regional disk. The zones must be in the
@@ -141,6 +147,11 @@ without a matching Customer\-Supplied Encryption Key in the supplied
 https://cloud.google.com/compute/docs/disks/customer\-supplied\-encryption for
 more details. Enabled by default, use \fB\-\-no\-require\-csek\-key\-create\fR
 to disable.
+
+.TP 2m
+\fB\-\-resource\-policies\fR=[\fIRESOURCE_POLICY\fR,...]
+A list of resource policy names to be added to the disk. The policies must exist
+in the same region as the disk.
 
 .TP 2m
 \fB\-\-size\fR=\fISIZE\fR
@@ -301,10 +312,11 @@ Alternatively, the zone can be stored in the environment variable
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

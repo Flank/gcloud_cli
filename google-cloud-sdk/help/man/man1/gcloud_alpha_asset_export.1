@@ -11,13 +11,19 @@ gcloud alpha asset export \- export the cloud assets to Google Cloud Storage
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha asset export\fR \fB\-\-output\-path\fR=\fIOUTPUT_PATH\fR [\fB\-\-asset\-types\fR=[\fIASSET_TYPES\fR,...]] [\fB\-\-content\-type\fR=\fICONTENT_TYPE\fR] [\fB\-\-organization\fR=\fIORGANIZATION_ID\fR] [\fB\-\-snapshot\-time\fR=\fISNAPSHOT_TIME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha asset export\fR (\fB\-\-output\-path\fR=\fIOUTPUT_PATH\fR\ |\ \fB\-\-output\-path\-prefix\fR=\fIOUTPUT_PATH_PREFIX\fR) [\fB\-\-asset\-types\fR=[\fIASSET_TYPES\fR,...]] [\fB\-\-content\-type\fR=\fICONTENT_TYPE\fR] [\fB\-\-snapshot\-time\fR=\fISNAPSHOT_TIME\fR] [\fB\-\-folder\fR=\fIFOLDER_ID\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION_ID\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Export the cloud assets to Google Cloud Storage.
+\fB(ALPHA)\fR Export the cloud assets to Google Cloud Storage. Use gcloud asset
+operations describe to get the latest status of the operation. Note that to
+export a project different from the project you want to bill, you can either
+explicitly set the billing/quota_project property or authenticate with a service
+account. See
+https://cloud.google.com/resource\-manager/docs/cloud\-asset\-inventory/gcloud\-asset
+for examples of using a service account.
 
 
 
@@ -25,11 +31,25 @@ gcloud alpha asset export \- export the cloud assets to Google Cloud Storage
 
 .RS 2m
 .TP 2m
+
+The destination path for exporting assets. Exactly one of these must be
+specified:
+
+.RS 2m
+.TP 2m
 \fB\-\-output\-path\fR=\fIOUTPUT_PATH\fR
 Google Cloud Storage URI where the results will go. URI must start with "gs://".
 For example, "gs://bucket_name/object_name"
 
+.TP 2m
+\fB\-\-output\-path\-prefix\fR=\fIOUTPUT_PATH_PREFIX\fR
+Google Cloud Storage URI where the results will go. URI must start with "gs://".
+For example, "gs://bucket_name/object_name_prefix", in which case each exported
+object uri is in format: "gs://bucket_name/object_name_prefix/<asset
+type>/<shard number>" and it only contains assets for that type.
 
+
+.RE
 .RE
 .sp
 
@@ -38,9 +58,11 @@ For example, "gs://bucket_name/object_name"
 .RS 2m
 .TP 2m
 \fB\-\-asset\-types\fR=[\fIASSET_TYPES\fR,...]
-A list of asset types (i.e., "google.compute.Disk") to take a snapshot. If
-specified and non\-empty, only assets matching the specified types will be
-returned.
+A list of asset types (i.e., "compute.googleapis.com/Disk") to take a snapshot.
+If specified and non\-empty, only assets matching the specified types will be
+returned. See
+https://cloud.google.com/resource\-manager/docs/cloud\-asset\-inventory/overview
+for supported asset types.
 
 .TP 2m
 \fB\-\-content\-type\fR=\fICONTENT_TYPE\fR
@@ -51,27 +73,54 @@ resource metadata, and specifying \f5iam\-policy\fR will export IAM policy set
 on assets. \fICONTENT_TYPE\fR must be one of: \fBresource\fR, \fBiam\-policy\fR.
 
 .TP 2m
+\fB\-\-snapshot\-time\fR=\fISNAPSHOT_TIME\fR
+Timestamp to take a snapshot on assets. This can only be a current or past time.
+If not specified, the current time will be used. Due to delays in resource data
+collection and indexing, there is a volatile window during which running the
+same query at different times may return different results. See $ gcloud topic
+datetimes for information on time formats.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-folder\fR=\fIFOLDER_ID\fR
+The ID of the folder which is the root asset.
+
+.TP 2m
 \fB\-\-organization\fR=\fIORGANIZATION_ID\fR
 The ID of the organization which is the root asset.
 
-.TP 2m
-\fB\-\-snapshot\-time\fR=\fISNAPSHOT_TIME\fR
-Timestamp to take a snapshot on assets. This could only be a current or past
-time. If not specified, the current time will be used. Due to delays in resource
-data collection and indexing, there is a volatile window during which running
-the same query at different time may return different results. See $ gcloud
-topic datetimes for information on time formats.
 
-
+.RE
 .RE
 .sp
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To export a snapshot of assets of type 'compute.googleapis.com/Disk' in project
+\'test\-project' at '2019\-03\-05T00:00:00Z' to 'gs://bucket\-name/object\-name'
+and only export the asset metadata, run:
+
+.RS 2m
+$ gcloud alpha asset export \-\-project='test\-project' \e
+    \-\-asset\-types='compute.googleapis.com/Disk' \e
+    \-\-snapshot\-time='2019\-03\-05T00:00:00Z' \e
+    \-\-output\-path='gs://bucket\-name/object\-name' \e
+    \-\-content\-type='resource'
+.RE
 
 
 
@@ -81,5 +130,10 @@ This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you will have to apply for early access and have your projects registered on the
 API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+https://cloud.google.com/support/. These variants are also available:
+
+.RS 2m
+$ gcloud asset export
+$ gcloud beta asset export
+.RE
 

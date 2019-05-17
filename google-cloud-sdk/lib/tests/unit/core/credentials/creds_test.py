@@ -305,15 +305,18 @@ class Sqlite3Tests(sdk_test_base.SdkBase, test_case.WithOutputCapture):
     access_token_cache = creds.AccessTokenCache(
         config.Paths().access_token_db_path)
     credentials = creds.FromJson(_GetJsonServiceADC())
+    credentials.token_response = json.loads("""{"id_token": "woweee"}""")
     self.assertIsNone(credentials.access_token)
     access_token_cache.Store(
         credentials.service_account_email,
         access_token='token1',
         token_expiry=datetime.datetime.utcnow() +
         datetime.timedelta(seconds=3600),
-        rapt_token=None)
+        rapt_token=None,
+        id_token=None)
     self.assertIsNone(credentials.access_token)
     new_cred = creds.MaybeAttachAccessTokenCacheStore(credentials)
+    self.assertIsNone(new_cred.token_response)
     self.assertEqual('token1', new_cred.access_token)
 
 

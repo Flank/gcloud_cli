@@ -1,0 +1,205 @@
+
+.TH "GCLOUD_ALPHA_AI\-PLATFORM_JOBS_SUBMIT_PREDICTION" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha ai\-platform jobs submit prediction \- start an AI Platform batch prediction job
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha ai\-platform jobs submit prediction\fR \fIJOB\fR \fB\-\-data\-format\fR=\fIDATA_FORMAT\fR \fB\-\-input\-paths\fR=\fIINPUT_PATH\fR,[\fIINPUT_PATH\fR,...] \fB\-\-output\-path\fR=\fIOUTPUT_PATH\fR \fB\-\-region\fR=\fIREGION\fR (\fB\-\-model\fR=\fIMODEL\fR\ |\ \fB\-\-model\-dir\fR=\fIMODEL_DIR\fR) [\fB\-\-batch\-size\fR=\fIBATCH_SIZE\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-max\-worker\-count\fR=\fIMAX_WORKER_COUNT\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-signature\-name\fR=\fISIGNATURE_NAME\fR] [\fB\-\-version\fR=\fIVERSION\fR] [\fB\-\-accelerator\-count\fR=\fIACCELERATOR_COUNT\fR\ \fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Start an AI Platform batch prediction job.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIJOB\fR
+Name of the batch prediction job.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-data\-format\fR=\fIDATA_FORMAT\fR
+Data format of the input files. \fIDATA_FORMAT\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBtext\fR
+Text files; see https://www.tensorflow.org/guide/datasets#consuming_text_data
+.TP 2m
+\fBtf\-record\fR
+TFRecord files; see
+https://www.tensorflow.org/guide/datasets#consuming_tfrecord_data
+.TP 2m
+\fBtf\-record\-gzip\fR
+GZIP\-compressed TFRecord files.
+.RE
+.sp
+
+
+.TP 2m
+\fB\-\-input\-paths\fR=\fIINPUT_PATH\fR,[\fIINPUT_PATH\fR,...]
+Google Cloud Storage paths to the instances to run prediction on.
+
+Wildcards (\f5*\fR) accepted at the \fBend\fR of a path. More than one path can
+be specified if multiple file patterns are needed. For example,
+
+.RS 2m
+gs://my\-bucket/instances*,gs://my\-bucket/other\-instances1
+.RE
+
+will match any objects whose names start with \f5instances\fR in
+\f5my\-bucket\fR as well as the \f5other\-instances1\fR bucket, while
+
+.RS 2m
+gs://my\-bucket/instance\-dir/*
+.RE
+
+will match any objects in the \f5instance\-dir\fR "directory" (since directories
+aren't a first\-class Cloud Storage concept) of \f5my\-bucket\fR.
+
+.TP 2m
+\fB\-\-output\-path\fR=\fIOUTPUT_PATH\fR
+Google Cloud Storage path to which to save the output. Example:
+gs://my\-bucket/output.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+The Google Compute Engine region to run the job in.
+
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-model\fR=\fIMODEL\fR
+Name of the model to use for prediction.
+
+.TP 2m
+\fB\-\-model\-dir\fR=\fIMODEL_DIR\fR
+Google Cloud Storage location where the model files are located.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-batch\-size\fR=\fIBATCH_SIZE\fR
+The number of records per batch. The service will buffer batch_size number of
+records in memory before invoking TensorFlow. Defaults to 64 if not specified.
+
+.TP 2m
+\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of label KEY=VALUE pairs to add.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
+.TP 2m
+\fB\-\-max\-worker\-count\fR=\fIMAX_WORKER_COUNT\fR
+The maximum number of workers to be used for parallel processing. Defaults to 10
+if not specified.
+
+.TP 2m
+\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR
+AI Platform runtime version for this job. Defaults to a stable version, which is
+defined in documentation along with the list of supported versions:
+https://cloud.google.com/ml\-engine/docs/tensorflow/runtime\-version\-list
+
+.TP 2m
+\fB\-\-signature\-name\fR=\fISIGNATURE_NAME\fR
+The name of the signature defined in the SavedModel to use for this job.
+Defaults to DEFAULT_SERVING_SIGNATURE_DEF_KEY in
+https://www.tensorflow.org/api_docs/python/tf/saved_model/signature_constants,
+which is "serving_default". Only applies to TensorFlow models.
+
+.TP 2m
+\fB\-\-version\fR=\fIVERSION\fR
+Model version to be used.
+
+This flag may only be given if \-\-model is specified. If unspecified, the
+default version of the model will be used. To list versions for a model, run
+
+.RS 2m
+$ gcloud ai\-platform versions list
+.RE
+
+.TP 2m
+
+Accelerator Configuration.
+
+.RS 2m
+.TP 2m
+\fB\-\-accelerator\-count\fR=\fIACCELERATOR_COUNT\fR
+The number of accelerators to attach to the machines. Must be >= 1. This flag
+must be specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR
+The available types of accelerators. \fIACCELERATOR_TYPE\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBnvidia\-tesla\-k80\fR
+NVIDIA Tesla K80 GPU
+.TP 2m
+\fBnvidia\-tesla\-p100\fR
+NVIDIA Tesla P100 GPU.
+.RE
+.sp
+
+This flag must be specified if any of the other arguments in this group are
+specified.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
+
+.RS 2m
+$ gcloud ai\-platform jobs submit prediction
+$ gcloud beta ai\-platform jobs submit prediction
+.RE
+

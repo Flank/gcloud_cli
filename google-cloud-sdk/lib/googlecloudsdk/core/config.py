@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2013 Google Inc. All Rights Reserved.
+# Copyright 2013 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -96,7 +96,7 @@ class InstallationConfig(object):
       seconds since the epoch.
     """
     return int(time.strftime(
-        InstallationConfig.REVISION_FORMAT_STRING, time_struct))  # pytype: disable=wrong-arg-types
+        InstallationConfig.REVISION_FORMAT_STRING, time_struct))
 
   @staticmethod
   def ParseRevision(revision):
@@ -111,7 +111,7 @@ class InstallationConfig(object):
       time.struct_time, The parsed time.
     """
     return time.strptime(str(revision),
-                         InstallationConfig.REVISION_FORMAT_STRING)  # pytype: disable=wrong-arg-types
+                         InstallationConfig.REVISION_FORMAT_STRING)
 
   @staticmethod
   def ParseRevisionAsSeconds(revision):
@@ -194,6 +194,7 @@ def EnsureSDKWriteAccess(sdk_root_override=None):
     raise exceptions.RequiresAdminRightsError(sdk_root)
 
 
+# Doesn't work in par or stub files.
 def GcloudPath():
   """Gets the path the main gcloud entrypoint.
 

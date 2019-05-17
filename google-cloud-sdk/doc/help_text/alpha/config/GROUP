@@ -28,8 +28,9 @@ DESCRIPTION
     For more information on configurations, see gcloud topic configurations.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -126,6 +127,10 @@ AVAILABLE PROPERTIES
             equivalent of using the global --verbosity flag. Supported
             verbosity levels: debug, info, warning, error, and none.
 
+     accessibility
+         screen_reader
+            Make gcloud more screen reader friendly.
+
      app
          cloud_build_timeout
             Timeout, in seconds, to wait for Docker builds to complete during
@@ -173,7 +178,8 @@ AVAILABLE PROPERTIES
             caching is disabled.
 
          timeout
-            Timeout, in seconds, to wait for builds to complete.
+            Timeout, in seconds, to wait for builds to complete. If unset,
+            defaults to 10 minutes.
 
          use_kaniko
             If True, kaniko will be used to build images described by a
@@ -221,18 +227,6 @@ AVAILABLE PROPERTIES
             Name of the cluster to use by default when working with Kubernetes
             Engine.
 
-         new_scopes_behavior
-            If True, use new scopes behavior and do not add compute-rw,
-            storage-ro, service-control, or service-management scopes. The
-            former two (compute-rw and storage-ro) only apply to clusters at
-            Kubernetes v1.9 and below; starting v1.10, compute-rw and
-            storage-ro are not added by default. Any of these scopes may be
-            added explicitly using --scopes. Using new scopes behavior will be
-            the default in a future release. Additionally, if this property is
-            set to True, using --[no-]enable-cloud-endpoints is not allowed.
-            This property is ignored in alpha and beta, since these tracks
-            always use the new behavior. See --scopes help for more info.
-
          use_application_default_credentials
             If True, use application default credentials to authenticate to the
             cluster API server.
@@ -257,9 +251,13 @@ AVAILABLE PROPERTIES
 
      filestore
          location
-            Default location to use when working with Cloud Filestore
-            locations. When a --location flag is required but not provided, the
-            command will fall back to this value, if set.
+            (DEPRECATED) Please use the --location flag or set the
+            filestore/zone property.
+
+         zone
+            Default zone to use when working with Cloud Filestore zones. When a
+            --zone flag is required but not provided, the command will fall
+            back to this value, if set.
 
      functions
          region
@@ -273,6 +271,17 @@ AVAILABLE PROPERTIES
             If True, do not upload .gcloudignore files (see $ gcloud topic
             gcloudignore). If False, turn off the gcloudignore mechanism
             entirely and upload all files.
+
+     healthcare
+         dataset
+            Default dataset to use when working with Cloud Healthcare
+            resources. When a --dataset flag is required but not provided, the
+            command will fall back to this value, if set.
+
+         location
+            Default location to use when working with Cloud Healthcare
+            resources. When a --location flag is required but not provided, the
+            command will fall back to this value.
 
      interactive
          bottom_bindings_line

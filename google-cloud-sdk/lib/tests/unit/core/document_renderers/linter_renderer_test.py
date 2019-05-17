@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 import textwrap
 
 from googlecloudsdk.core.document_renderers import linter_renderer
+from googlecloudsdk.core.document_renderers import render_document
 from tests.lib.core.document_renderers import test_base
 
 
@@ -40,18 +41,66 @@ personal pronouns in this description.
 To run the fake command, run:
 
   $ link:gcloud/fake/command/[gcloud fake command] positional
+
 This also has no personal pronouns and the example command starts with the
 command name.
     """)
     expected = textwrap.dedent("""\
+# NAME_PRONOUN_CHECK SUCCESS
+# NAME_DESCRIPTION_CHECK SUCCESS
+# NAME_LENGTH_CHECK SUCCESS
 There are no errors for the NAME section.
-
+# DESCRIPTION_PRONOUN_CHECK SUCCESS
 There are no errors for the DESCRIPTION section.
-
+# EXAMPLE_PRESENT_CHECK SUCCESS
+# EXAMPLES_PRONOUN_CHECK SUCCESS
+# EXAMPLE_FLAG_EQUALS_CHECK SUCCESS
+# EXAMPLE_NONEXISTENT_FLAG_CHECK SUCCESS
 There are no errors for the EXAMPLES section.
+""")
+    meta_data = render_document.CommandMetaData(is_group=False)
+    self.Run('linter', markdown, expected, notes='', command_metadata=meta_data)
 
+  def testNoSections(self):
+    markdown = textwrap.dedent("""\
     """)
-    self.Run('linter', markdown, expected, notes='')
+    expected = textwrap.dedent("""\
+# EXAMPLE_PRESENT_CHECK FAILED: You have not included an example in the """
+                               """Examples section.\n""")
+    meta_data = render_document.CommandMetaData(is_group=False)
+    self.Run('linter', markdown, expected, notes='', command_metadata=meta_data)
+
+  def testNoExampleAlpha(self):
+    markdown = textwrap.dedent("""\
+# NAME
+
+gcloud alpha fake command - fake alpha command to test not throwing examples
+error
+""")
+    expected = textwrap.dedent("""\
+    # NAME_PRONOUN_CHECK SUCCESS
+    # NAME_DESCRIPTION_CHECK SUCCESS
+    # NAME_LENGTH_CHECK SUCCESS
+    There are no errors for the NAME section.
+    """)
+    meta_data = render_document.CommandMetaData(is_group=False)
+    self.Run('linter', markdown, expected, notes='', command_metadata=meta_data)
+
+  def testNoExampleNotAlpha(self):
+    markdown = textwrap.dedent("""\
+# NAME
+
+gcloud fake command - fake command to test throwing examples error
+""")
+    expected = textwrap.dedent("""\
+    # NAME_PRONOUN_CHECK SUCCESS
+    # NAME_DESCRIPTION_CHECK SUCCESS
+    # NAME_LENGTH_CHECK SUCCESS
+    There are no errors for the NAME section.
+    # EXAMPLE_PRESENT_CHECK FAILED: You have not included an example in the """
+                               """Examples section.\n""")
+    meta_data = render_document.CommandMetaData(is_group=False)
+    self.Run('linter', markdown, expected, notes='', command_metadata=meta_data)
 
   def testNameTooLong(self):
     test_linter_renderer = linter_renderer.LinterRenderer()
@@ -59,70 +108,124 @@ There are no errors for the EXAMPLES section.
 # NAME
 
 gcloud info - display information about the current gcloud environment and
-this is making the line too long
-
-# EXAMPLES
-To run the fake command, run:
-
-  $ link:gcloud/info[gcloud info]
-    """)
+this is making the name section description way too long and over the max length
+allowed
+""")
     expected = textwrap.dedent("""\
-Refer to the detailed style guide: go/cloud-sdk-help-guide#name
-This is the analysis for NAME:
-Please shorten the name section to less than """ +
+# NAME_PRONOUN_CHECK SUCCESS
+# NAME_DESCRIPTION_CHECK SUCCESS
+# NAME_LENGTH_CHECK FAILED: Please shorten the name section description to """
+                               + """less than """ +
                                str(test_linter_renderer._NAME_WORD_LIMIT) +
-                               """ words.\n
-There are no errors for the EXAMPLES section.\n\n""")
-    self.Run('linter', markdown, expected, notes='')
+                               """ words.\n""")
+    meta_data = render_document.CommandMetaData(is_group=True)
+    self.Run('linter', markdown, expected, notes='', command_metadata=meta_data)
 
   def testNoNameExplanation(self):
     markdown = textwrap.dedent("""\
 # NAME
 gcloud fake command -
 
-# EXAMPLES
-
-To run the fake command, run:
-
-  $ link:gcloud/fake/command/[gcloud fake command]
-    """)
+""")
     expected = textwrap.dedent("""\
-Refer to the detailed style guide: go/cloud-sdk-help-guide#name
-This is the analysis for NAME:
-Please add an explanation for the command.
-
-There are no errors for the EXAMPLES section.\n\n""")
-    self.Run('linter', markdown, expected, notes='')
-
-  def testNoSections(self):
-    markdown = textwrap.dedent("""\
-    """)
-    expected = textwrap.dedent("""\
-Refer to the detailed style guide: go/cloud-sdk-help-guide#examples
-This is the analysis for EXAMPLES:
-You have not included an example in the Examples section.\n\n""")
-    self.Run('linter', markdown, expected, notes='')
+# NAME_PRONOUN_CHECK SUCCESS
+# NAME_DESCRIPTION_CHECK FAILED: Please add an explanation for the """
+                               """command.
+# NAME_LENGTH_CHECK SUCCESS\n""")
+    meta_data = render_document.CommandMetaData(is_group=True)
+    self.Run('linter', markdown, expected, notes='', command_metadata=meta_data)
 
   def testPersonalPronoun(self):
     markdown = textwrap.dedent("""\
 # NAME
 gcloud fake command - this is a brief summary
 
-# EXAMPLES
-
-To run the fake command, run:
-
-  $ link:gcloud/fake/command/[gcloud fake command]
-this is the examples section that has personal pronouns... me you us we bla
+# DESCRIPTION
+this is the description section that has personal pronouns... me you us we bla
     """)
     expected = textwrap.dedent("""\
+# NAME_PRONOUN_CHECK SUCCESS
+# NAME_DESCRIPTION_CHECK SUCCESS
+# NAME_LENGTH_CHECK SUCCESS
 There are no errors for the NAME section.
-
-Refer to the detailed style guide: go/cloud-sdk-help-guide#examples
-This is the analysis for EXAMPLES:\nPlease remove personal pronouns.\n\n""")
-    self.Run('linter', markdown, expected, notes='')
+# DESCRIPTION_PRONOUN_CHECK FAILED: Please remove personal pronouns in the """
+                               """DESCRIPTION section.\n""")
+    meta_data = render_document.CommandMetaData(is_group=True)
+    self.Run('linter', markdown, expected, notes='', command_metadata=meta_data)
 
   def testNotHeadingToLint(self):
+    markdown = textwrap.dedent("""\
+# NAME
+gcloud fake command - this is a brief summary
+
+# NOT A HEADING TO KEEP
+
+this is the filler text for the section not being kept
+    """)
+    expected = textwrap.dedent("""\
+    # NAME_PRONOUN_CHECK SUCCESS
+    # NAME_DESCRIPTION_CHECK SUCCESS
+    # NAME_LENGTH_CHECK SUCCESS
+    There are no errors for the NAME section.\n""")
+    meta_data = render_document.CommandMetaData(is_group=True)
+    self.Run('linter', markdown, expected, notes='', command_metadata=meta_data)
+
+  def testNotValidFlagForCommandNotEmptyFlag(self):
+    markdown = textwrap.dedent("""\
+    # NAME
+
+    gcloud fake command - this is a brief summary
+
+    # EXAMPLES
+    To run the fake command, run:
+
+      $ link:gcloud/fake/command/[gcloud fake command] \
+      positional --good-flag-name=GOOD --bad-flag-name=BAD_VALUE
+
+    """)
+    expected = textwrap.dedent("""\
+    # NAME_PRONOUN_CHECK SUCCESS
+    # NAME_DESCRIPTION_CHECK SUCCESS
+    # NAME_LENGTH_CHECK SUCCESS
+    There are no errors for the NAME section.
+    # EXAMPLE_PRESENT_CHECK SUCCESS
+    # EXAMPLES_PRONOUN_CHECK SUCCESS
+    # EXAMPLE_FLAG_EQUALS_CHECK SUCCESS
+    # EXAMPLE_NONEXISTENT_FLAG_CHECK FAILED: The following flags are not """
+                               """valid for the command: --bad-flag-name\n""")
+    meta_data = render_document.CommandMetaData(flags=['--good-flag-name'],
+                                                is_group=False)
+    self.Run('linter', markdown, expected, notes='', command_metadata=meta_data)
+
+  def testNotValidFlagForCommandEmptyFlag(self):
+    markdown = textwrap.dedent("""\
+    # NAME
+
+    gcloud fake command - this is a brief summary
+
+    # EXAMPLES
+    To run the fake command, run:
+
+      $ link:gcloud/fake/command/[gcloud fake command] \
+      positional -- other things for command args
+
+    """)
+    expected = textwrap.dedent("""\
+    # NAME_PRONOUN_CHECK SUCCESS
+    # NAME_DESCRIPTION_CHECK SUCCESS
+    # NAME_LENGTH_CHECK SUCCESS
+    There are no errors for the NAME section.
+    # EXAMPLE_PRESENT_CHECK SUCCESS
+    # EXAMPLES_PRONOUN_CHECK SUCCESS
+    # EXAMPLE_FLAG_EQUALS_CHECK SUCCESS
+    # EXAMPLE_NONEXISTENT_FLAG_CHECK SUCCESS
+    There are no errors for the EXAMPLES section.
+    """)
+    meta_data = render_document.CommandMetaData(flags=['--good-flag-name'],
+                                                is_group=False)
+    self.Run('linter', markdown, expected, notes='', command_metadata=meta_data)
+
+  def testCatchNoEqualsInNonBoolFlag(self):
     markdown = textwrap.dedent("""\
 # NAME
 gcloud fake command - this is a brief summary
@@ -131,44 +234,53 @@ gcloud fake command - this is a brief summary
 
 To run the fake command, run:
 
-  $ link:gcloud/fake/command/[gcloud fake command]
+  $ link:gcloud/fake/command/[gcloud fake command] \
+    --good=value --bad bad_value
 
-# NOT A HEADING TO KEEP
-
-this is the filler text for the section not being kept
     """)
     expected = textwrap.dedent("""\
+    # NAME_PRONOUN_CHECK SUCCESS
+    # NAME_DESCRIPTION_CHECK SUCCESS
+    # NAME_LENGTH_CHECK SUCCESS
     There are no errors for the NAME section.
+    # EXAMPLE_PRESENT_CHECK SUCCESS
+    # EXAMPLES_PRONOUN_CHECK SUCCESS
+    # EXAMPLE_FLAG_EQUALS_CHECK FAILED: There should be an `=` between the """
+                               """flag name and the value for the following """
+                               """flags: --bad
+    # EXAMPLE_NONEXISTENT_FLAG_CHECK SUCCESS\n""")
+    meta_data = render_document.CommandMetaData(flags=['--good', '--bad'],
+                                                is_group=False)
+    self.Run('linter', markdown, expected, notes='', command_metadata=meta_data)
 
-    There are no errors for the EXAMPLES section.\n\n""")
-    self.Run('linter', markdown, expected, notes='')
+  def testIgnoreNoEqualsInBoolFlag(self):
+    markdown = textwrap.dedent("""\
+# NAME
+gcloud fake command - this is a brief summary
 
-# This test runs successfully when _analyze_example_flags_equals() is called.
-# However this method is not invoked until b/121254697 is fixed.
+# EXAMPLES
+To run the fake command, run:
 
-#   def testNoEqualsInFlag(self):
-#     markdown = textwrap.dedent("""\
-# # NAME
-# gcloud fake command - this is a brief summary
-#
-# # EXAMPLES
-#
-# To run the fake command, run:
-#
-#   $ link:gcloud/fake/command/[gcloud fake command] \
-#     --good=value --bad bad_value
-#
-#     """)
-#
-#     expected = textwrap.dedent("""\
-#     There are no errors for the NAME section.\n
-#     Refer to the detailed style guide: go/cloud-sdk-help-guide#examples
-#     This is the analysis for EXAMPLES:
-#     There should be a `=` between the flag name and the value.
-#     The following flags are not formatted properly:
-#     bad\n
-#     """)
-#     self.Run('linter', markdown, expected, notes='')
+  $ link:gcloud/fake/command/[gcloud fake command] positional \
+    --non-bool value --bool positional
+
+    """)
+    expected = textwrap.dedent("""\
+    # NAME_PRONOUN_CHECK SUCCESS
+    # NAME_DESCRIPTION_CHECK SUCCESS
+    # NAME_LENGTH_CHECK SUCCESS
+    There are no errors for the NAME section.
+    # EXAMPLE_PRESENT_CHECK SUCCESS
+    # EXAMPLES_PRONOUN_CHECK SUCCESS
+    # EXAMPLE_FLAG_EQUALS_CHECK FAILED: There should be an `=` between the """
+                               """flag name and the value for the """
+                               """following flags: --non-bool
+    # EXAMPLE_NONEXISTENT_FLAG_CHECK SUCCESS\n""")
+    meta_data = render_document.CommandMetaData(flags=['--bool', '--non-bool'],
+                                                bool_flags=['--bool'],
+                                                is_group=False)
+    self.Run('linter', markdown, expected, notes='', command_metadata=meta_data)
+
 
 if __name__ == '__main__':
   test_base.main()

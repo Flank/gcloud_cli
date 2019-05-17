@@ -1,0 +1,178 @@
+
+.TH "GCLOUD_BETA_COMPUTE_INSTANCE\-GROUPS_MANAGED_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta compute instance\-groups managed update \- update Google Compute Engine managed instance groups
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta compute instance\-groups managed update\fR \fINAME\fR [\fB\-\-instance\-redistribution\-type\fR=\fITYPE\fR] [\fB\-\-clear\-autohealing\fR\ |\ \fB\-\-initial\-delay\fR=\fIINITIAL_DELAY\fR\ \fB\-\-health\-check\fR=\fIHEALTH_CHECK\fR\ |\ \fB\-\-http\-health\-check\fR=\fIHTTP_HEALTH_CHECK\fR\ |\ \fB\-\-https\-health\-check\fR=\fIHTTPS_HEALTH_CHECK\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR \fBgcloud beta compute instance\-groups managed update\fR allows
+you to specify or modify AutoHealingPolicy for an existing managed instance
+group.
+
+When updating the AutoHealingPolicy, you may specify the health check, initial
+delay, or both. If the field is unspecified, its value won't be modified. If
+\f5\-\-health\-check\fR is specified, the health check will be used to monitor
+the health of your application. Whenever the health check signal for the
+instance becomes \f5UNHEALTHY\fR, the autohealing action (\f5RECREATE\fR) on an
+instance will be performed.
+
+If no health check is specified, the instance autohealing will be triggered by
+the instance status only (i.e. the autohealing action (\f5RECREATE\fR) on an
+instance will be performed if \f5instance.status\fR is not \f5RUNNING\fR).
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+Name of the managed instance group to update.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-instance\-redistribution\-type\fR=\fITYPE\fR
+Specify type of instance redistribution policy. Instance redistribution type
+gives possibility to enable or disable automatic instance redistribution between
+zones to its target distribution. Target distribution is a state of regional
+managed instance group where all instances are spread out equally between all
+target zones.
+
+Instance redistribution type may be specified for non\-autoscaled regional
+managed instance group only. By default it is set to PROACTIVE.
+
+The following types are available:
+
+.RS 2m
+.IP "\(em" 2m
+NONE \- managed instance group will not take any action to bring instances to
+its target distribution.
+
+.IP "\(em" 2m
+PROACTIVE \- managed instance group will actively converge all instances between
+zones to its target distribution.
+
+.RE
+.RE
+.sp
+\fITYPE\fR must be one of: \fBNONE\fR, \fBPROACTIVE\fR.
+
+.RS 2m
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-autohealing\fR
+Clears all autohealing policy fields for the managed instance group.
+
+.TP 2m
+\fB\-\-initial\-delay\fR=\fIINITIAL_DELAY\fR
+Specifies the length of time during which the instance is known to be
+initializing and should not be autohealed even if unhealthy. This value cannot
+be greater than 1 hour. See $ gcloud topic datetimes for information on duration
+formats.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-health\-check\fR=\fIHEALTH_CHECK\fR
+Name of the health check to operate on.
+
+.TP 2m
+\fB\-\-http\-health\-check\fR=\fIHTTP_HEALTH_CHECK\fR
+(DEPRECATED) HTTP health check object used for autohealing instances in this
+group.
+
+HttpHealthCheck is deprecated. Use \-\-health\-check instead.
+
+.TP 2m
+\fB\-\-https\-health\-check\fR=\fIHTTPS_HEALTH_CHECK\fR
+(DEPRECATED) HTTPS health check object used for autohealing instances in this
+group.
+
+HttpsHealthCheck is deprecated. Use \-\-health\-check instead.
+
+.RE
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the managed instance group to update. If not specified, you may be
+prompted to select a region.
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+Overrides the default \fBcompute/region\fR property value for this command
+invocation.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+Zone of the managed instance group to update. If not specified, you may be
+prompted to select a zone.
+
+A list of zones can be fetched by running:
+
+.RS 2m
+$ gcloud compute zones list
+.RE
+
+Overrides the default \fBcompute/zone\fR property value for this command
+invocation.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud compute instance\-groups managed update
+$ gcloud alpha compute instance\-groups managed update
+.RE
+

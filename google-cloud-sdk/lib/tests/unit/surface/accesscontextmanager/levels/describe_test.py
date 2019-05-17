@@ -25,10 +25,10 @@ from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
 
 
-class LevelsDescribeTestBeta(accesscontextmanager.Base):
+class LevelsDescribeTestGA(accesscontextmanager.Base):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)
@@ -62,7 +62,7 @@ class LevelsDescribeTestBeta(accesscontextmanager.Base):
 
     self.assertEqual(result, level)
 
-  def testDelete_PolicyFromProperty(self):
+  def testDescribe_PolicyFromProperty(self):
     self.SetUpForTrack(self.track)
     level = self._MakeBasicLevel('my_level', title='My Level',
                                  combining_function='AND')
@@ -76,10 +76,17 @@ class LevelsDescribeTestBeta(accesscontextmanager.Base):
     self.assertEqual(result, level)
 
 
-class LevelsDescribeTestAlpha(LevelsDescribeTestBeta):
+class LevelsDescribeTestBeta(LevelsDescribeTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class LevelsDescribeTestAlpha(LevelsDescribeTestGA):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
+
 
 if __name__ == '__main__':
   test_case.main()

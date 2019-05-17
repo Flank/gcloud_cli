@@ -1,0 +1,36 @@
+NAME
+    gcloud alpha compute external-vpn-gateways describe - describe a Google
+        Compute Engine external VPN gateway
+
+SYNOPSIS
+    gcloud alpha compute external-vpn-gateways describe NAME
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute external-vpn-gateways describe is used to
+    display all data associated with a Google Compute Engine external VPN
+    gateway in a project.
+
+    An external VPN gateway provides the information to Google Cloud Platform
+    about your on-premises side or another Cloud provider's VPN gateway.
+
+POSITIONAL ARGUMENTS
+     NAME
+        Name of the external VPN gateway to describe.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. This variant is also available:
+
+        $ gcloud beta compute external-vpn-gateways describe
+

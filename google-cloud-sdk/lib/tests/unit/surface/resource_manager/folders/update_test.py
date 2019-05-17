@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 import copy
 
 from googlecloudsdk.api_lib.resource_manager import folders
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.resource_manager import testbase
 
@@ -57,6 +58,18 @@ class FoldersUpdateTest(testbase.FoldersUnitTestBase):
 
   def DoRequestWithoutName(self):
     self.RunFolders('update', folders.FolderNameToId(self.TEST_FOLDER.name))
+
+
+class FoldersUpdateAlphaTest(FoldersUpdateTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class FoldersUpdateBetaTest(FoldersUpdateTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 if __name__ == '__main__':

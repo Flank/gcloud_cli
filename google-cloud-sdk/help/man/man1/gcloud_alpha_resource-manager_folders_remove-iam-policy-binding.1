@@ -11,14 +11,15 @@ gcloud alpha resource\-manager folders remove\-iam\-policy\-binding \- remove IA
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha resource\-manager folders remove\-iam\-policy\-binding\fR \fIFOLDER_ID\fR \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha resource\-manager folders remove\-iam\-policy\-binding\fR \fIFOLDER\fR \fB\-\-member\fR=\fIMEMBER\fR \fB\-\-role\fR=\fIROLE\fR [\fB\-\-all\fR\ |\ \fB\-\-condition\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-condition\-from\-file\fR=\fICONDITION_FROM_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
 \fB(ALPHA)\fR Removes a policy binding to the IAM policy of a folder, given a
-folder ID and the binding.
+folder ID and the binding. One binding consists of a member, a role, and an
+optional condition.
 
 
 
@@ -26,10 +27,17 @@ folder ID and the binding.
 
 .RS 2m
 .TP 2m
-\fIFOLDER_ID\fR
-ID for the folder to which you want to add a binding
+
+Folder resource \- The ID of the folder to remove the IAM binding. This
+represents a Cloud resource. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIFOLDER\fR
+ID of the folder or fully qualified identifier for the folder.
 
 
+.RE
 .RE
 .sp
 
@@ -48,11 +56,11 @@ Examples: \f5user:test\-user@gmail.com\fR, \f5group:admins@example.com\fR,
 Can also be one of the following special values:
 .RS 2m
 .IP "\(em" 2m
-\f5allUsers\fR \- anyone who is on the internet, with or without a Google
-account.
+\f5allUsers\fR \- Special identifier that represents anyone who is on the
+internet, with or without a Google account.
 .IP "\(em" 2m
-\f5allAuthenticatedUsers\fR \- anyone who is authenticated with a Google account
-or a service account.
+\f5allAuthenticatedUsers\fR \- Special identifier that represents anyone who is
+authenticated with a Google account or a service account.
 .RE
 .RE
 .sp
@@ -66,33 +74,103 @@ The role to remove the member from.
 .RE
 .sp
 
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-all\fR
+Remove all bindings with this role and member, irrespective of any conditions.
+
+.TP 2m
+\fB\-\-condition\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+
+Condition of the binding to be removed. When condition is explicitly specified
+as \f5None\fR (e.g. \-\-condition=None), it matches a binding without a
+condition. Otherwise, only the binding with a condition which exactly matches
+the specified condition (including the optional description) will be removed.
+
+.TP 2m
+\fBexpression\fR
+(Required) Expression of the condition which evaluates to True or False. This
+uses a subset of Common Expression Language syntax.
+
+.TP 2m
+\fBtitle\fR
+(Required) Title for the expression, i.e. a short string describing its purpose.
+
+.TP 2m
+\fBdescription\fR
+(Optional) Description for the expression. This is a longer text which describes
+the expression.
+
+NOTE: An unsatisfied condition will not allow access via this binding.
+
+.TP 2m
+\fB\-\-condition\-from\-file\fR=\fICONDITION_FROM_FILE\fR
+Path to a local JSON or YAML file that defines the condition. To see available
+fields, see the help for \f5\-\-condition\fR.
+
+
+.RE
+.RE
+.sp
+
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBcloudresourcemanager/v2\fR API. The full documentation
+for this API can be found at: https://cloud.google.com/resource\-manager
 
 
 
 .SH "EXAMPLES"
 
 To remove an IAM policy binding for the role of 'roles/editor' for the user
-\'test\-user@gmail.com' on folder with identifier '3589215982', run:
+\'test\-user@gmail.com' on the folder 'folder\-id', run:
 
 .RS 2m
 $ gcloud alpha resource\-manager folders remove\-iam\-policy\-binding \e
-    3589215982 \-\-member='user:test\-user@gmail.com' \e
+    folder\-id \-\-member='user:test\-user@gmail.com' \e
     \-\-role='roles/editor'
 .RE
 
-To remove an IAM policy binding for the role of 'roles/editor' from all
-authenticated users on folder '3589215982', run:
+To remove an IAM policy binding with a condition of expression='request.time <
+timestamp("2019\-01\-01T00:00:00Z")', title='expires_end_of_2018', and
+description='Expires at midnight on 2018\-12\-31' for the role of
+\'roles/storage.objectAdmin' for the user 'test\-user@gmail.com' on the folder
+\'folder\-id', run:
 
 .RS 2m
 $ gcloud alpha resource\-manager folders remove\-iam\-policy\-binding \e
-    3589215982 \-\-member='allAuthenticatedUsers' \e
-    \-\-role='roles/editor'
+    folder\-id \-\-member='user:test\-user@gmail.com' \e
+    \-\-role='roles/storage.objectAdmin' \e
+    \-\-condition='expression=request.time <
+ timestamp("2019\-01\-01T00:00:00Z"),title=expires_end_of_2018,descrip\e
+tion=Expires at midnight on 2018\-12\-31'
+.RE
+
+To remove all IAM policy bindings regardless of the condition for the role of
+\'roles/storage.objectAdmin' and for the user 'test\-user@gmail.com' on the
+folder 'folder\-id', run:
+
+.RS 2m
+$ gcloud alpha resource\-manager folders remove\-iam\-policy\-binding \e
+    folder\-id \-\-member='user:test\-user@gmail.com' \e
+    \-\-role='roles/storage.objectAdmin' \-\-all
 .RE
 
 See https://cloud.google.com/iam/docs/managing\-policies for details of policy
@@ -106,5 +184,10 @@ This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you will have to apply for early access and have your projects registered on the
 API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+https://cloud.google.com/support/. These variants are also available:
+
+.RS 2m
+$ gcloud resource\-manager folders remove\-iam\-policy\-binding
+$ gcloud beta resource\-manager folders remove\-iam\-policy\-binding
+.RE
 

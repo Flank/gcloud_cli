@@ -25,19 +25,19 @@ from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
 
-class PeeringsUpdateAlphaTest(test_base.BaseTest):
+class PeeringsUpdateBetaTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
     self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'alpha')
-    self.messages = core_apis.GetMessagesModule('compute', 'alpha')
+    self.resources.RegisterApiByName('compute', 'beta')
+    self.messages = core_apis.GetMessagesModule('compute', 'beta')
 
   def testCreatePeeringWithCustomRoutesFlagsTrueTrue(self):
     self.Run('compute networks peerings update peering-1 --network '
              'network-1 --export-custom-routes --import-custom-routes')
-    self.CheckRequests([(self.compute_alpha.networks, 'UpdatePeering',
+    self.CheckRequests([(self.compute_beta.networks, 'UpdatePeering',
                          self.messages.ComputeNetworksUpdatePeeringRequest(
                              network='network-1',
                              networksUpdatePeeringRequest=self.messages
@@ -51,7 +51,7 @@ class PeeringsUpdateAlphaTest(test_base.BaseTest):
   def testCreatePeeringWithCustomRoutesFlagsFalseFalse(self):
     self.Run('compute networks peerings update peering-1 --network '
              'network-1 --no-export-custom-routes --no-import-custom-routes')
-    self.CheckRequests([(self.compute_alpha.networks, 'UpdatePeering',
+    self.CheckRequests([(self.compute_beta.networks, 'UpdatePeering',
                          self.messages.ComputeNetworksUpdatePeeringRequest(
                              network='network-1',
                              networksUpdatePeeringRequest=self.messages

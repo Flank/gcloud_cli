@@ -34,7 +34,7 @@ class Version(base.Command):
   components and prints a message if updates are available.
   """
 
-  category = 'SDK Tools'
+  category = base.SDK_TOOLS_CATEGORY
 
   @staticmethod
   def Args(parser):

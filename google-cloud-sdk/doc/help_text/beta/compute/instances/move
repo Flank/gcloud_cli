@@ -21,6 +21,11 @@ DESCRIPTION
     will move the instance called example-instance-1 with its all attached
     persistent disks, currently running in us-central1-b, to us-central1-f.
 
+    Please note that gcloud compute instances move does not yet support
+    instances which have regional persistent disks attached. Please see
+    https://cloud.google.com/compute/docs/disks/regional-persistent-disk for
+    more details.
+
 POSITIONAL ARGUMENTS
      INSTANCE_NAME
         Name of the instance to operate on.
@@ -58,8 +63,9 @@ OPTIONAL FLAGS
         CLOUDSDK_COMPUTE_ZONE.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

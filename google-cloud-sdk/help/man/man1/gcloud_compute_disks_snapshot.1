@@ -11,7 +11,7 @@ gcloud compute disks snapshot \- create snapshots of Google Compute Engine persi
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute disks snapshot\fR \fIDISK_NAME\fR [\fIDISK_NAME\fR\ ...] [\fB\-\-async\fR] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-guest\-flush\fR] [\fB\-\-snapshot\-names\fR=\fISNAPSHOT_NAME\fR,[...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute disks snapshot\fR \fIDISK_NAME\fR [\fIDISK_NAME\fR\ ...] [\fB\-\-async\fR] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-guest\-flush\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-snapshot\-names\fR=\fISNAPSHOT_NAME\fR,[...]] [\fB\-\-storage\-location\fR=\fILOCATION\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -23,8 +23,8 @@ creating a custom image. Snapshots can be created from persistent disks even
 while they are attached to running instances. Once created, snapshots may be
 managed (listed, deleted, resized etc.) via \f5gcloud compute snapshots\fR.
 
-For best practices regarding managing snapshots, refer to this guide:
-https://cloud.google.com/compute/docs/disks/create\-snapshots#best_practices.
+Refer to the Snapshot best practices guide.
+https://cloud.google.com/compute/docs/disks/snapshot\-best\-practices
 
 gcloud compute disks snapshot waits until the operation returns a status of
 \f5READY\fR or \f5FAILED\fR, or reaches the maximum timeout, and returns the
@@ -67,9 +67,18 @@ Text to describe the snapshots being created.
 
 .TP 2m
 \fB\-\-guest\-flush\fR
-Create an application consistent snapshot by informing the OS to prepare for the
-snapshot process. Currently only supported on Windows instances using the Volume
-Shadow Copy Service (VSS).
+Create an application\-consistent snapshot by informing the OS to prepare for
+the snapshot process. Currently only supported on Windows instances using the
+Volume Shadow Copy Service (VSS).
+
+.TP 2m
+\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of label KEY=VALUE pairs to add.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
 
 .TP 2m
 \fB\-\-snapshot\-names\fR=\fISNAPSHOT_NAME\fR,[...]
@@ -84,6 +93,44 @@ gcloud compute disks snapshot my\-disk\-1 my\-disk\-2 my\-disk\-3 \-\-snapshot\-
 
 will result in \f5my\-disk\-1\fR being snapshotted as \f5snapshot\-1\fR,
 \f5my\-disk\-2\fR as \f5snapshot\-2\fR, and so on.
+
+.TP 2m
+\fB\-\-storage\-location\fR=\fILOCATION\fR
+Google Cloud Storage location, either regional or multi\-regional, where
+snapshot content is to be stored. If absent, a nearby regional or
+multi\-regional location is chosen automatically.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the disks to operate on. If not specified, you may be prompted to
+select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
 
 .TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
@@ -115,14 +162,16 @@ Alternatively, the zone can be stored in the environment variable
 
 
 .RE
+.RE
 .sp
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

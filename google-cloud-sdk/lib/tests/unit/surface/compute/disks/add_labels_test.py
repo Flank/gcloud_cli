@@ -19,20 +19,20 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.compute import disks_labels_test_base
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA)
-class AddLabelsTestAlphaBeta(disks_labels_test_base.DisksLabelsTestBase,
-                             parameterized.TestCase):
+class AddLabelsTestGA(disks_labels_test_base.DisksLabelsTestBase):
 
-  def testRegionalUpdateValidDisksWithLabelsAndRemoveLabels(self, track):
-    self._SetUp(track)
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def SetUp(self):
+    self._SetUp(self.track)
+
+  def testRegionalUpdateValidDisksWithLabelsAndRemoveLabels(self):
     disk_ref = self._GetDiskRef('disk-1', region='us-central')
 
     disk_labels = (('key1', 'value1'), ('key2', 'value2'))
@@ -61,8 +61,7 @@ class AddLabelsTestAlphaBeta(disks_labels_test_base.DisksLabelsTestBase,
                       for pair in add_labels])))
     self.assertEqual(response, updated_disk)
 
-  def testScopePromptWithRegionAndZone(self, track):
-    self._SetUp(track)
+  def testScopePromptWithRegionAndZone(self):
     disk_ref = self._GetDiskRef('disk-1', region='us-central')
 
     # Make a disk that already has labels and add-labels later
@@ -88,12 +87,6 @@ class AddLabelsTestAlphaBeta(disks_labels_test_base.DisksLabelsTestBase,
     self.AssertErrContains('us-central1')
     self.AssertErrContains('us-central2')
     self.AssertErrContains('us-central')
-
-
-class AddLabelsTest(disks_labels_test_base.DisksLabelsTestBase):
-
-  def SetUp(self):
-    self._SetUp(calliope_base.ReleaseTrack.GA)
 
   def testZonalUpdateDiskWithNoLabels(self):
     disk_ref = self._GetDiskRef('disk-1', zone='atlanta')
@@ -177,33 +170,6 @@ class AddLabelsTest(disks_labels_test_base.DisksLabelsTestBase):
         ):
       self.Run('compute disks add-labels disk-1')
 
-  def testScopePromptWithZone(self):
-    disk_ref = self._GetDiskRef('disk-1', zone='atlanta')
-
-    # Make a disk that already has labels and add-labels later
-    # adds existing labels. So, we only test the prompting portion.
-    disk_labels = (('key1', 'value1'), ('key2', 'value2'))
-    disk = self._MakeDiskProto(
-        disk_ref, labels=disk_labels, fingerprint=b'fingerprint-42')
-    self._ExpectGetRequest(disk_ref, disk)
-
-    self.StartPatch('googlecloudsdk.core.console.console_io.CanPrompt',
-                    return_value=True)
-    self.StartPatch('googlecloudsdk.api_lib.compute.zones.service.List',
-                    return_value=[
-                        self.messages.Zone(name='atlanta'),
-                        self.messages.Zone(name='charlotte')],
-                   )
-    self.StartPatch('googlecloudsdk.api_lib.compute.regions.service.List',
-                    return_value=[
-                        self.messages.Region(name='georgia')],
-                   )
-    self.WriteInput('1\n')
-    self.Run('compute disks add-labels disk-1 --labels key1=value1')
-    self.AssertErrContains('atlanta')
-    self.AssertErrContains('charlotte')
-    self.AssertErrNotContains('georgia')
-
   def testInvalidLabel(self):
     disk_ref = self._GetDiskRef('disk-1', zone='atlanta')
 
@@ -234,6 +200,18 @@ class AddLabelsTest(disks_labels_test_base.DisksLabelsTestBase):
               ','.join(['{0}={1}'.format(pair[0], pair[1])
                         for pair in add_labels])
           ))
+
+
+class AddLabelsTestBeta(AddLabelsTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class AddLabelsTestAlpha(AddLabelsTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

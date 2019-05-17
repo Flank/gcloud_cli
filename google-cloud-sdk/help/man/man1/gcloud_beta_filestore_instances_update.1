@@ -11,7 +11,7 @@ gcloud beta filestore instances update \- update a Cloud Filestore instance
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta filestore instances update\fR (\fIINSTANCE\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-file\-share\fR=[\fIcapacity\fR=\fICAPACITY\fR],[\fIname\fR=\fINAME\fR]] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta filestore instances update\fR (\fIINSTANCE\fR\ :\ \fB\-\-zone\fR=\fIZONE\fR) [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-file\-share\fR=[\fIcapacity\fR=\fICAPACITY\fR],[\fIname\fR=\fINAME\fR],[\fIsource\-snapshot\fR=\fISOURCE\-SNAPSHOT\fR],[\fIsource\-snapshot\-region\fR=\fISOURCE\-SNAPSHOT\-REGION\fR]] [\fB\-\-location\fR=\fILOCATION\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -41,8 +41,8 @@ positional must be specified if any of the other arguments in this group are
 specified.
 
 .TP 2m
-\fB\-\-location\fR=\fILOCATION\fR
-The location of the instance.
+\fB\-\-zone\fR=\fIZONE\fR
+The zone of the instance.
 
 
 .RE
@@ -61,7 +61,7 @@ Do not wait for the update operation to complete.
 A description of the Cloud Filestore instance.
 
 .TP 2m
-\fB\-\-file\-share\fR=[\fIcapacity\fR=\fICAPACITY\fR],[\fIname\fR=\fINAME\fR]
+\fB\-\-file\-share\fR=[\fIcapacity\fR=\fICAPACITY\fR],[\fIname\fR=\fINAME\fR],[\fIsource\-snapshot\fR=\fISOURCE\-SNAPSHOT\fR],[\fIsource\-snapshot\-region\fR=\fISOURCE\-SNAPSHOT\-REGION\fR]
 File share configuration for an instance. Specifying both \f5name\fR and
 \f5capacity\fR is required.
 
@@ -79,6 +79,12 @@ The desired logical name of the volume.
 
 .RE
 .sp
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+(DEPRECATED) Location of the Cloud Filestore instance.
+
+The \f5\-\-location\fR flag is deprecated. Use \f5\-\-zone\fR.
+
 .TP 2m
 \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 List of label KEY=VALUE pairs to update. If a label exists its value is
@@ -123,10 +129,11 @@ List of label keys to remove. If a label does not exist it is silently ignored.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -152,5 +159,10 @@ $ gcloud beta filestore instances update NAME \e
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice.
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud filestore instances update
+.RE
 

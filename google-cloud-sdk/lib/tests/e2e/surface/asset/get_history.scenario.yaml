@@ -1,15 +1,12 @@
-skip: !!omap
-- bug: b/120609723
-- reason: Failing
 title: surface e2e tests for asset get-history
-release_tracks: [ALPHA]
+release_tracks: [GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: compute instances create $$compute-instance-asset$$ --zone=us-central1-f
       --quiet --format="disable"
   - stderr: |
-      Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$compute-instance-asset$$].
+      Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$compute-instance-asset$$].
 - execute:
   - command: asset get-history --project cloud-sdk-integration-testing --asset-names=//compute.googleapis.com/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$compute-instance-asset$$
       --content-type resource --start-time=2018-10-02T15:01:23.045Z --format=text(asset.name)
@@ -24,7 +21,7 @@ summary:
   - command: compute instances delete $$compute-instance-asset$$ --zone=us-central1-f
       --quiet
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$compute-instance-asset$$].
+      Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$compute-instance-asset$$].
 actions:
 - generate_resource_id:
     reference: compute-instance-asset
@@ -35,7 +32,7 @@ actions:
     validation_only: true
     events:
     - expect_stderr: |
-        Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$compute-instance-asset$$].
+        Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$compute-instance-asset$$].
     - expect_exit:
         code: 0
 - execute_command:
@@ -44,7 +41,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudasset.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing:batchGetAssetsHistory?assetNames=%2F%2Fcompute.googleapis.com%2Fprojects%2Fcloud-sdk-integration-testing%2Fzones%2Fus-central1-f%2Finstances%2F$$compute-instance-asset$$&contentType=RESOURCE&readTimeWindow.startTime=2018-10-02T15%3A01%3A23.045Z
+          uri: https://cloudasset.googleapis.com/v1/projects/cloud-sdk-integration-testing:batchGetAssetsHistory?assetNames=%2F%2Fcompute.googleapis.com%2Fprojects%2Fcloud-sdk-integration-testing%2Fzones%2Fus-central1-f%2Finstances%2F$$compute-instance-asset$$&contentType=RESOURCE&readTimeWindow.startTime=2018-10-02T15%3A01%3A23.045Z
           method: GET
           headers: {}
           body:
@@ -258,7 +255,7 @@ actions:
     validation_only: true
     events:
     - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$compute-instance-asset$$].
+        Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$compute-instance-asset$$].
     - expect_exit:
         code: 0
     cleanup_for: compute-instance-asset

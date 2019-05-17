@@ -36,10 +36,11 @@ to properties in the core section.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -163,6 +164,17 @@ using the global \f5\-\-verbosity\fR flag. Supported verbosity levels:
 .RE
 .sp
 .TP 2m
+\fIaccessibility\fR
+
+.RS 2m
+.TP 2m
+\fBscreen_reader\fR
+Make gcloud more screen reader friendly.
+
+
+.RE
+.sp
+.TP 2m
 \fIapp\fR
 
 .RS 2m
@@ -238,7 +250,8 @@ disabled.
 
 .TP 2m
 \fBtimeout\fR
-Timeout, in seconds, to wait for builds to complete.
+Timeout, in seconds, to wait for builds to complete. If unset, defaults to 10
+minutes.
 
 
 .TP 2m
@@ -323,20 +336,6 @@ Name of the cluster to use by default when working with Kubernetes Engine.
 
 
 .TP 2m
-\fBnew_scopes_behavior\fR
-If True, use new scopes behavior and do not add \f5compute\-rw\fR,
-\f5storage\-ro\fR, \f5service\-control\fR, or \f5service\-management\fR scopes.
-The former two (\f5compute\-rw\fR and \f5storage\-ro\fR) only apply to clusters
-at Kubernetes v1.9 and below; starting v1.10, \f5compute\-rw\fR and
-\f5storage\-ro\fR are not added by default. Any of these scopes may be added
-explicitly using \f5\-\-scopes\fR. Using new scopes behavior will be the default
-in a future release. Additionally, if this property is set to True, using
-\f5\-\-[no\-]enable\-cloud\-endpoints\fR is not allowed. This property is
-ignored in alpha and beta, since these tracks always use the new behavior. See
-\f5\-\-scopes\fR help for more info.
-
-
-.TP 2m
 \fBuse_application_default_credentials\fR
 If True, use application default credentials to authenticate to the cluster API
 server.
@@ -383,9 +382,15 @@ config file.
 .RS 2m
 .TP 2m
 \fBlocation\fR
-Default location to use when working with Cloud Filestore locations. When a
-\f5\-\-location\fR flag is required but not provided, the command will fall back
-to this value, if set.
+(DEPRECATED) Please use the \f5\-\-location\fR flag or set the filestore/zone
+property.
+
+
+.TP 2m
+\fBzone\fR
+Default zone to use when working with Cloud Filestore zones. When a
+\f5\-\-zone\fR flag is required but not provided, the command will fall back to
+this value, if set.
 
 
 .RE
@@ -413,6 +418,26 @@ regions list\fR.
 If True, do not upload \f5.gcloudignore\fR files (see \f5$ gcloud topic
 gcloudignore\fR). If False, turn off the gcloudignore mechanism entirely and
 upload all files.
+
+
+.RE
+.sp
+.TP 2m
+\fIhealthcare\fR
+
+.RS 2m
+.TP 2m
+\fBdataset\fR
+Default dataset to use when working with Cloud Healthcare resources. When a
+\f5\-\-dataset\fR flag is required but not provided, the command will fall back
+to this value, if set.
+
+
+.TP 2m
+\fBlocation\fR
+Default location to use when working with Cloud Healthcare resources. When a
+\f5\-\-location\fR flag is required but not provided, the command will fall back
+to this value.
 
 
 .RE

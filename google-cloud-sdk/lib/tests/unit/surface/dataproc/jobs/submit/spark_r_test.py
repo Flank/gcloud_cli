@@ -117,5 +117,10 @@ class JobsSubmitSparkRUnitTestBeta(JobsSubmitSparkRUnitTest,
                            self.CLUSTER_NAME, self.JOB_ID, self.R_SCRIPT_URI))
 
 
+class JobsSubmitSparkRUnitTestAlpha(
+    JobsSubmitSparkRUnitTestBeta, base.DataprocTestBaseAlpha):
+  pass
+
+
 if __name__ == '__main__':
   sdk_test_base.main()

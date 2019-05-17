@@ -26,6 +26,8 @@ from tests.lib import parameterized
 from tests.lib.parameterized_line_no import LineNo as T
 from tests.unit.calliope.testdata import gcloud_commands
 
+import mock
+
 
 class GetCommandSuggestionsTest(calliope_test_base.CalliopeTestBase,
                                 parameterized.TestCase):
@@ -1031,16 +1033,16 @@ class GetCommandSuggestionsTest(calliope_test_base.CalliopeTestBase,
   @parameterized.named_parameters(
       T(
           ['log', 'app'],
-          ([
+          [
               'gcloud app logs read',
               'gcloud app logs tail',
               'gcloud logging logs delete',
               'gcloud logging logs list',
-          ], 80),
+          ]
       ),
       T(
           ['update'],
-          ([
+          [
               'gcloud app update',
               'gcloud components update',
               'gcloud projects update',
@@ -1048,19 +1050,19 @@ class GetCommandSuggestionsTest(calliope_test_base.CalliopeTestBase,
               'gcloud compute health-checks update https',
               'gcloud compute health-checks update ssl',
               'gcloud compute health-checks update tcp'
-          ], 62),
+          ]
       ),
       T(
           ['get', 'image'],
-          ([
+          [
               'gcloud compute images describe',
               'gcloud container images describe',
               'gcloud compute images describe-from-family',
-          ], 180),
+          ]
       ),
       T(
           ['instances'],
-          ([
+          [
               'gcloud app instances',
               'gcloud bigtable instances',
               'gcloud compute instance-groups',
@@ -1071,11 +1073,11 @@ class GetCommandSuggestionsTest(calliope_test_base.CalliopeTestBase,
               'gcloud spanner instance-configs',
               'gcloud spanner instances',
               'gcloud sql instances'
-          ], 117),
+          ]
       ),
       T(
           ['list', 'instance'],
-          ([
+          [
               'gcloud compute instance-groups list-instances',
               'gcloud app instances list',
               'gcloud bigtable instances list',
@@ -1086,31 +1088,31 @@ class GetCommandSuggestionsTest(calliope_test_base.CalliopeTestBase,
               'gcloud compute instance-groups list',
               'gcloud compute instance-templates list',
               'gcloud compute target-instances list'
-          ], 271),
+          ]
       ),
       T(
           ['get', 'config'],
-          ([
+          [
               'gcloud config configurations describe',
               'gcloud config get-value',
               'gcloud config configurations activate',
               'gcloud config configurations create',
               'gcloud config configurations delete',
               'gcloud config configurations list'
-          ], 184),
+          ]
       ),
       T(
           ['auth', 'revoke', 'login'],
-          ([
+          [
               'gcloud auth login',
               'gcloud auth revoke',
               'gcloud auth application-default login',
               'gcloud auth application-default revoke'
-          ], 16),
+          ]
       ),
       T(
           ['component', 'ad', 'repository'],
-          ([
+          [
               'gcloud components repositories add',
               'gcloud components install',
               'gcloud components list',
@@ -1120,11 +1122,11 @@ class GetCommandSuggestionsTest(calliope_test_base.CalliopeTestBase,
               'gcloud components update',
               'gcloud components repositories list',
               'gcloud components repositories remove'
-          ], 58),
+          ]
       ),
       T(
           ['submit'],
-          ([
+          [
               'gcloud builds submit',
               'gcloud dataproc jobs submit hadoop',
               'gcloud dataproc jobs submit hive',
@@ -1134,23 +1136,154 @@ class GetCommandSuggestionsTest(calliope_test_base.CalliopeTestBase,
               'gcloud dataproc jobs submit spark-sql',
               'gcloud ml-engine jobs submit prediction',
               'gcloud ml-engine jobs submit training'
-          ], 9),
+          ]
       ),
       T(
           ['copy-files'],
-          ([
+          [
               'gcloud compute copy-files',
               'gcloud compute scp'
-          ], 4),
+          ]
       ),
       T(
-          ['nonexistent'], ([], 0)
+          ['nonexistent'], []
       )
   )
   def testGetCommandSuggestions(self, command, suggestions):
     self.assertEqual(suggestions,
                      suggest_commands.GetCommandSuggestions(command))
 
+  def testGetSurfaceHistoryFrequencies(self):
+    test_logs_dir = self.Resource('tests', 'unit', 'calliope', 'testdata',
+                                  'logs')
+    self.assertEqual(
+        {
+            'compute.instances': 0.6666666666666666,
+            'components': 0.3333333333333333
+        },
+        suggest_commands._GetSurfaceHistoryFrequencies(test_logs_dir))
+
+  def testGetSurfaceHistoryFrequenciesEmpty(self):
+    self.assertEqual({}, suggest_commands._GetSurfaceHistoryFrequencies(None))
+
+  @mock.patch('googlecloudsdk.calliope.suggest_commands.'
+              '_GetSurfaceHistoryFrequencies',
+              return_value={
+                  'logging': 0.6,
+                  'compute.instances': 0.4
+              })
+  def testGetScoredCommandsContainingWithLogs(
+      self,
+      mock_get_surface_history_frequencies):
+    self.assertEqual(
+        [
+            (['app', 'logs', 'read'], 145),
+            (['app', 'logs', 'tail'], 145),
+            (['logging', 'read'], 145),
+            (['logging', 'write'], 145),
+            (['logging', 'logs', 'delete'], 129),
+            (['logging', 'logs', 'list'], 129),
+            (['app', 'browse'], 91),
+            (['app', 'create'], 91),
+            (['app', 'deploy'], 91),
+            (['app', 'describe'], 91),
+            (['app', 'open-console'], 91),
+            (['app', 'update'], 91),
+            (['auth', 'application-default', 'login'], 87),
+            (['app', 'domain-mappings', 'create'], 81),
+            (['app', 'domain-mappings', 'delete'], 81),
+            (['app', 'domain-mappings', 'describe'], 81),
+            (['app', 'domain-mappings', 'list'], 81),
+            (['app', 'domain-mappings', 'update'], 81),
+            (['app', 'firewall-rules', 'create'], 81),
+            (['app', 'firewall-rules', 'delete'], 81),
+            (['app', 'firewall-rules', 'describe'], 81),
+            (['app', 'firewall-rules', 'list'], 81),
+            (['app', 'firewall-rules', 'test-ip'], 81),
+            (['app', 'firewall-rules', 'update'], 81),
+            (['app', 'instances', 'delete'], 81),
+            (['app', 'instances', 'describe'], 81),
+            (['app', 'instances', 'disable-debug'], 81),
+            (['app', 'instances', 'enable-debug'], 81),
+            (['app', 'instances', 'list'], 81),
+            (['app', 'instances', 'scp'], 81),
+            (['app', 'instances', 'ssh'], 81),
+            (['app', 'operations', 'describe'], 81),
+            (['app', 'operations', 'list'], 81),
+            (['app', 'operations', 'wait'], 81),
+            (['app', 'regions', 'list'], 81),
+            (['app', 'services', 'browse'], 81),
+            (['app', 'services', 'delete'], 81),
+            (['app', 'services', 'describe'], 81),
+            (['app', 'services', 'list'], 81),
+            (['app', 'services', 'set-traffic'], 81),
+            (['app', 'ssl-certificates', 'create'], 81),
+            (['app', 'ssl-certificates', 'delete'], 81),
+            (['app', 'ssl-certificates', 'describe'], 81),
+            (['app', 'ssl-certificates', 'list'], 81),
+            (['app', 'ssl-certificates', 'update'], 81),
+            (['app', 'versions', 'browse'], 81),
+            (['app', 'versions', 'delete'], 81),
+            (['app', 'versions', 'describe'], 81),
+            (['app', 'versions', 'list'], 81),
+            (['app', 'versions', 'migrate'], 81),
+            (['app', 'versions', 'start'], 81),
+            (['app', 'versions', 'stop'], 81),
+            (['logging', 'metrics', 'create'], 75),
+            (['logging', 'metrics', 'delete'], 75),
+            (['logging', 'metrics', 'describe'], 75),
+            (['logging', 'metrics', 'list'], 75),
+            (['logging', 'metrics', 'update'], 75),
+            (['logging', 'resource-descriptors', 'list'], 75),
+            (['logging', 'sinks', 'create'], 75),
+            (['logging', 'sinks', 'delete'], 75),
+            (['logging', 'sinks', 'describe'], 75),
+            (['logging', 'sinks', 'list'], 75),
+            (['logging', 'sinks', 'update'], 75),
+            (['functions', 'logs', 'read'], 54),
+            (['builds', 'log'], 51),
+            (['auth', 'application-default', 'print-access-token'], 50),
+            (['auth', 'application-default', 'revoke'], 50),
+            (['compute', 'os-login', 'describe-profile'], 50),
+            (['compute', 'os-login', 'remove-profile'], 50),
+            (['debug', 'logpoints', 'create'], 50),
+            (['debug', 'logpoints', 'delete'], 50),
+            (['debug', 'logpoints', 'list'], 50),
+            (['auth', 'login'], 47),
+            (['compute', 'os-login', 'ssh-keys', 'add'], 40),
+            (['compute', 'os-login', 'ssh-keys', 'describe'], 40),
+            (['compute', 'os-login', 'ssh-keys', 'list'], 40),
+            (['compute', 'os-login', 'ssh-keys', 'remove'], 40),
+            (['compute', 'os-login', 'ssh-keys', 'update'], 40),
+            (['ml', 'vision', 'detect-logos'], 25),
+            (['ml-engine', 'jobs', 'stream-logs'], 25)
+        ],
+        suggest_commands._GetScoredCommandsContaining(['log', 'app']))
+    self.assertEqual(1, mock_get_surface_history_frequencies.call_count)
+
+  @mock.patch('googlecloudsdk.calliope.suggest_commands.'
+              '_GetSurfaceHistoryFrequencies',
+              return_value={
+                  'dataproc.jobs.submit': 0.2,
+                  'ml-engine.jobs.submit': 0.3,
+                  'compute.instances': 0.5
+              })
+  def testGetCommandSuggestionsWithLogs(self,
+                                        mock_get_surface_history_frequencies):
+    self.assertEqual(
+        [
+            'gcloud ml-engine jobs submit prediction',
+            'gcloud ml-engine jobs submit training',
+            'gcloud dataproc jobs submit hadoop',
+            'gcloud dataproc jobs submit hive',
+            'gcloud dataproc jobs submit pig',
+            'gcloud dataproc jobs submit pyspark',
+            'gcloud dataproc jobs submit spark',
+            'gcloud dataproc jobs submit spark-sql',
+            'gcloud builds submit'
+        ],
+        suggest_commands.GetCommandSuggestions(['submit']))
+    self.assertEqual(1, mock_get_surface_history_frequencies.call_count)
 
 if __name__ == '__main__':
   calliope_test_base.main()

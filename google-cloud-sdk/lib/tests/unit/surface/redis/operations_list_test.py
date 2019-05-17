@@ -22,21 +22,17 @@ from apitools.base.py import encoding
 from apitools.base.py import extra_types
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface import redis_test_base
 from six.moves import range  # pylint: disable=redefined-builtin
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,
-                           calliope_base.ReleaseTrack.BETA,
-                           calliope_base.ReleaseTrack.GA])
-class ListTest(redis_test_base.OperationsUnitTestBase, parameterized.TestCase):
+class ListTestGA(redis_test_base.OperationsUnitTestBase):
 
-  def testList(self, track):
-    self.SetUpForTrack(track)
-    self.SetUpOperationsForTrack()
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def testList(self):
     expected_operations = self._MakeOperations(3)
     self._ExpectList(expected_operations)
 
@@ -47,9 +43,7 @@ class ListTest(redis_test_base.OperationsUnitTestBase, parameterized.TestCase):
 
     self.assertEqual(actual_operations, expected_operations)
 
-  def testList_UsingRegionProperty(self, track):
-    self.SetUpForTrack(track)
-    self.SetUpOperationsForTrack()
+  def testList_UsingRegionProperty(self):
     expected_operations = self._MakeOperations(3)
     self._ExpectList(expected_operations)
 
@@ -60,9 +54,7 @@ class ListTest(redis_test_base.OperationsUnitTestBase, parameterized.TestCase):
 
     self.assertEqual(actual_operations, expected_operations)
 
-  def testList_Uri(self, track):
-    self.SetUpForTrack(track)
-    self.SetUpOperationsForTrack()
+  def testList_Uri(self):
     expected_operations = self._MakeOperations(3)
     self._ExpectList(expected_operations)
 
@@ -77,9 +69,7 @@ class ListTest(redis_test_base.OperationsUnitTestBase, parameterized.TestCase):
                    operation_name=self.operation_relative_name),
         normalize_space=True)
 
-  def testList_CheckFormat(self, track):
-    self.SetUpForTrack(track)
-    self.SetUpOperationsForTrack()
+  def testList_CheckFormat(self):
     expected_operations = self._MakeOperations(3)
     self._ExpectList(expected_operations)
 
@@ -119,6 +109,18 @@ class ListTest(redis_test_base.OperationsUnitTestBase, parameterized.TestCase):
                                           done=True)
       operations.append(operation)
     return operations
+
+
+class ListTestBeta(ListTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class ListTestAlpha(ListTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

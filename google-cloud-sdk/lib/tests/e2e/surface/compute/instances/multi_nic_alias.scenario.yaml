@@ -3,13 +3,11 @@ release_tracks: [ALPHA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
-  - command: compute networks create $$network1$$ --subnet-mode custom --format 'text(name,x_gcloud_subnet_mode)'
+  - command: compute networks create $$network1$$ --subnet-mode custom --format 'yaml(name,x_gcloud_subnet_mode)'
   - stderr: |
       Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$].
-  - stdout: |
-      ---
-      name:                 $$network1$$
-      x_gcloud_subnet_mode: CUSTOM
+  - stdout:
+      matches: ^(---\s)?name:\s$$network1$$\s+x_gcloud_subnet_mode:\sCUSTOM$
 - execute:
   - command: compute networks subnets create $$subnet1$$ --region us-central1 --network
       $$network1$$ --range 10.0.3.0/24 --format 'text(name,network,ipCidrRange)'
@@ -73,7 +71,9 @@ summary:
   - stderr: |
       Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$].
 actions:
-
+- define_reference:
+    reference: compute-uri
+    value: www.googleapis.com/compute
 - generate_resource_id:
     reference: network1
     prefix: multi-nic-template
@@ -87,11 +87,11 @@ actions:
     prefix: multi-nic-template
 
 - execute_command:
-    command: compute networks create $$network1$$ --subnet-mode custom --format 'text(name,x_gcloud_subnet_mode)'
+    command: compute networks create $$network1$$ --subnet-mode custom --format 'yaml(name,x_gcloud_subnet_mode)'
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/global/networks?alt=json
           method: POST
           headers: {}
           body:
@@ -121,7 +121,7 @@ actions:
         Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -139,10 +139,8 @@ actions:
             routingConfig:
               routingMode: REGIONAL
             kind: compute#network
-    - expect_stdout: |
-        ---
-        name:                 $$network1$$
-        x_gcloud_subnet_mode: CUSTOM
+    - expect_stdout:
+        matches: ^(---\s)?name:\s$$network1$$\s+x_gcloud_subnet_mode:\sCUSTOM$
     - expect_exit:
         code: 0
 - execute_command:
@@ -151,7 +149,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks?alt=json
           method: POST
           headers: {}
           body:
@@ -182,7 +180,7 @@ actions:
         Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -218,7 +216,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f?alt=json
           method: GET
           headers: {}
           body: null
@@ -243,7 +241,7 @@ actions:
             kind: compute#zone
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing?alt=json
           method: GET
           headers: {}
           body: null
@@ -271,7 +269,7 @@ actions:
             kind: compute#project
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances?alt=json
           method: POST
           headers: {}
           body:
@@ -329,7 +327,7 @@ actions:
         Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -416,7 +414,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -492,7 +490,7 @@ actions:
             kind: compute#instance
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$/updateNetworkInterface?alt=json&networkInterface=nic0
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$/updateNetworkInterface?alt=json&networkInterface=nic0
           method: PATCH
           headers: {}
           body:
@@ -523,7 +521,7 @@ actions:
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -603,7 +601,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -684,7 +682,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -758,7 +756,7 @@ actions:
             kind: compute#instance
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$/updateNetworkInterface?alt=json&networkInterface=nic0
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$/updateNetworkInterface?alt=json&networkInterface=nic0
           method: PATCH
           headers: {}
           body:
@@ -790,7 +788,7 @@ actions:
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -872,7 +870,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -958,7 +956,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -990,7 +988,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -1022,7 +1020,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/global/networks/$$network1$$?alt=json
           method: DELETE
           headers: {}
           body: null

@@ -1,14 +1,13 @@
 NAME
-    gcloud ml-engine models describe - describe an existing Cloud ML Engine
-        model
+    gcloud ml-engine models describe - describe an existing AI Platform model
 
 SYNOPSIS
     gcloud ml-engine models describe MODEL [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Describe an existing Cloud ML Engine model.
+    Describe an existing AI Platform model.
 
-    If you would like to see all versions of a model, use gcloud ml-engine
+    If you would like to see all versions of a model, use gcloud ai-platform
     versions list.
 
 POSITIONAL ARGUMENTS
@@ -16,8 +15,9 @@ POSITIONAL ARGUMENTS
         Name of the model.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -49,7 +49,8 @@ class TCPGitServerIPv6(server.TCPGitServer):
   address_family = socket.AF_INET6
 
 
-@test_case.Filters.SkipOnPy3('Deprecated command; no py3 support', 'b/76013940')
+@sdk_test_base.Filters.DoNotRunOnWindows
+@test_case.Filters.DoNotRunOnPy3('Deprecated command; no py3 support')
 class LoaderTests(sdk_test_base.SdkBase):
 
   def SetUp(self):
@@ -94,7 +95,8 @@ class LoaderTests(sdk_test_base.SdkBase):
     self.repo.object_store.add_object(blob)
     self.repo.object_store.add_object(tree)
     commit_id = self.repo.do_commit(tree=tree.id, message=commit_message,
-                                    ref=branch, committer='user@example.com')
+                                    ref=branch,
+                                    committer='User Larry <user@example.com>')
     self.repo[b'HEAD'] = commit_id
     return commit_id
 

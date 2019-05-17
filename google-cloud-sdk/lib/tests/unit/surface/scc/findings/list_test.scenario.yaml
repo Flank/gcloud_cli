@@ -1,0 +1,575 @@
+title: scc findings list scenario test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      scc findings list 345840165995 --source 2948230327750090626 --order-by "resourceName desc" --read-time '2019-03-13T22:15:01.900Z'
+  - stdout: |
+      ---
+      finding:
+        createTime: '1970-01-01T00:00:00Z'
+        eventTime: '1970-01-01T00:00:00Z'
+        name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2
+        parent: organizations/345840165995/sources/2948230327750090626
+        resourceName: http://somedistinctresource1
+        securityMarks:
+          name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks
+      ---
+      finding:
+        createTime: '1970-01-01T00:00:00Z'
+        eventTime: '1970-01-01T00:00:00Z'
+        name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1
+        parent: organizations/345840165995/sources/2948230327750090626
+        resourceName: http://somearbitresource
+        securityMarks:
+          name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1/securityMarks
+      ---
+      finding:
+        createTime: '1970-01-01T00:00:00Z'
+        eventTime: '1970-01-01T00:00:00Z'
+        name: organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates
+        parent: organizations/345840165995/sources/2948230327750090626
+        securityMarks:
+          name: organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates/securityMarks
+- execute:
+  - command: |
+      scc findings list 345840165995 --source 2948230327750090626 --order-by "resourceName desc" --read-time "2019-03-13T22:15:01.900Z" --field-mask "finding.resourceName"
+  - stdout: |
+      ---
+      finding:
+        createTime: '1970-01-01T00:00:00Z'
+        eventTime: '1970-01-01T00:00:00Z'
+        name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2
+        parent: organizations/345840165995/sources/2948230327750090626
+        resourceName: http://somedistinctresource1
+        securityMarks:
+          name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks
+      ---
+      finding:
+        createTime: '1970-01-01T00:00:00Z'
+        eventTime: '1970-01-01T00:00:00Z'
+        name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1
+        parent: organizations/345840165995/sources/2948230327750090626
+        resourceName: http://somearbitresource
+        securityMarks:
+          name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1/securityMarks
+      ---
+      finding:
+        createTime: '1970-01-01T00:00:00Z'
+        eventTime: '1970-01-01T00:00:00Z'
+        name: organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates
+        parent: organizations/345840165995/sources/2948230327750090626
+        securityMarks:
+          name: organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates/securityMarks
+- execute:
+  - command: |
+      scc findings list 345840165995 --source 2948230327750090626 --order-by "resource_name desc" --read-time "2019-03-13T22:15:01.900Z" --field-mask "finding.resource_name"
+  - stdout: |
+      ---
+      finding:
+        createTime: '1970-01-01T00:00:00Z'
+        eventTime: '1970-01-01T00:00:00Z'
+        name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2
+        parent: organizations/345840165995/sources/2948230327750090626
+        resourceName: http://somedistinctresource1
+        securityMarks:
+          name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks
+      ---
+      finding:
+        createTime: '1970-01-01T00:00:00Z'
+        eventTime: '1970-01-01T00:00:00Z'
+        name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1
+        parent: organizations/345840165995/sources/2948230327750090626
+        resourceName: http://somearbitresource
+        securityMarks:
+          name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1/securityMarks
+      ---
+      finding:
+        createTime: '1970-01-01T00:00:00Z'
+        eventTime: '1970-01-01T00:00:00Z'
+        name: organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates
+        parent: organizations/345840165995/sources/2948230327750090626
+        securityMarks:
+          name: organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates/securityMarks
+- execute:
+  - command: |
+      scc findings list 345840165995 --order-by "resource_name desc" --read-time "2019-03-13T22:15:01.900Z" --field-mask "finding.resource_name" --limit 5
+  - stdout: |
+      ---
+      finding:
+        createTime: '1970-01-01T00:00:00Z'
+        eventTime: '1970-01-01T00:00:00Z'
+        name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2
+        parent: organizations/345840165995/sources/2948230327750090626
+        resourceName: http://somedistinctresource1
+        securityMarks:
+          name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks
+      ---
+      finding:
+        createTime: '1970-01-01T00:00:00Z'
+        eventTime: '1970-01-01T00:00:00Z'
+        name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1
+        parent: organizations/345840165995/sources/2948230327750090626
+        resourceName: http://somearbitresource
+        securityMarks:
+          name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1/securityMarks
+      ---
+      finding:
+        createTime: '1970-01-01T00:00:00Z'
+        eventTime: '1970-01-01T00:00:00Z'
+        name: organizations/345840165995/sources/2890746229750335218/findings/111222333444iamroles4
+        parent: organizations/345840165995/sources/2890746229750335218
+        securityMarks:
+          name: organizations/345840165995/sources/2890746229750335218/findings/111222333444iamroles4/securityMarks
+      ---
+      finding:
+        createTime: '1970-01-01T00:00:00Z'
+        eventTime: '1970-01-01T00:00:00Z'
+        name: organizations/345840165995/sources/2890746229750335218/findings/11223344iamroles4
+        parent: organizations/345840165995/sources/2890746229750335218
+        securityMarks:
+          name: organizations/345840165995/sources/2890746229750335218/findings/11223344iamroles4/securityMarks
+      ---
+      finding:
+        createTime: '1970-01-01T00:00:00Z'
+        eventTime: '1970-01-01T00:00:00Z'
+        name: organizations/345840165995/sources/2890746229750335218/findings/1234iamroles2
+        parent: organizations/345840165995/sources/2890746229750335218
+        securityMarks:
+          name: organizations/345840165995/sources/2890746229750335218/findings/1234iamroles2/securityMarks
+actions:
+- execute_command:
+    # Retrieve all attributes/properties.
+    command: |
+      scc findings list 345840165995 --source 2948230327750090626 --order-by "resourceName desc" --read-time '2019-03-13T22:15:01.900Z'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/sources/2948230327750090626/findings?alt=json&orderBy=resourceName+desc&readTime=2019-03-13T22%3A15%3A01.900Z
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "listFindingsResults": [
+                {
+                  "finding": {
+                    "name": "organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2",
+                    "parent": "organizations/345840165995/sources/2948230327750090626",
+                    "resourceName": "http://somedistinctresource1",
+                    "securityMarks": {
+                      "name": "organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks"
+                    },
+                    "eventTime": "1970-01-01T00:00:00Z",
+                    "createTime": "1970-01-01T00:00:00Z"
+                  }
+                },
+                {
+                  "finding": {
+                    "name": "organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1",
+                    "parent": "organizations/345840165995/sources/2948230327750090626",
+                    "resourceName": "http://somearbitresource",
+                    "securityMarks": {
+                      "name": "organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1/securityMarks"
+                    },
+                    "eventTime": "1970-01-01T00:00:00Z",
+                    "createTime": "1970-01-01T00:00:00Z"
+                  }
+                },
+                {
+                  "finding": {
+                    "name": "organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates",
+                    "parent": "organizations/345840165995/sources/2948230327750090626",
+                    "securityMarks": {
+                      "name": "organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates/securityMarks"
+                    },
+                    "eventTime": "1970-01-01T00:00:00Z",
+                    "createTime": "1970-01-01T00:00:00Z"
+                  }
+                }
+              ],
+              "readTime": "2019-03-13T22:15:01.900Z",
+              "totalSize": 3
+            }
+    - expect_stdout: |
+        ---
+        finding:
+          createTime: '1970-01-01T00:00:00Z'
+          eventTime: '1970-01-01T00:00:00Z'
+          name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2
+          parent: organizations/345840165995/sources/2948230327750090626
+          resourceName: http://somedistinctresource1
+          securityMarks:
+            name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks
+        ---
+        finding:
+          createTime: '1970-01-01T00:00:00Z'
+          eventTime: '1970-01-01T00:00:00Z'
+          name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1
+          parent: organizations/345840165995/sources/2948230327750090626
+          resourceName: http://somearbitresource
+          securityMarks:
+            name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1/securityMarks
+        ---
+        finding:
+          createTime: '1970-01-01T00:00:00Z'
+          eventTime: '1970-01-01T00:00:00Z'
+          name: organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates
+          parent: organizations/345840165995/sources/2948230327750090626
+          securityMarks:
+            name: organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates/securityMarks
+    - expect_exit:
+        code: 0
+- execute_command:
+    # Field masks in camelCase work.
+    command: |
+      scc findings list 345840165995 --source 2948230327750090626 --order-by "resourceName desc" --read-time "2019-03-13T22:15:01.900Z" --field-mask "finding.resourceName"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/sources/2948230327750090626/findings?alt=json&fieldMask=finding.resourceName&orderBy=resourceName+desc&readTime=2019-03-13T22%3A15%3A01.900Z
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "listFindingsResults": [
+                {
+                  "finding": {
+                    "name": "organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2",
+                    "parent": "organizations/345840165995/sources/2948230327750090626",
+                    "resourceName": "http://somedistinctresource1",
+                    "securityMarks": {
+                      "name": "organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks"
+                    },
+                    "eventTime": "1970-01-01T00:00:00Z",
+                    "createTime": "1970-01-01T00:00:00Z"
+                  }
+                },
+                {
+                  "finding": {
+                    "name": "organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1",
+                    "parent": "organizations/345840165995/sources/2948230327750090626",
+                    "resourceName": "http://somearbitresource",
+                    "securityMarks": {
+                      "name": "organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1/securityMarks"
+                    },
+                    "eventTime": "1970-01-01T00:00:00Z",
+                    "createTime": "1970-01-01T00:00:00Z"
+                  }
+                },
+                {
+                  "finding": {
+                    "name": "organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates",
+                    "parent": "organizations/345840165995/sources/2948230327750090626",
+                    "securityMarks": {
+                      "name": "organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates/securityMarks"
+                    },
+                    "eventTime": "1970-01-01T00:00:00Z",
+                    "createTime": "1970-01-01T00:00:00Z"
+                  }
+                }
+              ],
+              "readTime": "2019-03-13T22:15:01.900Z",
+              "totalSize": 3
+            }
+    - expect_stdout: |
+        ---
+        finding:
+          createTime: '1970-01-01T00:00:00Z'
+          eventTime: '1970-01-01T00:00:00Z'
+          name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2
+          parent: organizations/345840165995/sources/2948230327750090626
+          resourceName: http://somedistinctresource1
+          securityMarks:
+            name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks
+        ---
+        finding:
+          createTime: '1970-01-01T00:00:00Z'
+          eventTime: '1970-01-01T00:00:00Z'
+          name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1
+          parent: organizations/345840165995/sources/2948230327750090626
+          resourceName: http://somearbitresource
+          securityMarks:
+            name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1/securityMarks
+        ---
+        finding:
+          createTime: '1970-01-01T00:00:00Z'
+          eventTime: '1970-01-01T00:00:00Z'
+          name: organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates
+          parent: organizations/345840165995/sources/2948230327750090626
+          securityMarks:
+            name: organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates/securityMarks
+    - expect_exit:
+        code: 0
+- execute_command:
+    # Field masks in snake_case work.
+    command: |
+      scc findings list 345840165995 --source 2948230327750090626 --order-by "resource_name desc" --read-time "2019-03-13T22:15:01.900Z" --field-mask "finding.resource_name"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/sources/2948230327750090626/findings?alt=json&fieldMask=finding.resource_name&orderBy=resource_name+desc&readTime=2019-03-13T22%3A15%3A01.900Z
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "listFindingsResults": [
+                {
+                  "finding": {
+                    "name": "organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2",
+                    "parent": "organizations/345840165995/sources/2948230327750090626",
+                    "resourceName": "http://somedistinctresource1",
+                    "securityMarks": {
+                      "name": "organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks"
+                    },
+                    "eventTime": "1970-01-01T00:00:00Z",
+                    "createTime": "1970-01-01T00:00:00Z"
+                  }
+                },
+                {
+                  "finding": {
+                    "name": "organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1",
+                    "parent": "organizations/345840165995/sources/2948230327750090626",
+                    "resourceName": "http://somearbitresource",
+                    "securityMarks": {
+                      "name": "organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1/securityMarks"
+                    },
+                    "eventTime": "1970-01-01T00:00:00Z",
+                    "createTime": "1970-01-01T00:00:00Z"
+                  }
+                },
+                {
+                  "finding": {
+                    "name": "organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates",
+                    "parent": "organizations/345840165995/sources/2948230327750090626",
+                    "securityMarks": {
+                      "name": "organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates/securityMarks"
+                    },
+                    "eventTime": "1970-01-01T00:00:00Z",
+                    "createTime": "1970-01-01T00:00:00Z"
+                  }
+                }
+              ],
+              "readTime": "2019-03-13T22:15:01.900Z",
+              "totalSize": 3
+            }
+    - expect_stdout: |
+        ---
+        finding:
+          createTime: '1970-01-01T00:00:00Z'
+          eventTime: '1970-01-01T00:00:00Z'
+          name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2
+          parent: organizations/345840165995/sources/2948230327750090626
+          resourceName: http://somedistinctresource1
+          securityMarks:
+            name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks
+        ---
+        finding:
+          createTime: '1970-01-01T00:00:00Z'
+          eventTime: '1970-01-01T00:00:00Z'
+          name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1
+          parent: organizations/345840165995/sources/2948230327750090626
+          resourceName: http://somearbitresource
+          securityMarks:
+            name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1/securityMarks
+        ---
+        finding:
+          createTime: '1970-01-01T00:00:00Z'
+          eventTime: '1970-01-01T00:00:00Z'
+          name: organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates
+          parent: organizations/345840165995/sources/2948230327750090626
+          securityMarks:
+            name: organizations/345840165995/sources/2948230327750090626/findings/testUpdateCreates/securityMarks
+    - expect_exit:
+        code: 0
+- execute_command:
+    # Source is optional. Whenever unspecified it's treated as all sources.
+    command: |
+      scc findings list 345840165995 --order-by "resource_name desc" --read-time "2019-03-13T22:15:01.900Z" --field-mask "finding.resource_name" --limit 5
+    events:
+    - api_call:
+        expect_request:
+          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/sources/-/findings?alt=json&fieldMask=finding.resource_name&orderBy=resource_name+desc&readTime=2019-03-13T22%3A15%3A01.900Z
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "listFindingsResults": [
+                {
+                  "finding": {
+                    "name": "organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2",
+                    "parent": "organizations/345840165995/sources/2948230327750090626",
+                    "resourceName": "http://somedistinctresource1",
+                    "securityMarks": {
+                      "name": "organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks"
+                    },
+                    "eventTime": "1970-01-01T00:00:00Z",
+                    "createTime": "1970-01-01T00:00:00Z"
+                  }
+                },
+                {
+                  "finding": {
+                    "name": "organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1",
+                    "parent": "organizations/345840165995/sources/2948230327750090626",
+                    "resourceName": "http://somearbitresource",
+                    "securityMarks": {
+                      "name": "organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1/securityMarks"
+                    },
+                    "eventTime": "1970-01-01T00:00:00Z",
+                    "createTime": "1970-01-01T00:00:00Z"
+                  }
+                },
+                {
+                  "finding": {
+                    "name": "organizations/345840165995/sources/2890746229750335218/findings/111222333444iamroles4",
+                    "parent": "organizations/345840165995/sources/2890746229750335218",
+                    "securityMarks": {
+                      "name": "organizations/345840165995/sources/2890746229750335218/findings/111222333444iamroles4/securityMarks"
+                    },
+                    "eventTime": "1970-01-01T00:00:00Z",
+                    "createTime": "1970-01-01T00:00:00Z"
+                  }
+                },
+                {
+                  "finding": {
+                    "name": "organizations/345840165995/sources/2890746229750335218/findings/11223344iamroles4",
+                    "parent": "organizations/345840165995/sources/2890746229750335218",
+                    "securityMarks": {
+                      "name": "organizations/345840165995/sources/2890746229750335218/findings/11223344iamroles4/securityMarks"
+                    },
+                    "eventTime": "1970-01-01T00:00:00Z",
+                    "createTime": "1970-01-01T00:00:00Z"
+                  }
+                },
+                {
+                  "finding": {
+                    "name": "organizations/345840165995/sources/2890746229750335218/findings/1234iamroles2",
+                    "parent": "organizations/345840165995/sources/2890746229750335218",
+                    "securityMarks": {
+                      "name": "organizations/345840165995/sources/2890746229750335218/findings/1234iamroles2/securityMarks"
+                    },
+                    "eventTime": "1970-01-01T00:00:00Z",
+                    "createTime": "1970-01-01T00:00:00Z"
+                  }
+                },
+                {
+                  "finding": {
+                    "name": "organizations/345840165995/sources/2890746229750335218/findings/1234iamroles4",
+                    "parent": "organizations/345840165995/sources/2890746229750335218",
+                    "securityMarks": {
+                      "name": "organizations/345840165995/sources/2890746229750335218/findings/1234iamroles4/securityMarks"
+                    },
+                    "eventTime": "1970-01-01T00:00:00Z",
+                    "createTime": "1970-01-01T00:00:00Z"
+                  }
+                },
+                {
+                  "finding": {
+                    "name": "organizations/345840165995/sources/2890746229750335218/findings/123iamroles4",
+                    "parent": "organizations/345840165995/sources/2890746229750335218",
+                    "securityMarks": {
+                      "name": "organizations/345840165995/sources/2890746229750335218/findings/123iamroles4/securityMarks"
+                    },
+                    "eventTime": "1970-01-01T00:00:00Z",
+                    "createTime": "1970-01-01T00:00:00Z"
+                  }
+                },
+                {
+                  "finding": {
+                    "name": "organizations/345840165995/sources/2890746229750335218/findings/UpdateCreatedFinding",
+                    "parent": "organizations/345840165995/sources/2890746229750335218",
+                    "securityMarks": {
+                      "name": "organizations/345840165995/sources/2890746229750335218/findings/UpdateCreatedFinding/securityMarks"
+                    },
+                    "eventTime": "1970-01-01T00:00:00Z",
+                    "createTime": "1970-01-01T00:00:00Z"
+                  }
+                },
+                {
+                  "finding": {
+                    "name": "organizations/345840165995/sources/2890746229750335218/findings/UpdateCreatedFinding2",
+                    "parent": "organizations/345840165995/sources/2890746229750335218",
+                    "securityMarks": {
+                      "name": "organizations/345840165995/sources/2890746229750335218/findings/UpdateCreatedFinding2/securityMarks"
+                    },
+                    "eventTime": "1970-01-01T00:00:00Z",
+                    "createTime": "1970-01-01T00:00:00Z"
+                  }
+                },
+                {
+                  "finding": {
+                    "name": "organizations/345840165995/sources/2890746229750335218/findings/patTest",
+                    "parent": "organizations/345840165995/sources/2890746229750335218",
+                    "securityMarks": {
+                      "name": "organizations/345840165995/sources/2890746229750335218/findings/patTest/securityMarks"
+                    },
+                    "eventTime": "1970-01-01T00:00:00Z",
+                    "createTime": "1970-01-01T00:00:00Z"
+                  }
+                }
+              ],
+              "readTime": "2019-03-13T22:15:01.900Z",
+              "nextPageToken": "CuoB3cy7qgAx8QqfzMnCe6OSd_X6FOI0eltyCr2TBiBBgEXZIidvk-Ec_BcsTbdh-iD5r99qwWKOvbIDrkcC78wtM5vBf2gT2MfYJx5q7OWa03WdIzLf-NkenDzPGIjbwXOCeS4c6Y9SWCcQtblF_V_O2bEuUE6-3DX7NpF3E07T-WZEM9495ah2BxHWsbYsPZOAuv4majgmJHTx7LaBu5OHYkFSPhO51BslPZ04RmSdVMs6SwjlU1MVm75iFhO0kdnCM08yEIR_0inbOaZg71vVK-VvFcQtbvmHgBheizxNB75B4-OdEssmBRT3",
+              "totalSize": 13
+            }
+    - expect_stdout: |
+        ---
+        finding:
+          createTime: '1970-01-01T00:00:00Z'
+          eventTime: '1970-01-01T00:00:00Z'
+          name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2
+          parent: organizations/345840165995/sources/2948230327750090626
+          resourceName: http://somedistinctresource1
+          securityMarks:
+            name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks
+        ---
+        finding:
+          createTime: '1970-01-01T00:00:00Z'
+          eventTime: '1970-01-01T00:00:00Z'
+          name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1
+          parent: organizations/345840165995/sources/2948230327750090626
+          resourceName: http://somearbitresource
+          securityMarks:
+            name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1/securityMarks
+        ---
+        finding:
+          createTime: '1970-01-01T00:00:00Z'
+          eventTime: '1970-01-01T00:00:00Z'
+          name: organizations/345840165995/sources/2890746229750335218/findings/111222333444iamroles4
+          parent: organizations/345840165995/sources/2890746229750335218
+          securityMarks:
+            name: organizations/345840165995/sources/2890746229750335218/findings/111222333444iamroles4/securityMarks
+        ---
+        finding:
+          createTime: '1970-01-01T00:00:00Z'
+          eventTime: '1970-01-01T00:00:00Z'
+          name: organizations/345840165995/sources/2890746229750335218/findings/11223344iamroles4
+          parent: organizations/345840165995/sources/2890746229750335218
+          securityMarks:
+            name: organizations/345840165995/sources/2890746229750335218/findings/11223344iamroles4/securityMarks
+        ---
+        finding:
+          createTime: '1970-01-01T00:00:00Z'
+          eventTime: '1970-01-01T00:00:00Z'
+          name: organizations/345840165995/sources/2890746229750335218/findings/1234iamroles2
+          parent: organizations/345840165995/sources/2890746229750335218
+          securityMarks:
+            name: organizations/345840165995/sources/2890746229750335218/findings/1234iamroles2/securityMarks
+    - expect_exit:
+        code: 0

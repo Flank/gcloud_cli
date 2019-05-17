@@ -3,8 +3,8 @@ NAME
         operation
 
 SYNOPSIS
-    gcloud beta filestore operations describe (OPERATION : --location=LOCATION)
-        [GCLOUD_WIDE_FLAG ...]
+    gcloud beta filestore operations describe (OPERATION : --zone=ZONE)
+        [--location=LOCATION] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Describe a Cloud Filestore operation.
@@ -23,12 +23,19 @@ POSITIONAL ARGUMENTS
           This positional must be specified if any of the other arguments in
           this group are specified.
 
-       --location=LOCATION
-          The location of the operation.
+       --zone=ZONE
+          The zone of the operation.
+
+FLAGS
+     --location=LOCATION
+        (DEPRECATED) Location of the Cloud Filestore instance.
+
+        The --location flag is deprecated. Use --zone.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -40,8 +47,9 @@ EXAMPLES
             --location=us-central1-c
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud filestore operations describe
         $ gcloud alpha filestore operations describe
 

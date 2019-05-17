@@ -9,8 +9,9 @@ DESCRIPTION
     (ALPHA) List, create, and delete backend services.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -38,8 +39,14 @@ COMMANDS
      edit
         (ALPHA) Modify backend services.
 
+     export
+        (ALPHA) Export a backend service.
+
      get-health
         (ALPHA) Get backend health statuses from a backend service.
+
+     import
+        (ALPHA) Import a backend service.
 
      list
         (ALPHA) List Google Compute Engine backend services.

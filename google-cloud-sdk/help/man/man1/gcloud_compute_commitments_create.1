@@ -11,7 +11,7 @@ gcloud compute commitments create \- create Google Compute Engine commitments
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute commitments create\fR \fICOMMITMENT\fR \fB\-\-plan\fR=\fIPLAN\fR \fB\-\-resources\fR=[\fIRESOURCE\fR=\fICOMMITMENT\fR,...] [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute commitments create\fR \fICOMMITMENT\fR \fB\-\-plan\fR=\fIPLAN\fR \fB\-\-resources\fR=[\fImemory\fR=\fIMEMORY\fR],[\fIvcpu\fR=\fIVCPU\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -41,22 +41,22 @@ Duration of the commitment. \fIPLAN\fR must be one of: \fB12\-month\fR,
 \fB36\-month\fR.
 
 .TP 2m
-\fB\-\-resources\fR=[\fIRESOURCE\fR=\fICOMMITMENT\fR,...]
-Resources to be included in the commitment commitment:
+\fB\-\-resources\fR=[\fImemory\fR=\fIMEMORY\fR],[\fIvcpu\fR=\fIVCPU\fR]
+Resources to be included in the commitment, the ratio between number of vCPU
+cores and memory must conform to limits described at:
+https://cloud.google.com/compute/docs/instances/creating\-instance\-with\-custom\-machine\-type#specifications.
 .RS 2m
-.IP "\(em" 2m
-MEMORY should include unit (eg. 3072MB or 9GB). If no units are specified, GB is
-assumed.
-.IP "\(em" 2m
-VCPU is number of committed cores.
+.TP 2m
+\fBmemory\fR
+The size of the memory, should include units (e.g. 3072MB or 9GB). If no units
+are specified, GB is assumed.
+.TP 2m
+\fBvcpu\fR
+The number of the vCPU cores.
+
 .RE
 .RE
 .sp
-Ratio between number of VCPU cores and memory must conform to limits described
-on:
-https://cloud.google.com/compute/docs/instances/creating\-instance\-with\-custom\-machine\-type
-
-
 
 .SH "OPTIONAL FLAGS"
 
@@ -94,10 +94,11 @@ Alternatively, the region can be stored in the environment variable
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

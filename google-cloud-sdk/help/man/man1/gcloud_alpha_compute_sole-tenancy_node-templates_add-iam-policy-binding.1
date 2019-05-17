@@ -67,11 +67,11 @@ Examples: \f5user:test\-user@gmail.com\fR, \f5group:admins@example.com\fR,
 Can also be one of the following special values:
 .RS 2m
 .IP "\(em" 2m
-\f5allUsers\fR \- anyone who is on the internet, with or without a Google
-account.
+\f5allUsers\fR \- Special identifier that represents anyone who is on the
+internet, with or without a Google account.
 .IP "\(em" 2m
-\f5allAuthenticatedUsers\fR \- anyone who is authenticated with a Google account
-or a service account.
+\f5allAuthenticatedUsers\fR \- Special identifier that represents anyone who is
+authenticated with a Google account or a service account.
 .RE
 .RE
 .sp
@@ -130,10 +130,11 @@ fields, see the help for \f5\-\-condition\fR.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -149,21 +150,21 @@ https://developers.google.com/compute/docs/reference/latest/
 
 To add an IAM policy binding for the role of 'roles/compute.admin' for the user
 \'test\-user@gmail.com' with node template 'my\-node\-template' and region
-\'us\-central1', run:
+\'REGION', run:
 
 .RS 2m
 $ gcloud alpha compute sole\-tenancy node\-templates \e
-    add\-iam\-policy\-binding my\-node\-template \-\-region='us\-central1' \e
+    add\-iam\-policy\-binding my\-node\-template \-\-region=REGION \e
     \-\-member='user:test\-user@gmail.com' \-\-role='roles/compute.admin'
 .RE
 
 To add an IAM policy binding which expires at the end of the year 2018 for the
 role of 'roles/compute.admin' and the user 'test\-user@gmail.com' with node
-template 'my\-node\-template' and region 'us\-central1', run:
+template 'my\-node\-template' and region 'REGION', run:
 
 .RS 2m
 $ gcloud alpha compute sole\-tenancy node\-templates \e
-    add\-iam\-policy\-binding my\-node\-template \-\-region='us\-central1' \e
+    add\-iam\-policy\-binding my\-node\-template \-\-region=REGION \e
     \-\-member='user:test\-user@gmail.com' \e
     \-\-role='roles/compute.admin' \e
     \-\-condition='expression=request.time <
@@ -182,9 +183,10 @@ This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you will have to apply for early access and have your projects registered on the
 API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. This variant is also available:
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
+$ gcloud compute sole\-tenancy node\-templates add\-iam\-policy\-binding
 $ gcloud beta compute sole\-tenancy node\-templates \e
     add\-iam\-policy\-binding
 .RE

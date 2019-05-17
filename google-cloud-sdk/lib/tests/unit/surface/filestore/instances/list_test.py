@@ -25,7 +25,7 @@ from tests.lib.surface.filestore import base
 
 class CloudFilestoreInstancesListTest(base.CloudFilestoreUnitTestBase):
 
-  _TRACK = calliope_base.ReleaseTrack.BETA
+  _TRACK = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.SetUpTrack(self._TRACK)
@@ -98,7 +98,7 @@ class CloudFilestoreInstancesListTest(base.CloudFilestoreUnitTestBase):
     # pylint: disable=line-too-long
     self.AssertOutputContains(
         """\
-        INSTANCE_NAME LOCATION TIER CAPACITY_GB FILE_SHARE_NAME IP_ADDRESS STATE CREATE_TIME
+        INSTANCE_NAME ZONE TIER CAPACITY_GB FILE_SHARE_NAME IP_ADDRESS STATE CREATE_TIME
         Instance1 us-central1-c 3072 my_vol
         Instance2 us-central1-c 3072 my_vol
         """,
@@ -121,7 +121,14 @@ class CloudFilestoreInstancesListTest(base.CloudFilestoreUnitTestBase):
     )
     # pylint: enable=line-too-long
 
-  def testListWithLocation(self):
+  def testListWithZone(self):
+    test_instance = self.GetTestCloudFilestoreInstance()
+    self.ExpectListInstancesCalls(
+        self.parent, unreachable=[], instances=[test_instance])
+    results = list(self.RunList('--zone=us-central1-c'))
+    self.assertEqual([test_instance], results)
+
+  def testListWithDeprecatedLocation(self):
     test_instance = self.GetTestCloudFilestoreInstance()
     self.ExpectListInstancesCalls(
         self.parent, unreachable=[], instances=[test_instance])
@@ -137,15 +144,20 @@ class CloudFilestoreInstancesListTest(base.CloudFilestoreUnitTestBase):
         'WARNING: Location us-central1-c may be unreachable.')
 
 
+class CloudFilestoreInstancesListBetaTest(CloudFilestoreInstancesListTest):
+
+  _TRACK = calliope_base.ReleaseTrack.BETA
+
+
 class CloudFilestoreInstancesListAlphaTest(CloudFilestoreInstancesListTest):
 
   _TRACK = calliope_base.ReleaseTrack.ALPHA
 
   def FileShareMsg(self):
-    return self.messages.VolumeConfig
+    return self.messages.FileShareConfig
 
   def AddInstanceFileShare(self, instance, file_shares):
-    instance.volumes = file_shares
+    instance.fileShares = file_shares
 
 
 if __name__ == '__main__':

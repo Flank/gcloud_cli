@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.command_lib.util.apis import arg_utils
+from googlecloudsdk.command_lib.util.apis import yaml_command_schema
 from googlecloudsdk.core import exceptions
 
 
@@ -42,16 +43,18 @@ def GetMaskString(args, spec, mask_path, is_dotted=True):
   Raises:
     NoFieldsSpecifiedError: this error would happen when no args are specified.
   """
-  params_in_spec = spec.arguments.params
   specified_args_list = set(args.GetSpecifiedArgs().keys())
   if not specified_args_list:
     raise NoFieldsSpecifiedError(
         'Must specify at least one valid parameter to update.')
 
   field_list = []
-  for param in params_in_spec:
-    if ('--' + param.arg_name in specified_args_list or
-        param.arg_name in specified_args_list):
+  for param in _GetSpecParams(spec.arguments.params):
+    is_arg_specified = (
+        '--' + param.arg_name in specified_args_list or
+        '--no-' + param.arg_name in specified_args_list or
+        param.arg_name in specified_args_list)
+    if is_arg_specified and param.api_field is not None:
       api_field_name = _ExtractMaskField(mask_path, param.api_field, is_dotted)
       field_list.append(api_field_name)
 
@@ -60,6 +63,23 @@ def GetMaskString(args, spec, mask_path, is_dotted=True):
   mask = ','.join(trimmed_field_list)
 
   return mask
+
+
+def _GetSpecParams(params):
+  """Recursively yields all the params in the spec.
+
+  Args:
+    params: List of Argument or ArgumentGroup objects.
+
+  Yields:
+    All the Argument objects in the command spec.
+  """
+  for param in params:
+    if isinstance(param, yaml_command_schema.ArgumentGroup):
+      for p in _GetSpecParams(param.arguments):
+        yield p
+    else:
+      yield param
 
 
 def _ExtractMaskField(mask_path, api_field, is_dotted):

@@ -4,7 +4,12 @@ NAME
 
 SYNOPSIS
     gcloud alpha pubsub topics create TOPIC [TOPIC ...]
-        [--labels=[KEY=VALUE,...]] [GCLOUD_WIDE_FLAG ...]
+        [--labels=[KEY=VALUE,...]]
+        [--topic-encryption-key=TOPIC_ENCRYPTION_KEY
+          : --topic-encryption-key-keyring=TOPIC_ENCRYPTION_KEY_KEYRING
+          --topic-encryption-key-location=TOPIC_ENCRYPTION_KEY_LOCATION
+          --topic-encryption-key-project=TOPIC_ENCRYPTION_KEY_PROJECT]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Creates one or more Cloud Pub/Sub topics.
@@ -29,9 +34,33 @@ FLAGS
         contain only hyphens (-), underscores (_), lowercase characters, and
         numbers.
 
+     Key resource - The Cloud KMS (Key Management Service) cryptokey that will
+     be used to protect the topic. The specified CloudKMS key should have
+     purpose set to "ENCRYPT_DECRYPT". The service account,
+     "service-${CONSUMER_PROJECT_NUMBER}@gcp-sa-pubsub.iam.gserviceaccount.com"
+     requires the IAM cryptoKeyEncrypterDecrypter role for the given CloudKMS
+     key. CONSUMER_PROJECT_NUMBER is the project number of the project that is
+     the parent of the topic being created. The arguments in this group can be
+     used to specify the attributes of this resource.
+
+       --topic-encryption-key=TOPIC_ENCRYPTION_KEY
+          ID of the key or fully qualified identifier for the key. This flag
+          must be specified if any of the other arguments in this group are
+          specified.
+
+       --topic-encryption-key-keyring=TOPIC_ENCRYPTION_KEY_KEYRING
+          The KMS keyring of the key.
+
+       --topic-encryption-key-location=TOPIC_ENCRYPTION_KEY_LOCATION
+          The Cloud location for the key.
+
+       --topic-encryption-key-project=TOPIC_ENCRYPTION_KEY_PROJECT
+          The Cloud project for the key.
+
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

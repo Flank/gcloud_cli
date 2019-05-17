@@ -11,7 +11,7 @@ gcloud alpha kms asymmetric\-sign \- sign a user input file using an asymmetric\
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha kms asymmetric\-sign\fR \fB\-\-digest\-algorithm\fR=\fIDIGEST_ALGORITHM\fR \fB\-\-input\-file\fR=\fIINPUT_FILE\fR [\fB\-\-key\fR=\fIKEY\fR] [\fB\-\-keyring\fR=\fIKEYRING\fR] [\fB\-\-location\fR=\fILOCATION\fR] [\fB\-\-signature\-file\fR=\fISIGNATURE_FILE\fR] [\fB\-\-version\fR=\fIVERSION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha kms asymmetric\-sign\fR \fB\-\-digest\-algorithm\fR=\fIDIGEST_ALGORITHM\fR \fB\-\-input\-file\fR=\fIINPUT_FILE\fR \fB\-\-signature\-file\fR=\fISIGNATURE_FILE\fR [\fB\-\-key\fR=\fIKEY\fR] [\fB\-\-keyring\fR=\fIKEYRING\fR] [\fB\-\-location\fR=\fILOCATION\fR] [\fB\-\-version\fR=\fIVERSION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -36,6 +36,10 @@ The algorithm to digest the input. \fIDIGEST_ALGORITHM\fR must be one of:
 \fB\-\-input\-file\fR=\fIINPUT_FILE\fR
 Path to the input file to sign.
 
+.TP 2m
+\fB\-\-signature\-file\fR=\fISIGNATURE_FILE\fR
+Path to the signature file to output.
+
 
 .RE
 .sp
@@ -56,10 +60,6 @@ Key ring of the key.
 Location of the keyring.
 
 .TP 2m
-\fB\-\-signature\-file\fR=\fISIGNATURE_FILE\fR
-Path to the signature file to output.
-
-.TP 2m
 \fB\-\-version\fR=\fIVERSION\fR
 Version to use for signing.
 
@@ -69,10 +69,11 @@ Version to use for signing.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

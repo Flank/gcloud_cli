@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.compute import firewalls_utils
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import resources
 from googlecloudsdk.core.console import progress_tracker
 from tests.lib import test_case
@@ -448,6 +449,37 @@ class AlphaFirewallRulesCreateTest(BetaFirewallRulesCreateTest):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.resources = resources.REGISTRY.Clone()
     self.resources.RegisterApiByName('compute', 'alpha')
+
+  def testToggleLoggingMetadata(self):
+    self.Run("""
+        compute firewall-rules create firewall-1
+          --action allow
+          --rules 123
+          --enable-logging
+          --logging-metadata exclude-all
+        """)
+    self.CheckFirewallRequest(
+        allowed=[
+            self.messages.Firewall.AllowedValueListEntry(IPProtocol='123')
+        ],
+        name='firewall-1',
+        logConfig=self.messages.FirewallLogConfig(
+            enable=True,
+            metadata=self.messages.FirewallLogConfig.MetadataValueValuesEnum(
+                'EXCLUDE_ALL_METADATA')),
+        direction=self.messages.Firewall.DirectionValueValuesEnum.INGRESS,
+        sourceRanges=[])
+
+  def testToggleLoggingMetadataLoggingDisabled(self):
+    self.assertRaisesRegex(
+        exceptions.InvalidArgumentException,
+        '^Invalid value for \\[--logging-metadata\\]: cannot toggle logging'
+        ' metadata if logging is not enabled.', self.Run,
+        'compute firewall-rules create firewall-1'
+        ' --action allow'
+        ' --rules 123'
+        ' --logging-metadata exclude-all')
+
 
 if __name__ == '__main__':
   test_case.main()

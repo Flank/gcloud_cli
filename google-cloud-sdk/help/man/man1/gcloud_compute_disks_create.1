@@ -11,7 +11,7 @@ gcloud compute disks create \- create Google Compute Engine persistent disks
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute disks create\fR \fIDISK_NAME\fR [\fIDISK_NAME\fR\ ...] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-guest\-os\-features\fR=[\fIGUEST_OS_FEATURE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-licenses\fR=[\fILICENSE\fR,...]] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-size\fR=\fISIZE\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR] [\fB\-\-kms\-key\fR=\fIKMS_KEY\fR\ :\ \fB\-\-kms\-keyring\fR=\fIKMS_KEYRING\fR\ \fB\-\-kms\-location\fR=\fIKMS_LOCATION\fR\ \fB\-\-kms\-project\fR=\fIKMS_PROJECT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute disks create\fR \fIDISK_NAME\fR [\fIDISK_NAME\fR\ ...] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-guest\-os\-features\fR=[\fIGUEST_OS_FEATURE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-licenses\fR=[\fILICENSE\fR,...]] [\fB\-\-replica\-zones\fR=\fIZONE\fR,\fIZONE\fR] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-size\fR=\fISIZE\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR] [\fB\-\-kms\-key\fR=\fIKMS_KEY\fR\ :\ \fB\-\-kms\-keyring\fR=\fIKMS_KEYRING\fR\ \fB\-\-kms\-location\fR=\fIKMS_LOCATION\fR\ \fB\-\-kms\-project\fR=\fIKMS_PROJECT\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -123,6 +123,13 @@ A list of URIs to license resources. The provided licenses will be added onto
 the created disks to indicate the licensing and billing policies.
 
 .TP 2m
+\fB\-\-replica\-zones\fR=\fIZONE\fR,\fIZONE\fR
+A comma\-separated list of exactly 2 zones that a regional disk will be
+replicated to. Required when creating regional disk. The zones must be in the
+same region as specified in the \f5\-\-region\fR flag. See available zones with
+\f5gcloud compute zones list\fR.
+
+.TP 2m
 \fB\-\-require\-csek\-key\-create\fR
 Refuse to create resources not protected by a user managed key in the key file
 when \-\-csek\-key\-file is given. This behavior is enabled by default to
@@ -148,33 +155,6 @@ used.
 \fB\-\-type\fR=\fITYPE\fR
 Specifies the type of disk to create. To get a list of available disk types, run
 \f5gcloud compute disk\-types list\fR. The default disk type is pd\-standard.
-
-.TP 2m
-\fB\-\-zone\fR=\fIZONE\fR
-Zone of the disks to create. If not specified and the \f5\fIcompute/zone\fR\fR
-property isn't set, you may be prompted to select a zone.
-
-To avoid prompting when this flag is omitted, you can set the
-\f5\fIcompute/zone\fR\fR property:
-
-.RS 2m
-$ gcloud config set compute/zone ZONE
-.RE
-
-A list of zones can be fetched by running:
-
-.RS 2m
-$ gcloud compute zones list
-.RE
-
-To unset the property, run:
-
-.RS 2m
-$ gcloud config unset compute/zone
-.RE
-
-Alternatively, the zone can be stored in the environment variable
-\f5\fICLOUDSDK_COMPUTE_ZONE\fR\fR.
 
 .TP 2m
 \fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR
@@ -252,6 +232,67 @@ The Cloud location for the key.
 \fB\-\-kms\-project\fR=\fIKMS_PROJECT\fR
 The Cloud project for the key.
 
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the disks to create. If not specified, you may be prompted to select a
+region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+Zone of the disks to create. If not specified and the \f5\fIcompute/zone\fR\fR
+property isn't set, you may be prompted to select a zone.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/zone\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/zone ZONE
+.RE
+
+A list of zones can be fetched by running:
+
+.RS 2m
+$ gcloud compute zones list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/zone
+.RE
+
+Alternatively, the zone can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_ZONE\fR\fR.
+
 
 .RE
 .RE
@@ -259,10 +300,11 @@ The Cloud project for the key.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

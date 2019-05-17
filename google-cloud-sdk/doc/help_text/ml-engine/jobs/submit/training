@@ -1,6 +1,5 @@
 NAME
-    gcloud ml-engine jobs submit training - submit a Cloud Machine Learning
-        training job
+    gcloud ml-engine jobs submit training - submit an AI Platform training job
 
 SYNOPSIS
     gcloud ml-engine jobs submit training JOB --module-name=MODULE_NAME
@@ -12,7 +11,7 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...] [-- USER_ARGS ...]
 
 DESCRIPTION
-    Submit a Cloud Machine Learning training job.
+    Submit an AI Platform training job.
 
     This creates temporary files and executes Python code staged by a user on
     Google Cloud Storage. Model code can either be specified with a path, e.g.:
@@ -40,7 +39,7 @@ DESCRIPTION
 
     To follow the progress of your job, pass the --stream-logs flag (note that
     even with the --stream-logs flag, the job will continue to run after this
-    command exits and must be cancelled with gcloud ml-engine jobs cancel
+    command exits and must be cancelled with gcloud ai-platform jobs cancel
     JOB_ID).
 
     For more information, see:
@@ -107,8 +106,8 @@ OPTIONAL FLAGS
         data needed for training.
 
         This path will be passed to your TensorFlow program as the --job_dir
-        command-line arg. The benefit of specifying this field is that Cloud ML
-        Engine will validate the path for use in training.
+        command-line arg. The benefit of specifying this field is that AI
+        Platform will validate the path for use in training.
 
         If packages must be uploaded and --staging-bucket is not provided, this
         path will be used instead.
@@ -160,9 +159,9 @@ OPTIONAL FLAGS
         CLOUDSDK_COMPUTE_REGION.
 
      --runtime-version=RUNTIME_VERSION
-        Google Cloud ML Engine runtime version for this job. Defaults to a
-        stable version, which is defined in documentation along with the list
-        of supported versions:
+        AI Platform runtime version for this job. Defaults to a stable version,
+        which is defined in documentation along with the list of supported
+        versions:
         https://cloud.google.com/ml-engine/docs/tensorflow/runtime-version-list
 
      --scale-tier=SCALE_TIER
@@ -171,8 +170,8 @@ OPTIONAL FLAGS
 
          basic
             Single worker instance. This tier is suitable for learning how to
-            use Cloud ML Engine, and for experimenting with new models using
-            small datasets.
+            use AI Platform, and for experimenting with new models using small
+            datasets.
          basic-gpu
             Single worker instance with a GPU.
          basic-tpu
@@ -224,11 +223,12 @@ OPTIONAL FLAGS
           Note that even if command execution is halted, the job will still run
           until cancelled with
 
-              $ gcloud ml-engine jobs cancel JOB_ID
+              $ gcloud ai-platform jobs cancel JOB_ID
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

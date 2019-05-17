@@ -5,7 +5,8 @@ NAME
 SYNOPSIS
     gcloud firebase test ios run [ARGSPEC] [--device=DIMENSION=VALUE,[...]]
         [--test=XCTEST_ZIP] [--timeout=TIMEOUT] [--xcode-version=XCODE_VERSION]
-        [--xctestrun-file=XCTESTRUN_FILE] [--async] [--record-video]
+        [--xctestrun-file=XCTESTRUN_FILE] [--async]
+        [--num-flaky-test-attempts=int] [--record-video]
         [--results-bucket=RESULTS_BUCKET] [--results-dir=RESULTS_DIR]
         [--results-history-name=RESULTS_HISTORY_NAME] [--filter=EXPRESSION]
         [--limit=LIMIT] [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]]
@@ -89,6 +90,14 @@ FLAGS
      --async
         Invoke a test asynchronously without waiting for test results.
 
+     --num-flaky-test-attempts=int
+        Specifies the number of times a test execution should be reattempted if
+        one or more of its test cases fail for any reason. An execution that
+        initially fails but succeeds on any reattempt is reported as FLAKY.
+
+        The maximum number of reruns allowed is 10. (Default: 0, which implies
+        no reruns.) All additional attempts are executed in parallel.
+
      --record-video
         Enable video recording during the test. Enabled by default, use
         --no-record-video to disable.
@@ -139,8 +148,9 @@ LIST COMMAND FLAGS
         applied in this order: --flatten, --sort-by, --filter, --limit.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

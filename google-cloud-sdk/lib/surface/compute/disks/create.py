@@ -102,7 +102,9 @@ def _SourceArgs(parser, source_snapshot_arg):
   source_snapshot_arg.AddArgument(source_group)
 
 
-def _CommonArgs(parser, source_snapshot_arg):
+def _CommonArgs(parser,
+                source_snapshot_arg,
+                include_physical_block_size_support=False):
   """Add arguments used for parsing in all command tracks."""
   Create.disks_arg.AddArgument(parser, operation_type='create')
   parser.add_argument(
@@ -151,6 +153,16 @@ def _CommonArgs(parser, source_snapshot_arg):
   csek_utils.AddCsekKeyArgs(parser)
   labels_util.AddCreateLabelsFlags(parser)
 
+  if include_physical_block_size_support:
+    parser.add_argument(
+        '--physical-block-size',
+        choices=['4096', '16384'],
+        default='4096',
+        help="""\
+Physical block size of the persistent disk in bytes.
+Valid values are 4096(default) and 16384.
+""")
+
 
 def _AddReplicaZonesArg(parser):
   parser.add_argument(
@@ -186,6 +198,7 @@ class Create(base.Command):
     Create.disks_arg = disks_flags.MakeDiskArg(plural=True)
     _CommonArgs(parser, disks_flags.SOURCE_SNAPSHOT_ARG)
     image_utils.AddGuestOsFeaturesArg(parser, base.ReleaseTrack.GA)
+    _AddReplicaZonesArg(parser)
     kms_resource_args.AddKmsKeyResourceArg(
         parser, 'disk', region_fallthrough=True)
 
@@ -205,21 +218,7 @@ class Create(base.Command):
     return []
 
   def ValidateAndParseDiskRefs(self, args, compute_holder):
-    """Validate flags and parse disks references.
-
-    Subclasses may override it to customize parsing.
-
-    Args:
-      args: The argument namespace
-      compute_holder: base_classes.ComputeApiHolder instance
-
-    Returns:
-      List of compute.regionDisks resources.
-    """
-    return Create.disks_arg.ResolveAsResource(
-        args,
-        compute_holder.resources,
-        scope_lister=flags.GetDefaultScopeLister(compute_holder.client))
+    return _ValidateAndParseDiskRefsRegionalReplica(args, compute_holder)
 
   def GetFromImage(self, args):
     return args.image or args.image_family
@@ -319,7 +318,8 @@ class Create(base.Command):
   def Run(self, args):
     return self._Run(args, supports_kms_keys=True)
 
-  def _Run(self, args, supports_kms_keys=False):
+  def _Run(self, args, supports_kms_keys=False, supports_physical_block=False,
+           support_shared_disk=False):
     compute_holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
     client = compute_holder.client
 
@@ -398,13 +398,27 @@ class Create(base.Command):
 
       # end of alpha/beta features.
 
+      if supports_physical_block and args.IsSpecified('physical_block_size'):
+        physical_block_size_bytes = int(args.physical_block_size)
+      else:
+        physical_block_size_bytes = None
+
       disk = client.messages.Disk(
           name=disk_ref.Name(),
           description=args.description,
           sizeGb=size_gb,
           sourceSnapshot=snapshot_uri,
           type=type_uri,
+          physicalBlockSizeBytes=physical_block_size_bytes,
           **kwargs)
+      if (support_shared_disk and disk_ref.Collection() == 'compute.regionDisks'
+          and args.IsSpecified('multi_writer')):
+        raise exceptions.InvalidArgumentException('--multi-writer', (
+            '--multi-writer can be used only with --zone flag'))
+
+      if (support_shared_disk and disk_ref.Collection() == 'compute.disks' and
+          args.IsSpecified('multi_writer')):
+        disk.multiWriter = args.multi_writer
 
       if guest_os_feature_messages:
         disk.guestOsFeatures = guest_os_feature_messages
@@ -451,19 +465,20 @@ class CreateBeta(Create):
 
   @staticmethod
   def Args(parser):
-    Create.disks_arg = disks_flags.MakeDiskArgZonalOrRegional(plural=True)
+    Create.disks_arg = disks_flags.MakeDiskArg(plural=True)
 
-    _CommonArgs(parser, disks_flags.SOURCE_SNAPSHOT_ARG)
+    _CommonArgs(
+        parser,
+        disks_flags.SOURCE_SNAPSHOT_ARG,
+        include_physical_block_size_support=True)
     image_utils.AddGuestOsFeaturesArg(parser, base.ReleaseTrack.BETA)
     _AddReplicaZonesArg(parser)
+    resource_flags.AddResourcePoliciesArgs(parser, 'added to', 'disk')
     kms_resource_args.AddKmsKeyResourceArg(
         parser, 'disk', region_fallthrough=True)
 
-  def ValidateAndParseDiskRefs(self, args, compute_holder):
-    return _ValidateAndParseDiskRefsRegionalReplica(args, compute_holder)
-
   def Run(self, args):
-    return self._Run(args, supports_kms_keys=True)
+    return self._Run(args, supports_kms_keys=True, supports_physical_block=True)
 
 
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
@@ -472,20 +487,29 @@ class CreateAlpha(Create):
 
   @staticmethod
   def Args(parser):
-    Create.disks_arg = disks_flags.MakeDiskArgZonalOrRegional(plural=True)
+    Create.disks_arg = disks_flags.MakeDiskArg(plural=True)
 
-    _CommonArgs(parser, disks_flags.SOURCE_SNAPSHOT_ARG)
+    _CommonArgs(
+        parser,
+        disks_flags.SOURCE_SNAPSHOT_ARG,
+        include_physical_block_size_support=True)
     image_utils.AddGuestOsFeaturesArg(parser, base.ReleaseTrack.ALPHA)
     _AddReplicaZonesArg(parser)
     resource_flags.AddResourcePoliciesArgs(parser, 'added to', 'disk')
     kms_resource_args.AddKmsKeyResourceArg(
         parser, 'disk', region_fallthrough=True)
-
-  def ValidateAndParseDiskRefs(self, args, compute_holder):
-    return _ValidateAndParseDiskRefsRegionalReplica(args, compute_holder)
+    parser.add_argument(
+        '--multi-writer',
+        action='store_true',
+        help=('Create the disk in shared mode so that it can be attached with '
+              'read-write access to multiple VMs. Available only for zonal '
+              'disks. Cannot be used with regional disks. Shared disk is '
+              'exposed only as an NVMe device. Shared PD does not yet support '
+              'resize and snapshot operations.'))
 
   def Run(self, args):
-    return self._Run(args, supports_kms_keys=True)
+    return self._Run(args, supports_kms_keys=True, supports_physical_block=True,
+                     support_shared_disk=True)
 
 
 def _ValidateAndParseDiskRefsRegionalReplica(args, compute_holder):

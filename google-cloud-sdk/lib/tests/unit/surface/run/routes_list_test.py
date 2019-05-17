@@ -33,10 +33,13 @@ class RoutesListTest(base.ServerlessSurfaceBase):
     for i, r in enumerate(self.routes):
       r.name = 'route{}'.format(i)
       r.metadata.creationTimestamp = '2018/01/01 00:{}0:00Z'.format(i)
+      r.metadata.selfLink = '/apis/serving.knative.dev/v1alpha1/namespaces/{}/routes/{}'.format(
+          self.namespace.Name(), r.name)
       r.status.conditions = [self.serverless_messages.RouteCondition(
           type='Ready',
           status=six.text_type(bool(i%2)))]
     self.operations.ListRoutes.return_value = self.routes
+    self._MockConnectionContext()
 
   def testNoArg(self):
     """Two routes are listable using the Serverless API format."""
@@ -50,3 +53,13 @@ class RoutesListTest(base.ServerlessSurfaceBase):
         + route1
         """, normalize_space=True)
 
+  def testNoArgUri(self):
+    """Two routes are listable using the Serverless API format."""
+    self.Run('run routes list --uri')
+
+    self.operations.ListRoutes.assert_called_once_with(self.namespace)
+    self.AssertOutputEquals(
+        """https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/routes/route0
+        https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/routes/route1
+        """,
+        normalize_space=True)

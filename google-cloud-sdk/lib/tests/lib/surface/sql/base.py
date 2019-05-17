@@ -78,19 +78,22 @@ class MysqlIntegrationTestBase(SqlIntegrationTestBaseWithNewInstance):
   # Base class for all SQL e2e tests that need a fresh MySQL instance.
 
   def RunCreateInstanceCmd(self, tier):
+    # TODO(b/73362371): Specify a region or zone.
     return self.Run(
         'sql instances create {0} --tier {1} --backup --enable-bin-log '
-        '--backup-start-time 00:00 --async'.format(self.test_instance, tier))
+        '--backup-start-time 00:00 --async --quiet'.format(
+            self.test_instance, tier))
 
 
 class PsqlIntegrationTestBase(SqlIntegrationTestBaseWithNewInstance):
   # Base class for all SQL e2e tests that need a fresh PSQL instance.
 
   def RunCreateInstanceCmd(self, tier):
+    # TODO(b/73362371): Specify a region or zone.
     return self.Run(
         'sql instances create {0} --database-version POSTGRES_9_6 '
-        '--tier {1} --activation-policy ALWAYS --async'
-        .format(self.test_instance, tier),
+        '--tier {1} --activation-policy ALWAYS --async --quiet'.format(
+            self.test_instance, tier),
         track=calliope_base.ReleaseTrack.BETA)
 
 

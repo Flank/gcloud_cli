@@ -3,19 +3,19 @@ summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: |
-      ml video detect-labels toy.mp4 --format="value(@type)"
-  - progress_tracker:
-    - message: Waiting for operation [$$operation-id$$] to complete
-    - status: SUCCESS
+      ml video detect-labels toy.mp4 --format="text(name)" --async
+  - stderr: |
+      Check operation [$$operation-id$$] for status.
   - stdout: |
-      type.googleapis.com/google.cloud.videointelligence.v1.AnnotateVideoResponse
+      name: $$operation-id$$
 actions:
 - load_resource:
     path: tests/unit/command_lib/ml/video/testdata/toy.mp4
 - execute_command:
-    # basic test that the right kind of response is returned
+    # basic test that verifies a request returns an operation, waiting for the actual
+    # operation result time's out (> 10 min) too often.
     command: |
-      ml video detect-labels toy.mp4 --format="value(@type)"
+      ml video detect-labels toy.mp4 --format="text(name)" --async
     events:
     - api_call:
         expect_request:
@@ -37,120 +37,16 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: us-east1.8054007320354056161
+            name: us-east1.1841511835263812790
         expect_response:
           extract_references:
           - field: name
             reference: operation-id
           body:
             json: {}
-    - api_call:
-        expect_request:
-          uri: https://videointelligence.googleapis.com/v1/operations/$$operation-id$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private
-            content-length: '4280'
-            content-type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            name: us-east1.8054007320354056161
-            metadata:
-              '@type': type.googleapis.com/google.cloud.videointelligence.v1.AnnotateVideoProgress
-              annotationProgress:
-              - progressPercent: 100
-                startTime: '2018-11-20T04:04:14.891311Z'
-                updateTime: '2018-11-20T04:04:19.661442Z'
-            done: true
-            response:
-              '@type': type.googleapis.com/google.cloud.videointelligence.v1.AnnotateVideoResponse
-              annotationResults:
-              - segmentLabelAnnotations:
-                - entity:
-                    entityId: /m/0138tl
-                    description: toy
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 5.500s
-                    confidence: 0.93857837
-                - entity:
-                    entityId: /m/04ndr
-                    description: lego
-                    languageCode: en-US
-                  categoryEntities:
-                  - entityId: /m/0138tl
-                    description: toy
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 5.500s
-                    confidence: 0.925718
-                - entity:
-                    entityId: /m/06fgw
-                    description: robot
-                    languageCode: en-US
-                  categoryEntities:
-                  - entityId: /m/07c1v
-                    description: technology
-                    languageCode: en-US
-                  - entityId: /m/0dkw5
-                    description: machine
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 5.500s
-                    confidence: 0.3247936
-                shotLabelAnnotations:
-                - entity:
-                    entityId: /m/04ndr
-                    description: lego
-                    languageCode: en-US
-                  categoryEntities:
-                  - entityId: /m/0138tl
-                    description: toy
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 5.500s
-                    confidence: 0.925718
-                - entity:
-                    entityId: /m/06fgw
-                    description: robot
-                    languageCode: en-US
-                  categoryEntities:
-                  - entityId: /m/07c1v
-                    description: technology
-                    languageCode: en-US
-                  - entityId: /m/0dkw5
-                    description: machine
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 5.500s
-                    confidence: 0.3247936
-                - entity:
-                    entityId: /m/0138tl
-                    description: toy
-                    languageCode: en-US
-                  segments:
-                  - segment:
-                      startTimeOffset: 0s
-                      endTimeOffset: 5.500s
-                    confidence: 0.93821555
-        repeatable: true
-    - expect_progress_tracker:
-        message: Waiting for operation [$$operation-id$$] to complete
-        status: SUCCESS
+    - expect_stderr: |
+        Check operation [$$operation-id$$] for status.
     - expect_stdout: |
-        type.googleapis.com/google.cloud.videointelligence.v1.AnnotateVideoResponse
+        name: $$operation-id$$
     - expect_exit:
         code: 0

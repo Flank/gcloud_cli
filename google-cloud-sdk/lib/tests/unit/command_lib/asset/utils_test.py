@@ -27,29 +27,75 @@ from tests.lib import test_case
 
 class AssetUtilsTest(cli_test_base.CliTestBase, parameterized.TestCase):
 
-  def testVerifyParent_Conflicting(self):
+  def testVerifyParentForExport_Conflicting(self):
     with self.AssertRaisesExceptionRegexp(
         gcloud_exceptions.ConflictingArgumentsException,
         '.*arguments not allowed simultaneously.*'):
-      utils.VerifyParent('org_id', 'project_id')
+      utils.VerifyParentForExport('org_id', 'project_id', None)
+    with self.AssertRaisesExceptionRegexp(
+        gcloud_exceptions.ConflictingArgumentsException,
+        '.*arguments not allowed simultaneously.*'):
+      utils.VerifyParentForExport('org_id', None, 'folder_id')
+    with self.AssertRaisesExceptionRegexp(
+        gcloud_exceptions.ConflictingArgumentsException,
+        '.*arguments not allowed simultaneously.*'):
+      utils.VerifyParentForExport(None, 'project_id', 'folder_id')
+    with self.AssertRaisesExceptionRegexp(
+        gcloud_exceptions.ConflictingArgumentsException,
+        '.*arguments not allowed simultaneously.*'):
+      utils.VerifyParentForExport('org_id', 'project_id', 'folder_id')
 
-  def testVerifyParent_Missing(self):
+  def testVerifyParentForGetHistory_Conflicting(self):
+    with self.AssertRaisesExceptionRegexp(
+        gcloud_exceptions.ConflictingArgumentsException,
+        '.*arguments not allowed simultaneously.*'):
+      utils.VerifyParentForGetHistory('org_id', 'project_id')
+
+  def testVerifyParentForExport_Missing(self):
     with self.AssertRaisesExceptionRegexp(
         gcloud_exceptions.RequiredArgumentException,
-        '.*Should specify the project or organization name.*'):
-      utils.VerifyParent(None, None)
+        '.*Should specify the organization, or project, or the folder.*'):
+      utils.VerifyParentForExport(None, None, None)
+
+  def testVerifyParentForGetHistory_Missing(self):
+    with self.AssertRaisesExceptionRegexp(
+        gcloud_exceptions.RequiredArgumentException,
+        '.*Should specify the organization, or project for.*'):
+      utils.VerifyParentForGetHistory(None, None)
+
+  @parameterized.parameters(('org_id', None, None), (None, 'project_id', None),
+                            (None, None, 'folder_id'))
+  def testVerifyParentForExport_Normal(self, org_id, project_id, folder_id):
+    utils.VerifyParentForExport(org_id, project_id, folder_id)
 
   @parameterized.parameters(('org_id', None), (None, 'project_id'))
-  def testVerifyParent_Normal(self, org_id, project_id):
-    utils.VerifyParent(org_id, project_id)
+  def testVerifyParentForGetHistory_Normal(self, org_id, project_id):
+    utils.VerifyParentForGetHistory(org_id, project_id)
 
-  def testGetParentName_Organization(self):
+  def testGetParentNameForExport_Organization(self):
     self.assertEqual(
-        utils.GetParentName('org_id', None), 'organizations/org_id')
+        utils.GetParentNameForExport('org_id', None, None),
+        'organizations/org_id')
 
-  def testGetParentName_Project(self):
+  def testGetParentNameForExport_Project(self):
     self.assertEqual(
-        utils.GetParentName(None, 'project_id'), 'projects/project_id')
+        utils.GetParentNameForExport(None, 'project_id', None),
+        'projects/project_id')
+
+  def testGetParentNameForExport_Folder(self):
+    self.assertEqual(
+        utils.GetParentNameForExport(None, None, 'folder_id'),
+        'folders/folder_id')
+
+  def testGetParentNameForGetHistory_Organization(self):
+    self.assertEqual(
+        utils.GetParentNameForGetHistory('org_id', None),
+        'organizations/org_id')
+
+  def testGetParentNameForGetHistory_Project(self):
+    self.assertEqual(
+        utils.GetParentNameForGetHistory(None, 'project_id'),
+        'projects/project_id')
 
 
 if __name__ == '__main__':

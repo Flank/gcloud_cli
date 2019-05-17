@@ -17,13 +17,13 @@ DESCRIPTION
 
 REQUIRED FLAGS
      --artifact-url=ARTIFACT_URL
-        Container URL. May be in the .gcr.io/repository/image format, or may
+        Container URL. May be in the gcr.io/repository/image format, or may
         optionally contain the http or https scheme
 
      --pgp-key-fingerprint=PGP_KEY_FINGERPRINT
         The cryptographic ID of the key used to generate the signature. For
         Binary Authorization, this must be the version 4, full 160-bit
-        fingerprint, expressed as a 40 character hexidecimal string. See
+        fingerprint, expressed as a 40 character hexadecimal string. See
         https://tools.ietf.org/html/rfc4880#section-12.2 for details.
 
      --signature-file=SIGNATURE_FILE
@@ -47,8 +47,9 @@ REQUIRED FLAGS
           The Cloud project for the attestor.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

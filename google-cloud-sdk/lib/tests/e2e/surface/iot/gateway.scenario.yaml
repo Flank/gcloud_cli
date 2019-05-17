@@ -1,0 +1,330 @@
+title: Bind and Unbind devices from a gateway
+release_tracks: [GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: iot registries create $$my-registry$$ --region us-central1
+  - stderr: |
+      Created registry [$$my-registry$$].
+- execute:
+  - command: iot devices create $$my-device$$ --region us-central1 --registry $$my-registry$$
+  - stderr: |
+      Created device [$$my-device$$].
+- execute:
+  - command: |
+      iot devices create $$my-gateway$$ --region us-central1 --registry $$my-registry$$
+      --auth-method association-only --device-type gateway
+  - stderr: |
+      Created device [$$my-gateway$$].
+- execute:
+  - command: |
+      iot devices gateways bind --device $$my-device$$  --device-registry $$my-registry$$
+      --device-region us-central1 --gateway  $$my-gateway$$ --gateway-region us-central1
+  - stdout: |
+      {}
+- execute:
+  - command: |
+      iot devices gateways list-bound-devices --gateway $$my-gateway$$ --region us-central1
+      --registry $$my-registry$$ --format="yaml(id)"
+  - stdout: |
+      ---
+      id: $$my-device$$
+- execute:
+  - command: |
+      iot devices gateways unbind --device $$my-device$$  --device-registry $$my-registry$$
+      --device-region us-central1 --gateway  $$my-gateway$$ --gateway-region us-central1
+  - stdout: |
+      {}
+- execute:
+  - command: iot devices delete $$my-gateway$$ --region us-central1 --registry $$my-registry$$
+  - prompt:
+    - message: 'You are about to delete device: [$$my-gateway$$]'
+    - input: y
+  - stderr: |
+      Deleted device [$$my-gateway$$].
+- execute:
+  - command: iot devices delete $$my-device$$ --region us-central1 --registry $$my-registry$$
+  - prompt:
+    - message: 'You are about to delete device: [$$my-device$$]'
+    - input: y
+  - stderr: |
+      Deleted device [$$my-device$$].
+- execute:
+  - command: iot registries delete $$my-registry$$ --region us-central1
+  - prompt:
+    - message: You are about to delete registry [$$my-registry$$]
+    - input: y
+  - stderr: |
+      Deleted registry [$$my-registry$$].
+actions:
+- generate_resource_id:
+    reference: my-registry
+    prefix: iot-registry
+
+- execute_command:
+    command: iot registries create $$my-registry$$ --region us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudiot.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-central1/registries?alt=json
+          method: POST
+          body:
+            json:
+              httpConfig.httpEnabledState: HTTP_ENABLED
+              id: $$my-registry$$
+              mqttConfig:
+                mqttEnabledState: MQTT_ENABLED
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '324'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            id: $$my-registry$$
+            name: projects/cloud-sdk-integration-testing/locations/us-central1/registries/$$my-registry$$
+            mqttConfig:
+              mqttEnabledState: MQTT_ENABLED
+            stateNotificationConfig: {}
+            httpConfig:
+              httpEnabledState: HTTP_ENABLED
+    - expect_stderr: |
+        Created registry [$$my-registry$$].
+    - expect_exit:
+        code: 0
+
+- generate_resource_id:
+    reference: my-device
+    prefix: iot-device
+
+- execute_command:
+    command: iot devices create $$my-device$$ --region us-central1 --registry $$my-registry$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudiot.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-central1/registries/$$my-registry$$/devices?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              blocked: false
+              id: $$my-device$$
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '313'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            id: $$my-device$$
+            name: projects/cloud-sdk-integration-testing/locations/us-central1/registries/$$my-registry$$/devices/2651044600833604
+            numId: '2651044600833604'
+            config:
+              version: '1'
+              cloudUpdateTime: '2019-02-14T16:18:29.370477Z'
+    - expect_stderr: |
+        Created device [$$my-device$$].
+    - expect_exit:
+        code: 0
+
+- generate_resource_id:
+    reference: my-gateway
+    prefix: iot-gateway
+
+- execute_command:
+    command: |
+      iot devices create $$my-gateway$$ --region us-central1 --registry $$my-registry$$
+      --auth-method association-only --device-type gateway
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudiot.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-central1/registries/$$my-registry$$/devices?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              blocked: false
+              gatewayConfig:
+                gatewayAuthMethod: ASSOCIATION_ONLY
+                gatewayType: GATEWAY
+              id: $$my-gateway$$
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '414'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            id: $$my-gateway$$
+            name: projects/cloud-sdk-integration-testing/locations/us-central1/registries/$$my-registry$$/devices/2588161782717267
+            numId: '2588161782717267'
+            config:
+              version: '1'
+              cloudUpdateTime: '2019-02-14T16:18:29.793813Z'
+            gatewayConfig:
+              gatewayType: GATEWAY
+              gatewayAuthMethod: ASSOCIATION_ONLY
+    - expect_stderr: |
+        Created device [$$my-gateway$$].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      iot devices gateways bind --device $$my-device$$  --device-registry $$my-registry$$
+      --device-region us-central1 --gateway  $$my-gateway$$ --gateway-region us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudiot.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-central1/registries/$$my-registry$$:bindDeviceToGateway?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              deviceId: $$my-device$$
+              gatewayId: $$my-gateway$$
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '3'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body: |
+            {}
+    - expect_stdout: |
+        {}
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: |
+      iot devices gateways list-bound-devices --gateway $$my-gateway$$ --region us-central1
+      --registry $$my-registry$$ --format="yaml(id)"
+    validation_only: true
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudiot.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-central1/registries/$$my-registry$$/devices?alt=json&fieldMask=blocked%2Cname%2CgatewayConfig&gatewayListOptions.associationsGatewayId=$$my-gateway$$
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '291'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            devices:
+            - id: $$my-device$$
+              name: projects/cloud-sdk-integration-testing/locations/us-central1/registries/$$my-registry$$/devices/2687595418851315
+              numId: '2687595418851315'
+              gatewayConfig: {}
+    - expect_stdout: |
+        ---
+        id: $$my-device$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      iot devices gateways unbind --device $$my-device$$  --device-registry $$my-registry$$
+      --device-region us-central1 --gateway  $$my-gateway$$ --gateway-region us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudiot.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-central1/registries/$$my-registry$$:unbindDeviceFromGateway?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              deviceId: $$my-device$$
+              gatewayId: $$my-gateway$$
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '3'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body: |
+            {}
+    - expect_stdout: |
+        {}
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: iot devices delete $$my-gateway$$ --region us-central1 --registry $$my-registry$$
+    cleanup_for: my-gateway
+    events:
+    - expect_prompt_continue:
+        message: 'You are about to delete device: [$$my-gateway$$]'
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://cloudiot.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-central1/registries/$$my-registry$$/devices/$$my-gateway$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '3'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body: |
+            {}
+    - expect_stderr: |
+        Deleted device [$$my-gateway$$].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: iot devices delete $$my-device$$ --region us-central1 --registry $$my-registry$$
+    cleanup_for: my-device
+    events:
+    - expect_prompt_continue:
+        user_input: y
+        message: 'You are about to delete device: [$$my-device$$]'
+    - api_call:
+        expect_request:
+          uri: https://cloudiot.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-central1/registries/$$my-registry$$/devices/$$my-device$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '3'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body: |
+            {}
+    - expect_stderr: |
+        Deleted device [$$my-device$$].
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: iot registries delete $$my-registry$$ --region us-central1
+    cleanup_for: my-registry
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete registry [$$my-registry$$]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://cloudiot.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-central1/registries/$$my-registry$$?alt=json
+          method: DELETE
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '3'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body: |
+            {}
+    - expect_stderr: |
+        Deleted registry [$$my-registry$$].
+    - expect_exit:
+        code: 0

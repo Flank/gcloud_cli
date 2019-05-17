@@ -1,0 +1,114 @@
+
+.TH "GCLOUD_ALPHA_DIALOGFLOW_ENTITY\-TYPES_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha dialogflow entity\-types create \- create a Dialogflow entity type for the agent of the current project
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha dialogflow entity\-types create\fR \fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR [\fB\-\-auto\-expand\fR] [\fB\-\-entities\fR=\fIENTITIES\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Create a Dialogflow entity type for the agent of the current
+project.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
+A human readable name for the entity type.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-auto\-expand\fR
+Whether or not the entity type can be automatically expanded to idenitify
+entities not explicitly included.
+
+.TP 2m
+\fB\-\-entities\fR=\fIENTITIES\fR
+Comma separated list of entities, or a map of entities to synonyms.
+
+If a list, the entities can contain references to other entity types (with or
+without aliases).
+
+To specify a map, set this flag with \f5\-\-flags\-file\fR as a map, where each
+key is the canonical name and each value is a list of synonyms to map to the
+canonical name. The canonical name must be explicitly included in the list of
+synonyms. For more information on \f5\-\-flags\-file\fR, see \f5gcloud topics
+flags\-file\fR.
+
+For example, use \f5\-\-flags\-file=flags.yaml\fR, where \f5flags.yaml\fR
+contains:
+
+.RS 2m
+\-\-entities:
+  red:
+  \- red
+  \- cherry
+  \- rose
+  blue:
+  \- blue
+  \- azure
+  \- cyan
+.RE
+
+For more information, see
+https://cloud.google.com/dialogflow\-enterprise/docs/reference/rest/v2/Entity.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBdialogflow/v2\fR API. The full documentation for this
+API can be found at: https://cloud.google.com/dialogflow\-enterprise/
+
+
+
+.SH "EXAMPLES"
+
+To create an entity type with a display name and entities:
+
+.RS 2m
+$ gcloud alpha dialogflow entity\-types create \e
+    \-\-display\-name="color" \-\-entities=red,blue
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/.
+

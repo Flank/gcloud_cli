@@ -23,10 +23,11 @@ gcloud alpha compute instance\-groups managed \- read and manipulate Google Comp
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -60,6 +61,12 @@ instance groups.
 .TP 2m
 \fBcreate\fR
 \fB(ALPHA)\fR Create a Compute Engine managed instance group.
+
+.TP 2m
+\fBcreate\-instance\fR
+\fB(ALPHA)\fR Create a new virtual machine instance in a managed instance group
+with a defined name and optionally its stateful configuration: stateful disk,
+stateful metadata.
 
 .TP 2m
 \fBdelete\fR
@@ -99,7 +106,8 @@ instance groups.
 
 .TP 2m
 \fBset\-autohealing\fR
-\fB(ALPHA)\fR Set autohealing policy for managed instance group.
+\fB(ALPHA)\fR \fB(DEPRECATED)\fR Set autohealing policy for managed instance
+group.
 
 .TP 2m
 \fBset\-autoscaling\fR
@@ -130,8 +138,13 @@ instance groups.
 \fB(ALPHA)\fR Update autoscaling parameters of a managed instance group.
 
 .TP 2m
+\fBwait\-until\fR
+\fB(ALPHA)\fR Wait until managed instance group reaches desired state.
+
+.TP 2m
 \fBwait\-until\-stable\fR
-\fB(ALPHA)\fR Waits until state of managed instance group is stable.
+\fB(ALPHA)\fR \fB(DEPRECATED)\fR Waits until state of managed instance group is
+stable.
 
 
 .RE

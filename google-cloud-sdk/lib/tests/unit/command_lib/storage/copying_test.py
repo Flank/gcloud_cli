@@ -214,9 +214,6 @@ class CopyingTest(sdk_test_base.WithFakeAuth, parameterized.TestCase):
         'Copy: gs://bucket1/file --> gs://bucket2/file',
         'Copy: gs://bucket1/file2 --> gs://bucket2/file2']),
   ])
-  @test_case.Filters.SkipOnWindows(
-      'On windows the local paths start with t: and so they sort differently.',
-      'b/120033753')
   def testDirDest(self, sources, dest, expected):
     bucket1 = [s for s in sources if 'bucket1' in s]
     if bucket1 or 'bucket1' in dest:
@@ -235,7 +232,7 @@ class CopyingTest(sdk_test_base.WithFakeAuth, parameterized.TestCase):
     tasks = copier.GetCopyTasks(sources, dest)
 
     expected = [e.format(root=self.root_path, s=os.sep) for e in expected]
-    self.assertEqual(expected, [six.text_type(t) for t in tasks])
+    self.assertCountEqual(expected, [six.text_type(t) for t in tasks])
 
   @parameterized.named_parameters([
       # Local source files have . and .. resolved so it's ok.

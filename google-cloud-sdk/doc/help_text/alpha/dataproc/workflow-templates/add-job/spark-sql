@@ -1,0 +1,83 @@
+NAME
+    gcloud alpha dataproc workflow-templates add-job spark-sql - add a SparkSql
+        job to the workflow template
+
+SYNOPSIS
+    gcloud alpha dataproc workflow-templates add-job spark-sql
+        --step-id=STEP_ID --workflow-template=WORKFLOW_TEMPLATE
+        (--execute=QUERY, -e QUERY | --file=FILE, -f FILE)
+        [--driver-log-levels=[PACKAGE=LEVEL,...]] [--jars=[JAR,...]]
+        [--labels=[KEY=VALUE,...]] [--params=[PARAM=VALUE,...]]
+        [--properties=[PROPERTY=VALUE,...]] [--region=REGION]
+        [--start-after=STEP_ID,[STEP_ID,...]] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Add a SparkSql job to the workflow template.
+
+REQUIRED FLAGS
+     --step-id=STEP_ID
+        The step ID of the job in the workflow template.
+
+     --workflow-template=WORKFLOW_TEMPLATE
+        The dataproc workflow template ID.
+
+     Exactly one of these must be specified:
+
+       --execute=QUERY, -e QUERY
+          A Spark SQL query to execute as part of the job.
+
+       --file=FILE, -f FILE
+          HCFS URI of file containing Spark SQL script to execute as the job.
+
+OPTIONAL FLAGS
+     --driver-log-levels=[PACKAGE=LEVEL,...]
+        A list of package to log4j log level pairs to configure driver logging.
+        For example: root=FATAL,com.example=INFO
+
+     --jars=[JAR,...]
+        Comma separated list of jar files to be provided to the executor and
+        driver classpaths. May contain UDFs.
+
+     --labels=[KEY=VALUE,...]
+        List of label KEY=VALUE pairs to add.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
+     --params=[PARAM=VALUE,...]
+        A list of key value pairs to set variables in the Hive queries.
+
+     --properties=[PROPERTY=VALUE,...]
+        A list of key value pairs to configure Hive.
+
+     --region=REGION
+        Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
+        independent resource namespace constrained to deploying instances into
+        Compute Engine zones inside the region. The default value of global is
+        a special multi-region namespace which is capable of deploying
+        instances into all Compute Engine zones globally, and is disjoint from
+        other Cloud Dataproc regions. Overrides the default dataproc/region
+        property value for this command invocation.
+
+     --start-after=STEP_ID,[STEP_ID,...]
+        (Optional) List of step IDs to start this job after.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
+
+        $ gcloud dataproc workflow-templates add-job spark-sql
+        $ gcloud beta dataproc workflow-templates add-job spark-sql
+

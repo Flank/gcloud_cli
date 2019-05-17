@@ -2,8 +2,12 @@
 
   help_text:
     brief: Detect general attributes of an image.
-    DESCRIPTION: |
+    description: |
       Detect general attributes of an image, such as dominant color.
+    examples: |
+      To detect general attributes of image 'gs://my_bucket/input_file':
+
+        $ {command} gs://my_bucket/input_file
 
   request:
     _COMMON_: request
@@ -24,8 +28,12 @@
 
   help_text:
     brief: Detect general attributes of an image.
-    DESCRIPTION: |
+    description: |
       Detect general attributes of an image, such as dominant color.
+    examples: |
+      To detect general attributes of image 'gs://my_bucket/input_file':
+
+        $ {command} gs://my_bucket/input_file
 
   request:
     _COMMON_: request

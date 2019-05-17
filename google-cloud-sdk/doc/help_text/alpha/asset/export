@@ -2,24 +2,44 @@ NAME
     gcloud alpha asset export - export the cloud assets to Google Cloud Storage
 
 SYNOPSIS
-    gcloud alpha asset export --output-path=OUTPUT_PATH
+    gcloud alpha asset export
+        (--output-path=OUTPUT_PATH | --output-path-prefix=OUTPUT_PATH_PREFIX)
         [--asset-types=[ASSET_TYPES,...]] [--content-type=CONTENT_TYPE]
-        [--organization=ORGANIZATION_ID] [--snapshot-time=SNAPSHOT_TIME]
+        [--snapshot-time=SNAPSHOT_TIME]
+        [--folder=FOLDER_ID | --organization=ORGANIZATION_ID]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Export the cloud assets to Google Cloud Storage.
+    (ALPHA) Export the cloud assets to Google Cloud Storage. Use gcloud asset
+    operations describe to get the latest status of the operation. Note that to
+    export a project different from the project you want to bill, you can
+    either explicitly set the billing/quota_project property or authenticate
+    with a service account. See
+    https://cloud.google.com/resource-manager/docs/cloud-asset-inventory/gcloud-asset
+    for examples of using a service account.
 
 REQUIRED FLAGS
-     --output-path=OUTPUT_PATH
-        Google Cloud Storage URI where the results will go. URI must start with
-        "gs://". For example, "gs://bucket_name/object_name"
+     The destination path for exporting assets. Exactly one of these must be
+     specified:
+
+       --output-path=OUTPUT_PATH
+          Google Cloud Storage URI where the results will go. URI must start
+          with "gs://". For example, "gs://bucket_name/object_name"
+
+       --output-path-prefix=OUTPUT_PATH_PREFIX
+          Google Cloud Storage URI where the results will go. URI must start
+          with "gs://". For example, "gs://bucket_name/object_name_prefix", in
+          which case each exported object uri is in format:
+          "gs://bucket_name/object_name_prefix/<asset type>/<shard number>" and
+          it only contains assets for that type.
 
 OPTIONAL FLAGS
      --asset-types=[ASSET_TYPES,...]
-        A list of asset types (i.e., "google.compute.Disk") to take a snapshot.
-        If specified and non-empty, only assets matching the specified types
-        will be returned.
+        A list of asset types (i.e., "compute.googleapis.com/Disk") to take a
+        snapshot. If specified and non-empty, only assets matching the
+        specified types will be returned. See
+        https://cloud.google.com/resource-manager/docs/cloud-asset-inventory/overview
+        for supported asset types.
 
      --content-type=CONTENT_TYPE
         Asset content type. If specified, only content matching the specified
@@ -29,27 +49,47 @@ OPTIONAL FLAGS
         policy set on assets. CONTENT_TYPE must be one of: resource,
         iam-policy.
 
-     --organization=ORGANIZATION_ID
-        The ID of the organization which is the root asset.
-
      --snapshot-time=SNAPSHOT_TIME
-        Timestamp to take a snapshot on assets. This could only be a current or
+        Timestamp to take a snapshot on assets. This can only be a current or
         past time. If not specified, the current time will be used. Due to
         delays in resource data collection and indexing, there is a volatile
-        window during which running the same query at different time may return
-        different results. See $ gcloud topic datetimes for information on time
-        formats.
+        window during which running the same query at different times may
+        return different results. See $ gcloud topic datetimes for information
+        on time formats.
+
+     At most one of these may be specified:
+
+       --folder=FOLDER_ID
+          The ID of the folder which is the root asset.
+
+       --organization=ORGANIZATION_ID
+          The ID of the organization which is the root asset.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
+
+EXAMPLES
+    To export a snapshot of assets of type 'compute.googleapis.com/Disk' in
+    project 'test-project' at '2019-03-05T00:00:00Z' to
+    'gs://bucket-name/object-name' and only export the asset metadata, run:
+
+        $ gcloud alpha asset export --project='test-project' \
+            --asset-types='compute.googleapis.com/Disk' \
+            --snapshot-time='2019-03-05T00:00:00Z' \
+            --output-path='gs://bucket-name/object-name' \
+            --content-type='resource'
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you will have to apply for early access and have your projects
     registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    https://cloud.google.com/support/. These variants are also available:
+
+        $ gcloud asset export
+        $ gcloud beta asset export
 

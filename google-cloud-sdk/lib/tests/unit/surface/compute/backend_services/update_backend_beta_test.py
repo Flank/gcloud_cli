@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
+from googlecloudsdk.core import resources
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -33,12 +34,8 @@ def SetUp(test_obj, api_version):
   test_obj._rate = m.Backend.BalancingModeValueValuesEnum.RATE
   test_obj._connection = m.Backend.BalancingModeValueValuesEnum.CONNECTION
 
-  if api_version == 'v1':
-    test_obj._backend_services = test_resources.BACKEND_SERVICES_V1
-  elif api_version == 'beta':
+  if api_version == 'beta':
     test_obj._backend_services = test_resources.BACKEND_SERVICES_BETA
-  elif api_version == 'beta':
-    test_obj._backend_services = test_resources.BACKEND_SERVICES_ALPHA
   else:
     raise ValueError('bad api version: [{0}]'.format(api_version))
 
@@ -48,6 +45,8 @@ class BackendServicesUpdateBackendBetaTest(test_base.BaseTest):
   def SetUp(self):
     SetUp(self, 'beta')
     self.track = calliope_base.ReleaseTrack.BETA
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', 'beta')
 
   def testWithNoFlags(self):
     with self.AssertRaisesArgumentErrorMatches(
@@ -415,6 +414,65 @@ class BackendServicesUpdateBackendBetaTest(test_base.BaseTest):
         """)
 
     self.AssertErrNotContains('WARNING:')
+
+  def testWithFailover(self):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [self._backend_services[1]],
+
+        [],
+    ])
+
+    self.Run("""
+        compute backend-services update-backend backend-service-2
+          --instance-group group-1
+          --instance-group-zone zone-1
+          --failover
+          --global
+        """)
+
+    self.CheckRequests(
+        [(self.compute.backendServices, 'Get',
+          messages.ComputeBackendServicesGetRequest(
+              backendService='backend-service-2', project='my-project'))],
+        [(self.compute.backendServices, 'Update',
+          messages.ComputeBackendServicesUpdateRequest(
+              backendService='backend-service-2',
+              backendServiceResource=messages.BackendService(
+                  backends=[
+                      messages.Backend(
+                          balancingMode=self._rate,
+                          failover=True,
+                          description='group one',
+                          group=self.resources.Create(
+                              'compute.instanceGroups',
+                              instanceGroup='group-1',
+                              project='my-project',
+                              zone='zone-1').SelfLink(),
+                          maxRate=100),
+                      messages.Backend(
+                          balancingMode=self._utilization,
+                          description='group two',
+                          group=self.resources.Create(
+                              'compute.instanceGroups',
+                              instanceGroup='group-2',
+                              project='my-project',
+                              zone='zone-2').SelfLink(),
+                          maxUtilization=1.0),
+                  ],
+                  healthChecks=[
+                      (self.compute_uri + '/projects/'
+                       'my-project/global/httpHealthChecks/my-health-check')
+                  ],
+                  name='backend-service-2',
+                  portName='http',
+                  protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
+                  selfLink=(self.compute_uri + '/projects/'
+                            'my-project/global/backendServices/'
+                            'backend-service-2'),
+                  timeoutSec=30),
+              project='my-project'))],
+    )
 
   def testRegionalWithNewDescription(self):
     messages = self.messages

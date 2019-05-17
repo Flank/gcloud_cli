@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -43,8 +43,6 @@ contains Completer objects.  A Completer object:
 This module is resource agnostic.  All resource specific information is
 encapsulated in resource specific Completer objects.
 """
-# Ignore type because this file implements an abstract class.
-# type: ignore
 
 from __future__ import absolute_import
 from __future__ import division
@@ -58,7 +56,7 @@ import six
 
 
 @six.add_metaclass(abc.ABCMeta)
-class Completer(resource_cache.Updater):  # pytype: disable=ignored-abstractmethod
+class Completer(resource_cache.Updater):
   """A completion cache resource string completer.
 
   Along with the Complete() method, a completer has two main functions, each

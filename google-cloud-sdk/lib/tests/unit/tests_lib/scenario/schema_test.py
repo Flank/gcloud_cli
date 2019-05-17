@@ -68,6 +68,14 @@ class SchemaTests(sdk_test_base.WithOutputCapture,
     a.Execute(self.scenario_context)
     self.AssertBinaryFileEquals(b'hello', 'foo/bar.txt')
 
+  def testWriteFileActionResolveResources(self):
+    a = schema.WriteFileAction.FromData(
+        {'write_file': {'path': 'foo/bar.txt', 'contents': 'hello $$object$$'}})
+    self.scenario_context.resource_ref_resolver.AddGeneratedResourceId('object',
+                                                                       'world')
+    a.Execute(self.scenario_context)
+    self.AssertFileEquals('hello world', 'foo/bar.txt')
+
   def testLoadResourceAction(self):
     a = schema.LoadResourceAction.FromData(
         {'load_resource':

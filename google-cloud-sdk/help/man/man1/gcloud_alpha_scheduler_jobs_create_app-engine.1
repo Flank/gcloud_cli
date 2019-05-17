@@ -11,7 +11,7 @@ gcloud alpha scheduler jobs create app\-engine \- create a Cloud Scheduler job w
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha scheduler jobs create app\-engine\fR \fIJOB\fR \fB\-\-schedule\fR=\fISCHEDULE\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-headers\fR=\fIHEADERS\fR] [\fB\-\-http\-method\fR=\fIHTTP_METHOD\fR;\ default="post"] [\fB\-\-max\-backoff\fR=\fIMAX_BACKOFF\fR;\ default="1h"] [\fB\-\-max\-doublings\fR=\fIMAX_DOUBLINGS\fR;\ default=16] [\fB\-\-max\-retry\-attempts\fR=\fIMAX_RETRY_ATTEMPTS\fR] [\fB\-\-max\-retry\-duration\fR=\fIMAX_RETRY_DURATION\fR] [\fB\-\-min\-backoff\fR=\fIMIN_BACKOFF\fR;\ default="5s"] [\fB\-\-relative\-url\fR=\fIRELATIVE_URL\fR;\ default="/"] [\fB\-\-service\fR=\fISERVICE\fR] [\fB\-\-time\-zone\fR=\fITIME_ZONE\fR;\ default="Etc/UTC"] [\fB\-\-version\fR=\fIVERSION\fR] [\fB\-\-message\-body\fR=\fIMESSAGE_BODY\fR\ |\ \fB\-\-message\-body\-from\-file\fR=\fIMESSAGE_BODY_FROM_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha scheduler jobs create app\-engine\fR \fIJOB\fR \fB\-\-schedule\fR=\fISCHEDULE\fR [\fB\-\-attempt\-deadline\fR=\fIATTEMPT_DEADLINE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-headers\fR=\fIHEADERS\fR] [\fB\-\-http\-method\fR=\fIHTTP_METHOD\fR;\ default="post"] [\fB\-\-max\-backoff\fR=\fIMAX_BACKOFF\fR;\ default="1h"] [\fB\-\-max\-doublings\fR=\fIMAX_DOUBLINGS\fR;\ default=16] [\fB\-\-max\-retry\-attempts\fR=\fIMAX_RETRY_ATTEMPTS\fR] [\fB\-\-max\-retry\-duration\fR=\fIMAX_RETRY_DURATION\fR] [\fB\-\-min\-backoff\fR=\fIMIN_BACKOFF\fR;\ default="5s"] [\fB\-\-relative\-url\fR=\fIRELATIVE_URL\fR;\ default="/"] [\fB\-\-service\fR=\fISERVICE\fR] [\fB\-\-time\-zone\fR=\fITIME_ZONE\fR;\ default="Etc/UTC"] [\fB\-\-version\fR=\fIVERSION\fR] [\fB\-\-message\-body\fR=\fIMESSAGE_BODY\fR\ |\ \fB\-\-message\-body\-from\-file\fR=\fIMESSAGE_BODY_FROM_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -79,6 +79,12 @@ https://cloud.google.com/scheduler/docs/quickstart#defining_the_job_schedule
 .SH "OPTIONAL FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-attempt\-deadline\fR=\fIATTEMPT_DEADLINE\fR
+The deadline for job attempts. If the request handler doesn't respond by this
+dealine, the request is cancelled and the attempt is marked as failed. For
+example, 20s.
+
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
 Human\-readable description of the job.
@@ -166,10 +172,11 @@ request. May only be given with compatible HTTP methods (PUT or POST).
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

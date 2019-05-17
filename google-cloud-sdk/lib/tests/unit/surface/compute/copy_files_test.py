@@ -114,7 +114,8 @@ class CopyFilesTest(test_base.BaseSSHTest):
         port=None,
         recursive=True,
         compress=False,
-        options=dict(self.options, HostKeyAlias='compute.11111'))
+        options=dict(self.options, HostKeyAlias='compute.11111'),
+        iap_tunnel_args=None)
 
     self.scp_run.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SCPCommand),
@@ -159,7 +160,8 @@ class CopyFilesTest(test_base.BaseSSHTest):
         port=None,
         recursive=True,
         compress=False,
-        options=dict(self.options, HostKeyAlias='compute.11111'))
+        options=dict(self.options, HostKeyAlias='compute.11111'),
+        iap_tunnel_args=None)
 
     self.scp_run.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SCPCommand),

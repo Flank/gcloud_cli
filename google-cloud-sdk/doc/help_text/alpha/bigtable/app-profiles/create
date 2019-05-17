@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha bigtable app-profiles create - create a new Bigtable
-        app_profile
+    gcloud alpha bigtable app-profiles create - create a new Bigtable app
+        profile
 
 SYNOPSIS
     gcloud alpha bigtable app-profiles create
@@ -9,7 +9,7 @@ SYNOPSIS
         [--description=DESCRIPTION] [--force] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Create a new Bigtable app_profile.
+    (ALPHA) Create a new Bigtable app profile.
 
 POSITIONAL ARGUMENTS
      App profile resource - The app profile to create. The arguments in this
@@ -21,12 +21,12 @@ POSITIONAL ARGUMENTS
      must be specified.
 
        APP_PROFILE
-          ID of the app-profile or fully qualified identifier for the
-          app-profile. This positional must be specified if any of the other
+          ID of the app profile or fully qualified identifier for the app
+          profile. This positional must be specified if any of the other
           arguments in this group are specified.
 
        --instance=INSTANCE
-          The Cloud Bigtable instance for the app-profile.
+          Cloud Bigtable instance for the app profile.
 
 REQUIRED FLAGS
      Exactly one of these must be specified:
@@ -48,14 +48,15 @@ REQUIRED FLAGS
 
 OPTIONAL FLAGS
      --description=DESCRIPTION
-        Friendly name of the app-profile.
+        Friendly name of the app profile.
 
      --force
         Ignore warnings and force create.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -64,7 +65,8 @@ NOTES
     command fails with API permission errors despite specifying the right
     project, you will have to apply for early access and have your projects
     registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    https://cloud.google.com/support/. These variants are also available:
 
+        $ gcloud bigtable app-profiles create
         $ gcloud beta bigtable app-profiles create
 

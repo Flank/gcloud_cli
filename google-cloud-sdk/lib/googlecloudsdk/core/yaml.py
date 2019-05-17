@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,9 +28,9 @@ import collections
 from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import yaml_location_value
 from googlecloudsdk.core.util import files
-from googlecloudsdk.core.util import typing  # pylint: disable=unused-import
 
 from ruamel import yaml
+import six
 
 
 # YAML unfortunately uses a bunch of global class state for this kind of stuff.
@@ -68,7 +68,6 @@ class Error(exceptions.Error):
   """
 
   def __init__(self, e, verb, f=None):
-    # type: (Exception, typing.Text, typing.Optional[str]) -> None
     file_text = ' from [{}]'.format(f) if f else ''
     super(Error, self).__init__(
         'Failed to {} YAML{}: {}'.format(verb, file_text, e))
@@ -80,7 +79,6 @@ class YAMLParseError(Error):
   """An error that wraps all YAML parsing errors."""
 
   def __init__(self, e, f=None):
-    # type: (Exception, typing.Optional[str]) -> None
     super(YAMLParseError, self).__init__(e, verb='parse', f=f)
 
 
@@ -88,12 +86,10 @@ class FileLoadError(Error):
   """An error that wraps errors when loading/reading files."""
 
   def __init__(self, e, f):
-    # type: (Exception, str) -> None
     super(FileLoadError, self).__init__(e, verb='load', f=f)
 
 
 def load(stream, file_hint=None, round_trip=False, location_value=False):
-  # type: (typing.Union[str, typing.IO[typing.AnyStr]], typing.Optional[str], typing.Optional[bool], typing.Optional[bool]) -> typing.Any  # pylint: disable=line-too-long
   """Loads YAML from the given steam.
 
   Args:
@@ -126,7 +122,6 @@ def load(stream, file_hint=None, round_trip=False, location_value=False):
 
 
 def load_all(stream, file_hint=None):
-  # type: (typing.Union[str, typing.IO[typing.AnyStr]], typing.Optional[str]) -> typing.Generator[typing.Any, None, None]  # pylint: disable=line-too-long
   """Loads multiple YAML documents from the given steam.
 
   Args:
@@ -148,7 +143,6 @@ def load_all(stream, file_hint=None):
 
 
 def load_path(path, round_trip=False, location_value=False):
-  # type: (str, typing.Optional[bool], typing.Optional[bool]) -> typing.Any
   """Loads YAML from the given file path.
 
   Args:
@@ -176,7 +170,6 @@ def load_path(path, round_trip=False, location_value=False):
 
 
 def load_all_path(path):
-  # type: (str) -> typing.Generator[typing.Any, None, None]
   """Loads multiple YAML documents from the given file path.
 
   Args:
@@ -200,7 +193,6 @@ def load_all_path(path):
 
 
 def dump(data, stream=None, round_trip=False, **kwargs):
-  # type: (typing.Any, typing.Optional[typing.IO[typing.AnyStr]], typing.Any, typing.Optional[typing.Dict]) -> str  # pylint: disable=line-too-long
   """Dumps the given YAML data to the stream.
 
   Args:
@@ -219,7 +211,6 @@ def dump(data, stream=None, round_trip=False, **kwargs):
 
 
 def dump_all(documents, stream=None, **kwargs):
-  # type: (typing.Iterable[typing.Any], typing.Optional[typing.IO[typing.AnyStr]], typing.Any) -> str  # pylint: disable=line-too-long
   """Dumps multiple YAML documents to the stream.
 
   Args:
@@ -235,7 +226,6 @@ def dump_all(documents, stream=None, **kwargs):
 
 
 def convert_to_block_text(data):
-  # type: (typing.Union[dict, list]) -> None
   r"""This processes the given dict or list so it will render as block text.
 
   By default, the yaml dumper will write multiline strings out as a double
@@ -256,3 +246,11 @@ def list_like(item):
 def dict_like(item):
   """Return True if the item is like a dict: a MutableMapping."""
   return isinstance(item, collections.MutableMapping)
+
+
+def strip_locations(obj):
+  if list_like(obj):
+    return [strip_locations(item) for item in obj]
+  if dict_like(obj):
+    return {key: strip_locations(value) for key, value in six.iteritems(obj)}
+  return obj.value

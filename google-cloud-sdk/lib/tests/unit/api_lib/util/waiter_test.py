@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- #
 # Copyright 2016 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,8 +26,10 @@ from apitools.base.py import encoding
 from apitools.base.py.testing import mock as api_mock
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.api_lib.util import waiter
+from googlecloudsdk.core import log
 from googlecloudsdk.core import resources
 from googlecloudsdk.core.console import console_io
+from googlecloudsdk.core.console import progress_tracker
 
 from tests.lib import test_case
 from tests.lib.api_lib.util import waiter as waiter_test_base
@@ -94,6 +96,34 @@ class WaiterTest(waiter_test_base.Base):
     self.assertLess(98300, self.curr_time)
 
     self.AssertOutputEquals('')
+    self.AssertErrContains('Making Cheese')
+
+  def testCustomTrackerSuccessfulCase(self):
+    custom_tracker = progress_tracker.ProgressTracker('Making Cheese')
+    result = waiter.WaitFor(poller=OperationPoller(10),
+                            operation_ref='operation-X',
+                            custom_tracker=custom_tracker)
+    self.assertEqual('Super Cheese made by operation-X-10', result.name)
+    # With 0 jitter this should be at least that much for default retry params.
+    self.assertLess(98300, self.curr_time)
+
+    self.AssertOutputEquals('')
+    self.AssertErrContains('Making Cheese')
+
+  def testTrackerUpdateFuncSuccessfulCase(self):
+    def TrackerUpdate(tracker, unused_result, unused_status):
+      log.status.Print('Updating...')
+      tracker.Tick()
+    result = waiter.WaitFor(poller=OperationPoller(10),
+                            operation_ref='operation-X',
+                            message='Making Cheese',
+                            tracker_update_func=TrackerUpdate)
+    self.assertEqual('Super Cheese made by operation-X-10', result.name)
+    # With 0 jitter this should be at least that much for default retry params.
+    self.assertLess(98300, self.curr_time)
+
+    self.AssertOutputEquals('')
+    self.AssertErrContains('Updating...')
     self.AssertErrContains('Making Cheese')
 
   def testPollUntilDone(self):

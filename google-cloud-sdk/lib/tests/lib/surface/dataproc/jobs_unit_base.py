@@ -77,6 +77,8 @@ class JobsUnitTestBase(unit_base.DataprocUnitTestBase):
   ARCHIVE_URIS = ['gs://bucket/archive1.zip', 'gs://bucket/archive2.zip']
   FILE_URIS = ['gs://bucket/object1', 'gs://bucket/object2']
   PYFILE_URIS = ['gs://bucket/file1.py', 'gs://bucket/file2.py']
+  PRESTO_OUTPUT_FORMAT = 'foo-output'
+  PRESTO_CLIENT_TAGS = ['foo-tag', 'bar-tag']
 
   PARAMS = collections.OrderedDict([
       ('foo', 'bar'),
@@ -182,6 +184,17 @@ class JobsUnitTestBase(unit_base.DataprocUnitTestBase):
         properties=encoding.DictToMessage(
             self.PROPERTIES, self.messages.SparkRJob.PropertiesValue))
 
+  @property
+  def PRESTO_JOB(self):
+    return self.messages.PrestoJob(
+        continueOnFailure=False,
+        queryFileUri=self.SCRIPT_URI,
+        loggingConfig=self.LOG_CONFIG,
+        outputFormat=self.PRESTO_OUTPUT_FORMAT,
+        clientTags=self.PRESTO_CLIENT_TAGS,
+        properties=encoding.DictToAdditionalPropertyMessage(
+            self.PROPERTIES, self.messages.PrestoJob.PropertiesValue))
+
   def SetUp(self):
     # Set 0s sleep intervals in waiters.
     real_wait = util.WaitForJobTermination
@@ -274,7 +287,7 @@ class JobsUnitTestBase(unit_base.DataprocUnitTestBase):
         exception=exception)
     return response
 
-  def ExpectWaitCalls(self, job=None, final_state=None):
+  def ExpectWaitCalls(self, job=None, final_state=None, details=None):
     if not job:
       job = self.MakeSubmittedJob()
     if not final_state:
@@ -288,15 +301,16 @@ class JobsUnitTestBase(unit_base.DataprocUnitTestBase):
     self.ExpectGetJob(job=job)
     job = copy.deepcopy(job)
     job.status.state = final_state
+    job.status.details = details
     self.ExpectGetJob(job=job)
     return job
 
-  def ExpectSubmitCalls(self, job=None, final_state=None):
+  def ExpectSubmitCalls(self, job=None, **kwargs):
     if not job:
       job = self.MakeJob()
     self.ExpectGetCluster()
     job = self.ExpectSubmitJob(job=job)
-    return self.ExpectWaitCalls(job=job, final_state=final_state)
+    return self.ExpectWaitCalls(job=job, **kwargs)
 
   def ExpectUpdateWorkflowTemplatesJobCalls(self,
                                             workflow_template=None,

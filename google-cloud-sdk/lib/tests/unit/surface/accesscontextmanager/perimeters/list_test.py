@@ -26,10 +26,10 @@ from six.moves import map
 from six.moves import range
 
 
-class PerimetersListTestBeta(accesscontextmanager.Base):
+class PerimetersListTestGA(accesscontextmanager.Base):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)
@@ -88,7 +88,13 @@ class PerimetersListTestBeta(accesscontextmanager.Base):
         normalize_space=True)
 
 
-class PerimetersListTestAlpha(PerimetersListTestBeta):
+class PerimetersListTestBeta(PerimetersListTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class PerimetersListTestAlpha(PerimetersListTestGA):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA

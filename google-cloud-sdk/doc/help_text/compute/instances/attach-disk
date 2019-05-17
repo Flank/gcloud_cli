@@ -2,8 +2,9 @@ NAME
     gcloud compute instances attach-disk - attach a disk to an instance
 
 SYNOPSIS
-    gcloud compute instances attach-disk INSTANCE_NAME --disk=DISK
+    gcloud compute instances attach-disk INSTANCE_NAME --disk=DISK [--boot]
         [--csek-key-file=FILE] [--device-name=DEVICE_NAME]
+        [--disk-scope=DISK_SCOPE; default="zonal"] [--force-attach]
         [--mode=MODE; default="rw"] [--zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -30,6 +31,9 @@ REQUIRED FLAGS
         The name of the disk to attach to the instance.
 
 OPTIONAL FLAGS
+     --boot
+        Attach the disk to the instance as a boot disk.
+
      --csek-key-file=FILE
         Path to a Customer-Supplied Encryption Key (CSEK) key file, mapping
         Google Compute Engine resources to user managed keys to be used when
@@ -45,6 +49,24 @@ OPTIONAL FLAGS
         system will see. (Note: Device name does not correspond to mounted
         volume name). Must match the disk name if the disk is going to be
         mounted to a container with --container-mount-disk (alpha feature).
+
+     --disk-scope=DISK_SCOPE; default="zonal"
+        The scope of the disk. DISK_SCOPE must be one of:
+
+         regional
+            The disk specified in --disk is interpreted as a regional disk in
+            the same region as the instance. Ignored if a full URI is provided
+            to the --disk flag.
+         zonal
+            The disk specified in --disk is interpreted as a zonal disk in the
+            same zone as the instance. Ignored if a full URI is provided to the
+            --disk flag.
+
+     --force-attach
+        Attach the disk to the instance even if it is currently attached to
+        another instance. The attachment will succeed even if detaching from
+        the previous instance fails at first. The server will continue trying
+        to detach the disk from the previous instance in the background.
 
      --mode=MODE; default="rw"
         Specifies the mode of the disk. MODE must be one of:
@@ -79,8 +101,9 @@ OPTIONAL FLAGS
         CLOUDSDK_COMPUTE_ZONE.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

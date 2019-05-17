@@ -85,10 +85,11 @@ Print a list of resource URIs instead of the default output.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -98,7 +99,7 @@ List all subnetworks usable for cluster creation in project \f5my\-project\fR.
 
 .RS 2m
 $ gcloud alpha container subnets list\-usable \e
-  \-\-project my\-project
+  \-\-project=my\-project
 .RE
 
 List all subnetworks existing in project \f5my\-shared\-host\-project\fR usable
@@ -106,8 +107,8 @@ for cluster creation in project \f5my\-service\-project\fR.
 
 .RS 2m
 $ gcloud alpha container subnets list\-usable \e
-   \-\-project my\-service\-project \e
-   \-\-network\-project my\-shared\-host\-project
+   \-\-project=my\-service\-project \e
+   \-\-network\-project=my\-shared\-host\-project
 .RE
 
 
@@ -118,9 +119,10 @@ This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you will have to apply for early access and have your projects registered on the
 API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. This variant is also available:
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
+$ gcloud container subnets list\-usable
 $ gcloud beta container subnets list\-usable
 .RE
 

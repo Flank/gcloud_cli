@@ -18,12 +18,29 @@ import enum
 
 
 BASE_URL = 'https://cloudasset.googleapis.com/v1beta1/'
-DOCS_URL = 'https://console.cloud.google.com/apis/api/cloudasset.googleapis.com/overview'
+DOCS_URL = 'https://cloud.google.com/resource-manager/docs/cloud-asset-inventory/quickstart-cloud-asset-inventory'
 
 
 class Collections(enum.Enum):
   """Collections for all supported apis."""
 
+  FOLDERS = (
+      'folders',
+      'folders/{foldersId}',
+      {},
+      [u'foldersId'],
+      True
+  )
+  FOLDERS_OPERATIONS = (
+      'folders.operations',
+      '{+name}',
+      {
+          '':
+              'folders/{foldersId}/operations/{operationsId}/{operationsId1}',
+      },
+      [u'name'],
+      True
+  )
   ORGANIZATIONS = (
       'organizations',
       'organizations/{organizationsId}',

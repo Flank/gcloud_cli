@@ -119,10 +119,10 @@ class Binding(_messages.Message):
   r"""Associates `members` with a `role`.
 
   Fields:
-    condition: Unimplemented. The condition that is associated with this
-      binding. NOTE: an unsatisfied condition will not allow user access via
-      current binding. Different bindings, including their conditions, are
-      examined independently.
+    condition: The condition that is associated with this binding. NOTE: An
+      unsatisfied condition will not allow user access via current binding.
+      Different bindings, including their conditions, are examined
+      independently.
     members: Specifies the identities requesting access for a Cloud Platform
       resource. `members` can have the following values:  * `allUsers`: A
       special identifier that represents anyone who is    on the internet;
@@ -134,8 +134,8 @@ class Binding(_messages.Message):
       service    account. For example, `my-other-
       app@appspot.gserviceaccount.com`.  * `group:{emailid}`: An email address
       that represents a Google group.    For example, `admins@example.com`.
-      * `domain:{domain}`: A Google Apps domain name that represents all the
-      users of that domain. For example, `google.com` or `example.com`.
+      * `domain:{domain}`: The G Suite domain (primary) that represents all
+      the    users of that domain. For example, `google.com` or `example.com`.
     role: Role that is assigned to `members`. For example, `roles/viewer`,
       `roles/editor`, or `roles/owner`.
   """
@@ -211,9 +211,7 @@ class Condition(_messages.Message):
     svc: Trusted attributes discharged by the service.
     sys: Trusted attributes supplied by any service that owns resources and
       uses the IAM system for access control.
-    value: DEPRECATED. Use 'values' instead.
-    values: The objects of the condition. This is mutually exclusive with
-      'value'.
+    values: The objects of the condition.
   """
 
   class IamValueValuesEnum(_messages.Enum):
@@ -304,8 +302,7 @@ class Condition(_messages.Message):
   op = _messages.EnumField('OpValueValuesEnum', 2)
   svc = _messages.StringField(3)
   sys = _messages.EnumField('SysValueValuesEnum', 4)
-  value = _messages.StringField(5)
-  values = _messages.StringField(6, repeated=True)
+  values = _messages.StringField(5, repeated=True)
 
 
 class CounterOptions(_messages.Message):
@@ -341,29 +338,16 @@ class DataAccessOptions(_messages.Message):
   Enums:
     LogModeValueValuesEnum: Whether Gin logging should happen in a fail-closed
       manner at the caller. This is relevant only in the LocalIAM
-      implementation, for now.  NOTE: Logging to Gin in a fail-closed manner
-      is currently unsupported while work is being done to satisfy the
-      requirements of go/345. Currently, setting LOG_FAIL_CLOSED mode will
-      have no effect, but still exists because there is active work being done
-      to support it (b/115874152).
+      implementation, for now.
 
   Fields:
     logMode: Whether Gin logging should happen in a fail-closed manner at the
       caller. This is relevant only in the LocalIAM implementation, for now.
-      NOTE: Logging to Gin in a fail-closed manner is currently unsupported
-      while work is being done to satisfy the requirements of go/345.
-      Currently, setting LOG_FAIL_CLOSED mode will have no effect, but still
-      exists because there is active work being done to support it
-      (b/115874152).
   """
 
   class LogModeValueValuesEnum(_messages.Enum):
     r"""Whether Gin logging should happen in a fail-closed manner at the
     caller. This is relevant only in the LocalIAM implementation, for now.
-    NOTE: Logging to Gin in a fail-closed manner is currently unsupported
-    while work is being done to satisfy the requirements of go/345. Currently,
-    setting LOG_FAIL_CLOSED mode will have no effect, but still exists because
-    there is active work being done to support it (b/115874152).
 
     Values:
       LOG_MODE_UNSPECIFIED: Client is not required to write a partial Gin log
@@ -378,10 +362,7 @@ class DataAccessOptions(_messages.Message):
         if it succeeds.  If a matching Rule has this directive, but the client
         has not indicated that it will honor such requirements, then the IAM
         check will result in authorization failure by setting
-        CheckPolicyResponse.success=false.  NOTE: This is currently
-        unsupported. See the note on LogMode below. LOG_FAIL_CLOSED shouldn't
-        be used unless the application wants fail-closed logging to be turned
-        on implicitly when b/115874152 is resolved.
+        CheckPolicyResponse.success=false.
     """
     LOG_MODE_UNSPECIFIED = 0
     LOG_FAIL_CLOSED = 1
@@ -531,7 +512,8 @@ class Operation(_messages.Message):
       if any.
     name: The server-assigned name, which is only unique within the same
       service that originally returns it. If you use the default HTTP mapping,
-      the `name` should have the format of `operations/some/unique/name`.
+      the `name` should be a resource name ending with
+      `operations/{unique_id}`.
     response: The normal response of the operation in case of success.  If the
       original method returns no data on success, such as `Delete`, the
       response is `google.protobuf.Empty`.  If the original method is standard
@@ -1264,7 +1246,9 @@ class Variable(_messages.Message):
       will be UTC timestamp.
     value: The binary value of the variable. The length of the value must be
       less than 4096 bytes. Empty values are also accepted. The value must be
-      base64 encoded. Only one of `value` or `text` can be set.
+      base64 encoded, and must comply with IETF RFC4648
+      (https://www.ietf.org/rfc/rfc4648.txt). Only one of `value` or `text`
+      can be set.
   """
 
   class StateValueValuesEnum(_messages.Enum):

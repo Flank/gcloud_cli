@@ -29,6 +29,10 @@ from six.moves import range  # pylint: disable=redefined-builtin
 from six.moves import zip  # pylint: disable=redefined-builtin
 
 
+class MockArgs(object):
+  push_endpoint = None
+
+
 class SubscriptionsTest(base.CloudPubsubTestBase):
 
   def SetUp(self):
@@ -106,7 +110,9 @@ class SubscriptionsTest(base.CloudPubsubTestBase):
 
   def testModifyPushConfig(self):
     sub_ref = util.ParseSubscription('sub1', self.Project())
-    push_config = util.ParsePushConfig('endpoint')
+    args = MockArgs()
+    args.push_endpoint = 'endpoint'
+    push_config = util.ParsePushConfig(args)
     self.subscriptions_service.ModifyPushConfig.Expect(
         self.msgs.PubsubProjectsSubscriptionsModifyPushConfigRequest(
             modifyPushConfigRequest=self.msgs.ModifyPushConfigRequest(
@@ -157,7 +163,9 @@ class SubscriptionsTest(base.CloudPubsubTestBase):
 
   def testPatch_AllOptions(self):
     sub_ref = util.ParseSubscription('sub1', self.Project())
-    push_config = util.ParsePushConfig('endpoint')
+    args = MockArgs()
+    args.push_endpoint = 'endpoint'
+    push_config = util.ParsePushConfig(args)
     labels = self.msgs.Subscription.LabelsValue(additionalProperties=[
         self.msgs.Subscription.LabelsValue.AdditionalProperty(
             key='label1', value='label1')])

@@ -46,6 +46,9 @@ summary:
       Deleted [https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
 actions:
 - define_reference:
+    reference: compute-uri
+    value: www.googleapis.com/compute
+- define_reference:
     reference: api_version
     track_values:
       ALPHA: alpha
@@ -87,7 +90,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$/getGuestAttributes?alt=json
+          uri: https://$$compute-uri$$/$$api_version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$/getGuestAttributes?alt=json
           method: GET
           headers: {}
           body: null
@@ -125,7 +128,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$/getGuestAttributes?alt=json&queryPath=foo%2F
+          uri: https://$$compute-uri$$/$$api_version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$/getGuestAttributes?alt=json&queryPath=foo%2F
           method: GET
           headers: {}
           body: null
@@ -159,7 +162,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api_version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$/getGuestAttributes?alt=json&queryPath=foo%2Fbar
+          uri: https://$$compute-uri$$/$$api_version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$/getGuestAttributes?alt=json&queryPath=foo%2Fbar
           method: GET
           headers: {}
           body: null

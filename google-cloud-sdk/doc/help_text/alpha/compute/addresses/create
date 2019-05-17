@@ -35,6 +35,11 @@ FLAGS
         The network tier to assign to the reserved IP addresses. NETWORK_TIER
         must be one of: PREMIUM, STANDARD. The default value is PREMIUM.
 
+        While regional external addresses (--region specified, --subnet
+        omitted) can use either PREMIUM or STANDARD, global external addresses
+        (--global specified, --subnet omitted) can only use PREMIUM. Internal
+        addresses can only use PREMIUM.
+
      --prefix-length=PREFIX_LENGTH
         The prefix length of the IP range. It must be a value between 8 and 30
         inclusive. If not present, it means the address field is a single IP
@@ -73,9 +78,14 @@ FLAGS
           server-generated names will be assigned to the IP addresses.
 
        --ip-version=IP_VERSION
-          The version of the IP address to be allocated and reserved if
-          --addresses is not used. The default is IPv4. IP_VERSION must be one
-          of: IPV4, IPV6.
+          Version of the IP address to be allocated and reserved. The default
+          is IPV4.
+
+          IP version can only be specified for global addresses that are
+          generated automatically (i.e., along with the --global flag, given
+          --addresses is not specified) and if the --network-tier is PREMIUM.
+
+          IP_VERSION must be one of: IPV4, IPV6.
 
      At most one of these may be specified:
 
@@ -87,8 +97,9 @@ FLAGS
           compute/region property value for this command invocation.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

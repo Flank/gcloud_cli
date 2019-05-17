@@ -39,8 +39,9 @@ POSITIONAL ARGUMENTS
         (https://cloud.google.com/iam/reference/rest/v1/Policy).
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -48,12 +49,18 @@ API REFERENCE
     This command uses the cloudtasks/v2beta2 API. The full documentation for
     this API can be found at: https://cloud.google.com/tasks/
 
+EXAMPLES
+    To set the IAM policy for a queue:
+
+        $ gcloud alpha tasks queues set-iam-policy my-queue policy-file.json
+
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you will have to apply for early access and have your projects
     registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    https://cloud.google.com/support/. These variants are also available:
 
+        $ gcloud tasks queues set-iam-policy
         $ gcloud beta tasks queues set-iam-policy
 

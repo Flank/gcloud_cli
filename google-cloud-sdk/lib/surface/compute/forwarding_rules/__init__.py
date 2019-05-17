@@ -25,4 +25,4 @@ class ForwardingRules(base.Group):
   """Read and manipulate traffic forwarding rules to network load balancers."""
 
 
-ForwardingRules.category = 'Load Balancing'
+ForwardingRules.category = base.LOAD_BALANCING_CATEGORY

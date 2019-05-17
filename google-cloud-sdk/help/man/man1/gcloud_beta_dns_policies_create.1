@@ -11,7 +11,7 @@ gcloud beta dns policies create \- creates a new Cloud DNS policy
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta dns policies create\fR \fIPOLICY\fR \fB\-\-description\fR=\fIDESCRIPTION\fR \fB\-\-networks\fR=[\fIURL\fR,...] [\fB\-\-alternative\-name\-servers\fR=[\fIIP_ADDRESS\fR,...]] [\fB\-\-enable\-inbound\-forwarding\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta dns policies create\fR \fIPOLICY\fR \fB\-\-description\fR=\fIDESCRIPTION\fR \fB\-\-networks\fR=[\fIURL\fR,...] [\fB\-\-alternative\-name\-servers\fR=[\fIIP_ADDRESS\fR,...]] [\fB\-\-enable\-inbound\-forwarding\fR] [\fB\-\-enable\-logging\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -91,16 +91,21 @@ of IPv4 addresses.
 Specifies whether to allow networks bound to this policy to receive DNS queries
 sent by VMs or applications over VPN connections. Defaults to False.
 
+.TP 2m
+\fB\-\-enable\-logging\fR
+Specifies whether to enable query logging. Defaults to False.
+
 
 .RE
 .sp
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

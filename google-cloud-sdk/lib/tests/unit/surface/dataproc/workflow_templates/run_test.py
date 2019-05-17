@@ -74,8 +74,8 @@ class WorkflowTemplatesRunUnitTest(unit_base.DataprocUnitTestBase,
 
 class WorkflowTemplatesRunUnitTestBeta(WorkflowTemplatesRunUnitTest):
 
-  def SetUp(self):
-    self.SetupForReleaseTrack(calliope.base.ReleaseTrack.BETA)
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.ALPHA
 
   def testRunWorkflowTemplates(self):
     workflow_template = self.MakeWorkflowTemplate()
@@ -114,3 +114,9 @@ class WorkflowTemplatesRunUnitTestBeta(WorkflowTemplatesRunUnitTest):
     with self.AssertRaisesExceptionMatches(exceptions.HttpException, message):
       self.RunDataproc('workflow-templates run {0}'.format(
           self.WORKFLOW_TEMPLATE))
+
+
+class WorkflowTemplatesRunUnitTestAlpha(WorkflowTemplatesRunUnitTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.ALPHA

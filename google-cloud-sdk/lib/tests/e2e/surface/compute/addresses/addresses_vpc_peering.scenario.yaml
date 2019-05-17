@@ -1,6 +1,45 @@
 title: Create, describe, list and delete an range for VPC_PEERING
 release_tracks: [GA, BETA, ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute addresses create $$address-name$$ --global --prefix-length 24
+      --purpose VPC_PEERING --network default
+  - stderr: |
+      Created [https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$].
+- execute:
+  - command: |
+      compute addresses describe $$address-name$$ --global --format
+      "text(name,address,prefixLength,addressType,purpose,network,status)"
+  - stdout: |
+      address:      $$my-ip-address$$
+      addressType:  INTERNAL
+      name:         $$address-name$$
+      network:      https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/networks/default
+      prefixLength: 24
+      purpose:      VPC_PEERING
+      status:       RESERVED
+- execute:
+  - command: |
+      compute addresses list --global --filter 'name:$$address-name$$' --format
+      "text(name,address,prefixLength,addressType,purpose,network,status)"
+  - stdout: |
+      ---
+      address:      $$my-ip-address$$
+      addressType:  INTERNAL
+      name:         $$address-name$$
+      network:      https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/networks/default
+      prefixLength: 24
+      purpose:      VPC_PEERING
+      status:       RESERVED
+- execute:
+  - command: compute addresses delete $$address-name$$ --global -q
+  - stderr: |
+      Deleted [https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$].
 actions:
+- define_reference:
+    reference: compute-uri
+    value: www.googleapis.com/compute
 - define_reference:
     reference: api-version
     track_values:
@@ -19,41 +58,42 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/$$project$$/global/addresses?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/addresses?alt=json
           method: POST
           headers: {}
           body:
             json:
               name: $$address-name$$
               addressType: INTERNAL
-              ipVersion: 'IPV4'
-              network: https://www.googleapis.com/compute/$$api-version$$/projects/$$project$$/global/networks/default
+              ipVersion: IPV4
+              network: https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/networks/default
               prefixLength: 24
               purpose: VPC_PEERING
         return_response:
           headers:
             Cache-Control: private, max-age=0
-            Content-Length: '602'
+            Content-Length: '744'
             Content-Type: application/json; charset=UTF-8
             status: '200'
           body:
             kind: compute#operation
-            id: '3215164330445845205'
-            name: operation-1544981561734-57d270d2bf370-6c714391-68f95642
+            id: '9154370159617360581'
+            name: operation-1556118569502-587481690455d-5a3999e8-1c62b868
             operationType: insert
-            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$
-            targetId: '4613958380442825429'
-            status: PENDING
+            targetLink: https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$
+            targetId: '3070881728834683589'
+            status: RUNNING
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
-            insertTime: '2018-12-16T09:32:42.428-08:00'
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/$$project$$/global/operations/operation-1544981561734-57d270d2bf370-6c714391-68f95642
+            insertTime: '2019-04-24T08:09:30.542-07:00'
+            startTime: '2019-04-24T08:09:30.548-07:00'
+            selfLink: https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/operations/operation-1556118569502-587481690455d-5a3999e8-1c62b868
         poll_operation: true
     - expect_stderr: |
-        Created [https://www.googleapis.com/compute/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$].
+        Created [https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -67,22 +107,23 @@ actions:
         return_response:
           headers:
             Cache-Control: private, max-age=0
-            Content-Length: '523'
+            Content-Length: '597'
             Content-Type: application/json; charset=UTF-8
-            ETag: '"aslsJ-N9U5Hv6llZCpwJVlpFkYA=/MDuP7TNb-K6cio0_mKHQgRnfThI="'
+            ETag: '"JBdgaK0KLXvHt8pMDpWPIEPks7g=/PA3leRLSFoxzenwdvETJS35oIQ4="'
             status: '200'
           body:
             kind: compute#address
-            id: '4613958380442825429'
-            creationTimestamp: '2018-12-16T09:32:42.417-08:00'
+            id: '3070881728834683589'
+            creationTimestamp: '2019-04-24T08:09:30.537-07:00'
             name: $$address-name$$
             description: ''
-            address: 10.3.161.0
+            address: 10.82.68.0
             prefixLength: 24
+            status: RESERVED
+            selfLink: https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$
             addressType: INTERNAL
             purpose: VPC_PEERING
-            network: https://www.googleapis.com/compute/$$api-version$$/projects/$$project$$/global/networks/default
-            status: RESERVED
+            network: https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/networks/default
     - expect_exit:
         code: 0
 - execute_command:
@@ -92,34 +133,35 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$?alt=json
           method: GET
           headers: {}
           body: null
         return_response:
           headers:
             Cache-Control: private, max-age=0
-            Content-Length: '524'
+            Content-Length: '597'
             Content-Type: application/json; charset=UTF-8
-            ETag: '"aslsJ-N9U5Hv6llZCpwJVlpFkYA=/MDuP7TNb-K6cio0_mKHQgRnfThI="'
+            ETag: '"L9AoXmnPInReulWGXvLMwi0ee94=/uUoLTK4nWC0jpp4V3NHIxcaxG_o="'
             status: '200'
           body:
             kind: compute#address
-            id: '4613958380442825429'
-            creationTimestamp: '2018-12-16T09:32:42.417-08:00'
+            id: '3070881728834683589'
+            creationTimestamp: '2019-04-24T08:09:30.537-07:00'
             name: $$address-name$$
             description: ''
-            address: 10.3.161.0
+            address: 10.82.68.0
             prefixLength: 24
+            status: RESERVED
+            selfLink: https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$
             addressType: INTERNAL
             purpose: VPC_PEERING
-            network: https://www.googleapis.com/compute/$$api-version$$/projects/$$project$$/global/networks/default
-            status: RESERVED
+            network: https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/networks/default
     - expect_stdout: |
         address:      $$my-ip-address$$
         addressType:  INTERNAL
         name:         $$address-name$$
-        network:      https://www.googleapis.com/compute/$$api-version$$/projects/$$project$$/global/networks/default
+        network:      https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/networks/default
         prefixLength: 24
         purpose:      VPC_PEERING
         status:       RESERVED
@@ -136,7 +178,7 @@ actions:
         address:      $$my-ip-address$$
         addressType:  INTERNAL
         name:         $$address-name$$
-        network:      https://www.googleapis.com/compute/$$api-version$$/projects/$$project$$/global/networks/default
+        network:      https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/networks/default
         prefixLength: 24
         purpose:      VPC_PEERING
         status:       RESERVED
@@ -148,30 +190,31 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$?alt=json
           method: DELETE
           headers: {}
           body: null
         return_response:
           headers:
             Cache-Control: private, max-age=0
-            Content-Length: '649'
+            Content-Length: '744'
             Content-Type: application/json; charset=UTF-8
             status: '200'
           body:
             kind: compute#operation
-            id: '1449401411320829571'
-            name: operation-1545070699946-57d3bce392010-02eda868-c23fbccb
+            id: '3086183164007006940'
+            name: operation-1556118578691-58748171c7c60-acd06b12-c37158e4
             operationType: delete
-            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$
-            targetId: '4613958380442825429'
-            status: PENDING
+            targetLink: https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$
+            targetId: '3070881728834683589'
+            status: RUNNING
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
-            insertTime: '2018-12-17T10:18:20.818-08:00'
-            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/$$project$$/global/operations/operation-1545070699946-57d3bce392010-02eda868-c23fbccb
+            insertTime: '2019-04-24T08:09:39.454-07:00'
+            startTime: '2019-04-24T08:09:39.467-07:00'
+            selfLink: https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/operations/operation-1556118578691-58748171c7c60-acd06b12-c37158e4
         poll_operation: true
     - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$].
+        Deleted [https://$$compute-uri$$/$$api-version$$/projects/$$project$$/global/addresses/$$address-name$$].
     - expect_exit:
         code: 0

@@ -1071,133 +1071,213 @@ class UpdateTestBeta(base.BetaTestBase, UpdateTestGA):
   def testEnableAutoprovisioning(self):
     self._TestUpdateAutoprovisioning(
         enabled=True,
+        autoprovisioning_defaults=self.messages
+        .AutoprovisioningNodePoolDefaults(oauthScopes=[],),
         resource_limits=[
-            self.msgs.ResourceLimit(
-                resourceType='cpu',
-                maximum=100,
-                minimum=8),
-            self.msgs.ResourceLimit(
-                resourceType='memory',
-                maximum=128)],
+            self.msgs.ResourceLimit(resourceType='cpu', maximum=100, minimum=8),
+            self.msgs.ResourceLimit(resourceType='memory', maximum=128)
+        ],
         flags='--enable-autoprovisioning --max-memory 128 '
-              '--max-cpu 100 --min-cpu 8')
+        '--max-cpu 100 --min-cpu 8')
 
   def testEnableAutoprovisioningWithAcceleratorMaxLimit(self):
     self._TestUpdateAutoprovisioning(
         enabled=True,
+        autoprovisioning_defaults=self.messages
+        .AutoprovisioningNodePoolDefaults(oauthScopes=[],),
         resource_limits=[
+            self.msgs.ResourceLimit(resourceType='cpu', maximum=100, minimum=8),
+            self.msgs.ResourceLimit(resourceType='memory', maximum=128),
             self.msgs.ResourceLimit(
-                resourceType='cpu',
-                maximum=100,
-                minimum=8),
-            self.msgs.ResourceLimit(
-                resourceType='memory',
-                maximum=128),
-            self.msgs.ResourceLimit(
-                resourceType='nvidia-tesla-k80',
-                minimum=0,
-                maximum=2)],
+                resourceType='nvidia-tesla-k80', minimum=0, maximum=2)
+        ],
         flags='--enable-autoprovisioning --max-memory 128 '
-              '--max-cpu 100 --min-cpu 8 '
-              '--max-accelerator type=nvidia-tesla-k80,count=2')
+        '--max-cpu 100 --min-cpu 8 '
+        '--max-accelerator type=nvidia-tesla-k80,count=2')
 
   def testEnableAutoprovisioningWithAcceleratorLimits(self):
     self._TestUpdateAutoprovisioning(
         enabled=True,
+        autoprovisioning_defaults=self.messages
+        .AutoprovisioningNodePoolDefaults(oauthScopes=[],),
         resource_limits=[
+            self.msgs.ResourceLimit(resourceType='cpu', maximum=100, minimum=8),
+            self.msgs.ResourceLimit(resourceType='memory', maximum=128),
             self.msgs.ResourceLimit(
-                resourceType='cpu',
-                maximum=100,
-                minimum=8),
-            self.msgs.ResourceLimit(
-                resourceType='memory',
-                maximum=128),
-            self.msgs.ResourceLimit(
-                resourceType='nvidia-tesla-k80',
-                minimum=1,
-                maximum=2)],
+                resourceType='nvidia-tesla-k80', minimum=1, maximum=2)
+        ],
         flags='--enable-autoprovisioning --max-memory 128 '
-              '--max-cpu 100 --min-cpu 8 '
-              '--max-accelerator type=nvidia-tesla-k80,count=2 '
-              '--min-accelerator type=nvidia-tesla-k80,count=1')
+        '--max-cpu 100 --min-cpu 8 '
+        '--max-accelerator type=nvidia-tesla-k80,count=2 '
+        '--min-accelerator type=nvidia-tesla-k80,count=1')
 
   def testDisableAutoprovisioning(self):
     self._TestUpdateAutoprovisioning(
         enabled=False,
         resource_limits=[],
+        autoprovisioning_defaults=self.messages
+        .AutoprovisioningNodePoolDefaults(oauthScopes=[]),
         flags='--no-enable-autoprovisioning')
 
-  def _TestUpdateAutoprovisioning(self, enabled, resource_limits, flags):
+  def _TestUpdateAutoprovisioning(self, enabled, resource_limits,
+                                  autoprovisioning_defaults, flags):
     autoscaling = self.msgs.ClusterAutoscaling(
-        enableNodeAutoprovisioning=enabled, resourceLimits=resource_limits)
+        enableNodeAutoprovisioning=enabled,
+        resourceLimits=resource_limits,
+        autoprovisioningNodePoolDefaults=autoprovisioning_defaults)
     update = self.msgs.ClusterUpdate(desiredClusterAutoscaling=autoscaling)
     self._TestUpdate(update=update, flags=flags)
 
-  def testEnableAutoprovisioningNoLimitsInvalid(self):
-    name = 'tobeupdated'
-    self.ExpectGetCluster(self._RunningCluster(name=name))
-    with self.assertRaises(c_util.Error):
-      self.Run(
-          self.clusters_command_base.format(self.ZONE) + ' update ' + name +
-          ' --enable-autoprovisioning')
-    self.AssertErrContains('Must specify both --max-cpu and --max-memory'
-                           ' to enable autoprovisioning.')
+  def testEnableAutoprovisioningWithServiceAccount(self):
+    self._TestUpdateAutoprovisioning(
+        enabled=True,
+        autoprovisioning_defaults=self.msgs.AutoprovisioningNodePoolDefaults(
+            serviceAccount='sa1',
+            oauthScopes=[],
+        ),
+        resource_limits=[
+            self.msgs.ResourceLimit(resourceType='cpu', maximum=100, minimum=8),
+            self.msgs.ResourceLimit(resourceType='memory', maximum=128)
+        ],
+        flags='--enable-autoprovisioning --max-memory 128 '
+        '--max-cpu 100 --min-cpu 8 '
+        '--autoprovisioning-service-account=sa1')
 
-  def testEnableAutoprovisioningAcceleratorTypeMismatch(self):
-    name = 'tobeupdated'
-    self.ExpectGetCluster(self._RunningCluster(name=name))
-    with self.assertRaises(c_util.Error):
-      self.Run(
-          self.clusters_command_base.format(self.ZONE) + ' update ' + name +
-          ' --enable-autoprovisioning --max-cpu 10 --max-memory 64'
-          ' --max-accelerator type=nvidia-tesla-p100,count=2'
-          ' --min-accelerator type=nvidia-tesla-k80,count=1')
-    self.AssertErrContains('Maximum and minimum accelerator limits must be set'
-                           ' on the same accelerator type.')
+  def testEnableAutoprovisioningWithScopes(self):
+    self._TestUpdateAutoprovisioning(
+        enabled=True,
+        autoprovisioning_defaults=self.msgs.AutoprovisioningNodePoolDefaults(
+            oauthScopes=['scope1', 'scope2'],),
+        resource_limits=[
+            self.msgs.ResourceLimit(resourceType='cpu', maximum=100, minimum=8),
+            self.msgs.ResourceLimit(resourceType='memory', maximum=128)
+        ],
+        flags='--enable-autoprovisioning --max-memory 128 '
+        '--max-cpu 100 --min-cpu 8 '
+        '--autoprovisioning-scopes=scope1,scope2')
 
-  def testEnableAutoprovisioningWithMultipleAcceleratorLimits(self):
+  def testEnableAutoprovisioningWithScopesFromFile(self):
     autoprovisioning_config_file = self.Touch(
-        self.temp_path, 'autoprovisioning-config', contents="""
-- resourceType: 'cpu'
-  minimum: 8
-  maximum: 100
-- resourceType: 'memory'
-  maximum: 20
-- resourceType: 'nvidia-tesla-k80'
-  minimum: 1
-  maximum: 2
-- resourceType: 'nvidia-tesla-p100'
-  minimum: 0
-  maximum: 1
+        self.temp_path,
+        'autoprovisioning-config',
+        contents="""
+scopes:
+  - scope1
+  - scope2
+resourceLimits:
+  - resourceType: 'cpu'
+    minimum: 8
+    maximum: 100
+  - resourceType: 'memory'
+    maximum: 20
         """)
     self._TestUpdateAutoprovisioning(
         enabled=True,
+        autoprovisioning_defaults=self.msgs.AutoprovisioningNodePoolDefaults(
+            oauthScopes=['scope1', 'scope2'],),
         resource_limits=[
-            self.msgs.ResourceLimit(
-                resourceType='cpu',
-                maximum=100,
-                minimum=8),
-            self.msgs.ResourceLimit(
-                resourceType='memory',
-                maximum=20),
-            self.msgs.ResourceLimit(
-                resourceType='nvidia-tesla-k80',
-                minimum=1,
-                maximum=2),
-            self.msgs.ResourceLimit(
-                resourceType='nvidia-tesla-p100',
-                minimum=0,
-                maximum=1)
-            ],
+            self.msgs.ResourceLimit(resourceType='cpu', maximum=100, minimum=8),
+            self.msgs.ResourceLimit(resourceType='memory', maximum=20)
+        ],
         flags='--enable-autoprovisioning '
-              '--autoprovisioning-config-file {}'
-        .format(autoprovisioning_config_file))
+        '--autoprovisioning-config-file {}'.format(
+            autoprovisioning_config_file))
+
+  def testEnableAutoprovisioningWithServiceAccountFromFile(self):
+    autoprovisioning_config_file = self.Touch(
+        self.temp_path,
+        'autoprovisioning-config',
+        contents="""
+serviceAccount: sa1
+resourceLimits:
+  - resourceType: 'cpu'
+    minimum: 8
+    maximum: 100
+  - resourceType: 'memory'
+    maximum: 20
+        """)
+    self._TestUpdateAutoprovisioning(
+        enabled=True,
+        autoprovisioning_defaults=self.msgs.AutoprovisioningNodePoolDefaults(
+            serviceAccount='sa1',
+            oauthScopes=[],
+        ),
+        resource_limits=[
+            self.msgs.ResourceLimit(resourceType='cpu', maximum=100, minimum=8),
+            self.msgs.ResourceLimit(resourceType='memory', maximum=20)
+        ],
+        flags='--enable-autoprovisioning '
+        '--autoprovisioning-config-file {}'.format(
+            autoprovisioning_config_file))
+
+  def _TestUpdateClusteAutoscalingWithError(self, flags, error_message):
+    name = 'tobeupdated'
+    self.ExpectGetCluster(self._RunningCluster(name=name))
+    with self.assertRaises(c_util.Error):
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) + ' update ' + name +
+          flags)
+    self.AssertErrContains(error_message)
+
+  def testEnableAutoprovisioningNoLimitsInvalid(self):
+    self._TestUpdateClusteAutoscalingWithError(
+        ' --enable-autoprovisioning',
+        'Must specify both --max-cpu and --max-memory'
+        ' to enable autoprovisioning.')
+
+  def testEnableAutoprovisioningAcceleratorTypeMismatch(self):
+    self._TestUpdateClusteAutoscalingWithError(
+        ' --enable-autoprovisioning --max-cpu 10 --max-memory 64'
+        ' --max-accelerator type=nvidia-tesla-p100,count=2'
+        ' --min-accelerator type=nvidia-tesla-k80,count=1',
+        'Maximum and minimum accelerator limits must be set'
+        ' on the same accelerator type.')
+
+  def testEnableAutoprovisioningWithMultipleAcceleratorLimits(self):
+    autoprovisioning_config_file = self.Touch(
+        self.temp_path,
+        'autoprovisioning-config',
+        contents="""
+resourceLimits:
+  - resourceType: 'cpu'
+    minimum: 8
+    maximum: 100
+  - resourceType: 'memory'
+    maximum: 20
+  - resourceType: 'nvidia-tesla-k80'
+    minimum: 1
+    maximum: 2
+  - resourceType: 'nvidia-tesla-p100'
+    minimum: 0
+    maximum: 1
+        """)
+    self._TestUpdateAutoprovisioning(
+        enabled=True,
+        autoprovisioning_defaults=self.messages
+        .AutoprovisioningNodePoolDefaults(oauthScopes=[],),
+        resource_limits=[
+            self.msgs.ResourceLimit(resourceType='cpu', maximum=100, minimum=8),
+            self.msgs.ResourceLimit(resourceType='memory', maximum=20),
+            self.msgs.ResourceLimit(
+                resourceType='nvidia-tesla-k80', minimum=1, maximum=2),
+            self.msgs.ResourceLimit(
+                resourceType='nvidia-tesla-p100', minimum=0, maximum=1)
+        ],
+        flags='--enable-autoprovisioning '
+        '--autoprovisioning-config-file {}'.format(
+            autoprovisioning_config_file))
 
   def testEnableVerticalPodAutoscaling(self):
     update = self.msgs.ClusterUpdate(
         desiredVerticalPodAutoscaling=self.msgs.VerticalPodAutoscaling(
             enabled=True))
     self._TestUpdate(update=update, flags='--enable-vertical-pod-autoscaling')
+
+  def testEnableIntraNodeVisibility(self):
+    update = self.msgs.ClusterUpdate(
+        desiredIntraNodeVisibilityConfig=self.msgs.IntraNodeVisibilityConfig(
+            enabled=True))
+    self._TestUpdate(update=update, flags='--enable-intra-node-visibility')
 
   def testUpdateAddonsIstio(self):
     auth_none = self.messages.IstioConfig.AuthValueValuesEnum.AUTH_NONE
@@ -1289,6 +1369,56 @@ class UpdateTestBeta(base.BetaTestBase, UpdateTestGA):
     self._TestUpdate(update=update,
                      flags='--clear-resource-usage-bigquery-dataset')
 
+  def testDisableWorkloadIdentity(self):
+    cluster_name = 'abc'
+    update = self.msgs.ClusterUpdate(
+        desiredWorkloadIdentityConfig=self.msgs.WorkloadIdentityConfig(
+            identityNamespace=''))
+    self.ExpectGetCluster(self._RunningCluster(name=cluster_name))
+    self.ExpectUpdateCluster(
+        cluster_name=cluster_name,
+        update=update,
+        response=self._MakeOperation(operationType=self.op_update_cluster))
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) +
+        ' update {0} --disable-workload-identity'.format(cluster_name))
+
+  def testModifyIdentityNamespace(self):
+    cluster_name = 'abc'
+    new_idns = 'new-idns'
+    update = self.msgs.ClusterUpdate(
+        desiredWorkloadIdentityConfig=self.msgs.WorkloadIdentityConfig(
+            identityNamespace=new_idns))
+    self.ExpectGetCluster(self._RunningCluster(name=cluster_name))
+    self.ExpectUpdateCluster(
+        cluster_name=cluster_name,
+        update=update,
+        response=self._MakeOperation(operationType=self.op_update_cluster))
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) +
+        ' update {cluster} --identity-namespace={idns}'.format(
+            cluster=cluster_name, idns=new_idns))
+
+  @parameterized.parameters(
+      ('--no-enable-shielded-nodes', False),
+      ('--enable-shielded-nodes', True),
+  )
+  def testEnableShieldedNodes(self, flags, enabled):
+    cluster_name = 'abc'
+    update = self.msgs.ClusterUpdate(
+        desiredShieldedNodes=self.msgs.ShieldedNodes(enabled=enabled))
+    self.ExpectGetCluster(self._RunningCluster(name=cluster_name))
+    self.ExpectUpdateCluster(
+        cluster_name=cluster_name,
+        update=update,
+        response=self._MakeOperation(operationType=self.op_update_cluster))
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) +
+        ' update {0} {1}'.format(cluster_name, flags))
+
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.
 class UpdateTestAlpha(base.AlphaTestBase, UpdateTestBeta):
@@ -1308,6 +1438,67 @@ class UpdateTestAlpha(base.AlphaTestBase, UpdateTestBeta):
     profile = self.msgs.SecurityProfile(name='test-profile-1')
     update = self.msgs.ClusterUpdate(securityProfile=profile)
     self._TestUpdate(update=update, flags='--security-profile=test-profile-1')
+
+  def testEnablePeeringRouteSharing(self):
+    desired = self.msgs.PrivateClusterConfig(enablePeeringRouteSharing=True)
+    self._TestUpdate(
+        self.msgs.ClusterUpdate(desiredPrivateClusterConfig=desired),
+        flags='--enable-peering-route-sharing ')
+
+  def _TestUpdateAutoprovisioning(self, enabled, resource_limits,
+                                  autoprovisioning_defaults, flags):
+    autoscaling = self.msgs.ClusterAutoscaling(
+        enableNodeAutoprovisioning=enabled,
+        autoprovisioningNodePoolDefaults=autoprovisioning_defaults,
+        resourceLimits=resource_limits)
+    self._TestUpdateClusterAutoscaling(autoscaling, flags)
+
+  def _TestUpdateClusteAutoscalingWithError(self, flags, error_message):
+    name = 'tobeupdated'
+    self.ExpectGetCluster(self._RunningCluster(name=name))
+    self.ExpectGetCluster(self._RunningCluster(name=name))
+    with self.assertRaises(c_util.Error):
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) + ' update ' + name +
+          flags)
+    self.AssertErrContains(error_message)
+
+  def _TestUpdateClusterAutoscaling(self, autoscaling, flags):
+    name = 'tobeupdated'
+    update = self.msgs.ClusterUpdate(desiredClusterAutoscaling=autoscaling)
+    self.ExpectGetCluster(self._RunningCluster(name=name))
+    self.ExpectGetCluster(self._RunningCluster(name=name))
+    self.ExpectUpdateCluster(
+        cluster_name=name,
+        update=update,
+        response=self._MakeOperation(operationType=self.op_update_cluster))
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.Run(
+        self.clusters_command_base.format(self.ZONE) + ' update {0} {1}'.format(
+            name, flags))
+    self.AssertErrContains('Updating {cluster}'.format(cluster=name))
+    self.AssertErrContains(
+        ('go to: https://console.cloud.google.com/kubernetes/'
+         'workload_/gcloud/{zone}/{cluster}?project={project}').format(
+             cluster=name, zone=self.ZONE, project=self.PROJECT_ID))
+
+  def testUpdateAutoscalingProfile(self):
+    autoscaling = self.msgs.ClusterAutoscaling(
+        autoscalingProfile=self.messages.ClusterAutoscaling \
+          .AutoscalingProfileValueValuesEnum.OPTIMIZE_UTILIZATION)
+    self._TestUpdateClusterAutoscaling(
+        autoscaling, '--autoscaling-profile optimize-utilization')
+
+  def testUpdateAutoscalingProfileInvalid(self):
+    name = 'tobeupdated'
+    self.ExpectGetCluster(self._RunningCluster(name=name))
+    self.ExpectGetCluster(self._RunningCluster(name=name))
+    with self.assertRaises(c_util.Error):
+      self.Run(
+          self.clusters_command_base.format(self.ZONE) + ' update ' + name +
+          ' --autoscaling-profile invalid-profile')
+    self.AssertErrContains('Unknown autoscaling profile')
+
 
 if __name__ == '__main__':
   test_case.main()

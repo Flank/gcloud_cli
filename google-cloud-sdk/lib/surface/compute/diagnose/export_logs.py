@@ -35,6 +35,7 @@ from googlecloudsdk.command_lib.projects import util as projects_util
 from googlecloudsdk.command_lib.util import time_util
 from googlecloudsdk.core import log
 from googlecloudsdk.core import properties
+import six
 
 _DIAGNOSTICS_METADATA_KEY = 'diagnostics'
 _SERVICE_ACCOUNT_NAME = 'gce-diagnostics-extract-logs'
@@ -109,11 +110,16 @@ class ExportLogs(base_classes.BaseCommand):
       A string url that can be used until its expiration to upload a file.
     """
 
-    url_data = ('POST\n\n\n{0}\nx-goog-resumable:start\n/{1}/{2}'.format(
+    url_data = str('POST\n\n\n{0}\nx-goog-resumable:start\n/{1}/{2}'.format(
         expiration, bucket, filepath))
     signature = self._diagnose_client.SignBlob(service_account, url_data)
 
-    encoded_sig = base64.b64encode(signature.encode('utf-8'))
+    # In python3, string are utf-8 string, so we need to convert to byte string.
+    if isinstance(signature, six.text_type):
+      signature = signature.encode('utf-8')
+
+    encoded_sig = base64.b64encode(signature)
+
     url = ('https://storage.googleapis.com/'
            '{0}/{1}?GoogleAccessId={2}&Expires={3}&Signature={4}')
 
@@ -122,7 +128,7 @@ class ExportLogs(base_classes.BaseCommand):
     if hasattr(urllib, 'quote_plus'):
       url_suffix = urllib.quote_plus(encoded_sig)
     else:
-      url_suffix = urllib.parse.quote_plus(encoded_sig)  # pytype: disable=module-attr
+      url_suffix = urllib.parse.quote_plus(encoded_sig)
 
     return url.format(bucket, filepath, service_account, expiration, url_suffix)
 

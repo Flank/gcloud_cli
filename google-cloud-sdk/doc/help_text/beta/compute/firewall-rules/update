@@ -176,15 +176,15 @@ FLAGS
                 --target-service-accounts
 
      --target-tags=[TAG,...]
-        A list of instance tags indicating the set of instances on the network
-        which may accept inbound connections that match the firewall rule. If
-        both target tags and target service account are omitted, all instances
-        on the network can receive inbound connections that match the rule.
+        List of instance tags indicating the set of instances on the network
+        which may accept connections that match the firewall rule. Note that
+        tags can be assigned to instances during instance creation.
 
-        Tags can be assigned to instances during instance creation.
-
-        If target tags are specified then neither a source nor target service
+        If target tags are specified, then neither a source nor target service
         account can also be specified.
+
+        If both target tags and target service account are omitted, all
+        instances on the network can receive connections that match the rule.
 
         Setting this will override the existing target tags for the firewall.
         The following will clear the existing target tags:
@@ -192,10 +192,16 @@ FLAGS
             $ gcloud beta compute firewall-rules update MY-RULE --target-tags
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
+
+EXAMPLES
+    To update the firewall rule RULE to enable logging, run:
+
+        $ gcloud beta compute firewall-rules update RULE --enable-logging
 
 NOTES
     This command is currently in BETA and may change without notice. These

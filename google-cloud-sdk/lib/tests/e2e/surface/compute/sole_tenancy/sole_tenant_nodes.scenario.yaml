@@ -36,7 +36,9 @@ summary:
   - stderr: |
       Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/nodeTemplates/$$template$$].
 actions:
-
+- define_reference:
+    reference: compute-uri
+    value: www.googleapis.com/compute
 # We have the most CPU quota in us-central1
 - define_reference:
     reference: my-region
@@ -64,7 +66,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/nodeTemplates?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/nodeTemplates?alt=json
           method: POST
           headers: {}
           body:
@@ -96,7 +98,7 @@ actions:
         Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/nodeTemplates/$$template$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/nodeTemplates/$$template$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/nodeTemplates/$$template$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -124,7 +126,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/nodeGroups?alt=json&initialNodeCount=1
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/nodeGroups?alt=json&initialNodeCount=1
           method: POST
           headers: {}
           body:
@@ -156,7 +158,7 @@ actions:
         Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/nodeGroups/$$group$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/nodeGroups/$$group$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/nodeGroups/$$group$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -185,7 +187,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -211,7 +213,7 @@ actions:
             - Intel Haswell
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing?alt=json
           method: GET
           headers: {}
           body: null
@@ -241,7 +243,7 @@ actions:
             defaultNetworkTier: PREMIUM
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances?alt=json
           method: POST
           headers: {}
           body:
@@ -304,7 +306,7 @@ actions:
         Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -388,7 +390,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/nodeGroups/$$group$$/listNodes?alt=json&maxResults=500
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/nodeGroups/$$group$$/listNodes?alt=json&maxResults=500
           method: POST
           headers: {}
           body: null
@@ -416,7 +418,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance$$?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -451,7 +453,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/nodeGroups/$$group$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/nodeGroups/$$group$$?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -487,7 +489,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/nodeTemplates/$$template$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/nodeTemplates/$$template$$?alt=json
           method: DELETE
           headers: {}
           body: null

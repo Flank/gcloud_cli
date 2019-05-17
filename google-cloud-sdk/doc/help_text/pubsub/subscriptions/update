@@ -1,0 +1,70 @@
+NAME
+    gcloud pubsub subscriptions update - updates an existing Cloud Pub/Sub
+        subscription
+
+SYNOPSIS
+    gcloud pubsub subscriptions update SUBSCRIPTION
+        [--ack-deadline=ACK_DEADLINE] [--expiration-period=EXPIRATION_PERIOD]
+        [--message-retention-duration=MESSAGE_RETENTION_DURATION]
+        [--push-endpoint=PUSH_ENDPOINT] [--retain-acked-messages]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Updates an existing Cloud Pub/Sub subscription.
+
+POSITIONAL ARGUMENTS
+     Subscription resource - Name of the subscription to update. This
+     represents a Cloud resource. (NOTE) Some attributes are not given
+     arguments in this group but can be set in other ways. To set the [project]
+     attribute: provide the argument [subscription] on the command line with a
+     fully specified name; provide the argument [--project] on the command
+     line; set the property [core/project]. This must be specified.
+
+       SUBSCRIPTION
+          ID of the subscription or fully qualified identifier for the
+          subscription.
+
+FLAGS
+     --ack-deadline=ACK_DEADLINE
+        The number of seconds the system will wait for a subscriber to
+        acknowledge receiving a message before re-attempting delivery.
+
+     --expiration-period=EXPIRATION_PERIOD
+        The subscription will expire if it is inactive for the given period.
+        Valid values are strings of the form INTEGER[UNIT], where UNIT is one
+        of "s", "m", "h", and "d" for seconds, minutes, hours, and days,
+        respectively. If the unit is omitted, seconds is assumed. This flag
+        additionally accepts the special value "never" to indicate that the
+        subscription will never expire.
+
+     --message-retention-duration=MESSAGE_RETENTION_DURATION
+        How long to retain unacknowledged messages in the subscription's
+        backlog, from the moment a message is published. If
+        --retain-acked-messages is true, this also configures the retention of
+        acknowledged messages. Specify "default" to use the default value.
+        Valid values are strings of the form INTEGER[UNIT], where UNIT is one
+        of "s", "m", "h", and "d" for seconds, minutes, hours, and days,
+        respectively. If the unit is omitted, seconds is assumed.
+
+     --push-endpoint=PUSH_ENDPOINT
+        A URL to use as the endpoint for this subscription. This will also
+        automatically set the subscription type to PUSH.
+
+     --retain-acked-messages
+        Whether or not to retain acknowledged messages. If true, messages are
+        not expunged from the subscription's backlog until they fall out of the
+        --message-retention-duration window.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha pubsub subscriptions update
+        $ gcloud beta pubsub subscriptions update
+

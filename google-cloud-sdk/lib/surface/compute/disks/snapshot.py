@@ -44,8 +44,7 @@ DETAILED_HELP = {
         they are attached to running instances. Once created, snapshots may be
         managed (listed, deleted, resized etc.) via `gcloud compute snapshots`.
 
-        For best practices regarding managing snapshots, refer to this guide:
-        https://cloud.google.com/compute/docs/disks/create-snapshots#best_practices.
+        Refer to the Snapshot best practices guide. https://cloud.google.com/compute/docs/disks/snapshot-best-practices
 
         {command} waits until the operation returns a status of `READY` or
         `FAILED`, or reaches the maximum timeout, and returns the last known
@@ -82,26 +81,20 @@ def _CommonArgs(parser):
       will result in `my-disk-1` being snapshotted as
       `snapshot-1`, `my-disk-2` as `snapshot-2`, and so on.
       """)
-  parser.add_argument(
-      '--guest-flush',
-      action='store_true',
-      default=False,
-      help=('Create an application consistent snapshot by informing the OS '
-            'to prepare for the snapshot process. Currently only supported '
-            'on Windows instances using the Volume Shadow Copy Service '
-            '(VSS).'))
+  flags.AddGuestFlushFlag(parser, 'snapshot')
+  flags.AddStorageLocationFlag(parser, 'snapshot')
   csek_utils.AddCsekKeyArgs(parser, flags_about_creation=False)
 
   base.ASYNC_FLAG.AddToParser(parser)
 
 
-@base.ReleaseTracks(base.ReleaseTrack.GA)
 class SnapshotDisks(base.SilentCommand):
   """Create snapshots of Google Compute Engine persistent disks."""
 
   @staticmethod
   def Args(parser):
     SnapshotDisks.disks_arg = disks_flags.MakeDiskArg(plural=True)
+    labels_util.AddCreateLabelsFlags(parser)
     _CommonArgs(parser)
 
   def Run(self, args):
@@ -201,31 +194,6 @@ class SnapshotDisks(base.SilentCommand):
         .format(', '.join(s.Name() for s in snapshot_refs)),
         max_wait_ms=None
     )
-
-
-@base.ReleaseTracks(base.ReleaseTrack.BETA)
-class SnapshotDisksBeta(SnapshotDisks):
-  """Create snapshots of Google Compute Engine persistent disks."""
-
-  @staticmethod
-  def Args(parser):
-    SnapshotDisks.disks_arg = disks_flags.MakeDiskArgZonalOrRegional(
-        plural=True)
-    labels_util.AddCreateLabelsFlags(parser)
-    flags.AddStorageLocationFlag(parser, 'snapshot')
-    _CommonArgs(parser)
-
-
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class SnapshotDisksAlpha(SnapshotDisks):
-  """Create snapshots of Google Compute Engine persistent disks."""
-
-  @staticmethod
-  def Args(parser):
-    SnapshotDisks.disks_arg = disks_flags.MakeDiskArgZonalOrRegional(
-        plural=True)
-    flags.AddStorageLocationFlag(parser, 'snapshot')
-    _CommonArgs(parser)
 
 
 SnapshotDisks.detailed_help = DETAILED_HELP

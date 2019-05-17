@@ -470,8 +470,29 @@ class ProgressTrackerTest(sdk_test_base.WithOutputCapture,
       t.Tick()
     self.AssertErrEquals('')
 
+  def testProgressTrackerScreenReader(self):
+    console_size = self.SetConsoleSize(30)
+    with progress_tracker.ProgressTracker(
+        'tracker', autotick=False, screen_reader=True) as t:
+      for _ in range(5):
+        t.Tick()
+    self.AssertErrContains(
+        '\r' + ' ' * console_size +
+        '\rtracker...working.'
+        '\r' + ' ' * console_size +
+        '\rtracker...working..'
+        '\r' + ' ' * console_size +
+        '\rtracker...working...'
+        '\r' + ' ' * console_size +
+        '\rtracker...working'
+        '\r' + ' ' * console_size +
+        '\rtracker...working.'
+        '\r' + ' ' * console_size +
+        '\rtracker...done.\n')
 
-@test_case.Filters.SkipOnWindows('Enable completion on Windows', 'b/24905560')
+
+# TODO(b/125840199) Add tab completion support on windows.
+@test_case.Filters.DoNotRunOnWindows('Tab completion not supported on Windows.')
 class CompletionProgressTrackerTest(sdk_test_base.SdkBase):
 
   def SetUp(self):
@@ -528,7 +549,8 @@ class CompletionProgressTrackerTest(sdk_test_base.SdkBase):
     self.assertEqual('/\b-\b\\\b|\b/\b?\b', actual)
 
 
-@test_case.Filters.SkipOnWindows('Enable completion on Windows', 'b/24905560')
+# TODO(b/125840199) Add tab completion support on windows.
+@test_case.Filters.DoNotRunOnWindows('Tab completion not supported on Windows.')
 class CompletionProgressTrackerFdTest(sdk_test_base.SdkBase):
 
   def SetUp(self):
@@ -608,8 +630,9 @@ class StagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
     properties.VALUES.core.interactive_ux_style.Set(
         properties.VALUES.core.InteractiveUXStyles.NORMAL.name)
     self.stages = [
-        progress_tracker.Stage('Hello World...'),
-        progress_tracker.Stage('A' + 'h' * 15 + '...')]
+        progress_tracker.Stage('Hello World...', key='a'),
+        progress_tracker.Stage('A' + 'h' * 15 + '...', key='b')]
+    self.keys = [s.key for s in self.stages]
 
   def TearDown(self):
     # Wait for ProgressTracker ticker thread to end
@@ -627,6 +650,15 @@ class StagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
       pass
     self.AssertErrEquals('')
 
+  def testMapNature(self):
+    properties.VALUES.core.interactive_ux_style.Set(
+        properties.VALUES.core.InteractiveUXStyles.OFF.name)
+    with progress_tracker.StagedProgressTracker(
+        'tracker', self.stages, autotick=False) as tracker:
+      self.assertEqual(tracker[self.keys[0]], self.stages[0])
+      self.assertEqual(list(tracker.keys()), self.keys)
+    self.AssertErrEquals('')
+
   def testStubNoStages(self):
     properties.VALUES.core.interactive_ux_style.Set(
         properties.VALUES.core.InteractiveUXStyles.TESTING.name)
@@ -641,8 +673,8 @@ class StagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
         properties.VALUES.core.InteractiveUXStyles.TESTING.name)
     with progress_tracker.StagedProgressTracker(
         'tracker', self.stages, autotick=False) as spt:
-      spt.StartStage(self.stages[0])
-      spt.CompleteStage(self.stages[0])
+      spt.StartStage(self.keys[0])
+      spt.CompleteStage(self.keys[0])
     self.AssertErrEquals(
         '{"ux": "STAGED_PROGRESS_TRACKER", "message": "tracker", "status": '
         '"SUCCESS", "succeeded_stages": ["Hello World..."]}\n')
@@ -653,14 +685,27 @@ class StagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
     with self.assertRaises(ValueError):
       with progress_tracker.StagedProgressTracker(
           'tracker', self.stages, autotick=False) as spt:
-        spt.StartStage(self.stages[0])
-        spt.StartStage(self.stages[1])
-        spt.CompleteStage(self.stages[1])
-        spt.FailStage(self.stages[0], ValueError())
+        spt.StartStage(self.keys[0])
+        spt.StartStage(self.keys[1])
+        spt.CompleteStage(self.keys[1])
+        spt.FailStage(self.keys[0], ValueError())
     self.AssertErrEquals(
         '{"ux": "STAGED_PROGRESS_TRACKER", "message": "tracker", "status": '
         '"FAILURE", "succeeded_stages": ["Ahhhhhhhhhhhhhhh..."], '
         '"failed_stage": "Hello World..."}\n')
+
+  def testStubCompletedWithWarningStage(self):
+    properties.VALUES.core.interactive_ux_style.Set(
+        properties.VALUES.core.InteractiveUXStyles.TESTING.name)
+    with progress_tracker.StagedProgressTracker(
+        'tracker', self.stages, autotick=False) as spt:
+      spt.StartStage(self.keys[0])
+      spt.StartStage(self.keys[1])
+      spt.CompleteStageWithWarning(self.keys[0], 'Nooooooo')
+      spt.CompleteStage(self.keys[1])
+    self.AssertErrEquals(
+        '{"ux": "STAGED_PROGRESS_TRACKER", "message": "tracker", '
+        '"status": "WARNING", "succeeded_stages": ["Ahhhhhhhhhhhhhhh..."]}\n')
 
   def testStubUncaughtError(self):
     properties.VALUES.core.interactive_ux_style.Set(
@@ -668,8 +713,8 @@ class StagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
     with self.assertRaises(ValueError):
       with progress_tracker.StagedProgressTracker(
           'tracker', self.stages, autotick=False) as spt:
-        spt.StartStage(self.stages[0])
-        spt.CompleteStage(self.stages[0])
+        spt.StartStage(self.keys[0])
+        spt.CompleteStage(self.keys[0])
         raise ValueError()
     self.AssertErrEquals('{"ux": "STAGED_PROGRESS_TRACKER", "message": '
                          '"tracker", "status": "FAILURE", "succeeded_stages": '
@@ -686,8 +731,8 @@ class StagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
     self.console_size_mock.return_value = (0, 'unused size')
     with progress_tracker.StagedProgressTracker(
         'tracker', self.stages, autotick=False) as spt:
-      spt.StartStage(self.stages[0])
-      spt.CompleteStage(self.stages[0])
+      spt.StartStage(self.keys[0])
+      spt.CompleteStage(self.keys[0])
       spt.Tick()
       spt.Tick()
     self.AssertErrEquals('')
@@ -701,9 +746,9 @@ class StagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
         ValueError, 'This stage does not belong to this progress tracker.'):
       with progress_tracker.StagedProgressTracker(
           'tracker', [self.stages[0]], autotick=False) as spt:
-        spt.StartStage(self.stages[start_stage])
-        spt.UpdateStage(self.stages[update_stage], 'new message')
-        spt.CompleteStage(self.stages[complete_stage])
+        spt.StartStage(self.keys[start_stage])
+        spt.UpdateStage(self.keys[update_stage], 'new message')
+        spt.CompleteStage(self.keys[complete_stage])
 
   def testProgressTrackerUpdatingCompletedStage(self):
     self.console_size_mock.return_value = (0, 'unused size')
@@ -711,9 +756,9 @@ class StagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
         ValueError, 'This stage has already completed.'):
       with progress_tracker.StagedProgressTracker(
           'tracker', self.stages, autotick=False) as spt:
-        spt.StartStage(self.stages[0])
-        spt.CompleteStage(self.stages[0])
-        spt.StartStage(self.stages[0])
+        spt.StartStage(self.keys[0])
+        spt.CompleteStage(self.keys[0])
+        spt.StartStage(self.keys[0])
 
   def testProgressTrackerNonInteractive(self):
     self._interactive_mock.return_value = False
@@ -723,15 +768,15 @@ class StagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
         self.stages,
         success_message='Goodbye.',
         autotick=False) as spt:
-      spt.StartStage(self.stages[0])
+      spt.StartStage(self.keys[0])
       spt.Tick()
       self.AssertErrEquals(
           'tracker\n'
-          'Hello World....')
-      spt.CompleteStage(self.stages[0])
+          'Hello World.....')
+      spt.CompleteStage(self.keys[0])
     self.AssertErrEquals(
         'tracker\n'
-        'Hello World....done\n'
+        'Hello World.....done\n'
         'Goodbye.\n')
 
   def testProgressTrackerNonInteractiveFailedStage(self):
@@ -743,17 +788,17 @@ class StagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
           self.stages,
           failure_message='Badbye.',
           autotick=False) as spt:
-        spt.StartStage(self.stages[0])
-        spt.StartStage(self.stages[1])
+        spt.StartStage(self.keys[0])
+        spt.StartStage(self.keys[1])
         spt.Tick()
         self.AssertErrEquals(
             'tracker\n'
-            'Hello World....')
+            'Hello World......')
         error = ValueError('an error')
-        spt.FailStage(self.stages[0], error)
+        spt.FailStage(self.keys[0], error)
     self.AssertErrEquals(
         'tracker\n'
-        'Hello World....failed\n'
+        'Hello World......failed\n'
         'Ahhhhhhhhhhhhhhh...interrupted\n'
         'Badbye.\n')
 
@@ -766,16 +811,16 @@ class StagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
           self.stages,
           failure_message='Badbye.',
           autotick=False) as spt:
-        spt.StartStage(self.stages[0])
-        spt.StartStage(self.stages[1])
+        spt.StartStage(self.keys[0])
+        spt.StartStage(self.keys[1])
         spt.Tick()
         self.AssertErrEquals(
             'tracker\n'
-            'Hello World....')
+            'Hello World......')
         raise ValueError('an error')
     self.AssertErrEquals(
         'tracker\n'
-        'Hello World....failed\n'
+        'Hello World......failed\n'
         'Badbye.\n')
 
   def testProgressTracker(self):
@@ -785,16 +830,16 @@ class StagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
         self.stages,
         success_message='Goodbye.',
         autotick=False) as spt:
-      spt.StartStage(self.stages[0])
+      spt.StartStage(self.keys[0])
       spt.Tick()
-      self.AssertErrEquals(
+      self.AssertErrContains(
           '\r' + ' ' * clear_width + '\r'
           'tracker'
           '\r' + ' ' * clear_width + '\r'
           'tracker\n'
           '\r' + ' ' * clear_width + '\r'
           '  Hello World.../')
-      spt.CompleteStage(self.stages[0])
+      spt.CompleteStage(self.keys[0])
     self.AssertErrEquals(
         '\r' + ' ' * clear_width + '\r'
         'tracker'
@@ -802,6 +847,8 @@ class StagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
         'tracker\n'
         '\r' + ' ' * clear_width + '\r'
         '  Hello World.../'
+        '\r' + ' ' * clear_width + '\r'
+        '  Hello World...-'
         '\r' + ' ' * clear_width + '\r'
         '  Hello World...done'
         '\r' + ' ' * clear_width + '\r'
@@ -816,14 +863,14 @@ class StagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
         self.stages,
         success_message='Goodbye.',
         autotick=False) as spt:
-      spt.StartStage(self.stages[0])
-      spt.StartStage(self.stages[1])
-      spt.CompleteStage(self.stages[1])
+      spt.StartStage(self.keys[0])
+      spt.StartStage(self.keys[1])
+      spt.CompleteStage(self.keys[1])
       spt.Tick()
       self.AssertErrContains('tracker\n')
       self.AssertErrContains('  Hello World.../')
       self.AssertErrNotContains(self.stages[1].header)
-      spt.CompleteStage(self.stages[0])
+      spt.CompleteStage(self.keys[0])
     self.AssertErrContains('tracker\n')
     self.AssertErrContains('  Hello World...done\n')
     self.AssertErrContains('  Ahhhhhhhhhhhhhhh...done\n')
@@ -837,13 +884,13 @@ class StagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
           self.stages,
           failure_message='Badbye.',
           autotick=False) as spt:
-        spt.StartStage(self.stages[0])
-        spt.StartStage(self.stages[1])
+        spt.StartStage(self.keys[0])
+        spt.StartStage(self.keys[1])
         spt.Tick()
         self.AssertErrContains('tracker\n')
         self.AssertErrContains('  Hello World.../')
         error = ValueError('an error')
-        spt.FailStage(self.stages[0], error)
+        spt.FailStage(self.keys[0], error)
     self.AssertErrContains('  Hello World...failed\n')
     self.AssertErrContains('  Ahhhhhhhhhhhhhhh...interrup\n')
     self.AssertErrContains('  ted\n')
@@ -857,8 +904,8 @@ class StagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
           self.stages,
           failure_message='Badbye.',
           autotick=False) as spt:
-        spt.StartStage(self.stages[0])
-        spt.StartStage(self.stages[1])
+        spt.StartStage(self.keys[0])
+        spt.StartStage(self.keys[1])
         spt.Tick()
         self.AssertErrContains('tracker\n')
         self.AssertErrContains('  Hello World.../')
@@ -927,8 +974,8 @@ class StagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
 
       with progress_tracker.StagedProgressTracker(
           'tracker', self.stages, aborted_message='blah', autotick=False) as t:
-        t.StartStage(self.stages[0])
-        t.CompleteStage(self.stages[0])
+        t.StartStage(self.keys[0])
+        t.CompleteStage(self.keys[0])
         t.Tick()
         os.kill(os.getpid(), signal.SIGINT)
         t.Tick()
@@ -947,8 +994,8 @@ class StagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
 
     with progress_tracker.StagedProgressTracker(
         'tracker', self.stages, autotick=False, interruptable=False) as spt:
-      spt.StartStage(self.stages[0])
-      spt.CompleteStage(self.stages[0])
+      spt.StartStage(self.keys[0])
+      spt.CompleteStage(self.keys[0])
       spt.Tick()
       os.kill(os.getpid(), signal.SIGINT)
       spt.Tick()
@@ -967,8 +1014,8 @@ class StagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
     # Also, sending a CTRL_C_EVENT does not actually trigger the SIGINT handler.
     with progress_tracker.StagedProgressTracker(
         'tracker', self.stages, autotick=False, interruptable=False) as spt:
-      spt.StartStage(self.stages[0])
-      spt.CompleteStage(self.stages[0])
+      spt.StartStage(self.keys[0])
+      spt.CompleteStage(self.keys[0])
       spt.Tick()
       os.kill(os.getpid(), signal.SIGINT)
       spt.Tick()
@@ -986,7 +1033,7 @@ class StagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
     self.SetEncoding(encoding)
     with progress_tracker.StagedProgressTracker(
         'tracker', self.stages, autotick=False) as spt:
-      spt.StartStage(self.stages[0])
+      spt.StartStage(self.keys[0])
       for _ in range(len(spinners)):
         spt.Tick()
     for tick_mark in spinners:
@@ -1006,6 +1053,7 @@ class MultilineStagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
     self.stages = [
         progress_tracker.Stage('Hello World...'),
         progress_tracker.Stage('A' + 'h' * 15 + '...')]
+    self.keys = [s.key for s in self.stages]
 
   def TearDown(self):
     # Wait for ProgressTracker ticker thread to end
@@ -1014,7 +1062,7 @@ class MultilineStagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
   def _GetMultilineStagedProgressTracker(self, header, stages, autotick=False,
                                          interruptable=True):
     return progress_tracker._MultilineStagedProgressTracker(
-        header, stages, None, None, False, 0.1, interruptable,
+        header, stages, None, None, None, False, 0.1, interruptable,
         console_io.OperationCancelledError.DEFAULT_MESSAGE, None, None)
 
   def SetConsoleSize(self, size):
@@ -1029,8 +1077,8 @@ class MultilineStagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
     self.SetConsoleSize(0)
     with self._GetMultilineStagedProgressTracker(
         'tracker', self.stages, autotick=False) as spt:
-      spt.StartStage(self.stages[0])
-      spt.CompleteStage(self.stages[0])
+      spt.StartStage(self.keys[0])
+      spt.CompleteStage(self.keys[0])
       spt.Tick()
       spt.Tick()
     self.AssertErrEquals('')
@@ -1039,10 +1087,10 @@ class MultilineStagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
     self.SetConsoleSize(30)
     with self._GetMultilineStagedProgressTracker(
         'tracker', self.stages, autotick=False) as spt:
-      spt.StartStage(self.stages[0])
-      spt.CompleteStage(self.stages[0])
-      spt.StartStage(self.stages[1])
-      spt.CompleteStage(self.stages[1])
+      spt.StartStage(self.keys[0])
+      spt.CompleteStage(self.keys[0])
+      spt.StartStage(self.keys[1])
+      spt.CompleteStage(self.keys[1])
       spt.Tick()
     self.AssertErrContainsLines(
         'OK tracker\n',
@@ -1055,9 +1103,9 @@ class MultilineStagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
     with self.assertRaises(ValueError):
       with self._GetMultilineStagedProgressTracker(
           'tracker', self.stages, autotick=False) as spt:
-        spt.StartStage(self.stages[0])
-        spt.StartStage(self.stages[1])
-        spt.FailStage(self.stages[1], ValueError('Oh no!'), 'I failed.')
+        spt.StartStage(self.keys[0])
+        spt.StartStage(self.keys[1])
+        spt.FailStage(self.keys[1], ValueError('Oh no!'), 'I failed.')
         spt.Tick()
     self.AssertErrContainsLines(
         'X  tracker\n',
@@ -1070,12 +1118,12 @@ class MultilineStagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
     self.SetConsoleSize(30)
     with self._GetMultilineStagedProgressTracker(
         'tracker', self.stages, autotick=False) as spt:
-      spt.StartStage(self.stages[0])
-      spt.CompleteStage(self.stages[0])
-      spt.StartStage(self.stages[1])
+      spt.StartStage(self.keys[0])
+      spt.CompleteStage(self.keys[0])
+      spt.StartStage(self.keys[1])
       spt.Tick()
-      spt.UpdateStage(self.stages[1], 'whoops')
-      spt.CompleteStage(self.stages[1])
+      spt.UpdateStage(self.keys[1], 'whoops')
+      spt.CompleteStage(self.keys[1])
     self.AssertErrContainsLines(
         # Before Update (don't test the spinner)
         '  Ahhhhhhhhhhhhhhh...\n',
@@ -1090,11 +1138,11 @@ class MultilineStagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
     self.SetConsoleSize(30)
     with self._GetMultilineStagedProgressTracker(
         'tracker', self.stages, autotick=False) as spt:
-      spt.StartStage(self.stages[0])
-      spt.CompleteStage(self.stages[0])
-      spt.StartStage(self.stages[1])
-      spt.UpdateStage(self.stages[1], 'whoops')
-      spt.CompleteStage(self.stages[1])
+      spt.StartStage(self.keys[0])
+      spt.CompleteStage(self.keys[0])
+      spt.StartStage(self.keys[1])
+      spt.UpdateStage(self.keys[1], 'whoops')
+      spt.CompleteStage(self.keys[1])
       spt.Tick()
       spt.UpdateHeaderMessage('details')
       spt.Tick()
@@ -1112,9 +1160,9 @@ class MultilineStagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
     with self.assertRaises(ValueError):
       with self._GetMultilineStagedProgressTracker(
           'tracker', self.stages, autotick=False) as spt:
-        spt.StartStage(self.stages[0])
-        spt.CompleteStage(self.stages[0])
-        spt.StartStage(self.stages[1])
+        spt.StartStage(self.keys[0])
+        spt.CompleteStage(self.keys[0])
+        spt.StartStage(self.keys[1])
         spt.Tick()
         raise ValueError()
     self.AssertErrContainsLines(
@@ -1133,10 +1181,10 @@ class MultilineStagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
     self.SetEncoding(encoding)
     with self._GetMultilineStagedProgressTracker(
         'tracker', self.stages, autotick=False) as spt:
-      spt.StartStage(self.stages[0])
+      spt.StartStage(self.keys[0])
       for _ in range(len(spinners)):
         spt.Tick()
-      spt.CompleteStage(self.stages[0])
+      spt.CompleteStage(self.keys[0])
     for tick_mark in spinners:
       # Header ticks
       self.AssertErrContains(tick_mark + ' ' * spaces + 'tracker\n')
@@ -1156,10 +1204,10 @@ class MultilineStagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
                                 'Aborted by user.'):
       with self._GetMultilineStagedProgressTracker(
           'tracker', self.stages, autotick=False) as spt:
-        spt.StartStage(self.stages[0])
-        spt.CompleteStage(self.stages[0])
+        spt.StartStage(self.keys[0])
+        spt.CompleteStage(self.keys[0])
         spt.Tick()
-        spt.StartStage(self.stages[1])
+        spt.StartStage(self.keys[1])
         os.kill(os.getpid(), signal.SIGINT)
         spt.Tick()
     self.AssertOutputEquals('')
@@ -1179,12 +1227,12 @@ class MultilineStagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
 
     with self._GetMultilineStagedProgressTracker(
         'tracker', self.stages, autotick=False, interruptable=False) as spt:
-      spt.StartStage(self.stages[0])
-      spt.CompleteStage(self.stages[0])
+      spt.StartStage(self.keys[0])
+      spt.CompleteStage(self.keys[0])
       spt.Tick()
       os.kill(os.getpid(), signal.SIGINT)
-      spt.StartStage(self.stages[1])
-      spt.CompleteStage(self.stages[1])
+      spt.StartStage(self.keys[1])
+      spt.CompleteStage(self.keys[1])
       spt.Tick()
     self.AssertOutputEquals('')
     self.AssertErrContainsLines(
@@ -1192,6 +1240,16 @@ class MultilineStagedProgressTrackerTest(sdk_test_base.WithOutputCapture,
         '  OK Hello World...\n',
         '  OK Ahhhhhhhhhhhhhhh...\n',
         'Done.\n')
+
+  def testProgressTrackerHandlesTypedText(self):
+    properties.VALUES.core.color_theme.Set('testing')
+    self.SetConsoleSize(30)
+    self.SetEncoding('utf8')
+    with self._GetMultilineStagedProgressTracker(
+        'tracker', self.stages, autotick=False) as spt:
+      spt.StartStage(self.keys[0])
+      spt.CompleteStage(self.keys[0])
+    self.AssertErrContains('[✓](PT_SUCCESS) Hello World')
 
 
 if __name__ == '__main__':

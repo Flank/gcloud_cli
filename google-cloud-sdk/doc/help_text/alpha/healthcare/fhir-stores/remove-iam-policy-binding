@@ -1,0 +1,104 @@
+NAME
+    gcloud alpha healthcare fhir-stores remove-iam-policy-binding - remove an
+        IAM policy binding from a Cloud Healthcare API FHIR store
+
+SYNOPSIS
+    gcloud alpha healthcare fhir-stores remove-iam-policy-binding
+        (FHIR_STORE : --dataset=DATASET --location=LOCATION) --member=MEMBER
+        --role=ROLE
+        [--all | --condition=[KEY=VALUE,...]
+          | --condition-from-file=CONDITION_FROM_FILE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Removes an IAM policy binding from a Cloud Healthcare API FHIR
+    store.
+
+POSITIONAL ARGUMENTS
+     FhirStore resource - Cloud Healthcare API FHIR store to remove an IAM
+     policy binding from. The arguments in this group can be used to specify
+     the attributes of this resource. (NOTE) Some attributes are not given
+     arguments in this group but can be set in other ways. To set the [project]
+     attribute: provide the argument [fhir_store] on the command line with a
+     fully specified name; provide the argument [--project] on the command
+     line; set the property [core/project]. This must be specified.
+
+       FHIR_STORE
+          ID of the fhirStore or fully qualified identifier for the fhirStore.
+          This positional must be specified if any of the other arguments in
+          this group are specified.
+
+       --dataset=DATASET
+          Cloud Healthcare dataset.
+
+       --location=LOCATION
+          Google Cloud location.
+
+REQUIRED FLAGS
+     --member=MEMBER
+        The member to remove the binding for. Should be of the form
+        user|group|serviceAccount:email or domain:domain.
+
+        Examples: user:test-user@gmail.com, group:admins@example.com,
+        serviceAccount:test123@example.domain.com, or
+        domain:example.domain.com.
+
+        Can also be one of the following special values:
+        * allUsers - Special identifier that represents anyone who is on the
+          internet, with or without a Google account.
+        * allAuthenticatedUsers - Special identifier that represents anyone
+          who is authenticated with a Google account or a service account.
+
+     --role=ROLE
+        The role to remove the member from.
+
+OPTIONAL FLAGS
+     At most one of these may be specified:
+
+       --all
+          Remove all bindings with this role and member, irrespective of any
+          conditions.
+
+       --condition=[KEY=VALUE,...]
+          Condition of the binding to be removed. When condition is explicitly
+          specified as None (e.g. --condition=None), it matches a binding
+          without a condition. Otherwise, only the binding with a condition
+          which exactly matches the specified condition (including the optional
+          description) will be removed.
+
+       expression
+          (Required) Expression of the condition which evaluates to True or
+          False. This uses a subset of Common Expression Language syntax.
+
+       title
+          (Required) Title for the expression, i.e. a short string describing
+          its purpose.
+
+       description
+          (Optional) Description for the expression. This is a longer text
+          which describes the expression.
+
+          NOTE: An unsatisfied condition will not allow access via this
+          binding.
+
+       --condition-from-file=CONDITION_FROM_FILE
+          Path to a local JSON or YAML file that defines the condition. To see
+          available fields, see the help for --condition.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+API REFERENCE
+    This command uses the healthcare/v1alpha2 API. The full documentation for
+    this API can be found at: https://cloud.google.com/healthcare
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/.
+

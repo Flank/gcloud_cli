@@ -25,10 +25,10 @@ from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
 
 
-class PerimetersUpdateTestBeta(accesscontextmanager.Base):
+class PerimetersUpdateTestGA(accesscontextmanager.Base):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)
@@ -68,21 +68,19 @@ class PerimetersUpdateTestBeta(accesscontextmanager.Base):
 
   def testUpdate_NoUpdates(self):
     self.SetUpForTrack(self.track)
-    perimeter = self._MakePerimeter(
-        'MY_PERIMETER',
-        title='My Perimeter Title',
-        description=None,
-        restricted_services=[],
-        unrestricted_services=[],
-        access_levels=[],
-        type_='PERIMETER_TYPE_REGULAR')
+    perimeter_kwargs = {
+        'title': 'My Perimeter Title',
+        'description': None,
+        'restricted_services': [],
+        'access_levels': [],
+        'type_': 'PERIMETER_TYPE_REGULAR'
+    }
+    perimeter = self._MakePerimeter('MY_PERIMETER', **perimeter_kwargs)
     self._ExpectPatch(self.messages.ServicePerimeter(), perimeter, '',
                       'MY_POLICY')
 
-    result = self.Run(
-        'access-context-manager perimeters update MY_PERIMETER '
-        '    --policy MY_POLICY'
-    )
+    result = self.Run('access-context-manager perimeters update MY_PERIMETER '
+                      '    --policy MY_POLICY')
 
     self.assertEqual(result, perimeter)
 
@@ -93,7 +91,6 @@ class PerimetersUpdateTestBeta(accesscontextmanager.Base):
         title='My Perimeter Title',
         description='foo bar',
         restricted_services=[],
-        unrestricted_services=[],
         access_levels=[],
         type_='PERIMETER_TYPE_BRIDGE')
     perimeter_types = (
@@ -120,24 +117,22 @@ class PerimetersUpdateTestBeta(accesscontextmanager.Base):
         title='My Perimeter Title',
         description='foo bar',
         restricted_services=[],
-        unrestricted_services=[],
         access_levels=[],
         resources=[],
         type_='PERIMETER_TYPE_BRIDGE')
     perimeter_update = self.messages.ServicePerimeter(
         status=self.messages.ServicePerimeterConfig(
             restrictedServices=[],
-            unrestrictedServices=[],
             accessLevels=[],
             resources=[]))
     self._ExpectPatch(
         perimeter_update, perimeter, 'status.accessLevels,status.resources,'
-        'status.restrictedServices,status.unrestrictedServices', 'MY_POLICY')
+        'status.restrictedServices', 'MY_POLICY')
 
     result = self.Run(
         'access-context-manager perimeters update MY_PERIMETER '
         '   --policy MY_POLICY --clear-resources --clear-restricted-services '
-        '   --clear-unrestricted-services --clear-access-levels')
+        '   --clear-access-levels')
 
     self.assertEqual(result, perimeter)
 
@@ -148,13 +143,11 @@ class PerimetersUpdateTestBeta(accesscontextmanager.Base):
         title='My Perimeter Title',
         description='foo bar',
         restricted_services=['foo.googleapis.com', 'bar.googleapis.com'],
-        unrestricted_services=['*'],
         access_levels=['a', 'b'],
         type_='PERIMETER_TYPE_BRIDGE')
     perimeter_update = self.messages.ServicePerimeter(
         status=self.messages.ServicePerimeterConfig(
             restrictedServices=perimeter.status.restrictedServices,
-            unrestrictedServices=perimeter.status.unrestrictedServices,
             accessLevels=[  # _MakePerimeter has sugar for resource names
                 'accessPolicies/MY_POLICY/accessLevels/a',
                 'accessPolicies/MY_POLICY/accessLevels/b'
@@ -162,14 +155,13 @@ class PerimetersUpdateTestBeta(accesscontextmanager.Base):
             resources=perimeter.status.resources))
     self._ExpectPatch(
         perimeter_update, perimeter, 'status.accessLevels,status.resources,'
-        'status.restrictedServices,status.unrestrictedServices', 'MY_POLICY')
+        'status.restrictedServices', 'MY_POLICY')
 
     result = self.Run(
         'access-context-manager perimeters update MY_PERIMETER '
         '   --policy MY_POLICY '
         '   --set-resources projects/12345,projects/67890 '
         '   --set-restricted-services foo.googleapis.com,bar.googleapis.com '
-        '   --set-unrestricted-services * '
         '   --set-access-levels a,b')
 
     self.assertEqual(result, perimeter)
@@ -181,7 +173,6 @@ class PerimetersUpdateTestBeta(accesscontextmanager.Base):
         title='My Perimeter Title',
         description='foo bar',
         restricted_services=['foo.googleapis.com', 'bar.googleapis.com'],
-        unrestricted_services=['baz.googleapis.com'],
         access_levels=['a', 'b'],
         resources=['projects/12345', 'projects/67890'],
         type_='PERIMETER_TYPE_BRIDGE')
@@ -190,7 +181,6 @@ class PerimetersUpdateTestBeta(accesscontextmanager.Base):
         title='My Perimeter Title',
         description='foo bar',
         restricted_services=['bar.googleapis.com'],
-        unrestricted_services=['baz.googleapis.com'],
         access_levels=['a', 'b', 'c', 'd'],
         type_='PERIMETER_TYPE_BRIDGE')
     perimeter_update = self.messages.ServicePerimeter(
@@ -202,13 +192,11 @@ class PerimetersUpdateTestBeta(accesscontextmanager.Base):
                       'status.accessLevels,status.restrictedServices',
                       'MY_POLICY')
 
-    result = self.Run(
-        'access-context-manager perimeters update MY_PERIMETER '
-        '   --policy MY_POLICY '
-        '   --add-resources projects/12345,projects/67890 '
-        '   --remove-restricted-services foo.googleapis.com '
-        '   --remove-unrestricted-services qux.googleapis.com '
-        '   --add-access-levels c,d')
+    result = self.Run('access-context-manager perimeters update MY_PERIMETER '
+                      '   --policy MY_POLICY '
+                      '   --add-resources projects/12345,projects/67890 '
+                      '   --remove-restricted-services foo.googleapis.com '
+                      '   --add-access-levels c,d')
 
     self.assertEqual(result, perimeter_after)
 
@@ -222,7 +210,6 @@ class PerimetersUpdateTestBeta(accesscontextmanager.Base):
         description='foo bar',
         policy=policy,
         restricted_services=[],
-        unrestricted_services=[],
         access_levels=[],
         type_='PERIMETER_TYPE_BRIDGE')
     perimeter.name = (
@@ -244,7 +231,13 @@ class PerimetersUpdateTestBeta(accesscontextmanager.Base):
     self.assertEqual(result, perimeter)
 
 
-class PerimetersUpdateTestAlpha(PerimetersUpdateTestBeta):
+class PerimetersUpdateTestBeta(PerimetersUpdateTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class PerimetersUpdateTestAlpha(PerimetersUpdateTestGA):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA

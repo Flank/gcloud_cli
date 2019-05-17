@@ -148,6 +148,30 @@ class YAMLTest(test_case.Base):
     self.assertEqual(15, obj.lc.line)
     self.assertEqual(23, obj.lc.col)
 
+  def testStripLocations(self):
+    lv_data = yaml.load("""\
+        null: null
+        boolean: true
+        integer: 123
+        float: 3.14
+        string: abc
+        dict:
+          xyz: 789
+          abc: 123
+        list:
+        - a
+        - 2
+    """, location_value=True)
+    data = yaml.strip_locations(lv_data)
+
+    self.assertEqual(None, data['null'])
+    self.assertEqual(True, data['boolean'])
+    self.assertEqual(123, data['integer'])
+    self.assertEqual(3.14, data['float'])
+    self.assertEqual('abc', data['string'])
+    self.assertIsInstance(data['dict'], dict)
+    self.assertIsInstance(data['list'], list)
+
 
 if __name__ == '__main__':
   test_case.main()

@@ -71,6 +71,8 @@ class VisionTests(e2e_base.WithServiceAuth):
   def testSuggestCrop(self):
     self._RunTest('suggest-crop', self.image)
 
+  def testDetectObjects(self):
+    self._RunTest('detect-objects', self.image)
 
 if __name__ == '__main__':
   test_case.main()

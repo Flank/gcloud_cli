@@ -11,7 +11,7 @@ gcloud alpha redis instances create \- create a Memorystore Redis instance
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha redis instances create\fR (\fIINSTANCE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-alternative\-zone\fR=\fIALTERNATIVE_ZONE\fR] [\fB\-\-async\fR] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-labels\fR=\fIKEY\fR=\fIVALUE\fR] [\fB\-\-network\fR=\fINETWORK\fR;\ default="default"] [\fB\-\-redis\-config\fR=\fIKEY\fR=\fIVALUE\fR] [\fB\-\-reserved\-ip\-range\fR=\fIRESERVED_IP_RANGE\fR] [\fB\-\-size\fR=\fISIZE\fR;\ default=1] [\fB\-\-tier\fR=\fITIER\fR;\ default="basic"] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha redis instances create\fR (\fIINSTANCE\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-alternative\-zone\fR=\fIALTERNATIVE_ZONE\fR] [\fB\-\-async\fR] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-labels\fR=\fIKEY\fR=\fIVALUE\fR] [\fB\-\-network\fR=\fINETWORK\fR;\ default="default"] [\fB\-\-redis\-config\fR=\fIKEY\fR=\fIVALUE\fR] [\fB\-\-redis\-version\fR=\fIVERSION\fR] [\fB\-\-reserved\-ip\-range\fR=\fIRESERVED_IP_RANGE\fR] [\fB\-\-size\fR=\fISIZE\fR;\ default=1] [\fB\-\-tier\fR=\fITIER\fR;\ default="basic"] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -96,6 +96,21 @@ http://redis.io/topics/config. Currently, the only supported parameters are:
 maxmemory\-policy, notify\-keyspace\-events.
 
 .TP 2m
+\fB\-\-redis\-version\fR=\fIVERSION\fR
+The version of Redis software. \fIVERSION\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBredis_3_2\fR
+Redis 3.2 compatibility
+.TP 2m
+\fBredis_4_0\fR
+Redis 4.0 compatibility
+.RE
+.sp
+
+
+.TP 2m
 \fB\-\-reserved\-ip\-range\fR=\fIRESERVED_IP_RANGE\fR
 The CIDR range of internal addresses that are reserved for this instance. For
 example, 10.0.0.0/29 or 192.168.0.0/29. Range must be unique and
@@ -135,10 +150,11 @@ provided, it must be different from \-\-zone.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

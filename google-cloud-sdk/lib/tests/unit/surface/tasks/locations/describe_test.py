@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
@@ -73,6 +74,12 @@ class LocationsDescribeTest(test_base.CloudTasksTestBase):
       self.Run('tasks locations describe bad-region')
 
     self.AssertErrContains('Requested entity was not found.')
+
+
+class LocationsDescribeTestBeta(LocationsDescribeTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 if __name__ == '__main__':

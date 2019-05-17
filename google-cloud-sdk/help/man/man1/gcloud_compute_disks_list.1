@@ -11,7 +11,7 @@ gcloud compute disks list \- list Google Compute Engine disks
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute disks list\fR [\fINAME\fR\ ...] [\fB\-\-regexp\fR=\fIREGEXP\fR,\ \fB\-r\fR\ \fIREGEXP\fR] [\fB\-\-zones\fR=\fIZONE\fR,[\fIZONE\fR,...]] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute disks list\fR [\fINAME\fR\ ...] [\fB\-\-regexp\fR=\fIREGEXP\fR,\ \fB\-r\fR\ \fIREGEXP\fR] [\fB\-\-regions\fR=[\fIREGION\fR,...]\ |\ \fB\-\-zones\fR=[\fIZONE\fR,...]] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -20,8 +20,9 @@ gcloud compute disks list \- list Google Compute Engine disks
 \fBgcloud compute disks list\fR displays all Google Compute Engine disks in a
 project.
 
-By default, disks from all zones are listed. The results can be narrowed down
-using a filter: \f5\-\-filter="zone:( ZONE ... )"\fR.
+By default, disks from all regions and disks from all zones are listed. The
+results can be narrowed down by providing the \f5\fI\-\-regions\fR\fR or
+\f5\fI\-\-zones\fR\fR flag.
 
 
 
@@ -52,13 +53,30 @@ Flag \f5\-\-regexp\fR is deprecated. Use \f5\-\-filter="name~'REGEXP'"\fR
 instead.
 
 .TP 2m
-\fB\-\-zones\fR=\fIZONE\fR,[\fIZONE\fR,...]
-(DEPRECATED) If provided, only resources from the given zones are queried.
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-regions\fR=[\fIREGION\fR,...]
+(DEPRECATED) If provided, only regional resources are shown. If arguments are
+provided, only resources from the given regions are shown.
+
+Flag \f5\-\-regions\fR is deprecated. Use \f5\-\-filter="region:( REGION ...
+)"\fR instead. For example \f5\-\-filter="region:( europe\-west1 europe\-west2
+)"\fR.
+
+.TP 2m
+\fB\-\-zones\fR=[\fIZONE\fR,...]
+(DEPRECATED) If provided, only zonal resources are shown. If arguments are
+provided, only resources from the given zones are shown.
 
 Flag \f5\-\-zones\fR is deprecated. Use \f5\-\-filter="zone:( ZONE ... )"\fR
-instead. For example \-\-filter="zone:( europe\-west1\-b europe\-west1\-c )".
+instead. For example \f5\-\-filter="zone:( europe\-west1\-b europe\-west1\-c
+)"\fR.
 
 
+.RE
 .RE
 .sp
 
@@ -104,10 +122,11 @@ Print a list of resource URIs instead of the default output.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -125,12 +144,20 @@ To list the URIs of all disks in a project, run:
 $ gcloud compute disks list \-\-uri
 .RE
 
-To list all disks in the \f5\fIus\-central1\-b\fR\fR and
-\f5\fIeurope\-west1\-d\fR\fR zones, run:
+To list all disks in the \f5\fIus\-central1\fR\fR and \f5\fIeurope\-west1\fR\fR
+regions, given they are regional resources, run:
 
 .RS 2m
 $ gcloud compute disks list \e
-    \-\-filter="zone:( us\-central1\-b europe\-west1\-d )"
+    \-\-filter="region:( europe\-west1 us\-central1 )"
+.RE
+
+To list all disks in zones \f5\fIus\-central1\-b\fR\fR and
+\f5\fIeurope\-west1\-d\fR\fR, given they are zonal resources, run:
+
+.RS 2m
+$ gcloud compute disks list \e
+    \-\-filter="zone:( europe\-west1\-d us\-central1\-b )"
 .RE
 
 

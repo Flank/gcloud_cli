@@ -1,0 +1,44 @@
+NAME
+    gcloud alpha logging sinks - manages sinks used to export logs
+
+SYNOPSIS
+    gcloud alpha logging sinks COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manages sinks used to export logs.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Creates a sink.
+
+     delete
+        (ALPHA) Deletes a sink.
+
+     describe
+        (ALPHA) Displays information about a sink.
+
+     list
+        (ALPHA) Lists the defined sinks.
+
+     update
+        (ALPHA) Updates a sink.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
+
+        $ gcloud logging sinks
+        $ gcloud beta logging sinks
+

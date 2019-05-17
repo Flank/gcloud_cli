@@ -33,6 +33,20 @@ Resources = collections.namedtuple('Resources', [
     'TEST_PROJECT_WITH_FOLDER'
 ])
 
+warning_message = (
+    'Your project will be moved. This may alter the policies enforced on '
+    'your Project, either exposing your Project to more security risk '
+    'through looser polices or cause an outage through stricter polices. '
+    'See these public notes on policy implications for more information: '
+    'https://cloud.google.com/resource-manager/docs/'
+    'creating-managing-folders#moving-folders-policy-considerations and '
+    'https://cloud.google.com/resource-manager/docs/'
+    'migrating-projects-billing#note_on_policy_implications. '
+    'Once moved, you can move the Project again so long as you have the '
+    'appropriate permissions. See our public documentation for more '
+    'information: https://cloud.google.com/resource-manager/docs/'
+    'creating-managing-folders#moving_a_project_into_a_folder')
+
 
 def MakeTestResources():
   messages = projects_util.GetMessages()
@@ -67,9 +81,22 @@ class ProjectsMoveTest(base.ProjectsUnitTestBase):
     self.mock_client.projects.Update.Expect(
         resources.TEST_PROJECT_WITH_ORGANIZATION,
         resources.TEST_PROJECT_WITH_ORGANIZATION)
+    self.WriteInput('y\n')
     response = self.RunProjectsBeta('move', test_project.projectId,
                                     '--organization', test_parent.id)
     self.assertEqual(response.parent, test_parent)
+    self.AssertErrContains(warning_message)
+
+  def testDontMoveProjectToOrganization(self):
+    resources = MakeTestResources()
+    test_project = resources.TEST_PROJECT_WITHOUT_PARENT
+    test_parent = resources.TEST_ORGANIZATION_RESOURCE_ID
+    self.WriteInput('n\n')
+    response = self.RunProjectsBeta('move', test_project.projectId,
+                                    '--organization', test_parent.id)
+    self.assertEqual(response, None)
+    self.AssertOutputEquals('')
+    self.AssertErrContains(warning_message)
 
   def testMoveProjectToFolder(self):
     resources = MakeTestResources()
@@ -81,9 +108,11 @@ class ProjectsMoveTest(base.ProjectsUnitTestBase):
         test_project)
     self.mock_client.projects.Update.Expect(resources.TEST_PROJECT_WITH_FOLDER,
                                             resources.TEST_PROJECT_WITH_FOLDER)
+    self.WriteInput('y\n')
     response = self.RunProjectsBeta('move', test_project.projectId, '--folder',
                                     test_parent.id)
     self.assertEqual(response.parent, test_parent)
+    self.AssertErrContains(warning_message)
 
   def testMoveProjectWithBothFolderAndOrganizationSpecified(self):
     resources = MakeTestResources()

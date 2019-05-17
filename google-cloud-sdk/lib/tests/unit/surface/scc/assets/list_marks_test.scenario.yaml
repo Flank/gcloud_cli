@@ -1,0 +1,153 @@
+title: scc asset list-marks scenario test
+release_tracks: [ALPHA]
+summary:
+- execute:
+  - command: |
+      scc assets list-marks --organization 345840165995 595423472147994486
+  - stdout: |
+      marks:
+        probermark: proberTestValue
+        testA: valueA
+        testB: valueB
+      name: organizations/345840165995/assets/595423472147994486/securityMarks
+- execute:
+  - command: |
+      scc assets list-marks organizations/345840165995/assets/595423472147994486
+  - stdout: |
+      marks:
+        probermark: proberTestValue
+        testA: valueA
+        testB: valueB
+      name: organizations/345840165995/assets/595423472147994486/securityMarks
+actions:
+- execute_command:
+    command: |
+      scc assets list-marks --organization 345840165995 595423472147994486
+    events:
+    - api_call:
+        expect_request:
+          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/assets?alt=json&filter=name%3D%22organizations%2F345840165995%2Fassets%2F595423472147994486%22
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "listAssetsResults": [
+                {
+                  "asset": {
+                    "name": "organizations/345840165995/assets/595423472147994486",
+                    "securityCenterProperties": {
+                      "resourceName": "//cloudresourcemanager.googleapis.com/projects/428809690096",
+                      "resourceType": "google.cloud.resourcemanager.Project",
+                      "resourceParent": "//cloudresourcemanager.googleapis.com/organizations/345840165995",
+                      "resourceProject": "//cloudresourcemanager.googleapis.com/projects/428809690096",
+                      "resourceOwners": [
+                        "user:riskdashboard.prober@cscc-prober-org.joonix.net"
+                      ]
+                    },
+                    "resourceProperties": {
+                      "name": "prober project 1",
+                      "lifecycleState": "active",
+                      "parent": "{\"id\":\"345840165995\",\"type\":\"organization\"}",
+                      "projectId": "prober-project-1",
+                      "createTime": "2018-09-12t17:39:00.974z",
+                      "projectNumber": 428809690096
+                    },
+                    "securityMarks": {
+                      "name": "organizations/345840165995/assets/595423472147994486/securityMarks",
+                      "marks": {
+                        "probermark": "proberTestValue",
+                        "testB": "valueB",
+                        "testA": "valueA"
+                      }
+                    },
+                    "createTime": "2018-09-12T18:12:07.356Z",
+                    "updateTime": "2018-10-17T22:00:25.516Z"
+                  },
+                  "state": "UNUSED"
+                }
+              ],
+              "readTime": "2019-03-13T23:51:51.569Z",
+              "totalSize": 1
+            }
+    - expect_stdout: |
+        marks:
+          probermark: proberTestValue
+          testA: valueA
+          testB: valueB
+        name: organizations/345840165995/assets/595423472147994486/securityMarks
+    - expect_exit:
+        code: 0
+# List marks using resource name.
+- execute_command:
+    command: |
+      scc assets list-marks organizations/345840165995/assets/595423472147994486
+    events:
+    - api_call:
+        expect_request:
+          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/assets?alt=json&filter=name%3D%22organizations%2F345840165995%2Fassets%2F595423472147994486%22
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "listAssetsResults": [
+                {
+                  "asset": {
+                    "name": "organizations/345840165995/assets/595423472147994486",
+                    "securityCenterProperties": {
+                      "resourceName": "//cloudresourcemanager.googleapis.com/projects/428809690096",
+                      "resourceType": "google.cloud.resourcemanager.Project",
+                      "resourceParent": "//cloudresourcemanager.googleapis.com/organizations/345840165995",
+                      "resourceProject": "//cloudresourcemanager.googleapis.com/projects/428809690096",
+                      "resourceOwners": [
+                        "user:riskdashboard.prober@cscc-prober-org.joonix.net"
+                      ]
+                    },
+                    "resourceProperties": {
+                      "name": "prober project 1",
+                      "lifecycleState": "active",
+                      "parent": "{\"id\":\"345840165995\",\"type\":\"organization\"}",
+                      "projectId": "prober-project-1",
+                      "createTime": "2018-09-12t17:39:00.974z",
+                      "projectNumber": 428809690096
+                    },
+                    "securityMarks": {
+                      "name": "organizations/345840165995/assets/595423472147994486/securityMarks",
+                      "marks": {
+                        "probermark": "proberTestValue",
+                        "testB": "valueB",
+                        "testA": "valueA"
+                      }
+                    },
+                    "createTime": "2018-09-12T18:12:07.356Z",
+                    "updateTime": "2018-10-17T22:00:25.516Z"
+                  },
+                  "state": "UNUSED"
+                }
+              ],
+              "readTime": "2019-03-13T23:51:51.569Z",
+              "totalSize": 1
+            }
+    - expect_stdout: |
+        marks:
+          probermark: proberTestValue
+          testA: valueA
+          testB: valueB
+        name: organizations/345840165995/assets/595423472147994486/securityMarks
+    - expect_exit:
+        code: 0
+# List marks using resource name and organization flag should fail.
+- execute_command:
+    command: |
+      scc assets list-marks organizations/345840165995/assets/595423472147994486 --organization 345840165995
+    events:
+    - expect_exit:
+        code: 1
+        message: Only provide a full resouce name (organizations/123/assets/456) or an --organization flag, not both.

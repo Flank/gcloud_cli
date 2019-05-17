@@ -371,22 +371,13 @@ class InstancesAttachDiskTestGA(test_base.BaseTest,
             --csek-key-file {keyfile}
           """.format(keyfile=csek_key_file))
 
-
-class InstancesAttachDiskTestBeta(InstancesAttachDiskTestGA):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.api_version = 'beta'
-
-  def testWithKeyFileRsaWrapped(self):
-    csek_key_file = self.WriteKeyFile(include_rsa_encrypted=True)
-
+  def testAttachBootDisk(self):
     self.Run("""
         compute instances attach-disk instance-1
           --zone central2-a
-          --disk wrappedkeydisk
-          --csek-key-file {keyfile}
-        """.format(keyfile=csek_key_file))
+          --disk disk-1
+          --boot
+        """)
 
     msgs = self.messages  # avoid long lines below
 
@@ -397,14 +388,39 @@ class InstancesAttachDiskTestBeta(InstancesAttachDiskTestGA):
               attachedDisk=msgs.AttachedDisk(
                   mode=msgs.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
                   source=(self.compute_uri + '/projects/'
-                          'my-project/zones/central2-a/disks/wrappedkeydisk'),
-                  type=(msgs.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
-                  diskEncryptionKey=msgs.CustomerEncryptionKey(
-                      rsaEncryptedKey=test_base.SAMPLE_WRAPPED_CSEK_KEY)),
+                          'my-project/zones/central2-a/disks/disk-1'),
+                  type=msgs.AttachedDisk.TypeValueValuesEnum.PERSISTENT,
+                  boot=True),
               instance='instance-1',
               project='my-project',
               zone='central2-a'))],
     )
+
+    # By default, the resource should not be displayed
+    self.assertFalse(self.GetOutput())
+
+  def testZonalDiskForceAttach(self):
+    self.Run("""
+      compute instances attach-disk instance-1
+        --zone central2-a
+        --disk wrappedkeydisk
+        --force-attach
+      """)
+
+    msgs = self.messages  # avoid long lines below
+
+    self.CheckRequests(
+        [(self.compute.instances, 'AttachDisk',
+          msgs.ComputeInstancesAttachDiskRequest(
+              attachedDisk=msgs.AttachedDisk(
+                  mode=msgs.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                  source=(self.compute_uri + '/projects/my-project/zones/'
+                          'central2-a/disks/wrappedkeydisk'),
+                  type=(msgs.AttachedDisk.TypeValueValuesEnum.PERSISTENT)),
+              forceAttach=True,
+              instance='instance-1',
+              project='my-project',
+              zone='central2-a'))],)
 
     # By default, the resource should not be displayed
     self.assertFalse(self.GetOutput())
@@ -465,30 +481,38 @@ class InstancesAttachDiskTestBeta(InstancesAttachDiskTestGA):
     # By default, the resource should not be displayed
     self.assertFalse(self.GetOutput())
 
-  def testAttachBootDisk(self):
+
+class InstancesAttachDiskTestBeta(InstancesAttachDiskTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
+
+  def testWithKeyFileRsaWrapped(self):
+    csek_key_file = self.WriteKeyFile(include_rsa_encrypted=True)
+
     self.Run("""
         compute instances attach-disk instance-1
           --zone central2-a
-          --disk disk-1
-          --boot
-        """)
+          --disk wrappedkeydisk
+          --csek-key-file {keyfile}
+        """.format(keyfile=csek_key_file))
 
     msgs = self.messages  # avoid long lines below
 
     self.CheckRequests(
-        [(self.compute.instances,
-          'AttachDisk',
+        [(self.compute.instances, 'AttachDisk',
           msgs.ComputeInstancesAttachDiskRequest(
               attachedDisk=msgs.AttachedDisk(
                   mode=msgs.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
                   source=(self.compute_uri + '/projects/'
-                          'my-project/zones/central2-a/disks/disk-1'),
-                  type=msgs.AttachedDisk.TypeValueValuesEnum.PERSISTENT,
-                  boot=True),
+                          'my-project/zones/central2-a/disks/wrappedkeydisk'),
+                  type=(msgs.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
+                  diskEncryptionKey=msgs.CustomerEncryptionKey(
+                      rsaEncryptedKey=test_base.SAMPLE_WRAPPED_CSEK_KEY)),
               instance='instance-1',
               project='my-project',
-              zone='central2-a'))],
-    )
+              zone='central2-a'))],)
 
     # By default, the resource should not be displayed
     self.assertFalse(self.GetOutput())

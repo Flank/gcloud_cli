@@ -5,7 +5,7 @@ SYNOPSIS
     gcloud beta dns policies update POLICY
         [--alternative-name-servers=[NAME_SERVERS,...]]
         [--description=DESCRIPTION] [--enable-inbound-forwarding]
-        [--networks=[NETWORKS,...]] [GCLOUD_WIDE_FLAG ...]
+        [--enable-logging] [--networks=[NETWORKS,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Update an existing Cloud DNS policy.
@@ -33,12 +33,16 @@ FLAGS
         queries sent by VMs or applications over VPN connections. Defaults to
         False.
 
+     --enable-logging
+        Specifies whether to enable query logging. Defaults to False.
+
      --networks=[NETWORKS,...]
         The comma separated list of network names to associate with the policy.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

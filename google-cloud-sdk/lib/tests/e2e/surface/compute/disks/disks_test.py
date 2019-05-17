@@ -22,7 +22,6 @@ import contextlib
 
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import e2e_utils
-from tests.lib import parameterized
 from tests.lib.surface.compute import e2e_test_base
 
 
@@ -217,16 +216,15 @@ class DisksLabelsTest(e2e_test_base.BaseTest):
     self.AssertNewOutputNotContains('abc: xyz')
 
 
-class DisksTestRegional(e2e_test_base.BaseTest, parameterized.TestCase):
+class DisksTestRegionalGA(e2e_test_base.BaseTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
-    self.disk_size = 10
+    self.disk_size = 200
 
-  # TODO(b/117336602) Stop using parameterized for track parameterization.
-  @parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                            calliope_base.ReleaseTrack.BETA)
-  def testDisks(self, track):
-    self.track = track
+  def testDisks(self):
     with self._CreateInstance() as instance_name, \
          self._CreateRegionalDisk() as disk_name:
       self._TestDiskAttach(disk_name, instance_name)
@@ -251,9 +249,9 @@ class DisksTestRegional(e2e_test_base.BaseTest, parameterized.TestCase):
     disk_name = GetResourceName()
     try:
       self.Run('compute disks create {0} --region {1} --size {2} '
-               '--replica-zones {3},{4}'
-               .format(disk_name, self.region, self.disk_size, self.zone,
-                       self.alternative_zone))
+               '--replica-zones {3},{4}'.format(
+                   disk_name, self.region, self.disk_size, self.zone,
+                   self.alternative_zone))
       self.AssertNewOutputContains(disk_name)
       self.Run('compute disks list')
       self.AssertNewOutputContains(disk_name)
@@ -282,13 +280,13 @@ class DisksTestRegional(e2e_test_base.BaseTest, parameterized.TestCase):
   def _TestDiskResize(self, disk_name):
     self.WriteInput('y\n')
     self.Run('compute disks resize {0} --size={1} --region {2}'
-             .format(disk_name, '100', self.region))
+             .format(disk_name, '300', self.region))
     self.AssertNewOutputContains(disk_name, reset=False)
-    self.AssertNewOutputContains("sizeGb: '100'")
+    self.AssertNewOutputContains("sizeGb: '300'")
     result = self.Run('compute disks describe {0} --region {1} --format=disable'
                       .format(disk_name, self.region))
     self.assertEqual(disk_name, result.name)
-    self.assertEqual(100, result.sizeGb)
+    self.assertEqual(300, result.sizeGb)
 
   def _TestDiskDetach(self, disk_name, instance_name):
     self.Run('compute instances detach-disk {0} --disk {1} --zone {2} '
@@ -298,6 +296,41 @@ class DisksTestRegional(e2e_test_base.BaseTest, parameterized.TestCase):
         'compute instances describe {0} --zone {1} --format=disable'
         .format(instance_name, self.zone))
     self.assertEqual(len(result.disks), 1)
+
+
+class DisksTestRegionalBeta(DisksTestRegionalGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  @contextlib.contextmanager
+  def _CreateRegionalDisk(self):
+    disk_name = GetResourceName()
+    try:
+      self.Run('compute disks create {0} --region {1} --size {2} '
+               '--replica-zones {3},{4} --physical-block-size 4096'.format(
+                   disk_name, self.region, self.disk_size, self.zone,
+                   self.alternative_zone))
+      self.AssertNewOutputContains(disk_name)
+      self.Run('compute disks list')
+      self.AssertNewOutputContains(disk_name)
+      result = self.Run(
+          'compute disks describe {0} --region {1} --format=disable'
+          .format(disk_name, self.region))
+      self.assertEqual(disk_name, result.name)
+      self.assertEqual('READY', str(result.status))
+      self.assertEqual(self.disk_size, result.sizeGb)
+      self.assertEqual(4096, result.physicalBlockSizeBytes)
+      yield disk_name
+    finally:
+      self.Run('compute disks delete {0} --region {1} --quiet'
+               .format(disk_name, self.region))
+
+
+class DisksTestRegionalAlpha(DisksTestRegionalBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

@@ -1,0 +1,126 @@
+title: cloud domains search-domains test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      domains registrations search-domains example.com
+  - stdout: |
+      DOMAIN        AVAILABILITY  REGISTRATION_PRICE  RENEWAL_PRICE  NOTICES
+      example.com   UNAVAILABLE
+      example.net   UNAVAILABLE
+      example.org   UNAVAILABLE
+      example.info  AVAILABLE     12.00 USD           12.00 USD
+      example.app   AVAILABLE     14.00 USD           14.00 USD      HSTS_PRELOADED
+      music.info    AVAILABLE     12.00 USD           12.00 USD
+      xmpl.design   AVAILABLE     40.00 USD           40.00 USD
+actions:
+- execute_command:
+    command: |
+      domains registrations search-domains example.com
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha1/projects/fake-project/locations/global/registrations:searchAvailability?alt=json&query=example.com
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "availability": [
+                {
+                  "domainName": "example.com",
+                  "available": "UNAVAILABLE"
+                },
+                {
+                  "domainName": "example.net",
+                  "available": "UNAVAILABLE"
+                },
+                {
+                  "domainName": "example.org",
+                  "available": "UNAVAILABLE"
+                },
+                {
+                  "domainName": "example.info",
+                  "available": "AVAILABLE",
+                  "registrationPrice": {
+                    "currencyCode": "USD",
+                    "units": "12"
+                  },
+                  "supportedWhoisPrivacy": [
+                    "PUBLISH_REDACTED_CONTACT_DATA",
+                    "USE_WHOIS_PRIVACY_PROXY"
+                  ],
+                  "renewalPrice": {
+                    "currencyCode": "USD",
+                    "units": "12"
+                  }
+                },
+                {
+                  "domainName": "example.app",
+                  "available": "AVAILABLE",
+                  "registrationPrice": {
+                    "currencyCode": "USD",
+                    "units": "14"
+                  },
+                  "supportedWhoisPrivacy": [
+                    "PUBLISH_REDACTED_CONTACT_DATA",
+                    "USE_WHOIS_PRIVACY_PROXY"
+                  ],
+                  "notices": [
+                    "HSTS_PRELOADED"
+                  ],
+                  "renewalPrice": {
+                    "currencyCode": "USD",
+                    "units": "14"
+                  }
+                },
+                {
+                  "domainName": "music.info",
+                  "available": "AVAILABLE",
+                  "registrationPrice": {
+                    "currencyCode": "USD",
+                    "units": "12"
+                  },
+                  "supportedWhoisPrivacy": [
+                    "PUBLISH_REDACTED_CONTACT_DATA",
+                    "USE_WHOIS_PRIVACY_PROXY"
+                  ],
+                  "renewalPrice": {
+                    "currencyCode": "USD",
+                    "units": "12"
+                  }
+                },
+                {
+                  "domainName": "xmpl.design",
+                  "available": "AVAILABLE",
+                  "registrationPrice": {
+                    "currencyCode": "USD",
+                    "units": "40"
+                  },
+                  "supportedWhoisPrivacy": [
+                    "PUBLISH_REDACTED_CONTACT_DATA",
+                    "USE_WHOIS_PRIVACY_PROXY"
+                  ],
+                  "renewalPrice": {
+                    "currencyCode": "USD",
+                    "units": "40"
+                  }
+                }
+              ]
+            }
+
+    - expect_stdout: |
+        DOMAIN        AVAILABILITY  REGISTRATION_PRICE  RENEWAL_PRICE  NOTICES
+        example.com   UNAVAILABLE
+        example.net   UNAVAILABLE
+        example.org   UNAVAILABLE
+        example.info  AVAILABLE     12.00 USD           12.00 USD
+        example.app   AVAILABLE     14.00 USD           14.00 USD      HSTS_PRELOADED
+        music.info    AVAILABLE     12.00 USD           12.00 USD
+        xmpl.design   AVAILABLE     40.00 USD           40.00 USD
+    - expect_exit:
+        code: 0

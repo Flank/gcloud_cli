@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha ml\-engine local train \- run a Cloud ML Engine training job locally
+gcloud alpha ml\-engine local train \- run an AI Platform training job locally
 
 
 
@@ -18,15 +18,15 @@ gcloud alpha ml\-engine local train \- run a Cloud ML Engine training job locall
 .SH "DESCRIPTION"
 
 \fB(ALPHA)\fR This command runs the specified module in an environment similar
-to that of a live Cloud ML Engine Training Job.
+to that of a live AI Platform Training Job.
 
 This is especially useful in the case of testing distributed models, as it
-allows you to validate that you are properly interacting with the Cloud ML
-Engine cluster configuration. If your model expects a specific number of
-parameter servers or workers (i.e. you expect to use the CUSTOM machine type),
-use the \-\-parameter\-server\-count and \-\-worker\-count flags to further
-specify the desired cluster configuration, just as you would in your cloud
-training job configuration:
+allows you to validate that you are properly interacting with the AI Platform
+cluster configuration. If your model expects a specific number of parameter
+servers or workers (i.e. you expect to use the CUSTOM machine type), use the
+\-\-parameter\-server\-count and \-\-worker\-count flags to further specify the
+desired cluster configuration, just as you would in your cloud training job
+configuration:
 
 .RS 2m
 $ gcloud alpha ml\-engine local train \-\-module\-name trainer.task \e
@@ -82,8 +82,8 @@ Google Cloud Storage path or local_directory in which to store training outputs
 and other data needed for training.
 
 This path will be passed to your TensorFlow program as the \f5\-\-job_dir\fR
-command\-line arg. The benefit of specifying this field is that Cloud ML Engine
-will validate the path for use in training.
+command\-line arg. The benefit of specifying this field is that AI Platform will
+validate the path for use in training.
 
 .TP 2m
 \fB\-\-package\-path\fR=\fIPACKAGE_PATH\fR
@@ -117,10 +117,11 @@ specified. Default: 2
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

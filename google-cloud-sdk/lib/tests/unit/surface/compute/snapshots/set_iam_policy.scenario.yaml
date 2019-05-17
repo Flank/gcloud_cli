@@ -1,0 +1,94 @@
+title: compute snapshots set-iam-policy scenario test
+release_tracks: [ALPHA, BETA, GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute snapshots set-iam-policy my-snapshot policy.json
+  - stderr: |
+      Updated IAM policy for snapshot [my-snapshot].
+  - stdout: |
+      bindings:
+      - condition:
+          description: descr
+          expression: expr
+          title: title
+        members:
+        - user:oldtest@gmail.com
+        - user:test@gmail.com
+        role: roles/non-primitive
+      etag: etag
+      version: 1
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1
+      BETA: beta
+      ALPHA: alpha
+
+- write_file:
+    path: policy.json
+    contents: |
+      {
+        "version": 1,
+        "bindings": [
+            {
+             "role": "roles/owner",
+             "members": ["user:testuser@google.com"]
+            }],
+         "etag": "ACAB"
+      }
+
+- execute_command:
+    command: compute snapshots set-iam-policy my-snapshot policy.json
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/snapshots/my-snapshot/setIamPolicy?alt=json
+          method: POST
+          body:
+            json:
+              policy:
+                bindings:
+                - role: roles/owner
+                  members: ["user:testuser@google.com"]
+                etag: ACAB
+                version: 1
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "version": 1,
+              "etag": "etag",
+              "bindings": [
+                {
+                  "role": "roles/non-primitive",
+                  "members": [
+                    "user:oldtest@gmail.com",
+                    "user:test@gmail.com"
+                  ],
+                  "condition": {
+                    "expression": "expr",
+                    "title": "title",
+                    "description": "descr"
+                  }
+                }
+              ]
+            }
+    - expect_stderr: |
+        Updated IAM policy for snapshot [my-snapshot].
+    - expect_stdout: |
+        bindings:
+        - condition:
+            description: descr
+            expression: expr
+            title: title
+          members:
+          - user:oldtest@gmail.com
+          - user:test@gmail.com
+          role: roles/non-primitive
+        etag: etag
+        version: 1
+    - expect_exit:
+        code: 0

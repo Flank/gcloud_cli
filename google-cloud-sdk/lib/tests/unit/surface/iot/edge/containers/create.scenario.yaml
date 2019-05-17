@@ -1,0 +1,54 @@
+title: cloud iot edge containers create test scenario
+release_tracks: [ALPHA]
+description: tests simple Edge Container creation
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      iot edge containers create foo --region asia-east1 --registry my-registry --device my-device --docker-image gcr.io/cloud-iot-edge/samples/ml-camera-python:x86_64
+  - stderr: |
+      Created container [foo].
+actions:
+- execute_command:
+    command: |
+      iot edge containers create foo --region asia-east1 --registry my-registry --device my-device --docker-image gcr.io/cloud-iot-edge/samples/ml-camera-python:x86_64
+    events:
+    - api_call:
+        expect_request:
+          uri: https://edge.googleapis.com/v1alpha1/projects/fake-project/locations/asia-east1/registries/my-registry/devices/my-device/containers?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              autostart: true
+              dockerImageUri: gcr.io/cloud-iot-edge/samples/ml-camera-python:x86_64
+              inputTopics:
+              - topic: /container/foo/input
+              name: projects/fake-project/locations/asia-east1/registries/my-registry/devices/my-device/containers/foo
+              outputTopics:
+              - topic: /container/foo/output
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/asia-east1/registries/my-registry/devices/my-device/containers/foo",
+              "dockerImageUri": "gcr.io/cloud-iot-edge/samples/ml-camera-python:x86_64",
+              "inputTopics": [
+                {
+                  "topic": "/container/foo/input"
+                }
+              ],
+              "outputTopics": [
+                {
+                  "topic": "/container/foo/output"
+                }
+              ],
+              "autostart": true,
+              "updateTime": "2019-02-26T17:14:02.249486387Z",
+              "version": "1"
+            }
+    - expect_stderr: |
+        Created container [foo].
+    - expect_exit:
+        code: 0

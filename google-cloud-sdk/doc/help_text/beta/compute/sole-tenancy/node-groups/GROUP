@@ -9,8 +9,9 @@ DESCRIPTION
     (BETA) Read Google Compute Engine sole-tenancy node groups.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -30,7 +31,7 @@ COMMANDS
         (BETA) Describes a Google Compute Engine node group.
 
      get-iam-policy
-        (BETA) Get the IAM Policy for a Google Compute Engine node group.
+        (BETA) Get the IAM policy for a Google Compute Engine node group.
 
      list
         (BETA) List Google Compute Engine node groups.
@@ -40,7 +41,8 @@ COMMANDS
         group.
 
      remove-iam-policy-binding
-        (BETA) Remove IAM policy binding of a Google Compute Engine node group.
+        (BETA) Remove IAM policy binding from a Google Compute Engine node
+        group.
 
      set-iam-policy
         (BETA) Set the IAM policy for a Google Compute Engine node group.

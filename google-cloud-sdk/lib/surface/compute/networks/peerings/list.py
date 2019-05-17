@@ -26,7 +26,7 @@ from googlecloudsdk.core import properties
 from googlecloudsdk.core.resource import resource_projector
 
 
-@base.ReleaseTracks(base.ReleaseTrack.GA, base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.GA)
 class List(base.ListCommand):
   """List Google Compute Engine network peerings."""
 
@@ -76,8 +76,8 @@ class List(base.ListCommand):
       yield synthesized_network
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class ListAlpha(List):
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
+class ListBeta(List):
   """List Google Compute Engine network peerings."""
 
   @staticmethod
@@ -88,7 +88,6 @@ class ListAlpha(List):
             source_network.basename():label=NETWORK,
             network.map().scope(projects).segment(0):label=PEER_PROJECT,
             network.basename():label=PEER_NETWORK,
-            autoCreateRoutes,
             importCustomRoutes,
             exportCustomRoutes,
             state,

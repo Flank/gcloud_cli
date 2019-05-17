@@ -12,24 +12,34 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Mocked unit tests for Binary Authorization ca_client wrapper."""
+"""Tests for Binary Authorization's containeranalysis client wrapper."""
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.api_lib.container.binauthz import containeranalysis
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from tests.lib import test_case
 from tests.lib.surface.container.binauthz import base as binauthz_test_base
 
 
-class BinauthzClientTest(binauthz_test_base.BinauthzMockedClientTestBase):
+class ContaineranalysisClientTest(
+    binauthz_test_base.WithMockBetaContaineranalysis,
+    binauthz_test_base.BinauthzTestBase,
+):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
+    self.ca_client = containeranalysis.Client()
     self.project_ref = resources.REGISTRY.Parse(
         self.Project(),
         collection='cloudresourcemanager.projects',
     )
+    self.artifact_url = self.GenerateArtifactUrl()
     self.pgp_key_fingerprint = 'AAAABBBB'
     self.signature = 'fake-signature'
     self.note_id = 'my-aa-note'
@@ -59,7 +69,7 @@ class BinauthzClientTest(binauthz_test_base.BinauthzMockedClientTestBase):
         request_occurrence=self.request_occurrence,
         project_ref=self.project_ref,
     )
-    self.ca_client.CreateAttestationOccurrence(
+    self.ca_client.CreatePgpAttestationOccurrence(
         note_ref=self.note_ref,
         project_ref=self.project_ref,
         artifact_url=self.artifact_url,
@@ -82,7 +92,7 @@ class BinauthzClientTest(binauthz_test_base.BinauthzMockedClientTestBase):
 
   def testYieldAttestationsFilter(self):
     # Mock a returned occurrence with the wrong kind (but matching artifact URL)
-    messages = self.containeranalysis_messages
+    messages = self.ca_messages
     unmatched_kind_response_occurrence = self.CreateGenericResponseOccurrence(
         project_ref=self.project_ref,
         kind=messages.Occurrence.KindValueValuesEnum.BUILD,

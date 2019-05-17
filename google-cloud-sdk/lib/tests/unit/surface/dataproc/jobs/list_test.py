@@ -160,5 +160,10 @@ class JobsListUnitTestBeta(JobsListUnitTest, base.DataprocTestBaseBeta):
     self.assertEqual(self.messages, self._beta_messages)
     self.assertEqual(self.track, calliope_base.ReleaseTrack.BETA)
 
+
+class JobsListUnitTestAlpha(JobsListUnitTestBeta, base.DataprocTestBaseAlpha):
+  pass
+
+
 if __name__ == '__main__':
   sdk_test_base.main()

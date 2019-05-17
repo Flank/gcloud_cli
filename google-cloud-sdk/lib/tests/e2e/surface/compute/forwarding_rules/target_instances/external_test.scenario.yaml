@@ -55,6 +55,9 @@ summary:
   - stderr: |
       Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
 actions:
+- define_reference:
+    reference: compute-uri
+    value: www.googleapis.com/compute
 - generate_resource_id:
     reference: instance
     prefix: gcloud-compute-test-instance
@@ -92,7 +95,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules?alt=json
           method: POST
           headers: {}
           body:
@@ -125,7 +128,7 @@ actions:
         Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$forwarding-rule$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$forwarding-rule$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$forwarding-rule$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -160,7 +163,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$forwarding-rule$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$forwarding-rule$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -199,7 +202,7 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$forwarding-rule$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$forwarding-rule$$?alt=json
           method: DELETE
           headers: {}
           body: null

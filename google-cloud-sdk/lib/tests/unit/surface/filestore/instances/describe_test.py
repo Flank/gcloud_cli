@@ -30,7 +30,7 @@ from tests.lib.surface.filestore import base
 class CloudFilestoreInstancesDescribeTest(base.CloudFilestoreUnitTestBase,
                                           parameterized.TestCase):
 
-  _TRACK = calliope_base.ReleaseTrack.BETA
+  _TRACK = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.SetUpTrack(self._TRACK)
@@ -49,8 +49,14 @@ class CloudFilestoreInstancesDescribeTest(base.CloudFilestoreUnitTestBase,
   def testDescribeValidFilestoreInstance(self):
     test_instance = self.GetTestCloudFilestoreInstance()
     self.ExpectDescribeInstance(test_instance)
-    result = self.RunDescribe('instance_name', '--location=us-central1-c')
+    result = self.RunDescribe('instance_name', '--zone=us-central1-c')
     self.assertEquals(result, test_instance)
+
+  def testDescribeValidFilestoreInstanceWithDeprecatedLocation(self):
+    test_instance = self.GetTestCloudFilestoreInstance()
+    self.ExpectDescribeInstance(test_instance)
+    result = self.RunDescribe('instance_name', '--location=us-central1-c')
+    self.assertEqual(result, test_instance)
 
   def testDescribeWithDefaultLocation(self):
     properties.VALUES.filestore.location.Set('us-central1-c')
@@ -62,10 +68,16 @@ class CloudFilestoreInstancesDescribeTest(base.CloudFilestoreUnitTestBase,
   @parameterized.named_parameters(
       ('MissingLocation', handlers.ParseError, ['instance_name']),
       ('MissingInstanceName', cli_test_base.MockArgumentError,
-       ['--location=us-central1-c']))
+       ['--zone=us-central1-c']))
   def testMissingLocationWithoutDefault(self, expected_error, args):
     with self.assertRaises(expected_error):
       self.RunDescribe(*args)
+
+
+class CloudFilestoreInstancesDescribeBetaTest(
+    CloudFilestoreInstancesDescribeTest):
+
+  _TRACK = calliope_base.ReleaseTrack.BETA
 
 
 class CloudFilestoreInstancesDescribeAlphaTest(

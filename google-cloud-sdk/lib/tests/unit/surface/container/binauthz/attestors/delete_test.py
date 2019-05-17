@@ -19,11 +19,15 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.container.binauthz import base
 
 
-class DeleteTest(base.BinauthzMockedBetaPolicyClientUnitTest):
+class DeleteTest(base.WithMockBetaBinauthz, base.BinauthzTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testSuccess_ExistingAttestor(self):
     name = 'bar'
@@ -32,12 +36,18 @@ class DeleteTest(base.BinauthzMockedBetaPolicyClientUnitTest):
         name='projects/{}/attestors/{}'.format(proj, name),
     )
 
-    self.client.projects_attestors.Delete.Expect(
+    self.mock_client.projects_attestors.Delete.Expect(
         req, response=self.messages.Empty())
 
     response = self.RunBinauthz('attestors delete {name}'.format(name=name))
 
     self.assertIsNone(response)
+
+
+class DeleteAlphaTest(base.WithMockAlphaBinauthz, DeleteTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

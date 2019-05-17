@@ -36,14 +36,17 @@ from tests.lib.surface.compute import utils
 from six.moves import range
 
 
-class DisksSnapshotTestBase(sdk_test_base.WithFakeAuth,
-                            cli_test_base.CliTestBase,
-                            waiter_test_base.Base):
-  API_VERSION = 'v1'
+class DisksSnapshotTestGA(sdk_test_base.WithFakeAuth,
+                          cli_test_base.CliTestBase,
+                          waiter_test_base.Base):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+    self.api_version = 'v1'
 
   def SetUp(self):
     self.api_mock = utils.ComputeApiMock(
-        self.API_VERSION, project=self.Project(), zone='central2-a').Start()
+        self.api_version, project=self.Project(), zone='central2-a').Start()
     self.addCleanup(self.api_mock.Stop)
 
     self.StartObjectPatch(
@@ -159,12 +162,6 @@ class DisksSnapshotTestBase(sdk_test_base.WithFakeAuth,
   def _GetZoneList(self, zones):
     return self.api_mock.messages.ZoneList(
         items=[self.api_mock.messages.Zone(name=z) for z in zones])
-
-
-class DisksSnapshotTest(DisksSnapshotTestBase):
-
-  def Setup(self):
-    self.track = calliope_base.ReleaseTrack.GA
 
   def testSnapshotOfOneDiskWithDefaultName(self):
     disk_ref = self._GetDiskRef('disk-1')
@@ -424,33 +421,6 @@ class DisksSnapshotTest(DisksSnapshotTestBase):
         'Use [gcloud compute operations describe URI] command to check '
         'the status of the operation(s).\n'.format(operation_ref.SelfLink()))
 
-  def testZonePrompting(self):
-    self.StartPatch('googlecloudsdk.core.console.console_io.CanPrompt',
-                    return_value=True)
-    self.WriteInput('2\n')
-
-    self.api_mock.make_requests.side_effect = iter([
-        [
-            self.api_mock.messages.Zone(name='central2-a'),
-            self.api_mock.messages.Zone(name='central2-b'),
-        ],
-    ])
-
-    disk_ref = self._GetDiskRef('disk-1', zone='central2-b')
-    snapshot_ref = self._GetSnapshotRef('random-name-0')
-    operation_ref = self._GetOperationRef('operation-1')
-
-    self.api_mock.batch_responder.ExpectBatch([
-        (self._GetCreateSnapshotRequest(disk_ref, snapshot_ref),
-         self._GetOperationMessage(operation_ref, self.status_enum.PENDING)),
-    ])
-
-    self.Run('compute disks snapshot disk-1 --async')
-
-    self.AssertOutputEquals('')
-    self.AssertErrContains('PROMPT_CHOICE')
-    self.AssertErrContains('"choices": ["central2-a", "central2-b"]')
-
   def testUriSupport(self):
     disk_ref = self._GetDiskRef('disk-1')
     snapshot_ref = self._GetSnapshotRef('snapshot-1')
@@ -592,14 +562,6 @@ class DisksSnapshotTest(DisksSnapshotTestBase):
         max_wait_ms=None
     )
 
-
-class DisksSnapshotBetaTest(DisksSnapshotTestBase):
-
-  API_VERSION = 'beta'
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-
   def testRegional(self):
     disk_ref = self._GetDiskRef('disk-1', region='central2')
     snapshot_ref = self._GetSnapshotRef('random-name-0')
@@ -612,6 +574,28 @@ class DisksSnapshotBetaTest(DisksSnapshotTestBase):
 
     self.Run('compute disks snapshot {disk} --region {region} --async'
              .format(disk=disk_ref.Name(), region=disk_ref.region))
+
+    self.AssertOutputEquals('')
+    self.AssertErrEquals(
+        'Disk snapshot in progress for [{}].\n'
+        'Use [gcloud compute operations describe URI] command to check '
+        'the status of the operation(s).\n'.format(operation_ref.SelfLink()))
+
+  def testStorageLocation(self):
+    disk_ref = self._GetDiskRef('disk-1')
+    snapshot_ref = self._GetSnapshotRef('random-name-0')
+    storage_location = 'us-west1'
+    operation_ref = self._GetOperationRef('operation-1')
+
+    self.api_mock.batch_responder.ExpectBatch([
+        (self._GetCreateSnapshotRequest(disk_ref, snapshot_ref,
+                                        storage_location='us-west1'),
+         self._GetOperationMessage(operation_ref, self.status_enum.PENDING)),
+    ])
+
+    self.Run('compute disks snapshot {disk}  --zone central2-a '
+             '--storage-location {storage_location} --async'
+             .format(disk=disk_ref.Name(), storage_location=storage_location))
 
     self.AssertOutputEquals('')
     self.AssertErrEquals(
@@ -653,6 +637,13 @@ class DisksSnapshotBetaTest(DisksSnapshotTestBase):
     self.AssertOutputEquals('')
     self.AssertErrContains('Creating snapshot(s) random-name-0')
 
+
+class DisksSnapshotTestBeta(DisksSnapshotTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
+
   def testSnapshotCsekKeyFileRsaWrappedKey(self):
     disk_ref = self._GetDiskRef('disk-1')
     snapshot_ref = self._GetSnapshotRef('random-name-0')
@@ -680,122 +671,12 @@ class DisksSnapshotBetaTest(DisksSnapshotTestBase):
         'Use [gcloud compute operations describe URI] command to check '
         'the status of the operation(s).\n'.format(operation_ref.SelfLink()))
 
-  def testTimeout(self):
-    disk_ref = self._GetDiskRef('disk-1')
-    snapshot_ref = self._GetSnapshotRef('random-name-0')
-    operation_ref = self._GetOperationRef('operation-1')
 
-    self.api_mock.batch_responder.ExpectBatch([
-        (self._GetCreateSnapshotRequest(disk_ref, snapshot_ref),
-         self._GetOperationMessage(operation_ref, self.status_enum.PENDING)),
-    ])
+class DisksSnapshotTestAlpha(DisksSnapshotTestBeta):
 
-    waiter_mock = self.StartPatch(
-        'googlecloudsdk.api_lib.util.waiter.WaitFor',
-        autospec=True)
-
-    self.Run('compute disks snapshot disk-1 --zone central2-a')
-
-    waiter_mock.assert_called_once_with(
-        mock_matchers.TypeMatcher(poller.BatchPoller),
-        mock_matchers.TypeMatcher(poller.OperationBatch),
-        'Creating snapshot(s) random-name-0',
-        max_wait_ms=None
-    )
-
-  def testStorageLocation(self):
-    disk_ref = self._GetDiskRef('disk-1')
-    snapshot_ref = self._GetSnapshotRef('random-name-0')
-    storage_location = 'us-west1'
-    operation_ref = self._GetOperationRef('operation-1')
-
-    self.api_mock.batch_responder.ExpectBatch([
-        (self._GetCreateSnapshotRequest(disk_ref, snapshot_ref,
-                                        storage_location='us-west1'),
-         self._GetOperationMessage(operation_ref, self.status_enum.PENDING)),
-    ])
-
-    self.Run('compute disks snapshot {disk}  --zone central2-a '
-             '--storage-location {storage_location} --async'
-             .format(disk=disk_ref.Name(), storage_location=storage_location))
-
-    self.AssertOutputEquals('')
-    self.AssertErrEquals(
-        'Disk snapshot in progress for [{}].\n'
-        'Use [gcloud compute operations describe URI] command to check '
-        'the status of the operation(s).\n'.format(operation_ref.SelfLink()))
-
-
-class DisksSnapshotTestAlpha(DisksSnapshotTestBase):
-
-  API_VERSION = 'alpha'
-
-  def SetUp(self):
+  def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
-
-  def testRegional(self):
-    disk_ref = self._GetDiskRef('disk-1', region='central2')
-    snapshot_ref = self._GetSnapshotRef('random-name-0')
-    operation_ref = self._GetOperationRef('operation-1', region='central2')
-
-    self.api_mock.batch_responder.ExpectBatch([
-        (self._GetCreateSnapshotRequest(disk_ref, snapshot_ref),
-         self._GetOperationMessage(operation_ref, self.status_enum.PENDING)),
-    ])
-
-    self.Run('compute disks snapshot {disk} --region {region} --async'
-             .format(disk=disk_ref.Name(), region=disk_ref.region))
-
-    self.AssertOutputEquals('')
-    self.AssertErrEquals(
-        'Disk snapshot in progress for [{}].\n'
-        'Use [gcloud compute operations describe URI] command to check '
-        'the status of the operation(s).\n'.format(operation_ref.SelfLink()))
-
-  def testTimeout(self):
-    disk_ref = self._GetDiskRef('disk-1')
-    snapshot_ref = self._GetSnapshotRef('random-name-0')
-    operation_ref = self._GetOperationRef('operation-1')
-
-    self.api_mock.batch_responder.ExpectBatch([
-        (self._GetCreateSnapshotRequest(disk_ref, snapshot_ref),
-         self._GetOperationMessage(operation_ref, self.status_enum.PENDING)),
-    ])
-
-    waiter_mock = self.StartPatch(
-        'googlecloudsdk.api_lib.util.waiter.WaitFor',
-        autospec=True)
-
-    self.Run('compute disks snapshot disk-1 --zone central2-a')
-
-    waiter_mock.assert_called_once_with(
-        mock_matchers.TypeMatcher(poller.BatchPoller),
-        mock_matchers.TypeMatcher(poller.OperationBatch),
-        'Creating snapshot(s) random-name-0',
-        max_wait_ms=None
-    )
-
-  def testStorageLocation(self):
-    disk_ref = self._GetDiskRef('disk-1')
-    snapshot_ref = self._GetSnapshotRef('random-name-0')
-    storage_location = 'us-west1'
-    operation_ref = self._GetOperationRef('operation-1')
-
-    self.api_mock.batch_responder.ExpectBatch([
-        (self._GetCreateSnapshotRequest(disk_ref, snapshot_ref,
-                                        storage_location='us-west1'),
-         self._GetOperationMessage(operation_ref, self.status_enum.PENDING)),
-    ])
-
-    self.Run('compute disks snapshot {disk}  --zone central2-a '
-             '--storage-location {storage_location} --async'
-             .format(disk=disk_ref.Name(), storage_location=storage_location))
-
-    self.AssertOutputEquals('')
-    self.AssertErrEquals(
-        'Disk snapshot in progress for [{}].\n'
-        'Use [gcloud compute operations describe URI] command to check '
-        'the status of the operation(s).\n'.format(operation_ref.SelfLink()))
+    self.api_version = 'alpha'
 
 
 if __name__ == '__main__':

@@ -28,6 +28,7 @@ from googlecloudsdk.core import http_proxy
 from googlecloudsdk.core import log
 from googlecloudsdk.core import metrics
 from googlecloudsdk.core import properties
+from googlecloudsdk.core.console import console_attr
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.util import platforms
 from tests.lib import parameterized
@@ -58,6 +59,8 @@ class HttpTest(sdk_test_base.WithFakeAuth, test_case.WithOutputCapture,
     config.CLOUD_SDK_VERSION = '10.0.0'
     self.StartObjectPatch(console_io, 'IsRunFromShellScript',
                           return_value=False)
+    self.StartObjectPatch(console_attr.ConsoleAttr, 'GetTermIdentifier',
+                          return_value='xterm')
 
     self.default_response = ({}, b'response content')
 
@@ -68,7 +71,7 @@ class HttpTest(sdk_test_base.WithFakeAuth, test_case.WithOutputCapture,
                 interactive, fromscript=False):
     template = ('gcloud/{0} command/{1} invocation-id/{2} environment/{3} '
                 'environment-version/{4} interactive/{5} from-script/{8} '
-                'python/{6} {7}')
+                'python/{6} term/xterm {7}')
     # Mocking the platform fragment doesn't seem to work all the time.
     # Use the real platform we are on.
     platform = platforms.Platform.Current().UserAgentFragment()

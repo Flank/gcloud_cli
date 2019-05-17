@@ -11,7 +11,7 @@ gcloud dns managed\-zones update \- update an existing Cloud DNS managed\-zone
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud dns managed\-zones update\fR \fIZONE\fR [\fB\-\-denial\-of\-existence\fR=\fIDENIAL_OF_EXISTENCE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-dnssec\-state\fR=\fIDNSSEC_STATE\fR] [\fB\-\-ksk\-algorithm\fR=\fIKSK_ALGORITHM\fR] [\fB\-\-ksk\-key\-length\fR=\fIKSK_KEY_LENGTH\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-zsk\-algorithm\fR=\fIZSK_ALGORITHM\fR] [\fB\-\-zsk\-key\-length\fR=\fIZSK_KEY_LENGTH\fR] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud dns managed\-zones update\fR \fIZONE\fR [\fB\-\-denial\-of\-existence\fR=\fIDENIAL_OF_EXISTENCE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-dnssec\-state\fR=\fIDNSSEC_STATE\fR] [\fB\-\-ksk\-algorithm\fR=\fIKSK_ALGORITHM\fR] [\fB\-\-ksk\-key\-length\fR=\fIKSK_KEY_LENGTH\fR] [\fB\-\-networks\fR=[\fINETWORK\fR,...]] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-zsk\-algorithm\fR=\fIZSK_ALGORITHM\fR] [\fB\-\-zsk\-key\-length\fR=\fIZSK_KEY_LENGTH\fR] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -85,6 +85,11 @@ Requires DNSSEC enabled. \fIKSK_ALGORITHM\fR must be one of:
 Length of the key\-signing key in bits. Requires DNSSEC enabled.
 
 .TP 2m
+\fB\-\-networks\fR=[\fINETWORK\fR,...]
+List of networks that the zone should be visible in if the zone visibility is
+[private].
+
+.TP 2m
 \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 List of label KEY=VALUE pairs to update. If a label exists its value is
 modified, otherwise a new label is created.
@@ -139,10 +144,11 @@ List of label keys to remove. If a label does not exist it is silently ignored.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

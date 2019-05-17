@@ -66,7 +66,8 @@ class MonitoringE2eTests(e2e_base.WithServiceAuth, cli_test_base.CliTestBase):
                                 'my_condition.json',
                                 contents=test_data.CONDITION)
     with self._CreateAlertPolicy() as policy, \
-         self._CreateNotificationChannel() as channel:
+         self._CreateNotificationChannel() as channel, \
+         self._CreateNotificationChannel() as channel2:
       self.assertFalse(policy.enabled)
       self.assertEqual([], policy.notificationChannels)
 
@@ -76,6 +77,13 @@ class MonitoringE2eTests(e2e_base.WithServiceAuth, cli_test_base.CliTestBase):
                             policy.name, channel.name))
       self.assertTrue(policy.enabled)
       self.assertEqual([channel.name], policy.notificationChannels)
+
+      # Test updating a notification channel
+      policy = self.Run('monitoring policies update {0} --enabled '
+                        '--set-notification-channels {1}'.format(
+                            policy.name, channel2.name))
+      self.assertTrue(policy.enabled)
+      self.assertEqual([channel2.name], policy.notificationChannels)
 
       # Test creating and deleting conditions
       self.assertEqual(1, len(policy.conditions))

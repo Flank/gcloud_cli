@@ -29,7 +29,7 @@ from tests.lib.surface.pubsub import base
 class SnapshotsDeleteTest(base.CloudPubsubTestBase):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
     self.svc = self.client.projects_snapshots.Delete
 
   def testSnapshotsDelete(self):

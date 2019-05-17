@@ -1,0 +1,129 @@
+
+.TH "GCLOUD_ALPHA_LOGGING_SINKS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha logging sinks update \- updates a sink
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha logging sinks update\fR \fISINK_NAME\fR [\fIDESTINATION\fR] [\fB\-\-log\-filter\fR=\fILOG_FILTER\fR] [\fB\-\-billing\-account\fR=\fIBILLING_ACCOUNT_ID\fR\ |\ \fB\-\-folder\fR=\fIFOLDER_ID\fR\ |\ \fB\-\-organization\fR=\fIORGANIZATION_ID\fR] [\fB\-\-dlp\-deidentify\-template\fR=\fIDLP_DEIDENTIFY_TEMPLATE\fR\ \fB\-\-dlp\-inspect\-template\fR=\fIDLP_INSPECT_TEMPLATE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Changes the \fB[destination]\fR or \fB\-\-log\-filter\fR
+associated with a sink. The new destination must already exist and Stackdriver
+Logging must have permission to write to it. Log entries are exported to the new
+destination immediately.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fISINK_NAME\fR
+The name of the sink to update.
+
+.TP 2m
+[\fIDESTINATION\fR]
+A new destination for the sink. If omitted, the sink's existing destination is
+unchanged.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-log\-filter\fR=\fILOG_FILTER\fR
+A new filter expression for the sink. If omitted, the sink's existing filter (if
+any) is unchanged.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-billing\-account\fR=\fIBILLING_ACCOUNT_ID\fR
+Update a sink associated with this billing account.
+
+.TP 2m
+\fB\-\-folder\fR=\fIFOLDER_ID\fR
+Update a sink associated with this folder.
+
+.TP 2m
+\fB\-\-organization\fR=\fIORGANIZATION_ID\fR
+Update a sink associated with this organization.
+
+.RE
+.sp
+.TP 2m
+
+Settings for Cloud DLP enabled sinks. If any of these arguments are omitted they
+are unchanged.
+
+.RS 2m
+.TP 2m
+\fB\-\-dlp\-deidentify\-template\fR=\fIDLP_DEIDENTIFY_TEMPLATE\fR
+Relative path to a Cloud DLP de\-identification template resource. For example
+"projects/my\-project/deidentifyTemplates/my\-template" or
+"organizations/my\-org/deidentifyTemplates/my\-template".
+
+.TP 2m
+\fB\-\-dlp\-inspect\-template\fR=\fIDLP_INSPECT_TEMPLATE\fR
+Relative path to a Cloud DLP inspection template resource. For example
+"projects/my\-project/inspectTemplates/my\-template" or
+"organizations/my\-org/inspectTemplates/my\-template".
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To only update a sink filter, run:
+
+.RS 2m
+$ gcloud alpha logging sinks update my\-sink \e
+    \-\-log\-filter='severity>=ERROR'
+.RE
+
+Detailed information about filters can be found at:
+https://cloud.google.com/logging/docs/view/advanced_filters
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
+
+.RS 2m
+$ gcloud logging sinks update
+$ gcloud beta logging sinks update
+.RE
+

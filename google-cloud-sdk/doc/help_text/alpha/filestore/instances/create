@@ -2,11 +2,14 @@ NAME
     gcloud alpha filestore instances create - create a Cloud Filestore instance
 
 SYNOPSIS
-    gcloud alpha filestore instances create (INSTANCE : --location=LOCATION)
-        --file-share=[capacity=CAPACITY],[name=NAME]
+    gcloud alpha filestore instances create (INSTANCE : --zone=ZONE)
+        --file-share=[capacity=CAPACITY],[name=NAME],
+          [source-snapshot=SOURCE-SNAPSHOT],
+          [source-snapshot-region=SOURCE-SNAPSHOT-REGION]
         --network=[name=NAME],[reserved-ip-range=RESERVED-IP-RANGE] [--async]
         [--description=DESCRIPTION] [--labels=[KEY=VALUE,...]]
-        [--tier=TIER; default="STANDARD"] [GCLOUD_WIDE_FLAG ...]
+        [--location=LOCATION] [--tier=TIER; default="STANDARD"]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Create a Cloud Filestore instance.
@@ -25,11 +28,11 @@ POSITIONAL ARGUMENTS
           This positional must be specified if any of the other arguments in
           this group are specified.
 
-       --location=LOCATION
-          The location of the instance.
+       --zone=ZONE
+          The zone of the instance.
 
 REQUIRED FLAGS
-     --file-share=[capacity=CAPACITY],[name=NAME]
+     --file-share=[capacity=CAPACITY],[name=NAME],[source-snapshot=SOURCE-SNAPSHOT],[source-snapshot-region=SOURCE-SNAPSHOT-REGION]
         File share configuration for an instance. Specifying both name and
         capacity is required.
 
@@ -41,6 +44,12 @@ REQUIRED FLAGS
 
          name
             The desired logical name of the volume.
+
+                *source-snapshot*::: The name of the snapshot to restore from.
+
+         source-snapshot-region
+            The region of the source snapshot. If unspecified, the region of
+            the instance will be used.
 
      --network=[name=NAME],[reserved-ip-range=RESERVED-IP-RANGE]
         Network configuration for a Cloud Filestore instance. Specifying
@@ -74,6 +83,11 @@ OPTIONAL FLAGS
         contain only hyphens (-), underscores (_), lowercase characters, and
         numbers.
 
+     --location=LOCATION
+        (DEPRECATED) Location of the Cloud Filestore instance.
+
+        The --location flag is deprecated. Use --zone.
+
      --tier=TIER; default="STANDARD"
         The service tier for the Cloud Filestore instance. TIER must be one of:
 
@@ -83,8 +97,9 @@ OPTIONAL FLAGS
             Standard Filestore instance.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -102,7 +117,8 @@ NOTES
     command fails with API permission errors despite specifying the right
     project, you will have to apply for early access and have your projects
     registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    https://cloud.google.com/support/. These variants are also available:
 
+        $ gcloud filestore instances create
         $ gcloud beta filestore instances create
 

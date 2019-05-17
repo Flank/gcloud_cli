@@ -1,6 +1,6 @@
 NAME
     gcloud alpha compute snapshots remove-iam-policy-binding - remove IAM
-        policy binding of a Google Compute Engine snapshot
+        policy binding from a Google Compute Engine snapshot
 
 SYNOPSIS
     gcloud alpha compute snapshots remove-iam-policy-binding SNAPSHOT_NAME
@@ -34,10 +34,10 @@ REQUIRED FLAGS
         domain:example.domain.com.
 
         Can also be one of the following special values:
-        * allUsers - anyone who is on the internet, with or without a Google
-          account.
-        * allAuthenticatedUsers - anyone who is authenticated with a Google
-          account or a service account.
+        * allUsers - Special identifier that represents anyone who is on the
+          internet, with or without a Google account.
+        * allAuthenticatedUsers - Special identifier that represents anyone
+          who is authenticated with a Google account or a service account.
 
      --role=ROLE
         The role to remove the member from.
@@ -76,8 +76,9 @@ OPTIONAL FLAGS
           available fields, see the help for --condition.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -114,7 +115,8 @@ NOTES
     command fails with API permission errors despite specifying the right
     project, you will have to apply for early access and have your projects
     registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    https://cloud.google.com/support/. These variants are also available:
 
+        $ gcloud compute snapshots remove-iam-policy-binding
         $ gcloud beta compute snapshots remove-iam-policy-binding
 

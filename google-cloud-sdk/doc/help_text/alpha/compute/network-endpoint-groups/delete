@@ -6,9 +6,6 @@ SYNOPSIS
     gcloud alpha compute network-endpoint-groups delete NAME [--zone=ZONE]
         [GCLOUD_WIDE_FLAG ...]
 
-DESCRIPTION
-    (ALPHA) Deletes a Google Compute Engine network endpoint group.
-
 POSITIONAL ARGUMENTS
      NAME
         Name of the network endpoint group to operate on.
@@ -36,17 +33,25 @@ FLAGS
         CLOUDSDK_COMPUTE_ZONE.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
+
+EXAMPLES
+    To delete a network endpoint group:
+
+        $ gcloud alpha compute network-endpoint-groups delete my-neg \
+            --zone=us-central1-a
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you will have to apply for early access and have your projects
     registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    https://cloud.google.com/support/. These variants are also available:
 
+        $ gcloud compute network-endpoint-groups delete
         $ gcloud beta compute network-endpoint-groups delete
 

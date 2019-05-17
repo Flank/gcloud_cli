@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2013 Google Inc. All Rights Reserved.
+# Copyright 2013 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -35,6 +35,25 @@ from googlecloudsdk.core import properties
 from googlecloudsdk.core.resource import resource_printer
 
 import six
+
+# Category constants
+AI_AND_MACHINE_LEARNING_CATEGORY = 'AI and Machine Learning'
+API_PLATFORM_AND_ECOSYSTEMS_CATEGORY = 'API Platform and Ecosystems'
+COMPUTE_CATEGORY = 'Compute'
+DATA_ANALYTICS_CATEGORY = 'Data Analytics'
+DATABASES_CATEGORY = 'Databases'
+IDENTITY_AND_SECURITY_CATEGORY = 'Identity and Security'
+INTERNET_OF_THINGS_CATEGORY = 'Internet of Things'
+MANAGEMENT_TOOLS_CATEGORY = 'Management Tools'
+MOBILE_CATEGORY = 'Mobile'
+NETWORKING_CATEGORY = 'Networking'
+SDK_TOOLS_CATEGORY = 'SDK Tools'
+DISKS_CATEGORY = 'Disks'
+INFO_CATEGORY = 'Info'
+INSTANCES_CATEGORY = 'Instances'
+LOAD_BALANCING_CATEGORY = 'Load Balancing'
+TOOLS_CATEGORY = 'Tools'
+STORAGE_CATEGORY = 'Storage'
 
 
 # Common markdown.

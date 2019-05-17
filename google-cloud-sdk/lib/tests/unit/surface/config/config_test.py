@@ -238,14 +238,15 @@ class ConfigTest(cli_test_base.CliTestBase):
   def testCompletion(self):
     for verb in ['set', 'unset']:
       # Complete properties without section.
-      self.RunCompletion('config {0} acc'.format(verb), ['account'])
+      self.RunCompletion(
+          'config {0} acc'.format(verb), ['account', 'accessibility/'])
       self.RunCompletion(
           'config {0} dis'.format(verb),
           ['disable_color', 'disable_prompts', 'disable_usage_reporting'])
 
       # Complete both sections and properties.
       self.RunCompletion('config {0} a'.format(verb),
-                         ['app/', 'auth/', 'account'])
+                         ['app/', 'auth/', 'account', 'accessibility/'])
 
       # Complete only sections.
       self.RunCompletion('config {0} co'.format(verb), [

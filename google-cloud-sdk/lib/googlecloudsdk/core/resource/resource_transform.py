@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -997,7 +997,7 @@ def TransformScope(r, *args):
   if not r:
     return ''
   # pylint: disable=too-many-function-args
-  r = urllib.parse.unquote(six.text_type(r))  # pytype: disable=module-attr
+  r = urllib.parse.unquote(six.text_type(r))
   # pylint: enable=too-many-function-args
   if '/' not in r:
     return r
@@ -1025,7 +1025,7 @@ def TransformSegment(r, index=-1, undefined=''):
   if not r:
     return undefined
   # pylint: disable=too-many-function-args
-  r = urllib.parse.unquote(six.text_type(r))  # pytype: disable=module-attr
+  r = urllib.parse.unquote(six.text_type(r))
   # pylint: enable=too-many-function-args
   segments = r.split('/')
   try:

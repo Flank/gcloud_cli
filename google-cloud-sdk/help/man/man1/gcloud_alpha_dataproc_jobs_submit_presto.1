@@ -1,0 +1,150 @@
+
+.TH "GCLOUD_ALPHA_DATAPROC_JOBS_SUBMIT_PRESTO" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha dataproc jobs submit presto \- submit a Presto job to a cluster
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha dataproc jobs submit presto\fR \fB\-\-cluster\fR=\fICLUSTER\fR (\fB\-\-execute\fR=\fIQUERY\fR,\ \fB\-e\fR\ \fIQUERY\fR\ |\ \fB\-\-file\fR=\fIFILE\fR,\ \fB\-f\fR\ \fIFILE\fR) [\fB\-\-async\fR] [\fB\-\-bucket\fR=\fIBUCKET\fR] [\fB\-\-client\-tags\fR=[\fICLIENT_TAG\fR,...]] [\fB\-\-continue\-on\-failure\fR] [\fB\-\-driver\-log\-levels\fR=[\fIPACKAGE\fR=\fILEVEL\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-max\-failures\-per\-hour\fR=\fIMAX_FAILURES_PER_HOUR\fR] [\fB\-\-properties\fR=[\fIPARAM\fR=\fIVALUE\fR,...]] [\fB\-\-query\-output\-format\fR=\fIQUERY_OUTPUT_FORMAT\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Submit a Presto job to a cluster
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-cluster\fR=\fICLUSTER\fR
+The Dataproc cluster to submit the job to.
+
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-execute\fR=\fIQUERY\fR, \fB\-e\fR \fIQUERY\fR
+A Presto query to execute as the job.
+
+.TP 2m
+\fB\-\-file\fR=\fIFILE\fR, \fB\-f\fR \fIFILE\fR
+HCFS URI of file containing Presto script to execute as the job
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Does not wait for the job to run.
+
+.TP 2m
+\fB\-\-bucket\fR=\fIBUCKET\fR
+The Cloud Storage bucket to stage files in. Defaults to the cluster's configured
+bucket.
+
+.TP 2m
+\fB\-\-client\-tags\fR=[\fICLIENT_TAG\fR,...]
+List of Presto client tags to attach to this query.
+
+.TP 2m
+\fB\-\-continue\-on\-failure\fR
+Whether to continue if a single query fails.
+
+.TP 2m
+\fB\-\-driver\-log\-levels\fR=[\fIPACKAGE\fR=\fILEVEL\fR,...]
+A list of package to log4j log level pairs to configure driver logging. For
+example: root=FATAL,com.example=INFO
+
+.TP 2m
+\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of label KEY=VALUE pairs to add.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
+.TP 2m
+\fB\-\-max\-failures\-per\-hour\fR=\fIMAX_FAILURES_PER_HOUR\fR
+Specifies maximum number of times a job can be restarted in event of failure.
+Expressed as a per\-hour rate. Default is 0 (no failure retries).
+
+.TP 2m
+\fB\-\-properties\fR=[\fIPARAM\fR=\fIVALUE\fR,...]
+A list of key value pairs to set Presto session properties
+
+.TP 2m
+\fB\-\-query\-output\-format\fR=\fIQUERY_OUTPUT_FORMAT\fR
+The format in which query output will be displayed. See the Presto documentation
+for supported output formats.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
+independent resource namespace constrained to deploying instances into Compute
+Engine zones inside the region. The default value of \f5global\fR is a special
+multi\-region namespace which is capable of deploying instances into all Compute
+Engine zones globally, and is disjoint from other Cloud Dataproc regions.
+Overrides the default \fBdataproc/region\fR property value for this command
+invocation.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To submit a Presto job with a local script, run:
+
+.RS 2m
+$ gcloud alpha dataproc jobs submit presto \-\-cluster my_cluster \e
+    \-\-file my_script.R
+.RE
+
+To submit a Presto job with inline queries, run:
+
+.RS 2m
+$ gcloud alpha dataproc jobs submit presto \-\-cluster my_cluster \e
+    \-e "SELECT * FROM foo WHERE bar > 2"
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. This variant is also available:
+
+.RS 2m
+$ gcloud beta dataproc jobs submit presto
+.RE
+

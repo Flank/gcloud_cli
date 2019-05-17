@@ -32,6 +32,9 @@ summary:
       1: Could not fetch resource:
        - The resource 'projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$' was not found
 actions:
+- define_reference:
+    reference: compute-uri
+    value: www.googleapis.com/compute
 - generate_resource_id:
     reference: instance
     prefix: gcloud-compute-instances-creation-errors
@@ -41,7 +44,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f?alt=json
           method: GET
           headers: {}
           body: null
@@ -68,7 +71,7 @@ actions:
             - Intel Ivy Bridge
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/custom-2-14336?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/custom-2-14336?alt=json
           method: GET
           headers: {}
           body: null
@@ -99,7 +102,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f?alt=json
           method: GET
           headers: {}
           body: null
@@ -126,7 +129,7 @@ actions:
             - Intel Ivy Bridge
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/custom-2-3000?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/custom-2-3000?alt=json
           method: GET
           headers: {}
           body: null
@@ -159,7 +162,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f?alt=json
           method: GET
           headers: {}
           body: null
@@ -186,7 +189,7 @@ actions:
             - Intel Ivy Bridge
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/custom-3-10240?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/custom-3-10240?alt=json
           method: GET
           headers: {}
           body: null
@@ -221,7 +224,7 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
           method: DELETE
           headers: {}
           body: null

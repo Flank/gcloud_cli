@@ -1,13 +1,12 @@
 NAME
-    gcloud beta access-context-manager policies update - update an existing
-        access policy
+    gcloud beta access-context-manager policies update -
 
 SYNOPSIS
     gcloud beta access-context-manager policies update [POLICY] [--title=TITLE]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Update an existing access policy.
+    (BETA)
 
 POSITIONAL ARGUMENTS
      Policy resource - The access policy to update. This represents a Cloud
@@ -21,11 +20,16 @@ FLAGS
         Short human-readable title of the access policy.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud access-context-manager policies update
+        $ gcloud alpha access-context-manager policies update
 

@@ -1,6 +1,6 @@
 - help_text:
     brief: Create a Cloud Scheduler job with an App Engine target.
-    DESCRIPTION: Create a Cloud Scheduler job with an App Engine target.
+    description: Create a Cloud Scheduler job with an App Engine target.
 
   request:
     collection: cloudscheduler.projects.locations.jobs
@@ -60,6 +60,13 @@
         KEY=VALUE pairs of HTTP headers to include in the request.
         *Cannot be repeated*. For example:
         `--headers Accept-Language=en-us,Accept=text/plain`
+    - api_field: job.attemptDeadline
+      arg_name: attempt-deadline
+      type: googlecloudsdk.core.util.times:ParseDuration
+      processor: googlecloudsdk.core.util.times:FormatDurationForJson
+      help_text: |-
+        The deadline for job attempts. If the request handler doesn't respond by this dealine,
+        the request is cancelled and the attempt is marked as failed. For example, 20s.
     - group:
         mutex: true
         params:

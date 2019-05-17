@@ -19,6 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.logging import base
@@ -109,6 +110,35 @@ More information about sinks can be found at https://cloud.google.com/logging/do
 
   def testListNoAuth(self):
     self.RunWithoutAuth('sinks create my-sink dest')
+
+
+class SinksCreateTestAlpha(SinksCreateTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testCreateSuccessWithDlp(self):
+    new_sink = self.msgs.LogSink(
+        name='my-sink',
+        destination='dest',
+        filter='foo',
+        includeChildren=False,
+        dlpOptions=self.msgs.DlpOptions(
+            inspectTemplateName='my-inspect-template',
+            deidentifyTemplateName='my-deidentify-template'))
+    self.mock_client_v2.projects_sinks.Create.Expect(
+        self.msgs.LoggingProjectsSinksCreateRequest(
+            parent='projects/my-project',
+            logSink=new_sink,
+            uniqueWriterIdentity=True), new_sink)
+    self.RunLogging('sinks create my-sink dest --log-filter=foo '
+                    '--dlp-inspect-template=my-inspect-template '
+                    '--dlp-deidentify-template=my-deidentify-template')
+    self.AssertOutputEquals('')
+    self.AssertErrEquals("""\
+Created [https://logging.googleapis.com/v2/projects/my-project/sinks/my-sink].
+More information about sinks can be found at https://cloud.google.com/logging/docs/export/configure_export
+""")
 
 
 if __name__ == '__main__':

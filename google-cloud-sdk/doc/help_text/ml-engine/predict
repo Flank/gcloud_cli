@@ -1,5 +1,5 @@
 NAME
-    gcloud ml-engine predict - run Cloud ML Engine online prediction
+    gcloud ml-engine predict - run AI Platform online prediction
 
 SYNOPSIS
     gcloud ml-engine predict --model=MODEL
@@ -8,8 +8,8 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    gcloud ml-engine predict sends a prediction request to Cloud ML Engine for
-    the given instances. This command will read up to 100 instances, though the
+    gcloud ml-engine predict sends a prediction request to AI Platform for the
+    given instances. This command will read up to 100 instances, though the
     service itself will accept instances up to the payload limit size
     (currently, 1.5MB). If you are predicting on more instances, you should use
     batch prediction via
@@ -62,8 +62,9 @@ OPTIONAL FLAGS
             $ gcloud ml-engine versions list
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

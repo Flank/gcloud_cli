@@ -1,0 +1,28 @@
+NAME
+    gcloud filestore zones - list zones where Cloud Filestore is available
+
+SYNOPSIS
+    gcloud filestore zones COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    List zones where Cloud Filestore is available.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     list
+        List Filestore zones.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha filestore zones
+        $ gcloud beta filestore zones
+

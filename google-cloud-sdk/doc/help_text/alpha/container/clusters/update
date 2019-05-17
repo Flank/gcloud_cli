@@ -6,8 +6,9 @@ SYNOPSIS
     gcloud alpha container clusters update NAME
         (--complete-credential-rotation | --complete-ip-rotation
           | --enable-autoscaling | --enable-binauthz
-          | --enable-legacy-authorization | --enable-master-authorized-networks
-          | --enable-network-policy | --enable-pod-security-policy
+          | --enable-intra-node-visibility | --enable-legacy-authorization
+          | --enable-master-authorized-networks | --enable-network-policy
+          | --enable-peering-route-sharing | --enable-pod-security-policy
           | --enable-vertical-pod-autoscaling | --generate-password
           | --maintenance-window=MAINTENANCE_WINDOW | --remove-labels=[KEY,...]
           | --security-profile=SECURITY_PROFILE | --set-password
@@ -71,6 +72,17 @@ REQUIRED FLAGS
        --enable-binauthz
           Enable Binary Authorization for this cluster.
 
+       --enable-intra-node-visibility
+          Enable Intra-node visibility for this cluster.
+
+          Enabling intra-node visibility makes your intra-node pod to pod
+          traffic visible to the networking fabric. With this feature, you can
+          use VPC flow logging or other VPC features for intra-node traffic.
+
+          This is a beta feature, enabling it on existing cluster causes the
+          cluster master and the cluster nodes to restart, which might cause
+          disruption.
+
        --enable-legacy-authorization
           Enables the legacy ABAC authentication for the cluster. User rights
           are granted through the use of policies which combine attributes
@@ -99,6 +111,11 @@ REQUIRED FLAGS
           enabling network policy on an existing cluster the network policy
           addon must first be enabled on the master by using
           --update-addons=NetworkPolicy=ENABLED flag.
+
+       --enable-peering-route-sharing
+          Enable custom route sharing between the master and node VPCs, which
+          ensures clients running in networks connected via a Cloud Router,
+          VPN, or Interconnect can reach the API server.
 
        --enable-pod-security-policy
           Enables the pod security policy admission controller for the cluster.
@@ -171,7 +188,7 @@ REQUIRED FLAGS
           HorizontalPodAutoscaling=ENABLED|DISABLED
           HttpLoadBalancing=ENABLED|DISABLED
           KubernetesDashboard=ENABLED|DISABLED Istio=ENABLED|DISABLED
-          NetworkPolicy=ENABLED|DISABLED
+          NetworkPolicy=ENABLED|DISABLED CloudRun=ENABLED|DISABLED
 
        --update-labels=[KEY=VALUE,...]
           Labels to apply to the Google Cloud resources in use by the
@@ -272,18 +289,29 @@ REQUIRED FLAGS
 
            --autoprovisioning-config-file=AUTOPROVISIONING_CONFIG_FILE
               Path of the JSON/YAML file which contains information about the
-              cluster's autoscaling configuration. Currently it only contains a
-              list of resource limits of the cluster.
+              cluster's node autoprovisioning configuration. Currently it
+              contains a list of resource limits and identity defaults for
+              autoprovisioning.
 
-              Each resource limits definition contains three fields:
-              resourceType, maximum and minimum. Resource type can be "cpu",
-              "memory" or an accelerator (e.g. "nvidia-tesla-k80" for nVidia
-              Tesla K80). Use gcloud compute accelerator-types list to learn
-              about available accelerator types. Maximum is the maximum allowed
-              amount with the unit of the resource. Minimum is the minimum
-              allowed amount with the unit of the resource.
+              Resource limits are specified in the field 'resourceLimits'. Each
+              resource limits definition contains three fields: resourceType,
+              maximum and minimum. Resource type can be "cpu", "memory" or an
+              accelerator (e.g. "nvidia-tesla-k80" for nVidia Tesla K80). Use
+              gcloud compute accelerator-types list to learn about available
+              accelerator types. Maximum is the maximum allowed amount with the
+              unit of the resource. Minimum is the minimum allowed amount with
+              the unit of the resource.
 
-           Flags to configure resource limits:
+              Identity default contains at most one of the below fields:
+              serviceAccount: The Google Cloud Platform Service Account to be
+              used by node VMs in autoprovisioined node pools. If not
+              specified, the project default service account is used. scopes: A
+              list of scopes be used by node instances in autoprovisioined node
+              pools. Multiple scopes can be specified, separated by commas. For
+              information on defaults, look at:
+              https://cloud.google.com/sdk/gcloud/reference/container/clusters/create#--scopes
+
+           Flags to configure autoprovisioned nodes
 
              --max-cpu=MAX_CPU
                 Maximum number of cores in the cluster.
@@ -395,7 +423,7 @@ OPTIONAL FLAGS
                     --istio-config=auth=MTLS_PERMISSIVE
 
      --master-authorized-networks=NETWORK,[NETWORK,...]
-        The list of CIDR blocks (up to 20) that are allowed to connect to
+        The list of CIDR blocks (up to 50) that are allowed to connect to
         Kubernetes master through HTTPS. Specified in CIDR notation (e.g.
         1.2.3.4/30). Can not be specified unless
         --enable-master-authorized-networks is also specified.
@@ -429,8 +457,9 @@ OPTIONAL FLAGS
           default compute/zone property value for this command invocation.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

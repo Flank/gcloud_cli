@@ -1,0 +1,32 @@
+NAME
+    gcloud beta ai-platform models delete - delete an existing AI Platform
+        model
+
+SYNOPSIS
+    gcloud beta ai-platform models delete MODEL [GCLOUD_WIDE_FLAG ...]
+
+POSITIONAL ARGUMENTS
+     MODEL
+        Name of the model.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+EXAMPLES
+    To delete all models matching the regular expression vision[0-9]+, run:
+
+        $ gcloud beta ai-platform models list --uri \
+              --filter 'name ~ vision[0-9]+' |
+              xargs -n 1 gcloud beta ai-platform models delete
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud ai-platform models delete
+        $ gcloud alpha ai-platform models delete
+

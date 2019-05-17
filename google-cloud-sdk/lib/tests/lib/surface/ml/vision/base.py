@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2019 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ from __future__ import unicode_literals
 from apitools.base.py import encoding
 from apitools.base.py.testing import mock
 from googlecloudsdk.api_lib.util import apis
-from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.ml.vision import util
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
@@ -34,7 +33,6 @@ class MlVisionTestBase(sdk_test_base.WithFakeAuth,
 
   def SetUp(self):
     """Creates mock client and adds Unmock on cleanup."""
-    self.track = calliope_base.ReleaseTrack.BETA
     self.client = mock.Client(client_class=apis.GetClientClass('vision', 'v1'))
     self.client.Mock()
     self.addCleanup(self.client.Unmock)
@@ -93,3 +91,57 @@ class MlVisionTestBase(sdk_test_base.WithFakeAuth,
     response = self.messages.BatchAnnotateImagesResponse(responses=responses)
     self.client.images.Annotate.Expect(request,
                                        response=response)
+
+  def _ExpectAsyncBatchAnnotationRequest(self, input_file, output_path,
+                                         feature_type,
+                                         entity_field_name=None,
+                                         mime_type=None,
+                                         results=None, error_message=None,
+                                         model=None):
+    """Expect requests that lead to AsyncBatchAnnotations.
+
+    Args:
+      input_file: str, the path to the input PDF/TIFF file.
+      output_path: str, the path where output file will be stored.
+      feature_type: Feature, the message for the feature being requested.
+      entity_field_name: str, the field name of the entity to annotate, e.g.
+          textAnnotations.
+      mime_type: str, the type of the file. Currently only "application/pdf" and
+          "image/tiff" are supported.
+      results: [str], the list of entities to return.
+      error_message: str, the error message to be given if an error is desired.
+      model: str, the model version to use for the feature.
+    """
+    feature = self.messages.Feature(type=feature_type, model=model)
+    if input_file:
+      gcs_source = self.messages.GcsSource(uri=input_file)
+    if output_path:
+      gcs_destination = self.messages.GcsDestination(
+          uri=output_path)
+    input_config = self.messages.InputConfig()
+    output_config = self.messages.OutputConfig()
+    input_config.gcsSource = gcs_source
+    input_config.mimeType = mime_type
+    output_config.gcsDestination = gcs_destination
+    async_annotate_request = self.messages.AsyncAnnotateFileRequest(
+        features=[feature],
+        inputConfig=input_config,
+        outputConfig=output_config)
+    request = self.messages.AsyncBatchAnnotateFilesRequest(
+        requests=[async_annotate_request])
+    response = None
+    error = None
+    if results:
+      entities = [{'confidence': 0.5, 'description': r} for r in results]
+      response = encoding.PyValueToMessage(
+          self.messages.Operation.ResponseValue,
+          {entity_field_name: entities})
+    if error_message:
+      error = encoding.PyValueToMessage(
+          self.messages.Status,
+          {'code': 400,
+           'details': [],
+           'message': error_message})
+    operation = self.messages.Operation(response=response, error=error)
+    self.client.files.AsyncBatchAnnotate.Expect(request,
+                                                response=operation)

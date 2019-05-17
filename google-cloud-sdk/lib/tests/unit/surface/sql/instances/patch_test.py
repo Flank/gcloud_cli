@@ -54,6 +54,11 @@ class _BaseInstancePatchTest(object):
     self.AssertOutputContains(
         '-settings.maintenanceWindow.hour: 2', normalize_space=True)
 
+    # TODO(b/122660263): Remove when V1 instances are no longer supported.
+    # This is a V2 instance, so check that the deprecation message is not shown.
+    self.AssertErrNotContains(
+        'Upgrade your First Generation instance to Second Generation')
+
   def testClearMaintenanceWindowAsync(self):
     # No reason to choose this over any other patch scenario for testing async,
     # but we need the coverage.
@@ -112,6 +117,11 @@ class _BaseInstancePatchTest(object):
         '-settings.ipConfiguration.authorizedNetworks[0].value: 0.0.0.0/0',
         normalize_space=True)
     self.AssertErrContains('{"ipConfiguration": {"authorizedNetworks": []}}')
+
+    # TODO(b/122660263): Remove when V1 instances are no longer supported.
+    # This is a V1 instance, so check that the deprecation message is shown.
+    self.AssertErrContains(
+        'Upgrade your First Generation instance to Second Generation')
 
   def testPatchAuthorizedNetworks(self):
     overwrite_prompt_mock = self.StartObjectPatch(
@@ -247,7 +257,7 @@ class _BaseInstancePatchTest(object):
 """,
         normalize_space=True)
 
-  def testUpdateDatabaseFlags(self):
+  def _ExpectDatabaseFlagsUpdate(self, instance):
     diff = {
         'name': 'custom-instance',
         'settings': {
@@ -263,7 +273,7 @@ class _BaseInstancePatchTest(object):
             ]
         }
     }
-    self.ExpectInstanceGet(self.GetV2Instance(), diff)
+    self.ExpectInstanceGet(instance, diff)
     diff['settings'].update({
         'databaseFlags': [
             self.messages.DatabaseFlags(
@@ -278,11 +288,33 @@ class _BaseInstancePatchTest(object):
     })
     self.ExpectInstancePatch(self.GetPatchRequestInstance(), diff)
     self.ExpectDoneUpdateOperationGet()
-    self.ExpectInstanceGet(self.GetV2Instance(), diff)
+    self.ExpectInstanceGet(instance, diff)
     self.Run('sql instances patch custom-instance '
              '--database-flags=second=two,third=thr33')
 
-  def testClearDatabaseFlags(self):
+  def testUpdateMysqlDatabaseFlags(self):
+    prompt_mock = self.StartObjectPatch(
+        console_io, 'PromptContinue', return_value=True)
+    self._ExpectDatabaseFlagsUpdate(self.GetV2Instance())
+
+    prompt_mock.assert_called_with(
+        'WARNING: This patch modifies database flag values, which may require '
+        'your instance to be restarted. Check the list of supported flags - '
+        'https://cloud.google.com/sql/docs/mysql/flags - to see if your '
+        'instance will be restarted when this patch is submitted.')
+
+  def testUpdatePostgresDatabaseFlags(self):
+    prompt_mock = self.StartObjectPatch(
+        console_io, 'PromptContinue', return_value=True)
+    self._ExpectDatabaseFlagsUpdate(self.GetPostgresInstance())
+
+    prompt_mock.assert_called_with(
+        'WARNING: This patch modifies database flag values, which may require '
+        'your instance to be restarted. Check the list of supported flags - '
+        'https://cloud.google.com/sql/docs/postgres/flags - to see if your '
+        'instance will be restarted when this patch is submitted.')
+
+  def _ExpectDatabaseFlagsClear(self, instance):
     diff = {
         'name': 'custom-instance',
         'settings': {
@@ -298,15 +330,37 @@ class _BaseInstancePatchTest(object):
             ]
         }
     }
-    self.ExpectInstanceGet(self.GetV2Instance(), diff)
+    self.ExpectInstanceGet(instance, diff)
     diff['settings'].update({
         'databaseFlags': []
     })
     self.ExpectInstancePatch(self.GetPatchRequestInstance(), diff)
     self.ExpectDoneUpdateOperationGet()
-    self.ExpectInstanceGet(self.GetV2Instance(), diff)
+    self.ExpectInstanceGet(instance, diff)
     self.Run('sql instances patch custom-instance '
              '--clear-database-flags')
+
+  def testClearMysqlDatabaseFlags(self):
+    prompt_mock = self.StartObjectPatch(
+        console_io, 'PromptContinue', return_value=True)
+    self._ExpectDatabaseFlagsClear(self.GetV2Instance())
+
+    prompt_mock.assert_called_with(
+        'WARNING: This patch modifies database flag values, which may require '
+        'your instance to be restarted. Check the list of supported flags - '
+        'https://cloud.google.com/sql/docs/mysql/flags - to see if your '
+        'instance will be restarted when this patch is submitted.')
+
+  def testClearPostgresDatabaseFlags(self):
+    prompt_mock = self.StartObjectPatch(
+        console_io, 'PromptContinue', return_value=True)
+    self._ExpectDatabaseFlagsClear(self.GetPostgresInstance())
+
+    prompt_mock.assert_called_with(
+        'WARNING: This patch modifies database flag values, which may require '
+        'your instance to be restarted. Check the list of supported flags - '
+        'https://cloud.google.com/sql/docs/postgres/flags - to see if your '
+        'instance will be restarted when this patch is submitted.')
 
   def testDisableBackup(self):
     diff = {

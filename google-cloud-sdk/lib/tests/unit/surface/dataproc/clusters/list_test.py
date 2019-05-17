@@ -145,7 +145,6 @@ class ClustersListUnitTestBeta(ClustersListUnitTest, base.DataprocTestBaseBeta):
 
   def testBeta(self):
     self.assertEqual(self.messages, self._beta_messages)
-    self.assertEqual(self.track, calliope_base.ReleaseTrack.BETA)
 
   def testListClustersOutput_scheduledDeleteCluster(self):
     cluster = self.MakeRunningCluster()
@@ -161,6 +160,12 @@ class ClustersListUnitTestBeta(ClustersListUnitTest, base.DataprocTestBaseBeta):
     # SCHEDULED_DELETE column should be marked as enabled.
     self.AssertOutputContains(
         'test-cluster 2 RUNNING us-central1-a enabled', normalize_space=True)
+
+
+class ClustersListUnitTestAlpha(ClustersListUnitTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

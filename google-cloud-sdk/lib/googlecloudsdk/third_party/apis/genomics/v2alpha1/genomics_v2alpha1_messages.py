@@ -113,8 +113,9 @@ class Action(_messages.Message):
       set to this name, making it useful for inter-container communication.
       The name must contain only upper and lowercase alphanumeric characters
       and hypens and cannot start with a hypen.
-    pidNamespace: The PID namespace to run the action inside. If unspecified,
-      a separate isolated namespace is used.
+    pidNamespace: An optional identifier for a PID namespace to run the action
+      inside. Multiple actions should use the same string to share a
+      namespace.  If unspecified, a separate isolated namespace is used.
     portMappings: A map of containers to host port mappings for this
       container. If the container already specifies exposed ports, use the
       `PUBLISH_EXPOSED_PORTS` flag instead.  The host port number must be less
@@ -655,7 +656,8 @@ class FailedEvent(_messages.Message):
         for serious errors.  HTTP Mapping: 500 Internal Server Error
       UNAVAILABLE: The service is currently unavailable.  This is most likely
         a transient condition, which can be corrected by retrying with a
-        backoff.  See the guidelines above for deciding between
+        backoff. Note that it is not always safe to retry non-idempotent
+        operations.  See the guidelines above for deciding between
         `FAILED_PRECONDITION`, `ABORTED`, and `UNAVAILABLE`.  HTTP Mapping:
         503 Service Unavailable
       DATA_LOSS: Unrecoverable data loss or corruption.  HTTP Mapping: 500
@@ -732,8 +734,8 @@ class GenomicsProjectsOperationsListRequest(_messages.Message):
       `projectId = my-project AND labels.color = *` * `projectId = my-project
       AND labels.color = red`
     name: The name of the operation's parent resource.
-    pageSize: The maximum number of results to return. If unspecified,
-      defaults to 256. The maximum value is 2048.
+    pageSize: The maximum number of results to return. The maximum value is
+      256.
     pageToken: The standard list page token.
   """
 
@@ -754,26 +756,6 @@ class GenomicsWorkersCheckInRequest(_messages.Message):
 
   checkInRequest = _messages.MessageField('CheckInRequest', 1)
   id = _messages.StringField(2, required=True)
-
-
-class ImportReadGroupSetsResponse(_messages.Message):
-  r"""The read group set import response.
-
-  Fields:
-    readGroupSetIds: IDs of the read group sets that were created.
-  """
-
-  readGroupSetIds = _messages.StringField(1, repeated=True)
-
-
-class ImportVariantsResponse(_messages.Message):
-  r"""The variant data import response.
-
-  Fields:
-    callSetIds: IDs of the call sets created during the import.
-  """
-
-  callSetIds = _messages.StringField(1, repeated=True)
 
 
 class ListOperationsResponse(_messages.Message):
@@ -889,9 +871,7 @@ class Operation(_messages.Message):
   Messages:
     MetadataValue: An OperationMetadata or Metadata object. This will always
       be returned with the Operation.
-    ResponseValue: If importing ReadGroupSets, an ImportReadGroupSetsResponse
-      is returned. If importing Variants, an ImportVariantsResponse is
-      returned. For pipelines and exports, an Empty response is returned.
+    ResponseValue: An Empty object.
 
   Fields:
     done: If the value is `false`, it means the operation is still in
@@ -904,9 +884,7 @@ class Operation(_messages.Message):
     name: The server-assigned name, which is only unique within the same
       service that originally returns it. For example&#58; `operations
       /CJHU7Oi_ChDrveSpBRjfuL-qzoWAgEw`
-    response: If importing ReadGroupSets, an ImportReadGroupSetsResponse is
-      returned. If importing Variants, an ImportVariantsResponse is returned.
-      For pipelines and exports, an Empty response is returned.
+    response: An Empty object.
   """
 
   @encoding.MapUnrecognizedFields('additionalProperties')
@@ -937,9 +915,7 @@ class Operation(_messages.Message):
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class ResponseValue(_messages.Message):
-    r"""If importing ReadGroupSets, an ImportReadGroupSetsResponse is
-    returned. If importing Variants, an ImportVariantsResponse is returned.
-    For pipelines and exports, an Empty response is returned.
+    r"""An Empty object.
 
     Messages:
       AdditionalProperty: An additional property for a ResponseValue object.
@@ -1495,6 +1471,8 @@ class VirtualMachine(_messages.Message):
       https://cloud.google.com/compute/docs/instances/specify-min-cpu-
       platform.
     disks: The list of disks to create and attach to the VM.
+    enableStackdriverMonitoring: Whether Stackdriver monitoring should be
+      enabled on the VM.
     labels: Optional set of labels to apply to the VM and any attached disk
       resources. These labels must adhere to the name and value restrictions
       on VM labels imposed by Compute Engine.  Labels applied at creation time
@@ -1552,12 +1530,13 @@ class VirtualMachine(_messages.Message):
   bootImage = _messages.StringField(3)
   cpuPlatform = _messages.StringField(4)
   disks = _messages.MessageField('Disk', 5, repeated=True)
-  labels = _messages.MessageField('LabelsValue', 6)
-  machineType = _messages.StringField(7)
-  network = _messages.MessageField('Network', 8)
-  nvidiaDriverVersion = _messages.StringField(9)
-  preemptible = _messages.BooleanField(10)
-  serviceAccount = _messages.MessageField('ServiceAccount', 11)
+  enableStackdriverMonitoring = _messages.BooleanField(6)
+  labels = _messages.MessageField('LabelsValue', 7)
+  machineType = _messages.StringField(8)
+  network = _messages.MessageField('Network', 9)
+  nvidiaDriverVersion = _messages.StringField(10)
+  preemptible = _messages.BooleanField(11)
+  serviceAccount = _messages.MessageField('ServiceAccount', 12)
 
 
 class WorkerAssignedEvent(_messages.Message):

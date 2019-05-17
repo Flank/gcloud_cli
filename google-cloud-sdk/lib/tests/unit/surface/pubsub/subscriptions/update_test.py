@@ -31,7 +31,7 @@ from tests.lib.surface.pubsub import base
 class SubscriptionsUpdateTest(base.CloudPubsubTestBase):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
     self.svc = self.client.projects_subscriptions.Patch
     properties.VALUES.core.user_output_enabled.Set(True)
 
@@ -63,6 +63,135 @@ class SubscriptionsUpdateTest(base.CloudPubsubTestBase):
         ' --retain-acked-messages --message-retention-duration 3d')
     self.AssertErrEquals('Updated subscription [{0}].\n'
                          .format(sub_ref.RelativeName()))
+
+  def testUpdateAllFullUri(self):
+    sub_ref = util.ParseSubscription('sub', self.Project())
+    new_sub = self.msgs.Subscription(
+        name=sub_ref.RelativeName(),
+        ackDeadlineSeconds=100,
+        pushConfig=self.msgs.PushConfig(
+            pushEndpoint='https://my.appspot.com/push'),
+        retainAckedMessages=True,
+        messageRetentionDuration='259200s')
+
+    update_req = self.msgs.PubsubProjectsSubscriptionsPatchRequest(
+        updateSubscriptionRequest=self.msgs.UpdateSubscriptionRequest(
+            subscription=new_sub,
+            updateMask=('ackDeadlineSeconds,pushConfig,retainAckedMessages,'
+                        'messageRetentionDuration')),
+        name=sub_ref.RelativeName())
+    self.svc.Expect(request=update_req,
+                    response=self.msgs.Subscription())  # Ignore
+    self.Run(
+        'pubsub subscriptions update {} --ack-deadline 100'
+        ' --push-endpoint https://my.appspot.com/push'
+        ' --retain-acked-messages --message-retention-duration 3d'
+        .format(sub_ref.SelfLink()))
+    self.AssertErrEquals('Updated subscription [{0}].\n'
+                         .format(sub_ref.RelativeName()))
+
+  def testUnsetPushEndpoint(self):
+    sub_ref = util.ParseSubscription('sub', self.Project())
+    new_sub = self.msgs.Subscription(
+        name=sub_ref.RelativeName(),
+        pushConfig=self.msgs.PushConfig(pushEndpoint=''))
+
+    update_req = self.msgs.PubsubProjectsSubscriptionsPatchRequest(
+        updateSubscriptionRequest=self.msgs.UpdateSubscriptionRequest(
+            subscription=new_sub, updateMask='pushConfig'),
+        name=sub_ref.RelativeName())
+    self.svc.Expect(request=update_req,
+                    response=self.msgs.Subscription())  # Ignore
+    self.Run('pubsub subscriptions update sub --push-endpoint ""')
+    self.AssertErrEquals('Updated subscription [{0}].\n'
+                         .format(sub_ref.RelativeName()))
+
+  def testUpdateNoExpiration(self):
+    sub_ref = util.ParseSubscription('sub', self.Project())
+    new_sub = self.msgs.Subscription(
+        name=sub_ref.RelativeName(),
+        expirationPolicy=self.msgs.ExpirationPolicy())
+
+    update_req = self.msgs.PubsubProjectsSubscriptionsPatchRequest(
+        updateSubscriptionRequest=self.msgs.UpdateSubscriptionRequest(
+            subscription=new_sub, updateMask='expirationPolicy'),
+        name=sub_ref.RelativeName())
+    self.svc.Expect(
+        request=update_req, response=self.msgs.Subscription())  # Ignore
+    self.Run('pubsub subscriptions update sub --expiration-period never')
+    self.AssertErrEquals('Updated subscription [{0}].\n'.format(
+        sub_ref.RelativeName()))
+
+  def testUpdateExpirationPeriod(self):
+    sub_ref = util.ParseSubscription('sub', self.Project())
+    new_sub = self.msgs.Subscription(
+        name=sub_ref.RelativeName(),
+        expirationPolicy=self.msgs.ExpirationPolicy(ttl='172800s'))
+
+    update_req = self.msgs.PubsubProjectsSubscriptionsPatchRequest(
+        updateSubscriptionRequest=self.msgs.UpdateSubscriptionRequest(
+            subscription=new_sub, updateMask='expirationPolicy'),
+        name=sub_ref.RelativeName())
+    self.svc.Expect(
+        request=update_req, response=self.msgs.Subscription())  # Ignore
+    self.Run('pubsub subscriptions update sub --expiration-period 2d')
+    self.AssertErrEquals('Updated subscription [{0}].\n'.format(
+        sub_ref.RelativeName()))
+
+  def testUnsetMessageRetention(self):
+    sub_ref = util.ParseSubscription('sub', self.Project())
+    new_sub = self.msgs.Subscription(
+        name=sub_ref.RelativeName(), retainAckedMessages=False)
+
+    update_req = self.msgs.PubsubProjectsSubscriptionsPatchRequest(
+        updateSubscriptionRequest=self.msgs.UpdateSubscriptionRequest(
+            subscription=new_sub, updateMask='retainAckedMessages'),
+        name=sub_ref.RelativeName())
+    self.svc.Expect(request=update_req,
+                    response=self.msgs.Subscription())  # Ignore
+    self.Run('pubsub subscriptions update sub --no-retain-acked-messages')
+    self.AssertErrEquals('Updated subscription [{0}].\n'
+                         .format(sub_ref.RelativeName()))
+
+  def testDefaultMessageRetentionDuration(self):
+    sub_ref = util.ParseSubscription('sub', self.Project())
+    new_sub = self.msgs.Subscription(name=sub_ref.RelativeName(),
+                                     messageRetentionDuration=None)
+
+    update_req = self.msgs.PubsubProjectsSubscriptionsPatchRequest(
+        updateSubscriptionRequest=self.msgs.UpdateSubscriptionRequest(
+            subscription=new_sub, updateMask='messageRetentionDuration'),
+        name=sub_ref.RelativeName())
+    self.svc.Expect(request=update_req,
+                    response=self.msgs.Subscription())  # Ignore
+    self.Run('pubsub subscriptions update sub'
+             '     --message-retention-duration default')
+    self.AssertErrEquals('Updated subscription [{0}].\n'
+                         .format(sub_ref.RelativeName()))
+
+  def testUpdateWithNonExistentSubscription(self):
+    sub_ref = util.ParseSubscription('non-existent', self.Project())
+    new_sub = self.msgs.Subscription(name=sub_ref.RelativeName(),
+                                     ackDeadlineSeconds=100)
+
+    update_req = self.msgs.PubsubProjectsSubscriptionsPatchRequest(
+        updateSubscriptionRequest=self.msgs.UpdateSubscriptionRequest(
+            subscription=new_sub, updateMask='ackDeadlineSeconds'),
+        name=sub_ref.RelativeName())
+    self.svc.Expect(
+        request=update_req,
+        response=None,
+        exception=http_error.MakeHttpError(404, 'Subscription does not exist.'))
+
+    with self.AssertRaisesHttpExceptionMatches(r'Subscription does not exist.'):
+      self.Run('pubsub subscriptions update non-existent'
+               '    --ack-deadline 100')
+
+
+class SubscriptionsUpdateTestBeta(SubscriptionsUpdateTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def _RunLabelsTest(self, old_labels, new_labels, command):
     sub_ref = util.ParseSubscription('sub', self.Project())
@@ -144,127 +273,56 @@ class SubscriptionsUpdateTest(base.CloudPubsubTestBase):
         [('bar', 'value2'), ('baz', 'newvalue3'), ('foo', 'newvalue1')],
         '--update-labels foo=newvalue1,baz=newvalue3')
 
-  def testUpdateAllFullUri(self):
+  def testUpdatePushAuthServiceAccountAndAudience(self):
     sub_ref = util.ParseSubscription('sub', self.Project())
     new_sub = self.msgs.Subscription(
         name=sub_ref.RelativeName(),
-        ackDeadlineSeconds=100,
         pushConfig=self.msgs.PushConfig(
-            pushEndpoint='https://my.appspot.com/push'),
-        retainAckedMessages=True,
-        messageRetentionDuration='259200s')
-
-    update_req = self.msgs.PubsubProjectsSubscriptionsPatchRequest(
-        updateSubscriptionRequest=self.msgs.UpdateSubscriptionRequest(
-            subscription=new_sub,
-            updateMask=('ackDeadlineSeconds,pushConfig,retainAckedMessages,'
-                        'messageRetentionDuration')),
-        name=sub_ref.RelativeName())
-    self.svc.Expect(request=update_req,
-                    response=self.msgs.Subscription())  # Ignore
-    self.Run(
-        'pubsub subscriptions update {} --ack-deadline 100'
-        ' --push-endpoint https://my.appspot.com/push'
-        ' --retain-acked-messages --message-retention-duration 3d'
-        .format(sub_ref.SelfLink()))
-    self.AssertErrEquals('Updated subscription [{0}].\n'
-                         .format(sub_ref.RelativeName()))
-
-  def testUnsetPushEndpoint(self):
-    sub_ref = util.ParseSubscription('sub', self.Project())
-    new_sub = self.msgs.Subscription(
-        name=sub_ref.RelativeName(),
-        pushConfig=self.msgs.PushConfig(pushEndpoint=''))
+            pushEndpoint='https://example.com/push',
+            oidcToken=self.msgs.OidcToken(
+                serviceAccountEmail='account@example.com',
+                audience='my-audience')))
 
     update_req = self.msgs.PubsubProjectsSubscriptionsPatchRequest(
         updateSubscriptionRequest=self.msgs.UpdateSubscriptionRequest(
             subscription=new_sub, updateMask='pushConfig'),
         name=sub_ref.RelativeName())
-    self.svc.Expect(request=update_req,
-                    response=self.msgs.Subscription())  # Ignore
-    self.Run('pubsub subscriptions update sub --push-endpoint ""')
-    self.AssertErrEquals('Updated subscription [{0}].\n'
-                         .format(sub_ref.RelativeName()))
+    self.svc.Expect(
+        request=update_req, response=self.msgs.Subscription())  # Ignore
+    self.Run('pubsub subscriptions update sub '
+             '--push-endpoint=https://example.com/push '
+             '--push-auth-service-account=account@example.com '
+             '--push-auth-token-audience=my-audience')
+    self.AssertErrEquals('Updated subscription [{0}].\n'.format(
+        sub_ref.RelativeName()))
 
-  def testUnsetMessageRetention(self):
+  def testUpdatePushAuthServiceAccountNoAudience(self):
     sub_ref = util.ParseSubscription('sub', self.Project())
     new_sub = self.msgs.Subscription(
-        name=sub_ref.RelativeName(), retainAckedMessages=False)
+        name=sub_ref.RelativeName(),
+        pushConfig=self.msgs.PushConfig(
+            pushEndpoint='https://example.com/push',
+            oidcToken=self.msgs.OidcToken(
+                serviceAccountEmail='account@example.com')))
 
     update_req = self.msgs.PubsubProjectsSubscriptionsPatchRequest(
         updateSubscriptionRequest=self.msgs.UpdateSubscriptionRequest(
-            subscription=new_sub, updateMask='retainAckedMessages'),
-        name=sub_ref.RelativeName())
-    self.svc.Expect(request=update_req,
-                    response=self.msgs.Subscription())  # Ignore
-    self.Run('pubsub subscriptions update sub --no-retain-acked-messages')
-    self.AssertErrEquals('Updated subscription [{0}].\n'
-                         .format(sub_ref.RelativeName()))
-
-  def testDefaultMessageRetentionDuration(self):
-    sub_ref = util.ParseSubscription('sub', self.Project())
-    new_sub = self.msgs.Subscription(name=sub_ref.RelativeName(),
-                                     messageRetentionDuration=None)
-
-    update_req = self.msgs.PubsubProjectsSubscriptionsPatchRequest(
-        updateSubscriptionRequest=self.msgs.UpdateSubscriptionRequest(
-            subscription=new_sub, updateMask='messageRetentionDuration'),
-        name=sub_ref.RelativeName())
-    self.svc.Expect(request=update_req,
-                    response=self.msgs.Subscription())  # Ignore
-    self.Run('pubsub subscriptions update sub'
-             '     --message-retention-duration default')
-    self.AssertErrEquals('Updated subscription [{0}].\n'
-                         .format(sub_ref.RelativeName()))
-
-  def testUpdateWithNonExistentSubscription(self):
-    sub_ref = util.ParseSubscription('non-existent', self.Project())
-    new_sub = self.msgs.Subscription(name=sub_ref.RelativeName(),
-                                     ackDeadlineSeconds=100)
-
-    update_req = self.msgs.PubsubProjectsSubscriptionsPatchRequest(
-        updateSubscriptionRequest=self.msgs.UpdateSubscriptionRequest(
-            subscription=new_sub, updateMask='ackDeadlineSeconds'),
+            subscription=new_sub, updateMask='pushConfig'),
         name=sub_ref.RelativeName())
     self.svc.Expect(
-        request=update_req,
-        response=None,
-        exception=http_error.MakeHttpError(404, 'Subscription does not exist.'))
+        request=update_req, response=self.msgs.Subscription())  # Ignore
+    self.Run('pubsub subscriptions update sub '
+             '--push-endpoint=https://example.com/push '
+             '--push-auth-service-account=account@example.com')
+    self.AssertErrEquals('Updated subscription [{0}].\n'.format(
+        sub_ref.RelativeName()))
 
-    with self.AssertRaisesHttpExceptionMatches(r'Subscription does not exist.'):
-      self.Run('pubsub subscriptions update non-existent'
-               '    --ack-deadline 100')
 
-  def testUpdateNoExpiration(self):
-    sub_ref = util.ParseSubscription('sub', self.Project())
-    new_sub = self.msgs.Subscription(
-        name=sub_ref.RelativeName(),
-        expirationPolicy=self.msgs.ExpirationPolicy())
+class SubscriptionsUpdateTestAlpha(SubscriptionsUpdateTestBeta):
 
-    update_req = self.msgs.PubsubProjectsSubscriptionsPatchRequest(
-        updateSubscriptionRequest=self.msgs.UpdateSubscriptionRequest(
-            subscription=new_sub, updateMask='expirationPolicy'),
-        name=sub_ref.RelativeName())
-    self.svc.Expect(request=update_req,
-                    response=self.msgs.Subscription())  # Ignore
-    self.Run('pubsub subscriptions update sub --expiration-period never')
-    self.AssertErrEquals('Updated subscription [{0}].\n'
-                         .format(sub_ref.RelativeName()))
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
-  def testUpdateExpirationPeriod(self):
-    sub_ref = util.ParseSubscription('sub', self.Project())
-    new_sub = self.msgs.Subscription(
-        name=sub_ref.RelativeName(),
-        expirationPolicy=self.msgs.ExpirationPolicy(ttl='172800s'))
 
-    update_req = self.msgs.PubsubProjectsSubscriptionsPatchRequest(
-        updateSubscriptionRequest=self.msgs.UpdateSubscriptionRequest(
-            subscription=new_sub, updateMask='expirationPolicy'),
-        name=sub_ref.RelativeName())
-    self.svc.Expect(request=update_req,
-                    response=self.msgs.Subscription())  # Ignore
-    self.Run('pubsub subscriptions update sub --expiration-period 2d')
-    self.AssertErrEquals('Updated subscription [{0}].\n'
-                         .format(sub_ref.RelativeName()))
 if __name__ == '__main__':
   test_case.main()

@@ -217,7 +217,8 @@ balancing mode value to set the current max usage of the instance group.
 Acceptable values are \f50.0\fR (0%) through \f51.0\fR (100%). Setting this
 value to \f50.0\fR (0%) drains the backend service. Note that draining a backend
 service only prevents new connections to instances in the group. All existing
-connections are allowed to continue until they close by normal means.
+connections are allowed to continue until they close by normal means. This
+cannot be used for internal load balancing.
 
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
@@ -311,11 +312,6 @@ At most one of these may be specified:
 
 .RS 2m
 .TP 2m
-
-At most one of these may be specified:
-
-.RS 2m
-.TP 2m
 \fB\-\-max\-connections\fR=\fIMAX_CONNECTIONS\fR
 Maximum concurrent connections that the backend can handle. Valid for instance
 group and network endpoint group backends.
@@ -338,13 +334,6 @@ connections per healthy instance is calculated by multiplying
 MAX_CONNECTIONS_PER_INSTANCE by the number of instances in the instance group,
 then dividing by the number of healthy instances.
 
-.RE
-.sp
-.TP 2m
-
-At most one of these may be specified:
-
-.RS 2m
 .TP 2m
 \fB\-\-max\-rate\fR=\fIMAX_RATE\fR
 Maximum number of HTTP requests per second (RPS) that the backend can handle.
@@ -373,15 +362,15 @@ backends that use autoscaling based on load balancing.
 
 .RE
 .RE
-.RE
 .sp
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

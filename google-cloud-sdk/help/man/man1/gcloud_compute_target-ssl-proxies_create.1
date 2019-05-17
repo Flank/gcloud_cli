@@ -21,7 +21,7 @@ gcloud compute target\-ssl\-proxies create \- create a target SSL proxy
 proxies. A target SSL proxy is referenced by one or more forwarding rules which
 define which packets the proxy is responsible for routing. The target SSL proxy
 points to a backend service which handle the actual requests. The target SSL
-proxy also points to at most 10 SSL certificates used for server\-side
+proxy also points to at most 15 SSL certificates used for server\-side
 authentication. The target SSL proxy can be associated with at most one SSL
 policy.
 
@@ -47,7 +47,7 @@ A backend service that will be used for connections to the target SSL proxy.
 
 .TP 2m
 \fB\-\-ssl\-certificates\fR=\fISSL_CERTIFICATE\fR,[...]
-References to at most 10 SSL certificate resources that are used for
+References to at most 15 SSL certificate resources that are used for
 server\-side authentication. The first SSL certificate in this list is
 considered the primary SSL certificate associated with the load balancer. The
 SSL certificate must exist and cannot be deleted while referenced by a target
@@ -93,10 +93,11 @@ target SSL proxy.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

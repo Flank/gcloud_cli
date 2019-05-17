@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2016 Google Inc. All Rights Reserved.
+# Copyright 2016 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -267,9 +267,7 @@ def GetTimeZone(name):
     name = times_data.IANA_TO_WINDOWS.get(name, name)
     try:
       tzinfo = tzwin.tzwin(name)
-    # pytype: disable=name-error
     except WindowsError:  # pylint: disable=undefined-variable
-      # pytype: enable=name-error
       pass
   return tzinfo
 

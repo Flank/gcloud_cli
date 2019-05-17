@@ -19,11 +19,15 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.container.binauthz import base
 
 
-class ExportTest(base.BinauthzMockedBetaPolicyClientUnitTest):
+class ExportTest(base.WithMockBetaBinauthz, base.BinauthzTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testSuccess(self):
     # Create the expected policy proto.
@@ -62,7 +66,7 @@ class ExportTest(base.BinauthzMockedBetaPolicyClientUnitTest):
         ),
     )
 
-    self.client.projects.GetPolicy.Expect(
+    self.mock_client.projects.GetPolicy.Expect(
         self.messages.BinaryauthorizationProjectsGetPolicyRequest(
             name='projects/{}/policy'.format(self.Project())),
         policy_proto,
@@ -71,6 +75,12 @@ class ExportTest(base.BinauthzMockedBetaPolicyClientUnitTest):
     response = self.RunBinauthz('policy export')
 
     self.assertEqual(response, policy_proto)
+
+
+class ExportAlphaTest(base.WithMockAlphaBinauthz, ExportTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

@@ -4,8 +4,8 @@ NAME
 
 SYNOPSIS
     gcloud alpha scheduler jobs create app-engine JOB --schedule=SCHEDULE
-        [--description=DESCRIPTION] [--headers=HEADERS]
-        [--http-method=HTTP_METHOD; default="post"]
+        [--attempt-deadline=ATTEMPT_DEADLINE] [--description=DESCRIPTION]
+        [--headers=HEADERS] [--http-method=HTTP_METHOD; default="post"]
         [--max-backoff=MAX_BACKOFF; default="1h"]
         [--max-doublings=MAX_DOUBLINGS; default=16]
         [--max-retry-attempts=MAX_RETRY_ATTEMPTS]
@@ -55,6 +55,11 @@ REQUIRED FLAGS
           https://cloud.google.com/scheduler/docs/quickstart#defining_the_job_schedule
 
 OPTIONAL FLAGS
+     --attempt-deadline=ATTEMPT_DEADLINE
+        The deadline for job attempts. If the request handler doesn't respond
+        by this dealine, the request is cancelled and the attempt is marked as
+        failed. For example, 20s.
+
      --description=DESCRIPTION
         Human-readable description of the job.
 
@@ -121,8 +126,9 @@ OPTIONAL FLAGS
           (PUT or POST).
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

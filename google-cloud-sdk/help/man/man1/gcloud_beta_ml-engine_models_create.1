@@ -5,19 +5,19 @@
 
 .SH "NAME"
 .HP
-gcloud beta ml\-engine models create \- create a new Cloud ML Engine model
+gcloud beta ml\-engine models create \- create a new AI Platform model
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta ml\-engine models create\fR \fIMODEL\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-logging\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-regions\fR=\fIREGION\fR,[\fIREGION\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta ml\-engine models create\fR \fIMODEL\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-console\-logging\fR] [\fB\-\-enable\-logging\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-regions\fR=\fIREGION\fR,[\fIREGION\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Create a new Cloud ML Engine model.
+\fB(BETA)\fR Create a new AI Platform model.
 
 
 
@@ -40,8 +40,16 @@ Name of the model.
 The description of the model.
 
 .TP 2m
+\fB\-\-enable\-console\-logging\fR
+If set, enables StackDriver Logging of stderr and stdout streams for online
+prediction. These logs are more verbose than the standard access logs and can be
+helpful for debugging.
+
+.TP 2m
 \fB\-\-enable\-logging\fR
-If set, enables StackDriver Logging for online prediction.
+If set, enables StackDriver Logging for online prediction. These logs are like
+standard server access logs, containing information such as timestamps and
+latency for each request.
 
 .TP 2m
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
@@ -65,10 +73,11 @@ Will soon be required, but defaults to 'us\-central1' for now.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

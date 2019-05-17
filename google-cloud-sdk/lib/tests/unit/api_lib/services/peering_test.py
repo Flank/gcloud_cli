@@ -53,6 +53,29 @@ class PeeringTest(unit_test_base.SNUnitTestBase):
       peering.CreateConnection(self.PROJECT_NUMBER, self.service, self.NETWORK,
                                self.RANGES)
 
+  def testUpdateConnection_Success(self):
+    """Test UpdateConnection returns operation when successful."""
+    want = self.services_messages.Operation(
+        name=self.OPERATION_NAME, done=False)
+    self.ExpectUpdateConnection(self.NETWORK, self.RANGES, self.OPERATION_NAME,
+                                True)
+
+    got = peering.UpdateConnection(self.PROJECT_NUMBER, self.service,
+                                   self.NETWORK, self.RANGES, True)
+
+    self.assertEqual(got, want)
+
+  def testUpdateConnection_PermissionDenied(self):
+    """Test UpdateConnection raises correctly when server returns 403 error."""
+    server_error = http_error.MakeDetailedHttpError(code=403, message='Error!')
+    self.ExpectUpdateConnection(
+        self.NETWORK, self.RANGES, None, True, error=server_error)
+
+    with self.assertRaisesRegex(
+        exceptions.CreateConnectionsPermissionDeniedException, r'Error!'):
+      peering.UpdateConnection(self.PROJECT_NUMBER, self.service, self.NETWORK,
+                               self.RANGES, True)
+
   def testGetOperation_Success(self):
     """Test GetOperation returns operation when successful."""
     want = self.services_messages.Operation(name=self.OPERATION_NAME, done=True)

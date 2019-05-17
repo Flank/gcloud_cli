@@ -1,15 +1,16 @@
 NAME
-    gcloud pubsub subscriptions - manage Cloud Pubsub subscriptions
+    gcloud pubsub subscriptions - manage Cloud Pub/Sub subscriptions
 
 SYNOPSIS
     gcloud pubsub subscriptions COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Manage Cloud Pubsub subscriptions.
+    Manage Cloud Pub/Sub subscriptions.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -39,6 +40,13 @@ COMMANDS
 
      pull
         Pulls one or more Cloud Pub/Sub messages from a subscription.
+
+     seek
+        Resets a subscription's backlog to a point in time or to a given
+        snapshot.
+
+     update
+        Updates an existing Cloud Pub/Sub subscription.
 
 NOTES
     These variants are also available:

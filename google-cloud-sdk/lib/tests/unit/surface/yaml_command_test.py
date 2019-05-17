@@ -213,7 +213,7 @@ class Validator(object):
     try:
       # Checks that the method is valid.
       poller = yaml_command_translator.AsyncOperationPoller(
-          self.builder.spec, self.fake_resource_ref)
+          self.builder.spec, self.fake_resource_ref, None)
     except registry.Error as e:
       self.E('async.collection/api_version/method', '{}', e)
       return
@@ -285,7 +285,8 @@ class Validator(object):
     request_collection = self.builder.method.request_collection
     if (request_collection and request_collection.params and
         not (self.builder.spec.arguments.resource or
-             self.builder.spec.arguments.additional_arguments_hook)):
+             self.builder.spec.arguments.additional_arguments_hook or
+             self.builder.spec.request.disable_resource_check)):
       # Currently, an additional_arguments_hook is the only way to workaround
       # declarative limitation of only one resource arg per command. However,
       # using such a hook means that a resource argument will not be defined in
@@ -434,7 +435,7 @@ class YAMLCommandTests(cli_test_base.CliTestBase, parameterized.TestCase):
     data = {
         'help_text': {
             'brief': 'help',
-            'DESCRIPTION': 'Help.',
+            'description': 'Help.',
         },
         'request': {
             'collection': 'foo.instances',
@@ -463,7 +464,7 @@ class YAMLCommandTests(cli_test_base.CliTestBase, parameterized.TestCase):
     data = {
         'help_text': {
             'brief': 'help',
-            'DESCRIPTION': 'Help.',
+            'description': 'Help.',
         },
         'request': {
             'collection': 'foo.instances',

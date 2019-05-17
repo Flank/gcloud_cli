@@ -59,13 +59,17 @@ The update type. Exactly one of these must be specified:
 .RS 2m
 .TP 2m
 \fB\-\-node\-count\fR=\fINODE_COUNT\fR
-The new number of nodes running the Environment. Must be >= 3.
+The new number of nodes running the environment. Must be >= 3.
 
+.TP 2m
+
+Group of arguments for modifying the Airflow configuration.
+
+.RS 2m
 .TP 2m
 \fB\-\-update\-airflow\-configs\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 A list of Airflow config override KEY=VALUE pairs to set. If a config override
-already exists, its value is updated; otherwise a new config override is
-created.
+exists, its value is updated; otherwise, a new config override is created.
 
 KEYs should specify the configuration section and property name, separated by a
 hyphen, for example \f5core\-print_stats_interval\fR. The section may not
@@ -76,24 +80,30 @@ character.
 
 .TP 2m
 
-At most one of these may be specified:
+Arguments available for item removal. At most one of these may be specified:
 
 .RS 2m
 .TP 2m
 \fB\-\-clear\-airflow\-configs\fR
-Remove all Airflow config overrides from the environment.
+Removes all Airflow config overrides from the environment.
 
 .TP 2m
 \fB\-\-remove\-airflow\-configs\fR=[\fIKEY\fR,...]
 A list of Airflow config override keys to remove.
 
 .RE
+.RE
 .sp
 .TP 2m
+
+Group of arguments for modifying environment variables.
+
+.RS 2m
+.TP 2m
 \fB\-\-update\-env\-variables\fR=[\fINAME\fR=\fIVALUE\fR,...]
-A list of environment variable NAME=VALUE pairs to set and provide to the Aiflow
-scheduler, worker, and webserver processes. If an environment variable already
-exists, its value is updated; otherwise a new environment variable is created.
+A list of environment variable NAME=VALUE pairs to set and provide to the
+Airflow scheduler, worker, and webserver processes. If an environment variable
+exists, its value is updated; otherwise, a new environment variable is created.
 
 NAMEs are the environment variable names and may contain upper and lowercase
 letters, digits, and underscores; they must not begin with a digit.
@@ -104,12 +114,12 @@ flag.
 
 .TP 2m
 
-At most one of these may be specified:
+Arguments available for item removal. At most one of these may be specified:
 
 .RS 2m
 .TP 2m
 \fB\-\-clear\-env\-variables\fR
-Remove all environment variables from the environment.
+Removes all environment variables from the environment.
 
 Environment variables that have system\-provided defaults cannot be unset with
 the \f5\-\-remove\-env\-variables\fR or \f5\-\-clear\-env\-variables\fR flags;
@@ -124,7 +134,13 @@ the \f5\-\-remove\-env\-variables\fR or \f5\-\-clear\-env\-variables\fR flags;
 only the user\-supplied overrides will be removed.
 
 .RE
+.RE
 .sp
+.TP 2m
+
+Group of arguments for modifying environment labels.
+
+.RS 2m
 .TP 2m
 \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 List of label KEY=VALUE pairs to update. If a label exists its value is
@@ -163,10 +179,12 @@ $ gcloud composer environments update \-\-clear\-labels \e
 List of label keys to remove. If a label does not exist it is silently ignored.
 
 .RE
+.RE
 .sp
 .TP 2m
 
-At most one of these may be specified:
+Group of arguments for modifying the PyPI package configuration. At most one of
+these may be specified:
 
 .RS 2m
 .TP 2m
@@ -179,13 +197,13 @@ starts with 'gs://').
 
 .TP 2m
 \fB\-\-update\-pypi\-package\fR=\fIPACKAGE\fR[\fIEXTRAS_LIST\fR]\fIVERSION_SPECIFIER\fR
-A PyPI package add to the environment. If a package already exists, its value is
-updated; otherwise a new package is installed.
+A PyPI package to add to the environment. If a package exists, its value is
+updated; otherwise, a new package is installed.
 
 The value takes the form of: \f5PACKAGE[EXTRAS_LIST]VERSION_SPECIFIER\fR, as one
 would specify in a pip requirements file.
 
-PACKAGE is specified as a package name such as \f5numpy.\fR EXTRAS_LIST is a
+PACKAGE is specified as a package name, such as \f5numpy.\fR EXTRAS_LIST is a
 comma\-delimited list of PEP 508 distribution extras that may be empty, in which
 case the enclosing square brackets may be omitted. VERSION_SPECIFIER is an
 optional PEP 440 version specifier. If both EXTRAS_LIST and VERSION_SPECIFIER
@@ -197,12 +215,12 @@ used.
 
 .TP 2m
 
-At most one of these may be specified:
+Arguments available for item removal. At most one of these may be specified:
 
 .RS 2m
 .TP 2m
 \fB\-\-clear\-pypi\-packages\fR
-Remove all PyPI packages from the environment.
+Removes all PyPI packages from the environment.
 
 PyPI packages that are required by the environment's core software cannot be
 uninstalled with the \f5\-\-remove\-pypi\-packages\fR or
@@ -237,10 +255,11 @@ operation to complete.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

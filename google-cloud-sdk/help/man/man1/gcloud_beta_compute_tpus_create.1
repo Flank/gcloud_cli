@@ -11,7 +11,7 @@ gcloud beta compute tpus create \- create a new Cloud TPU
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute tpus create\fR (\fITPU\fR\ :\ \fB\-\-zone\fR=\fIZONE\fR) \fB\-\-network\fR=\fINETWORK\fR \fB\-\-range\fR=\fIRANGE\fR \fB\-\-version\fR=\fIVERSION\fR [\fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR;\ default="v2\-8"] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-preemptible\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute tpus create\fR (\fITPU\fR\ :\ \fB\-\-zone\fR=\fIZONE\fR) \fB\-\-network\fR=\fINETWORK\fR \fB\-\-range\fR=\fIRANGE\fR \fB\-\-version\fR=\fIVERSION\fR [\fB\-\-accelerator\-type\fR=\fIACCELERATOR_TYPE\fR;\ default="v2\-8"] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-preemptible\fR] [\fB\-\-reserved\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -105,16 +105,26 @@ limited amount of time.
 
 Preemptible TPUs cannot be restarted.
 
+.TP 2m
+\fB\-\-reserved\fR
+When specified, will attempt to create the TPU node under reservations made in
+the current project. The reservations can be made separately but used in
+aggregated form. i.e., the user can make a reservation of 128 V2 TPUs and later
+on make another reservation of 128 V2 TPUs then creates a v2\-256 TPU instance.
+If there exists no reservation or not sufficient amount of reserved cores under
+the project, the request will fail due to lack of capacity.
+
 
 .RE
 .sp
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

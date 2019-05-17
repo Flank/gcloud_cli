@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ class JsonPrinter(resource_printer_base.ResourcePrinter):
         ensure_ascii=True,
         indent=resource_printer_base.STRUCTURED_INDENTATION,
         separators=(',', ': '),
-        sort_keys=True)  # pytype: disable=wrong-arg-types
+        sort_keys=True)
     # ensure_ascii makes the json module always return byte strings. Any
     # non-ascii characters will be escaped. This is the default behavior, it is
     # just now explicit. We decode here so we get text strings back, and we can

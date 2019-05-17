@@ -238,8 +238,8 @@ class WorkflowTemplateSetManagedClusterUnitTest(
 class WorkflowTemplateSetManagedClusterUnitTestBeta(
     WorkflowTemplateSetManagedClusterUnitTest):
 
-  def SetUp(self):
-    self.SetupForReleaseTrack(calliope.base.ReleaseTrack.BETA)
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.BETA
 
   def testSetManagedClusterFlags(self):
     cluster_name = 'test-cluster'
@@ -427,3 +427,10 @@ class WorkflowTemplateSetManagedClusterUnitTestBeta(
                    expiration_time='2017-08-25T00:00:00-07:00')
     result = self.RunDataproc(command)
     self.AssertMessagesEqual(workflow_template, result)
+
+
+class WorkflowTemplateSetManagedClusterUnitTestAlpha(
+    WorkflowTemplateSetManagedClusterUnitTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.ALPHA

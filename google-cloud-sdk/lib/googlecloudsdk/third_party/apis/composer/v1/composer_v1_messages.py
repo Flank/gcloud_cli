@@ -128,7 +128,7 @@ class ComposerProjectsLocationsEnvironmentsPatchRequest(_messages.Message):
       form and the "labels" mask.</td>  </tr>  <tr>  <td>config.nodeCount</td>
       <td>Horizontally scale the number of nodes in the environment. An
       integer  greater than or equal to 3 must be provided in the
-      `config.nodeCount` field.  </td>  </tr>  <tr>
+      `config.nodeCount`  field.  </td>  </tr>  <tr>
       <td>config.softwareConfig.airflowConfigOverrides</td>  <td>Replace all
       Apache Airflow config overrides. If a replacement config  overrides map
       is not included in `environment`, all config overrides  are cleared.  It
@@ -151,6 +151,22 @@ class ComposerProjectsLocationsEnvironmentsPatchRequest(_messages.Message):
   environment = _messages.MessageField('Environment', 1)
   name = _messages.StringField(2, required=True)
   updateMask = _messages.StringField(3)
+
+
+class ComposerProjectsLocationsImageVersionsListRequest(_messages.Message):
+  r"""A ComposerProjectsLocationsImageVersionsListRequest object.
+
+  Fields:
+    pageSize: The maximum number of image_versions to return.
+    pageToken: The next_page_token value returned from a previous List
+      request, if any.
+    parent: List ImageVersions in the given project and location, in the form:
+      "projects/{projectId}/locations/{locationId}"
+  """
+
+  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(2)
+  parent = _messages.StringField(3, required=True)
 
 
 class ComposerProjectsLocationsOperationsDeleteRequest(_messages.Message):
@@ -320,6 +336,22 @@ class EnvironmentConfig(_messages.Message):
   softwareConfig = _messages.MessageField('SoftwareConfig', 6)
 
 
+class ImageVersion(_messages.Message):
+  r"""ImageVersion information
+
+  Fields:
+    imageVersionId: The string identifier of the ImageVersion, in the form:
+      "composer-x.y.z-airflow-a.b(.c)"
+    isDefault: Whether this is the default ImageVersion used by Composer
+      during environment creation if no input ImageVersion is specified.
+    supportedPythonVersions: supported python versions
+  """
+
+  imageVersionId = _messages.StringField(1)
+  isDefault = _messages.BooleanField(2)
+  supportedPythonVersions = _messages.StringField(3, repeated=True)
+
+
 class ListEnvironmentsResponse(_messages.Message):
   r"""The environments in a project and location.
 
@@ -331,6 +363,19 @@ class ListEnvironmentsResponse(_messages.Message):
   """
 
   environments = _messages.MessageField('Environment', 1, repeated=True)
+  nextPageToken = _messages.StringField(2)
+
+
+class ListImageVersionsResponse(_messages.Message):
+  r"""The ImageVersions in a project and location.
+
+  Fields:
+    imageVersions: The list of supported ImageVersions in a location.
+    nextPageToken: The page token used to query for the next page if one
+      exists.
+  """
+
+  imageVersions = _messages.MessageField('ImageVersion', 1, repeated=True)
   nextPageToken = _messages.StringField(2)
 
 
@@ -450,7 +495,8 @@ class Operation(_messages.Message):
       if any.
     name: The server-assigned name, which is only unique within the same
       service that originally returns it. If you use the default HTTP mapping,
-      the `name` should have the format of `operations/some/unique/name`.
+      the `name` should be a resource name ending with
+      `operations/{unique_id}`.
     response: The normal response of the operation in case of success.  If the
       original method returns no data on success, such as `Delete`, the
       response is `google.protobuf.Empty`.  If the original method is standard
@@ -646,15 +692,22 @@ class SoftwareConfig(_messages.Message):
       * `C_FORCE_ROOT` * `CONTAINER_NAME` * `DAGS_FOLDER` * `GCP_PROJECT` *
       `GCS_BUCKET` * `GKE_CLUSTER_NAME` * `SQL_DATABASE` * `SQL_INSTANCE` *
       `SQL_PASSWORD` * `SQL_PROJECT` * `SQL_REGION` * `SQL_USER`
-    imageVersion: Output only. The version of the software running in the
-      environment. This encapsulates both the version of Cloud Composer
-      functionality and the version of Apache Airflow. It must match the
-      regular expression `composer-[0-9]+\.[0-9]+(\.[0-9]+)?-airflow-[0-9]+\.[
-      0-9]+(\.[0-9]+.*)?`.  The Cloud Composer portion of the version is a
-      [semantic version](https://semver.org). The portion of the image version
-      following _airflow-_ is an official Apache Airflow repository [release
-      name](https://github.com/apache/incubator-airflow/releases).  See also
-      [Release Notes](/composer/docs/release-notes).
+    imageVersion: The version of the software running in the environment. This
+      encapsulates both the version of Cloud Composer functionality and the
+      version of Apache Airflow. It must match the regular expression `compose
+      r-([0-9]+\.[0-9]+\.[0-9]+|latest)-airflow-[0-9]+\.[0-9]+(\.[0-9]+.*)?`.
+      When used as input, the server also checks if the provided version is
+      supported and denies the request for an unsupported version.  The Cloud
+      Composer portion of the version is a [semantic
+      version](https://semver.org) or `latest`. When the patch version is
+      omitted, the current Cloud Composer patch version is selected. When
+      `latest` is provided instead of an explicit version number, the server
+      replaces `latest` with the current Cloud Composer version and stores
+      that version number in the same field.  The portion of the image version
+      that follows <em>airflow-</em> is an official Apache Airflow repository
+      [release name](https://github.com/apache/incubator-airflow/releases).
+      See also [Version List](/composer/docs/concepts/versioning/composer-
+      versions).
     pypiPackages: Optional. Custom Python Package Index (PyPI) packages to be
       installed in the environment.  Keys refer to the lowercase package name
       such as "numpy" and values are the lowercase extras and version

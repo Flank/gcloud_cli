@@ -19,8 +19,10 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
+from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.surface.dns import base
+from tests.lib.surface.dns import util
 from tests.lib.surface.dns import util_beta
 
 
@@ -130,18 +132,12 @@ class ManagedZonesUpdateTest(base.DnsMockMultiTrackTest):
     self.assertEqual(op, result)
     self.AssertOutputEquals('')
 
-
-class BetaManagedZonesUpdateTest(ManagedZonesUpdateTest):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.api_version = 'v1beta2'
-
   def testUpdate_Networks(self):
-    visibility_settings = util_beta.GetDnsVisibilityDict(
+    visibility_settings = util.GetDnsVisibilityDict(
         self.api_version,
         visibility='private',
-        network_urls=['1.0.1.1', '1.2.1.1'])
+        network_urls=['1.0.1.1', '1.2.1.1'],
+        messages=self.messages)
     zone = self.messages.ManagedZone(
         creationTime=None,
         description=None,
@@ -163,6 +159,13 @@ class BetaManagedZonesUpdateTest(ManagedZonesUpdateTest):
         '--format=disable {0}'.format(zone.name))
     self.assertEqual(op, update_result)
     self.AssertOutputEquals('')
+
+
+class BetaManagedZonesUpdateTest(ManagedZonesUpdateTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'v1beta2'
 
   def testUpdate_NetworksAddForwarding(self):
     visibility_settings = util_beta.GetDnsVisibilityDict(
@@ -191,6 +194,34 @@ class BetaManagedZonesUpdateTest(ManagedZonesUpdateTest):
         'dns managed-zones update --networks 1.0.1.1,1.2.1.1 '
         '--format=disable {0} --forwarding-targets 1.0.1.1,1.2.1.1'.format(
             zone.name))
+    self.assertEqual(op, update_result)
+    self.AssertOutputEquals('')
+
+  def testUpdateWithDnsPeering_IncompleteTargetProject(self):
+    # set target-project, no target-network.
+    with self.assertRaisesRegex(
+        cli_test_base.MockArgumentError,
+        'argument --target-network: Must be specified.'):
+      self.Run('dns managed-zones update --target-project tp zone')
+
+  def testUpdateWithDnsPeering_IncompleteTargetNetwork(self):
+    # set target-network, no target-project.
+    with self.assertRaisesRegex(
+        cli_test_base.MockArgumentError,
+        'argument --target-project: Must be specified.'):
+      self.Run('dns managed-zones update --target-network tn zone')
+
+  def testUpdateWithDnsPeering(self):
+    zone = self.messages.ManagedZone(
+        kind='dns#managedZone',
+        name='mz',
+        peeringConfig=util_beta.PeeringConfig('tp', 'tn'))
+    zone_update_request = self.messages.DnsManagedZonesPatchRequest(
+        managedZone=zone.name, managedZoneResource=zone, project=self.Project())
+    op = self.messages.Operation(id='myop')
+    self.client.managedZones.Patch.Expect(zone_update_request, op)
+    update_result = self.Run(
+        'dns managed-zones update --target-network tn --target-project tp mz')
     self.assertEqual(op, update_result)
     self.AssertOutputEquals('')
 

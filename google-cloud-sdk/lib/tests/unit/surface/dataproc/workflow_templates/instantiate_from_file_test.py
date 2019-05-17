@@ -167,5 +167,12 @@ class WorkflowTemplatesInstantiateFromFileUnitTestBeta(
     client.projects_regions_workflowTemplates.InstantiateInline.Expect(
         request, response=response, exception=exception)
 
-  def SetUp(self):
-    self.SetupForReleaseTrack(calliope.base.ReleaseTrack.BETA)
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.BETA
+
+
+class WorkflowTemplatesInstantiateFromFileUnitTestAlpha(
+    WorkflowTemplatesInstantiateFromFileUnitTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.ALPHA

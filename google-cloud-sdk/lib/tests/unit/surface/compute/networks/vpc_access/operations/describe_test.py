@@ -23,31 +23,40 @@ from tests.lib import test_case
 from tests.lib.surface.compute.networks.vpc_access import base
 
 
-class OperationsDescribeTest(base.VpcAccessUnitTestBase):
+class OperationsDescribeTestBeta(base.VpcAccessUnitTestBase):
 
-  def _ExpectDescribe(self, expected_operation):
-    self.operations_client.Get.Expect(
-        request=self.messages.VpcaccessProjectsLocationsOperationsGetRequest(
-            name=expected_operation.name),
-        response=expected_operation)
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'v1beta1'
 
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+  def _SetExpected(self):
     self.expected_operation = self.messages.Operation(
         name=self.operation_relative_name)
-    self._ExpectDescribe(self.expected_operation)
+    self.operations_client.Get.Expect(
+        request=self.messages.VpcaccessProjectsLocationsOperationsGetRequest(
+            name=self.expected_operation.name),
+        response=self.expected_operation)
 
   def testOperationsDescribe(self):
+    self._SetExpected()
     actual_operation = self.Run(
         'compute networks vpc-access operations describe {} --region={}'.format(
             self.operation_id, self.region_id))
     self.assertEqual(actual_operation, self.expected_operation)
 
   def testOpertionsDescribe_UsingRelativeOperationName(self):
+    self._SetExpected()
     actual_operation = self.Run(
         'compute networks vpc-access operations describe {}'.format(
             self.operation_relative_name))
     self.assertEqual(actual_operation, self.expected_operation)
+
+
+class OperationsDescribeTestAlpha(OperationsDescribeTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'v1alpha1'
 
 
 if __name__ == '__main__':

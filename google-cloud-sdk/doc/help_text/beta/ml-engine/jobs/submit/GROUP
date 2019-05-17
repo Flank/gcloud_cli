@@ -1,15 +1,16 @@
 NAME
-    gcloud beta ml-engine jobs submit - cloud ML Engine Jobs submit commands
+    gcloud beta ml-engine jobs submit - AI Platform Jobs submit commands
 
 SYNOPSIS
     gcloud beta ml-engine jobs submit COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Cloud ML Engine Jobs submit commands.
+    (BETA) AI Platform Jobs submit commands.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -17,10 +18,10 @@ COMMANDS
     COMMAND is one of the following:
 
      prediction
-        (BETA) Start a Cloud ML Engine batch prediction job.
+        (BETA) Start an AI Platform batch prediction job.
 
      training
-        (BETA) Submit a Cloud Machine Learning training job.
+        (BETA) Submit an AI Platform training job.
 
 NOTES
     This command is currently in BETA and may change without notice. These

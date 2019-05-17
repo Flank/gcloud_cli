@@ -18,16 +18,31 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import os
+
 from googlecloudsdk.api_lib.compute import csek_utils
 from googlecloudsdk.api_lib.compute import image_utils
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import properties
+from googlecloudsdk.core.util import files as file_utils
 from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 import six
+
+_PK_FILE_NAME = b'test_pk'
+_KEK_FILE_NAME = b'test_kek'
+_DB_FILE_NAME_1 = b'test_db_2'
+_DB_FILE_NAME_2 = b'test_db_2'
+_DBX_FILE_NAME = b'test_dbx'
+_X509_FILE_SUFFIX = '.cer'
+_BIN_FILE_SUFFIX = '.bin'
+# test the file content that can't be decoded as utf-8
+_FILE_CONTENT = b'0\202'
+_STORAGE_IMAGE_URL =\
+    'https://www.googleapis.com/storage/v1/b/31dd/o/source-image'
 
 
 class ImagesCreateTest(test_base.BaseTest, sdk_test_base.WithLogCapture):
@@ -53,8 +68,7 @@ class ImagesCreateTest(test_base.BaseTest, sdk_test_base.WithLogCapture):
                   name='my-image',
                   description='nifty',
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
-                      'source-image'),
+                      source=_STORAGE_IMAGE_URL),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -72,8 +86,7 @@ class ImagesCreateTest(test_base.BaseTest, sdk_test_base.WithLogCapture):
               image=self.messages.Image(
                   name='my-image',
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
-                      'source-image'),
+                      source=_STORAGE_IMAGE_URL),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -91,8 +104,7 @@ class ImagesCreateTest(test_base.BaseTest, sdk_test_base.WithLogCapture):
               image=self.messages.Image(
                   name='my-image',
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
-                      'source-image'),
+                      source=_STORAGE_IMAGE_URL),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -260,8 +272,7 @@ class ImagesCreateTest(test_base.BaseTest, sdk_test_base.WithLogCapture):
                   description='nifty',
                   licenses=licenses,
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
-                      'source-image'),
+                      source=_STORAGE_IMAGE_URL),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -289,8 +300,7 @@ class ImagesCreateTest(test_base.BaseTest, sdk_test_base.WithLogCapture):
                   description='nifty',
                   licenses=licenses,
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
-                      'source-image'),
+                      source=_STORAGE_IMAGE_URL),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -487,8 +497,7 @@ class ImagesCreateTest(test_base.BaseTest, sdk_test_base.WithLogCapture):
                       self.messages.GuestOsFeature(type=vsm_type),
                   ],
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
-                      'source-image'),
+                      source=_STORAGE_IMAGE_URL),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -516,8 +525,7 @@ class ImagesCreateTest(test_base.BaseTest, sdk_test_base.WithLogCapture):
                       self.messages.GuestOsFeature(type=vsm_type),
                   ],
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
-                      'source-image'),
+                      source=_STORAGE_IMAGE_URL),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -774,8 +782,7 @@ class ImagesCreateTest(test_base.BaseTest, sdk_test_base.WithLogCapture):
                                  'keyRings/ring/cryptoKeys/image-key'
                   ),
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
-                      'source-image'),
+                      source=_STORAGE_IMAGE_URL),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -798,8 +805,7 @@ class ImagesCreateTest(test_base.BaseTest, sdk_test_base.WithLogCapture):
                                  'keyRings/ring/cryptoKeys/image-key'
                   ),
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
-                      'source-image'),
+                      source=_STORAGE_IMAGE_URL),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -822,8 +828,7 @@ class ImagesCreateTest(test_base.BaseTest, sdk_test_base.WithLogCapture):
                                  'keyRings/ring/cryptoKeys/image-key'
                   ),
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
-                      'source-image'),
+                      source=_STORAGE_IMAGE_URL),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -922,8 +927,7 @@ class ImagesCreateBetaTest(ImagesCreateTest):
                       self.messages.GuestOsFeature(type=vsm_type),
                   ],
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
-                      'source-image'),
+                      source=_STORAGE_IMAGE_URL),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -951,8 +955,7 @@ class ImagesCreateBetaTest(ImagesCreateTest):
                       self.messages.GuestOsFeature(type=vsm_type),
                   ],
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
-                      'source-image'),
+                      source=_STORAGE_IMAGE_URL),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -1003,7 +1006,7 @@ class ImagesCreateBetaTest(ImagesCreateTest):
 
 
 class ImagesCreateAlphaTest(ImagesCreateBetaTest):
-  """Tests for GuestOsFeatures currently available in alpha."""
+  """Tests for features currently available in alpha."""
 
   def PreSetUp(self):
     self.api_version = 'alpha'
@@ -1011,6 +1014,30 @@ class ImagesCreateAlphaTest(ImagesCreateBetaTest):
 
   def SetUp(self):
     self.SelectApi(self.api_version)
+    self.dir = file_utils.TemporaryDirectory()
+    self._createTestInitialStateFiles()
+
+  def _createSingleTestInitialStateFile(self, file_name, suffix):
+    # create a temporary file in self.dir, set the content equals to file_name.
+    path = os.path.join(self.dir.path, file_name.decode('utf-8') + suffix)
+    file_utils.WriteBinaryFileContents(path, _FILE_CONTENT, overwrite=False)
+    return path
+
+  def _createTestInitialStateFiles(self):
+    self.platform_key_path = self._createSingleTestInitialStateFile(
+        _PK_FILE_NAME, _X509_FILE_SUFFIX)
+    self.key_exchange_key_path = self._createSingleTestInitialStateFile(
+        _KEK_FILE_NAME, _BIN_FILE_SUFFIX)
+    self.key_database_path_1 = self._createSingleTestInitialStateFile(
+        _DB_FILE_NAME_1, _X509_FILE_SUFFIX)
+    self.key_database_path_2 = self._createSingleTestInitialStateFile(
+        _DB_FILE_NAME_2, _BIN_FILE_SUFFIX)
+    self.forbidden_key_database_path = self._createSingleTestInitialStateFile(
+        _DBX_FILE_NAME, _X509_FILE_SUFFIX)
+    self.x509_enum = self.messages.FileContentBuffer.\
+        FileTypeValueValuesEnum('X509')
+    self.bin_enum = self.messages.FileContentBuffer.\
+        FileTypeValueValuesEnum('BIN')
 
   # Guest OS Features
   def testCreateGuestImageWithOsFeatures(self):
@@ -1036,8 +1063,7 @@ class ImagesCreateAlphaTest(ImagesCreateBetaTest):
                       self.messages.GuestOsFeature(type=vsm_type),
                   ],
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
-                      'source-image'),
+                      source=_STORAGE_IMAGE_URL),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -1065,8 +1091,7 @@ class ImagesCreateAlphaTest(ImagesCreateBetaTest):
                       self.messages.GuestOsFeature(type=vsm_type),
                   ],
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
-                      'source-image'),
+                      source=_STORAGE_IMAGE_URL),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
@@ -1107,10 +1132,46 @@ class ImagesCreateAlphaTest(ImagesCreateBetaTest):
               image=self.messages.Image(
                   name='my-image',
                   rawDisk=self.messages.Image.RawDiskValue(
-                      source='https://www.googleapis.com/storage/v1/b/31dd/o/'
-                      'source-image'),
+                      source=_STORAGE_IMAGE_URL),
                   sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW,
                   storageLocations=['us-central1']),
+              project='my-project'))],
+    )
+
+  def testShieldedInstanceInitialState(self):
+    self.Run("""
+        compute images create my-image
+          --source-uri gs://31dd/source-image
+          --platform-key-file %s --key-exchange-key-file %s
+          --signature-database-file %s,%s --forbidden-database-file %s
+        """ % (self.platform_key_path, self.key_exchange_key_path,
+               self.key_database_path_1, self.key_database_path_2,
+               self.forbidden_key_database_path))
+
+    self.CheckRequests(
+        [(self.compute.images,
+          'Insert',
+          self.messages.ComputeImagesInsertRequest(
+              image=self.messages.Image(
+                  name='my-image',
+                  shieldedInstanceInitialState={
+                      'pk': self.messages.FileContentBuffer(
+                          content=_FILE_CONTENT, fileType=self.x509_enum),
+                      'keks': [
+                          self.messages.FileContentBuffer(
+                              content=_FILE_CONTENT, fileType=self.bin_enum)],
+                      'dbs': [
+                          self.messages.FileContentBuffer(
+                              content=_FILE_CONTENT, fileType=self.x509_enum),
+                          self.messages.FileContentBuffer(
+                              content=_FILE_CONTENT, fileType=self.bin_enum)],
+                      'dbxs': [
+                          self.messages.FileContentBuffer(
+                              content=_FILE_CONTENT, fileType=self.x509_enum)],
+                  },
+                  rawDisk=self.messages.Image.RawDiskValue(
+                      source=_STORAGE_IMAGE_URL),
+                  sourceType=self.messages.Image.SourceTypeValueValuesEnum.RAW),
               project='my-project'))],
     )
 

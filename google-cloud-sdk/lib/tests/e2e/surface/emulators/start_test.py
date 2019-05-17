@@ -42,8 +42,6 @@ class StartTests(sdk_test_base.BundledBase, cli_test_base.CliTestBase):
     with self.SkipTestIfRaises(java.JavaError):
       java.RequireJavaInstalled('test')
 
-  @test_case.Filters.SkipOnWindows('Subprocess and windows not playing nicely',
-                                   'b/34811745')
   def testStart(self):
     port = self.GetPort()
     test_call_out = None
@@ -67,9 +65,14 @@ class StartTests(sdk_test_base.BundledBase, cli_test_base.CliTestBase):
                          'com.google.cloudsdk.emulators.EmulatorProxy main',
                          'INFO: Starting server on port: {}'.format(port)],
           timeout=30):
-        test_call_env = dict(os.environ,
-                             PUBSUB_EMULATOR_HOST='localhost:{}'.format(port),
-                             GOOGLE_CLOUD_PROJECT='cloudsdktest')
+
+        env_dict = {(str(k) if isinstance(k, unicode) else k):
+                    (str(v) if isinstance(v, unicode) else v)
+                    for k, v in os.environ.items()}  # workaround for py2 on win
+        test_call_env = dict(
+            env_dict,
+            PUBSUB_EMULATOR_HOST=str('localhost:{}'.format(port)),
+            GOOGLE_CLOUD_PROJECT=str('cloudsdktest'))
         test_call_out_no, test_call_out = tempfile.mkstemp()
         with proxy_util.RunEmulatorProxyClient(
             log_file=test_call_out_no, env=test_call_env) as proc:

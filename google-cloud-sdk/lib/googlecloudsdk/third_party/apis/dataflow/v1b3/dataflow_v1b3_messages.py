@@ -492,7 +492,9 @@ class CreateJobFromTemplateRequest(_messages.Message):
       create the job. Must be a valid Cloud Storage URL, beginning with
       `gs://`.
     jobName: Required. The job name to use for the created job.
-    location: The location to which to direct the request.
+    location: The [regional endpoint]
+      (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints) to
+      which to direct the request.
     parameters: The runtime parameters to pass to the job.
   """
 
@@ -554,6 +556,21 @@ class DataDiskAssignment(_messages.Message):
   vmInstance = _messages.StringField(2)
 
 
+class DataflowProjectsDeleteSnapshotsRequest(_messages.Message):
+  r"""A DataflowProjectsDeleteSnapshotsRequest object.
+
+  Fields:
+    location: The location that contains this snapshot.
+    projectId: The ID of the Cloud Platform project that the snapshot belongs
+      to.
+    snapshotId: The ID of the snapshot.
+  """
+
+  location = _messages.StringField(1)
+  projectId = _messages.StringField(2, required=True)
+  snapshotId = _messages.StringField(3)
+
+
 class DataflowProjectsJobsAggregatedRequest(_messages.Message):
   r"""A DataflowProjectsJobsAggregatedRequest object.
 
@@ -564,7 +581,9 @@ class DataflowProjectsJobsAggregatedRequest(_messages.Message):
 
   Fields:
     filter: The kind of filter to use.
-    location: The location that contains this job.
+    location: The [regional endpoint]
+      (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints)
+      that contains this job.
     pageSize: If there are many jobs, limit response to at most this many. The
       actual number of jobs returned will be the lesser of max_responses and
       an unspecified server-defined limit.
@@ -620,7 +639,9 @@ class DataflowProjectsJobsCreateRequest(_messages.Message):
 
   Fields:
     job: A Job resource to be passed as the request body.
-    location: The location that contains this job.
+    location: The [regional endpoint]
+      (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints)
+      that contains this job.
     projectId: The ID of the Cloud Platform project that the job belongs to.
     replaceJobId: Deprecated. This field is now in the Job message.
     view: The level of information requested in response.
@@ -682,7 +703,9 @@ class DataflowProjectsJobsGetMetricsRequest(_messages.Message):
 
   Fields:
     jobId: The job to get messages for.
-    location: The location which contains the job specified by job_id.
+    location: The [regional endpoint]
+      (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints)
+      that contains the job specified by job_id.
     projectId: A project id.
     startTime: Return only metric data that has changed since this time.
       Default is to return all information about all metrics for the job.
@@ -702,7 +725,9 @@ class DataflowProjectsJobsGetRequest(_messages.Message):
 
   Fields:
     jobId: The job ID.
-    location: The location that contains this job.
+    location: The [regional endpoint]
+      (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints)
+      that contains this job.
     projectId: The ID of the Cloud Platform project that the job belongs to.
     view: The level of information requested in response.
   """
@@ -737,7 +762,9 @@ class DataflowProjectsJobsListRequest(_messages.Message):
 
   Fields:
     filter: The kind of filter to use.
-    location: The location that contains this job.
+    location: The [regional endpoint]
+      (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints)
+      that contains this job.
     pageSize: If there are many jobs, limit response to at most this many. The
       actual number of jobs returned will be the lesser of max_responses and
       an unspecified server-defined limit.
@@ -796,7 +823,9 @@ class DataflowProjectsJobsMessagesListRequest(_messages.Message):
     endTime: Return only messages with timestamps < end_time. The default is
       now (i.e. return up to the latest messages available).
     jobId: The job to get messages about.
-    location: The location which contains the job specified by job_id.
+    location: The [regional endpoint]
+      (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints)
+      that contains the job specified by job_id.
     minimumImportance: Filter to only get messages with importance >= level
     pageSize: If specified, determines the maximum number of messages to
       return.  If unspecified, the service may choose an appropriate default,
@@ -859,7 +888,9 @@ class DataflowProjectsJobsUpdateRequest(_messages.Message):
   Fields:
     job: A Job resource to be passed as the request body.
     jobId: The job ID.
-    location: The location that contains this job.
+    location: The [regional endpoint]
+      (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints)
+      that contains this job.
     projectId: The ID of the Cloud Platform project that the job belongs to.
   """
 
@@ -907,7 +938,9 @@ class DataflowProjectsLocationsJobsCreateRequest(_messages.Message):
 
   Fields:
     job: A Job resource to be passed as the request body.
-    location: The location that contains this job.
+    location: The [regional endpoint]
+      (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints)
+      that contains this job.
     projectId: The ID of the Cloud Platform project that the job belongs to.
     replaceJobId: Deprecated. This field is now in the Job message.
     view: The level of information requested in response.
@@ -941,7 +974,9 @@ class DataflowProjectsLocationsJobsDebugGetConfigRequest(_messages.Message):
     getDebugConfigRequest: A GetDebugConfigRequest resource to be passed as
       the request body.
     jobId: The job id.
-    location: The location which contains the job specified by job_id.
+    location: The [regional endpoint]
+      (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints)
+      that contains the job specified by job_id.
     projectId: The project id.
   """
 
@@ -956,7 +991,9 @@ class DataflowProjectsLocationsJobsDebugSendCaptureRequest(_messages.Message):
 
   Fields:
     jobId: The job id.
-    location: The location which contains the job specified by job_id.
+    location: The [regional endpoint]
+      (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints)
+      that contains the job specified by job_id.
     projectId: The project id.
     sendDebugCaptureRequest: A SendDebugCaptureRequest resource to be passed
       as the request body.
@@ -973,7 +1010,9 @@ class DataflowProjectsLocationsJobsGetMetricsRequest(_messages.Message):
 
   Fields:
     jobId: The job to get messages for.
-    location: The location which contains the job specified by job_id.
+    location: The [regional endpoint]
+      (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints)
+      that contains the job specified by job_id.
     projectId: A project id.
     startTime: Return only metric data that has changed since this time.
       Default is to return all information about all metrics for the job.
@@ -993,7 +1032,9 @@ class DataflowProjectsLocationsJobsGetRequest(_messages.Message):
 
   Fields:
     jobId: The job ID.
-    location: The location that contains this job.
+    location: The [regional endpoint]
+      (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints)
+      that contains this job.
     projectId: The ID of the Cloud Platform project that the job belongs to.
     view: The level of information requested in response.
   """
@@ -1028,7 +1069,9 @@ class DataflowProjectsLocationsJobsListRequest(_messages.Message):
 
   Fields:
     filter: The kind of filter to use.
-    location: The location that contains this job.
+    location: The [regional endpoint]
+      (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints)
+      that contains this job.
     pageSize: If there are many jobs, limit response to at most this many. The
       actual number of jobs returned will be the lesser of max_responses and
       an unspecified server-defined limit.
@@ -1087,7 +1130,9 @@ class DataflowProjectsLocationsJobsMessagesListRequest(_messages.Message):
     endTime: Return only messages with timestamps < end_time. The default is
       now (i.e. return up to the latest messages available).
     jobId: The job to get messages about.
-    location: The location which contains the job specified by job_id.
+    location: The [regional endpoint]
+      (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints)
+      that contains the job specified by job_id.
     minimumImportance: Filter to only get messages with importance >= level
     pageSize: If specified, determines the maximum number of messages to
       return.  If unspecified, the service may choose an appropriate default,
@@ -1152,7 +1197,9 @@ class DataflowProjectsLocationsJobsUpdateRequest(_messages.Message):
   Fields:
     job: A Job resource to be passed as the request body.
     jobId: The job ID.
-    location: The location that contains this job.
+    location: The [regional endpoint]
+      (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints)
+      that contains this job.
     projectId: The ID of the Cloud Platform project that the job belongs to.
   """
 
@@ -1169,7 +1216,9 @@ class DataflowProjectsLocationsJobsWorkItemsLeaseRequest(_messages.Message):
     jobId: Identifies the workflow job this worker belongs to.
     leaseWorkItemRequest: A LeaseWorkItemRequest resource to be passed as the
       request body.
-    location: The location which contains the WorkItem's job.
+    location: The [regional endpoint]
+      (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints)
+      that contains the WorkItem's job.
     projectId: Identifies the project this worker belongs to.
   """
 
@@ -1184,7 +1233,9 @@ class DataflowProjectsLocationsJobsWorkItemsReportStatusRequest(_messages.Messag
 
   Fields:
     jobId: The job which the WorkItem is part of.
-    location: The location which contains the WorkItem's job.
+    location: The [regional endpoint]
+      (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints)
+      that contains the WorkItem's job.
     projectId: The project which owns the WorkItem's job.
     reportWorkItemStatusRequest: A ReportWorkItemStatusRequest resource to be
       passed as the request body.
@@ -1196,13 +1247,74 @@ class DataflowProjectsLocationsJobsWorkItemsReportStatusRequest(_messages.Messag
   reportWorkItemStatusRequest = _messages.MessageField('ReportWorkItemStatusRequest', 4)
 
 
+class DataflowProjectsLocationsSnapshotsDeleteRequest(_messages.Message):
+  r"""A DataflowProjectsLocationsSnapshotsDeleteRequest object.
+
+  Fields:
+    location: The location that contains this snapshot.
+    projectId: The ID of the Cloud Platform project that the snapshot belongs
+      to.
+    snapshotId: The ID of the snapshot.
+  """
+
+  location = _messages.StringField(1, required=True)
+  projectId = _messages.StringField(2, required=True)
+  snapshotId = _messages.StringField(3, required=True)
+
+
+class DataflowProjectsLocationsSnapshotsGetRequest(_messages.Message):
+  r"""A DataflowProjectsLocationsSnapshotsGetRequest object.
+
+  Fields:
+    location: The location that contains this snapshot.
+    projectId: The ID of the Cloud Platform project that the snapshot belongs
+      to.
+    snapshotId: The ID of the snapshot.
+  """
+
+  location = _messages.StringField(1, required=True)
+  projectId = _messages.StringField(2, required=True)
+  snapshotId = _messages.StringField(3, required=True)
+
+
+class DataflowProjectsLocationsSnapshotsListRequest(_messages.Message):
+  r"""A DataflowProjectsLocationsSnapshotsListRequest object.
+
+  Fields:
+    location: The location to list snapshots in.
+    projectId: The project ID to list snapshots for.
+  """
+
+  location = _messages.StringField(1, required=True)
+  projectId = _messages.StringField(2, required=True)
+
+
+class DataflowProjectsLocationsSqlValidateRequest(_messages.Message):
+  r"""A DataflowProjectsLocationsSqlValidateRequest object.
+
+  Fields:
+    location: The [regional endpoint]
+      (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints) to
+      which to direct the request.
+    projectId: Required. The ID of the Cloud Platform project that the job
+      belongs to.
+    query: The sql query to validate.
+  """
+
+  location = _messages.StringField(1, required=True)
+  projectId = _messages.StringField(2, required=True)
+  query = _messages.StringField(3)
+
+
 class DataflowProjectsLocationsTemplatesCreateRequest(_messages.Message):
   r"""A DataflowProjectsLocationsTemplatesCreateRequest object.
 
   Fields:
     createJobFromTemplateRequest: A CreateJobFromTemplateRequest resource to
       be passed as the request body.
-    location: The location to which to direct the request.
+    location: The [regional endpoint]
+      (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints) to
+      which to direct the request.
     projectId: Required. The ID of the Cloud Platform project that the job
       belongs to.
   """
@@ -1221,7 +1333,9 @@ class DataflowProjectsLocationsTemplatesGetRequest(_messages.Message):
   Fields:
     gcsPath: Required. A Cloud Storage path to the template from which to
       create the job. Must be valid Cloud Storage URL, beginning with 'gs://'.
-    location: The location to which to direct the request.
+    location: The [regional endpoint]
+      (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints) to
+      which to direct the request.
     projectId: Required. The ID of the Cloud Platform project that the job
       belongs to.
     view: The view to retrieve. Defaults to METADATA_ONLY.
@@ -1253,7 +1367,9 @@ class DataflowProjectsLocationsTemplatesLaunchRequest(_messages.Message):
       job. Must be valid Cloud Storage URL, beginning with 'gs://'.
     launchTemplateParameters: A LaunchTemplateParameters resource to be passed
       as the request body.
-    location: The location to which to direct the request.
+    location: The [regional endpoint]
+      (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints) to
+      which to direct the request.
     projectId: Required. The ID of the Cloud Platform project that the job
       belongs to.
     validateOnly: If true, the request is validated but not actually executed.
@@ -1273,7 +1389,9 @@ class DataflowProjectsLocationsWorkerMessagesRequest(_messages.Message):
   r"""A DataflowProjectsLocationsWorkerMessagesRequest object.
 
   Fields:
-    location: The location which contains the job
+    location: The [regional endpoint]
+      (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints)
+      that contains the job.
     projectId: The project to send the WorkerMessages to.
     sendWorkerMessagesRequest: A SendWorkerMessagesRequest resource to be
       passed as the request body.
@@ -1282,6 +1400,33 @@ class DataflowProjectsLocationsWorkerMessagesRequest(_messages.Message):
   location = _messages.StringField(1, required=True)
   projectId = _messages.StringField(2, required=True)
   sendWorkerMessagesRequest = _messages.MessageField('SendWorkerMessagesRequest', 3)
+
+
+class DataflowProjectsSnapshotsGetRequest(_messages.Message):
+  r"""A DataflowProjectsSnapshotsGetRequest object.
+
+  Fields:
+    location: The location that contains this snapshot.
+    projectId: The ID of the Cloud Platform project that the snapshot belongs
+      to.
+    snapshotId: The ID of the snapshot.
+  """
+
+  location = _messages.StringField(1)
+  projectId = _messages.StringField(2, required=True)
+  snapshotId = _messages.StringField(3, required=True)
+
+
+class DataflowProjectsSnapshotsListRequest(_messages.Message):
+  r"""A DataflowProjectsSnapshotsListRequest object.
+
+  Fields:
+    location: The location to list snapshots in.
+    projectId: The project ID to list snapshots for.
+  """
+
+  location = _messages.StringField(1)
+  projectId = _messages.StringField(2, required=True)
 
 
 class DataflowProjectsTemplatesCreateRequest(_messages.Message):
@@ -1307,7 +1452,9 @@ class DataflowProjectsTemplatesGetRequest(_messages.Message):
   Fields:
     gcsPath: Required. A Cloud Storage path to the template from which to
       create the job. Must be valid Cloud Storage URL, beginning with 'gs://'.
-    location: The location to which to direct the request.
+    location: The [regional endpoint]
+      (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints) to
+      which to direct the request.
     projectId: Required. The ID of the Cloud Platform project that the job
       belongs to.
     view: The view to retrieve. Defaults to METADATA_ONLY.
@@ -1339,7 +1486,9 @@ class DataflowProjectsTemplatesLaunchRequest(_messages.Message):
       job. Must be valid Cloud Storage URL, beginning with 'gs://'.
     launchTemplateParameters: A LaunchTemplateParameters resource to be passed
       as the request body.
-    location: The location to which to direct the request.
+    location: The [regional endpoint]
+      (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints) to
+      which to direct the request.
     projectId: Required. The ID of the Cloud Platform project that the job
       belongs to.
     validateOnly: If true, the request is validated but not actually executed.
@@ -1378,6 +1527,10 @@ class DatastoreIODetails(_messages.Message):
 
   namespace = _messages.StringField(1)
   projectId = _messages.StringField(2)
+
+
+class DeleteSnapshotResponse(_messages.Message):
+  r"""Response from deleting a snapshot."""
 
 
 class DerivedSource(_messages.Message):
@@ -1526,6 +1679,10 @@ class DynamicSourceSplit(_messages.Message):
 class Environment(_messages.Message):
   r"""Describes the environment in which a Dataflow Job runs.
 
+  Enums:
+    FlexResourceSchedulingGoalValueValuesEnum: Which Flexible Resource
+      Scheduling mode to run in.
+
   Messages:
     InternalExperimentsValue: Experimental settings.
     SdkPipelineOptionsValue: The Cloud Dataflow SDK pipeline options specified
@@ -1545,6 +1702,8 @@ class Environment(_messages.Message):
       related tables are stored.  The supported resource type is:  Google
       BigQuery:   bigquery.googleapis.com/{dataset}
     experiments: The list of experiments to enable.
+    flexResourceSchedulingGoal: Which Flexible Resource Scheduling mode to run
+      in.
     internalExperiments: Experimental settings.
     sdkPipelineOptions: The Cloud Dataflow SDK pipeline options specified by
       the user. These options are passed through the service and are used to
@@ -1552,6 +1711,10 @@ class Environment(_messages.Message):
       and platform independent way.
     serviceAccountEmail: Identity to run virtual machines as. Defaults to the
       default account.
+    serviceKmsKeyName: If set, contains the Cloud KMS key identifier used to
+      encrypt data at rest, AKA a Customer Managed Encryption Key (CMEK).
+      Format:
+      projects/PROJECT_ID/locations/LOCATION/keyRings/KEY_RING/cryptoKeys/KEY
     tempStoragePrefix: The prefix of the resources the system should use for
       temporary storage.  The system will append the suffix "/temp-{JOBNAME}
       to this resource prefix, where {JOBNAME} is the value of the job_name
@@ -1567,6 +1730,18 @@ class Environment(_messages.Message):
     workerPools: The worker pools. At least one "harness" worker pool must be
       specified in order for the job to have workers.
   """
+
+  class FlexResourceSchedulingGoalValueValuesEnum(_messages.Enum):
+    r"""Which Flexible Resource Scheduling mode to run in.
+
+    Values:
+      FLEXRS_UNSPECIFIED: Run in the default mode.
+      FLEXRS_SPEED_OPTIMIZED: Optimize for lower execution time.
+      FLEXRS_COST_OPTIMIZED: Optimize for lower cost.
+    """
+    FLEXRS_UNSPECIFIED = 0
+    FLEXRS_SPEED_OPTIMIZED = 1
+    FLEXRS_COST_OPTIMIZED = 2
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class InternalExperimentsValue(_messages.Message):
@@ -1674,13 +1849,15 @@ class Environment(_messages.Message):
   clusterManagerApiService = _messages.StringField(1)
   dataset = _messages.StringField(2)
   experiments = _messages.StringField(3, repeated=True)
-  internalExperiments = _messages.MessageField('InternalExperimentsValue', 4)
-  sdkPipelineOptions = _messages.MessageField('SdkPipelineOptionsValue', 5)
-  serviceAccountEmail = _messages.StringField(6)
-  tempStoragePrefix = _messages.StringField(7)
-  userAgent = _messages.MessageField('UserAgentValue', 8)
-  version = _messages.MessageField('VersionValue', 9)
-  workerPools = _messages.MessageField('WorkerPool', 10, repeated=True)
+  flexResourceSchedulingGoal = _messages.EnumField('FlexResourceSchedulingGoalValueValuesEnum', 4)
+  internalExperiments = _messages.MessageField('InternalExperimentsValue', 5)
+  sdkPipelineOptions = _messages.MessageField('SdkPipelineOptionsValue', 6)
+  serviceAccountEmail = _messages.StringField(7)
+  serviceKmsKeyName = _messages.StringField(8)
+  tempStoragePrefix = _messages.StringField(9)
+  userAgent = _messages.MessageField('UserAgentValue', 10)
+  version = _messages.MessageField('VersionValue', 11)
+  workerPools = _messages.MessageField('WorkerPool', 12, repeated=True)
 
 
 class ExecutionStageState(_messages.Message):
@@ -1819,10 +1996,14 @@ class ExecutionStageSummary(_messages.Message):
 
 
 class FailedLocation(_messages.Message):
-  r"""Indicates which location failed to respond to a request for data.
+  r"""Indicates which [regional endpoint]
+  (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints) failed
+  to respond to a request for data.
 
   Fields:
-    name: The name of the failed location.
+    name: The name of the [regional endpoint]
+      (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints)
+      that failed to respond.
   """
 
   name = _messages.StringField(1)
@@ -1877,7 +2058,9 @@ class GetDebugConfigRequest(_messages.Message):
   Fields:
     componentId: The internal component id for which debug configuration is
       requested.
-    location: The location which contains the job specified by job_id.
+    location: The [regional endpoint]
+      (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints)
+      that contains the job specified by job_id.
     workerId: The worker id, i.e., VM hostname.
   """
 
@@ -2095,7 +2278,9 @@ class Job(_messages.Message):
       \p{Ll}\p{Lo}{0,62} * Values must conform to regexp:
       [\p{Ll}\p{Lo}\p{N}_-]{0,63} * Both keys and values are additionally
       constrained to be <= 128 bytes in size.
-    location: The location that contains this job.
+    location: The [regional endpoint]
+      (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints)
+      that contains this job.
     name: The user-specified Cloud Dataflow job name.  Only one Job with a
       given name may exist in a project at any given time. If a caller
       attempts to create a Job with the same name as an already-existing Job,
@@ -2480,7 +2665,7 @@ class JobMessage(_messages.Message):
 
 class JobMetadata(_messages.Message):
   r"""Metadata available primarily for filtering jobs. Will be included in the
-  ListJob response and Job SUMMARY view+.
+  ListJob response and Job SUMMARY view.
 
   Fields:
     bigTableDetails: Identification of a BigTable source used in the Dataflow
@@ -2506,7 +2691,7 @@ class JobMetadata(_messages.Message):
 
 
 class JobMetrics(_messages.Message):
-  r"""JobMetrics contains a collection of metrics descibing the detailed
+  r"""JobMetrics contains a collection of metrics describing the detailed
   progress of a Dataflow job. Metrics correspond to user-defined and system-
   defined metrics in the job.  This resource captures only the most recent
   values of each metric; time-series data can be queried for them (under the
@@ -2621,10 +2806,18 @@ class LaunchTemplateResponse(_messages.Message):
 class LeaseWorkItemRequest(_messages.Message):
   r"""Request to lease WorkItems.
 
+  Messages:
+    UnifiedWorkerRequestValue: Untranslated bag-of-bytes WorkRequest from
+      UnifiedWorker.
+
   Fields:
     currentWorkerTime: The current timestamp at the worker.
-    location: The location which contains the WorkItem's job.
+    location: The [regional endpoint]
+      (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints)
+      that contains the WorkItem's job.
     requestedLeaseDuration: The initial lease period.
+    unifiedWorkerRequest: Untranslated bag-of-bytes WorkRequest from
+      UnifiedWorker.
     workItemTypes: Filter for WorkItem type.
     workerCapabilities: Worker capabilities. WorkItems might be limited to
       workers with specific capabilities.
@@ -2632,22 +2825,82 @@ class LeaseWorkItemRequest(_messages.Message):
       virtual machine running the worker.
   """
 
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class UnifiedWorkerRequestValue(_messages.Message):
+    r"""Untranslated bag-of-bytes WorkRequest from UnifiedWorker.
+
+    Messages:
+      AdditionalProperty: An additional property for a
+        UnifiedWorkerRequestValue object.
+
+    Fields:
+      additionalProperties: Properties of the object. Contains field @type
+        with type URL.
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a UnifiedWorkerRequestValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A extra_types.JsonValue attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('extra_types.JsonValue', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
   currentWorkerTime = _messages.StringField(1)
   location = _messages.StringField(2)
   requestedLeaseDuration = _messages.StringField(3)
-  workItemTypes = _messages.StringField(4, repeated=True)
-  workerCapabilities = _messages.StringField(5, repeated=True)
-  workerId = _messages.StringField(6)
+  unifiedWorkerRequest = _messages.MessageField('UnifiedWorkerRequestValue', 4)
+  workItemTypes = _messages.StringField(5, repeated=True)
+  workerCapabilities = _messages.StringField(6, repeated=True)
+  workerId = _messages.StringField(7)
 
 
 class LeaseWorkItemResponse(_messages.Message):
   r"""Response to a request to lease WorkItems.
 
+  Messages:
+    UnifiedWorkerResponseValue: Untranslated bag-of-bytes WorkResponse for
+      UnifiedWorker.
+
   Fields:
+    unifiedWorkerResponse: Untranslated bag-of-bytes WorkResponse for
+      UnifiedWorker.
     workItems: A list of the leased WorkItems.
   """
 
-  workItems = _messages.MessageField('WorkItem', 1, repeated=True)
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class UnifiedWorkerResponseValue(_messages.Message):
+    r"""Untranslated bag-of-bytes WorkResponse for UnifiedWorker.
+
+    Messages:
+      AdditionalProperty: An additional property for a
+        UnifiedWorkerResponseValue object.
+
+    Fields:
+      additionalProperties: Properties of the object. Contains field @type
+        with type URL.
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a UnifiedWorkerResponseValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A extra_types.JsonValue attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('extra_types.JsonValue', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  unifiedWorkerResponse = _messages.MessageField('UnifiedWorkerResponseValue', 1)
+  workItems = _messages.MessageField('WorkItem', 2, repeated=True)
 
 
 class ListJobMessagesResponse(_messages.Message):
@@ -2670,8 +2923,9 @@ class ListJobsResponse(_messages.Message):
   partial response, depending on the page size in the ListJobsRequest.
 
   Fields:
-    failedLocation: Zero or more messages describing locations that failed to
-      respond.
+    failedLocation: Zero or more messages describing the [regional endpoints]
+      (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints)
+      that failed to respond.
     jobs: A subset of the requested job information.
     nextPageToken: Set if there may be more results than fit in this response.
   """
@@ -2679,6 +2933,16 @@ class ListJobsResponse(_messages.Message):
   failedLocation = _messages.MessageField('FailedLocation', 1, repeated=True)
   jobs = _messages.MessageField('Job', 2, repeated=True)
   nextPageToken = _messages.StringField(3)
+
+
+class ListSnapshotsResponse(_messages.Message):
+  r"""List of snapshots.
+
+  Fields:
+    snapshots: Returned snapshots.
+  """
+
+  snapshots = _messages.MessageField('Snapshot', 1, repeated=True)
 
 
 class MapTask(_messages.Message):
@@ -3105,7 +3369,7 @@ class PartialGroupByKeyInstruction(_messages.Message):
 class PipelineDescription(_messages.Message):
   r"""A descriptive representation of submitted pipeline as well as the
   executed form.  This data is provided by the Dataflow service for ease of
-  visualizing the pipeline and interpretting Dataflow provided metrics.
+  visualizing the pipeline and interpreting Dataflow provided metrics.
 
   Fields:
     displayData: Pipeline level display data.
@@ -3199,9 +3463,17 @@ class ReadInstruction(_messages.Message):
 class ReportWorkItemStatusRequest(_messages.Message):
   r"""Request to report the status of WorkItems.
 
+  Messages:
+    UnifiedWorkerRequestValue: Untranslated bag-of-bytes
+      WorkProgressUpdateRequest from UnifiedWorker.
+
   Fields:
     currentWorkerTime: The current timestamp at the worker.
-    location: The location which contains the WorkItem's job.
+    location: The [regional endpoint]
+      (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints)
+      that contains the WorkItem's job.
+    unifiedWorkerRequest: Untranslated bag-of-bytes WorkProgressUpdateRequest
+      from UnifiedWorker.
     workItemStatuses: The order is unimportant, except that the order of the
       WorkItemServiceState messages in the ReportWorkItemStatusResponse
       corresponds to the order of WorkItemStatus messages here.
@@ -3211,23 +3483,85 @@ class ReportWorkItemStatusRequest(_messages.Message):
       (with an error response).
   """
 
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class UnifiedWorkerRequestValue(_messages.Message):
+    r"""Untranslated bag-of-bytes WorkProgressUpdateRequest from
+    UnifiedWorker.
+
+    Messages:
+      AdditionalProperty: An additional property for a
+        UnifiedWorkerRequestValue object.
+
+    Fields:
+      additionalProperties: Properties of the object. Contains field @type
+        with type URL.
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a UnifiedWorkerRequestValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A extra_types.JsonValue attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('extra_types.JsonValue', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
   currentWorkerTime = _messages.StringField(1)
   location = _messages.StringField(2)
-  workItemStatuses = _messages.MessageField('WorkItemStatus', 3, repeated=True)
-  workerId = _messages.StringField(4)
+  unifiedWorkerRequest = _messages.MessageField('UnifiedWorkerRequestValue', 3)
+  workItemStatuses = _messages.MessageField('WorkItemStatus', 4, repeated=True)
+  workerId = _messages.StringField(5)
 
 
 class ReportWorkItemStatusResponse(_messages.Message):
   r"""Response from a request to report the status of WorkItems.
 
+  Messages:
+    UnifiedWorkerResponseValue: Untranslated bag-of-bytes
+      WorkProgressUpdateResponse for UnifiedWorker.
+
   Fields:
+    unifiedWorkerResponse: Untranslated bag-of-bytes
+      WorkProgressUpdateResponse for UnifiedWorker.
     workItemServiceStates: A set of messages indicating the service-side state
       for each WorkItem whose status was reported, in the same order as the
       WorkItemStatus messages in the ReportWorkItemStatusRequest which
       resulting in this response.
   """
 
-  workItemServiceStates = _messages.MessageField('WorkItemServiceState', 1, repeated=True)
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class UnifiedWorkerResponseValue(_messages.Message):
+    r"""Untranslated bag-of-bytes WorkProgressUpdateResponse for
+    UnifiedWorker.
+
+    Messages:
+      AdditionalProperty: An additional property for a
+        UnifiedWorkerResponseValue object.
+
+    Fields:
+      additionalProperties: Properties of the object. Contains field @type
+        with type URL.
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a UnifiedWorkerResponseValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A extra_types.JsonValue attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.MessageField('extra_types.JsonValue', 2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  unifiedWorkerResponse = _messages.MessageField('UnifiedWorkerResponseValue', 1)
+  workItemServiceStates = _messages.MessageField('WorkItemServiceState', 2, repeated=True)
 
 
 class ReportedParallelism(_messages.Message):
@@ -3269,11 +3603,17 @@ class RuntimeEnvironment(_messages.Message):
   r"""The environment values to set at runtime.
 
   Messages:
-    AdditionalUserLabelsValue: Additional user labels attached to the job.
+    AdditionalUserLabelsValue: Additional user labels to be specified for the
+      job. Keys and values should follow the restrictions specified in the
+      [labeling restrictions](https://cloud.google.com/compute/docs/labeling-
+      resources#restrictions) page.
 
   Fields:
     additionalExperiments: Additional experiment flags for the job.
-    additionalUserLabels: Additional user labels attached to the job.
+    additionalUserLabels: Additional user labels to be specified for the job.
+      Keys and values should follow the restrictions specified in the
+      [labeling restrictions](https://cloud.google.com/compute/docs/labeling-
+      resources#restrictions) page.
     bypassTempDirValidation: Whether to bypass the safety checks for the job's
       temporary directory. Use with caution.
     machineType: The machine type to use for the job. Defaults to the value
@@ -3297,7 +3637,10 @@ class RuntimeEnvironment(_messages.Message):
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class AdditionalUserLabelsValue(_messages.Message):
-    r"""Additional user labels attached to the job.
+    r"""Additional user labels to be specified for the job. Keys and values
+    should follow the restrictions specified in the [labeling
+    restrictions](https://cloud.google.com/compute/docs/labeling-
+    resources#restrictions) page.
 
     Messages:
       AdditionalProperty: An additional property for a
@@ -3335,7 +3678,7 @@ class RuntimeEnvironment(_messages.Message):
 
 
 class SdkVersion(_messages.Message):
-  r"""The version of the SDK used to run the jobl
+  r"""The version of the SDK used to run the job.
 
   Enums:
     SdkSupportStatusValueValuesEnum: The support status for this SDK version.
@@ -3343,7 +3686,7 @@ class SdkVersion(_messages.Message):
   Fields:
     sdkSupportStatus: The support status for this SDK version.
     version: The version of the SDK used to run the job.
-    versionDisplayName: A readable string describing the version of the sdk.
+    versionDisplayName: A readable string describing the version of the SDK.
   """
 
   class SdkSupportStatusValueValuesEnum(_messages.Enum):
@@ -3377,7 +3720,9 @@ class SendDebugCaptureRequest(_messages.Message):
     componentId: The internal component id for which debug information is
       sent.
     data: The encoded debug information.
-    location: The location which contains the job specified by job_id.
+    location: The [regional endpoint]
+      (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints)
+      that contains the job specified by job_id.
     workerId: The worker id, i.e., VM hostname.
   """
 
@@ -3396,7 +3741,9 @@ class SendWorkerMessagesRequest(_messages.Message):
   r"""A request for sending worker messages to the service.
 
   Fields:
-    location: The location which contains the job
+    location: The [regional endpoint]
+      (https://cloud.google.com/dataflow/docs/concepts/regional-endpoints)
+      that contains the job.
     workerMessages: The WorkerMessages to send.
   """
 
@@ -3599,19 +3946,43 @@ class Sink(_messages.Message):
 class Snapshot(_messages.Message):
   r"""Represents a snapshot of a job.
 
+  Enums:
+    StateValueValuesEnum: State of the snapshot.
+
   Fields:
     creationTime: The time this snapshot was created.
     id: The unique ID of this snapshot.
     projectId: The project this snapshot belongs to.
     sourceJobId: The job this snapshot was created from.
+    state: State of the snapshot.
     ttl: The time after which this snapshot will be automatically deleted.
   """
+
+  class StateValueValuesEnum(_messages.Enum):
+    r"""State of the snapshot.
+
+    Values:
+      UNKNOWN_SNAPSHOT_STATE: Unknown state.
+      PENDING: Snapshot intent to create has been persisted, snapshotting of
+        state has not yet started.
+      RUNNING: Snapshotting is being performed.
+      READY: Snapshot has been created and is ready to be used.
+      FAILED: Snapshot failed to be created.
+      DELETED: Snapshot has been deleted.
+    """
+    UNKNOWN_SNAPSHOT_STATE = 0
+    PENDING = 1
+    RUNNING = 2
+    READY = 3
+    FAILED = 4
+    DELETED = 5
 
   creationTime = _messages.StringField(1)
   id = _messages.StringField(2)
   projectId = _messages.StringField(3)
   sourceJobId = _messages.StringField(4)
-  ttl = _messages.StringField(5)
+  state = _messages.EnumField('StateValueValuesEnum', 5)
+  ttl = _messages.StringField(6)
 
 
 class SnapshotJobRequest(_messages.Message):
@@ -4244,17 +4615,52 @@ class StreamingApplianceSnapshotConfig(_messages.Message):
 class StreamingComputationConfig(_messages.Message):
   r"""Configuration information for a single streaming computation.
 
+  Messages:
+    TransformUserNameToStateFamilyValue: Map from user name of stateful
+      transforms in this stage to their state family.
+
   Fields:
     computationId: Unique identifier for this computation.
     instructions: Instructions that comprise the computation.
     stageName: Stage name of this computation.
     systemName: System defined name for this computation.
+    transformUserNameToStateFamily: Map from user name of stateful transforms
+      in this stage to their state family.
   """
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class TransformUserNameToStateFamilyValue(_messages.Message):
+    r"""Map from user name of stateful transforms in this stage to their state
+    family.
+
+    Messages:
+      AdditionalProperty: An additional property for a
+        TransformUserNameToStateFamilyValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type
+        TransformUserNameToStateFamilyValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a TransformUserNameToStateFamilyValue
+      object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
   computationId = _messages.StringField(1)
   instructions = _messages.MessageField('ParallelInstruction', 2, repeated=True)
   stageName = _messages.StringField(3)
   systemName = _messages.StringField(4)
+  transformUserNameToStateFamily = _messages.MessageField('TransformUserNameToStateFamilyValue', 5)
 
 
 class StreamingComputationRanges(_messages.Message):
@@ -4313,6 +4719,8 @@ class StreamingConfigTask(_messages.Message):
       families.
 
   Fields:
+    maxWorkItemCommitBytes: Maximum size for work item commit supported
+      windmill storage layer.
     streamingComputationConfigs: Set of computation configuration information.
     userStepToStateFamilyNameMap: Map from user step names to state families.
     windmillServiceEndpoint: If present, the worker must use this endpoint to
@@ -4350,10 +4758,11 @@ class StreamingConfigTask(_messages.Message):
 
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
-  streamingComputationConfigs = _messages.MessageField('StreamingComputationConfig', 1, repeated=True)
-  userStepToStateFamilyNameMap = _messages.MessageField('UserStepToStateFamilyNameMapValue', 2)
-  windmillServiceEndpoint = _messages.StringField(3)
-  windmillServicePort = _messages.IntegerField(4)
+  maxWorkItemCommitBytes = _messages.IntegerField(1)
+  streamingComputationConfigs = _messages.MessageField('StreamingComputationConfig', 2, repeated=True)
+  userStepToStateFamilyNameMap = _messages.MessageField('UserStepToStateFamilyNameMapValue', 3)
+  windmillServiceEndpoint = _messages.StringField(4)
+  windmillServicePort = _messages.IntegerField(5)
 
 
 class StreamingSetupTask(_messages.Message):
@@ -4418,7 +4827,7 @@ class StructuredMessage(_messages.Message):
   programmatic consumption.
 
   Fields:
-    messageKey: Idenfier for this message type.  Used by external systems to
+    messageKey: Identifier for this message type.  Used by external systems to
       internationalize or personalize message.
     messageText: Human-readable version of message.
     parameters: The structured data associated with this message.
@@ -4606,6 +5015,16 @@ class TransformSummary(_messages.Message):
   kind = _messages.EnumField('KindValueValuesEnum', 4)
   name = _messages.StringField(5)
   outputCollectionName = _messages.StringField(6, repeated=True)
+
+
+class ValidateResponse(_messages.Message):
+  r"""Response to the validation request.
+
+  Fields:
+    errorMessage: Will be empty if validation succeeds.
+  """
+
+  errorMessage = _messages.StringField(1)
 
 
 class WorkItem(_messages.Message):
@@ -4799,6 +5218,7 @@ class WorkerHealthReport(_messages.Message):
     PodsValueListEntry: A PodsValueListEntry object.
 
   Fields:
+    msg: A message describing any unusual health reports.
     pods: The pods running on the worker. See: http://kubernetes.io/v1.1/docs
       /api-reference/v1/definitions.html#_v1_pod  This field is used by the
       worker to send the status of the indvidual containers running on each
@@ -4806,7 +5226,10 @@ class WorkerHealthReport(_messages.Message):
     reportInterval: The interval at which the worker is sending health
       reports. The default value of 0 should be interpreted as the field is
       not being explicitly set by the worker.
-    vmIsHealthy: Whether the VM is healthy.
+    vmIsBroken: Whether the VM is in a permanently broken state. Broken VMs
+      should be abandoned or deleted ASAP to avoid assigning or completing any
+      work.
+    vmIsHealthy: Whether the VM is currently healthy.
     vmStartupTime: The time the VM was booted.
   """
 
@@ -4835,10 +5258,12 @@ class WorkerHealthReport(_messages.Message):
 
     additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
 
-  pods = _messages.MessageField('PodsValueListEntry', 1, repeated=True)
-  reportInterval = _messages.StringField(2)
-  vmIsHealthy = _messages.BooleanField(3)
-  vmStartupTime = _messages.StringField(4)
+  msg = _messages.StringField(1)
+  pods = _messages.MessageField('PodsValueListEntry', 2, repeated=True)
+  reportInterval = _messages.StringField(3)
+  vmIsBroken = _messages.BooleanField(4)
+  vmIsHealthy = _messages.BooleanField(5)
+  vmStartupTime = _messages.StringField(6)
 
 
 class WorkerHealthReportResponse(_messages.Message):

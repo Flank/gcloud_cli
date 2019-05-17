@@ -30,8 +30,10 @@ from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.compute import flags
 from googlecloudsdk.command_lib.compute import scope as compute_scope
 from googlecloudsdk.command_lib.compute.instance_groups import flags as instance_groups_flags
+from googlecloudsdk.command_lib.compute.instance_groups.flags import AutoDeleteFlag
 from googlecloudsdk.command_lib.compute.instance_groups.managed import flags as managed_flags
 from googlecloudsdk.command_lib.compute.managed_instance_groups import auto_healing_utils
+from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import properties
 
 # API allows up to 58 characters but asked us to send only 54 (unless user
@@ -72,6 +74,34 @@ def _IsZonalGroup(ref):
   return ref.Collection() == 'compute.instanceGroupManagers'
 
 
+def ValidateAndFixUpdatePolicyAgainstStateful(update_policy, group_ref,
+                                              stateful_policy, client):
+  """Validates and fixed update policy for stateful MIG.
+
+  Sets default values in update_policy for stateful IGMs or throws exception
+  if the wrong value is set explicitly.
+
+  Args:
+    update_policy: Update policy to be validated
+    group_ref: Reference of IGM being validated
+    stateful_policy: Stateful policy to check if the group is stateful
+    client: The compute API client
+  """
+  if stateful_policy is None or update_policy is None:
+    return
+  if _IsZonalGroup(group_ref):
+    return
+  redistribution_type_none = (
+      client.messages.InstanceGroupManagerUpdatePolicy
+      .InstanceRedistributionTypeValueValuesEnum.NONE)
+  if update_policy.instanceRedistributionType is None:
+    update_policy.instanceRedistributionType = redistribution_type_none
+  elif update_policy.instanceRedistributionType != redistribution_type_none:
+    raise exceptions.Error(
+        'Stateful regional IGMs cannot use proactive instance redistribution. '
+        'Use --instance-redistribution-type=NONE')
+
+
 @base.ReleaseTracks(base.ReleaseTrack.GA)
 class CreateGA(base.CreateCommand):
   """Create Google Compute Engine managed instance groups."""
@@ -80,6 +110,7 @@ class CreateGA(base.CreateCommand):
   def Args(parser):
     parser.display_info.AddFormat(managed_flags.DEFAULT_LIST_FORMAT)
     _AddInstanceGroupManagerArgs(parser)
+    auto_healing_utils.AddAutohealingArgs(parser)
     igm_arg = instance_groups_flags.GetInstanceGroupManagerArg(zones_flag=True)
     igm_arg.AddArgument(parser, operation_type='create')
     instance_groups_flags.AddZonesFlag(parser)
@@ -178,6 +209,13 @@ class CreateGA(base.CreateCommand):
     """Create parts of Instance Group Manager shared for the track."""
     instance_groups_flags.ValidateManagedInstanceGroupScopeArgs(
         args, holder.resources)
+    health_check = managed_instance_groups_utils.GetHealthCheckUri(
+        holder.resources, args)
+    auto_healing_policies = (
+        managed_instance_groups_utils.CreateAutohealingPolicies(
+            client.messages, health_check, args.initial_delay))
+    managed_instance_groups_utils.ValidateAutohealingPolicies(
+        auto_healing_policies)
     return client.messages.InstanceGroupManager(
         name=group_ref.Name(),
         description=args.description,
@@ -187,6 +225,7 @@ class CreateGA(base.CreateCommand):
         targetPools=self._GetInstanceGroupManagerTargetPools(
             args.target_pool, group_ref, holder),
         targetSize=int(args.size),
+        autoHealingPolicies=auto_healing_policies,
         distributionPolicy=self._CreateDistributionPolicy(
             args.zones, holder.resources, client.messages),
     )
@@ -231,45 +270,11 @@ class CreateBeta(CreateGA):
 
   @classmethod
   def Args(cls, parser):
-    parser.display_info.AddFormat(managed_flags.DEFAULT_LIST_FORMAT)
-    _AddInstanceGroupManagerArgs(parser)
-    auto_healing_utils.AddAutohealingArgs(parser)
-    igm_arg = instance_groups_flags.GetInstanceGroupManagerArg(zones_flag=True)
-    igm_arg.AddArgument(parser, operation_type='create')
-    instance_groups_flags.AddZonesFlag(parser)
+    CreateGA.Args(parser)
+    instance_groups_flags.AddMigInstanceRedistributionTypeFlag(parser)
 
-  def CreateGroupReference(self, args, client, resources):
-    if args.zones:
-      zone_ref = resources.Parse(
-          args.zones[0], collection='compute.zones',
-          params={'project': properties.VALUES.core.project.GetOrFail})
-      region = utils.ZoneNameToRegionName(zone_ref.Name())
-      return resources.Parse(
-          args.name,
-          params={
-              'region': region,
-              'project': properties.VALUES.core.project.GetOrFail},
-          collection='compute.regionInstanceGroupManagers')
-    return (instance_groups_flags.GetInstanceGroupManagerArg().
-            ResolveAsResource)(
-                args, resources,
-                default_scope=compute_scope.ScopeEnum.ZONE,
-                scope_lister=flags.GetDefaultScopeLister(client))
-
-  def _CreateDistributionPolicy(self, zones, resources, messages):
-    if zones:
-      policy_zones = []
-      for zone in zones:
-        zone_ref = resources.Parse(
-            zone, collection='compute.zones',
-            params={'project': properties.VALUES.core.project.GetOrFail})
-        policy_zones.append(
-            messages.DistributionPolicyZoneConfiguration(
-                zone=zone_ref.SelfLink()))
-      return messages.DistributionPolicy(zones=policy_zones)
-
-  def _CreateInstanceGroupManager(
-      self, args, group_ref, template_ref, client, holder):
+  def _CreateInstanceGroupManager(self, args, group_ref, template_ref, client,
+                                  holder):
     """Create parts of Instance Group Manager shared for the track."""
     instance_groups_flags.ValidateManagedInstanceGroupScopeArgs(
         args, holder.resources)
@@ -280,6 +285,13 @@ class CreateBeta(CreateGA):
             client.messages, health_check, args.initial_delay))
     managed_instance_groups_utils.ValidateAutohealingPolicies(
         auto_healing_policies)
+    instance_groups_flags.ValidateMigInstanceRedistributionTypeFlag(
+        args.GetValue('instance_redistribution_type'), group_ref)
+    update_policy = (managed_instance_groups_utils
+                     .ApplyInstanceRedistributionTypeToUpdatePolicy)(
+                         client, args.GetValue('instance_redistribution_type'),
+                         None)
+
     return client.messages.InstanceGroupManager(
         name=group_ref.Name(),
         description=args.description,
@@ -292,6 +304,7 @@ class CreateBeta(CreateGA):
         autoHealingPolicies=auto_healing_policies,
         distributionPolicy=self._CreateDistributionPolicy(
             args.zones, holder.resources, client.messages),
+        updatePolicy=update_policy,
     )
 
 
@@ -301,26 +314,44 @@ class CreateAlpha(CreateBeta):
 
   @classmethod
   def Args(cls, parser):
-    parser.display_info.AddFormat(managed_flags.DEFAULT_LIST_FORMAT)
-    _AddInstanceGroupManagerArgs(parser=parser)
-    auto_healing_utils.AddAutohealingArgs(parser)
-    igm_arg = instance_groups_flags.GetInstanceGroupManagerArg(zones_flag=True)
-    igm_arg.AddArgument(parser, operation_type='create')
-    instance_groups_flags.AddZonesFlag(parser)
+    CreateBeta.Args(parser)
     instance_groups_flags.AddMigCreateStatefulFlags(parser)
-    instance_groups_flags.AddMigInstanceRedistributionTypeFlag(parser)
 
   @staticmethod
-  def _GetStatefulPolicy(args, client):
-    if args.stateful_disks:
+  def _MakePreservedStateWithDisks(client, stateful_disks):
+    """Create StatefulPolicyPreservedState from a list of device names."""
+    # Add all disk_devices to preserved state
+    additional_properties = []
+    for stateful_disk in stateful_disks:
+      auto_delete = (stateful_disk.get('auto-delete') or
+                     AutoDeleteFlag.NEVER).GetAutoDeleteEnumValue(
+                         client.messages.StatefulPolicyPreservedStateDiskDevice
+                         .AutoDeleteValueValuesEnum)
+      disk_device = client.messages.StatefulPolicyPreservedStateDiskDevice(
+          autoDelete=auto_delete)
+      disk_value = client.messages.StatefulPolicyPreservedState.DisksValue \
+        .AdditionalProperty(
+            key=stateful_disk.get('device-name'), value=disk_device)
+      additional_properties.append(disk_value)
+    return client.messages.StatefulPolicyPreservedState(
+        disks=client.messages.StatefulPolicyPreservedState.DisksValue(
+            additionalProperties=additional_properties))
+
+  @staticmethod
+  def _CreateStatefulPolicy(args, client):
+    if args.stateful_disk:
       disks = [
-          client.messages.StatefulPolicyPreservedDisk(deviceName=device)
-          for device in args.stateful_disks
+          client.messages.StatefulPolicyPreservedDisk(
+              deviceName=stateful_disk.get('device-name'))
+          for stateful_disk in args.stateful_disk
       ]
-      preserved_resources = client.messages.StatefulPolicyPreservedResources(
-          disks=disks)
       return client.messages.StatefulPolicy(
-          preservedResources=preserved_resources)
+          preservedResources=client.messages.StatefulPolicyPreservedResources(
+              disks=disks),
+          preservedState=CreateAlpha._MakePreservedStateWithDisks(
+              client, args.stateful_disk))
+    # Create empty stateful policy in case --stateful-names flag is specified to
+    # make MIG stateful nevertheless.
     if args.stateful_names:
       return client.messages.StatefulPolicy()
     return None
@@ -338,12 +369,15 @@ class CreateAlpha(CreateBeta):
             client.messages, health_check, args.initial_delay))
     managed_instance_groups_utils.ValidateAutohealingPolicies(
         auto_healing_policies)
+    instance_redistribution_type = args.GetValue('instance_redistribution_type')
     instance_groups_flags.ValidateMigInstanceRedistributionTypeFlag(
-        args.GetValue('instance_redistribution_type'), group_ref)
-    update_policy = (managed_instance_groups_utils.
-                     ApplyInstanceRedistributionTypeToUpdatePolicy)(
-                         client, args.GetValue('instance_redistribution_type'),
-                         None)
+        instance_redistribution_type, group_ref)
+    stateful_policy = self._CreateStatefulPolicy(args, client)
+    update_policy = (managed_instance_groups_utils
+                     .ApplyInstanceRedistributionTypeToUpdatePolicy)(
+                         client, instance_redistribution_type, None)
+    ValidateAndFixUpdatePolicyAgainstStateful(update_policy, group_ref,
+                                              stateful_policy, client)
 
     return client.messages.InstanceGroupManager(
         name=group_ref.Name(),
@@ -357,7 +391,7 @@ class CreateAlpha(CreateBeta):
         autoHealingPolicies=auto_healing_policies,
         distributionPolicy=self._CreateDistributionPolicy(
             args.zones, holder.resources, client.messages),
-        statefulPolicy=self._GetStatefulPolicy(args, client),
+        statefulPolicy=stateful_policy,
         updatePolicy=update_policy,
     )
 
@@ -376,4 +410,3 @@ in the ``us-central1-a'' zone.
 """,
 }
 CreateGA.detailed_help = DETAILED_HELP
-CreateBeta.detailed_help = DETAILED_HELP

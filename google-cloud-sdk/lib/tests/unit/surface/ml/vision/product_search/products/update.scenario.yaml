@@ -1,0 +1,364 @@
+title: test product update
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: ml vision product-search products update my-product --location=us-east1
+      --description=new-desc --display-name=new-display-name
+  - stderr: |
+      Updated product [my-product].
+  - stdout: |
+      description: new-desc
+      displayName: new-display-name
+      name: projects/fake-project/locations/us-east1/products/chaoren-product
+      productCategory: toys
+      productLabels:
+      - key: a
+        value: b
+- execute:
+  - command: ml vision product-search products update my-product --location=us-east1
+      --clear-product-labels
+  - stderr: |
+      Updated product [my-product].
+  - stdout: |
+      description: old-des
+      displayName: old-display-name
+      name: projects/fake-project/locations/us-east1/products/my-product
+      productCategory: toys
+- execute:
+  - command: ml vision product-search products update my-product --location=us-east1
+      --clear-product-labels --add-product-labels=c=d
+  - stderr: |
+      Updated product [my-product].
+  - stdout: |
+      description: old-des
+      displayName: old-display-name
+      name: projects/fake-project/locations/us-east1/products/my-product
+      productCategory: toys
+      productLabels:
+      - key: c
+        value: d
+- execute:
+  - command: ml vision product-search products update my-product --location=us-east1
+      --remove-product-labels=a=b --add-product-labels=a=d
+  - stderr: |
+      Updated product [my-product].
+  - stdout: |
+      description: old-des
+      displayName: old-display-name
+      name: projects/fake-project/locations/us-east1/products/my-product
+      productCategory: toys
+      productLabels:
+      - key: a
+        value: d
+- execute:
+  - command: ml vision product-search products update my-product --location=us-east1
+      --remove-product-labels=a=b,c=d --add-product-labels=a=d,g=f --description=new-des --display-name=new-display-name
+  - stderr: |
+      Updated product [my-product].
+  - stdout: |
+      description: new-des
+      displayName: new-display-name
+      name: projects/fake-project/locations/us-east1/products/my-product
+      productCategory: toys
+      productLabels:
+      - key: a
+        value: d
+      - key: g
+        value: f
+actions:
+- execute_command:
+    command: ml vision product-search products update my-product --location=us-east1
+      --description=new-desc --display-name=new-display-name
+    events:
+    - api_call:
+        expect_request:
+          uri: https://vision.googleapis.com/v1/projects/fake-project/locations/us-east1/products/my-product?alt=json&updateMask=description%2CdisplayName
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              description: new-desc
+              displayName: new-display-name
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-east1/products/chaoren-product",
+              "displayName": "new-display-name",
+              "description": "new-desc",
+              "productCategory": "toys",
+              "productLabels": [
+                {
+                  "key": "a",
+                  "value": "b"
+                }
+              ]
+            }
+    - expect_stderr: |
+        Updated product [my-product].
+    - expect_stdout: |
+        description: new-desc
+        displayName: new-display-name
+        name: projects/fake-project/locations/us-east1/products/chaoren-product
+        productCategory: toys
+        productLabels:
+        - key: a
+          value: b
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: ml vision product-search products update my-product --location=us-east1
+      --clear-product-labels
+    events:
+    - api_call:
+        expect_request:
+          uri: https://vision.googleapis.com/v1/projects/fake-project/locations/us-east1/products/my-product?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-east1/products/my-product",
+              "displayName": "old-display-name",
+              "description": "old-des",
+              "productCategory": "toys",
+              "productLabels": [
+                {
+                  "key": "a",
+                  "value": "b"
+                }
+              ]
+            }
+    - api_call:
+        expect_request:
+          uri: https://vision.googleapis.com/v1/projects/fake-project/locations/us-east1/products/my-product?alt=json&updateMask=productLabels
+          method: PATCH
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-east1/products/my-product",
+              "displayName": "old-display-name",
+              "description": "old-des",
+              "productCategory": "toys"
+            }
+    - expect_stderr: |
+        Updated product [my-product].
+    - expect_stdout: |
+        description: old-des
+        displayName: old-display-name
+        name: projects/fake-project/locations/us-east1/products/my-product
+        productCategory: toys
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: ml vision product-search products update my-product --location=us-east1
+      --clear-product-labels --add-product-labels=c=d
+    events:
+    - api_call:
+        expect_request:
+          uri: https://vision.googleapis.com/v1/projects/fake-project/locations/us-east1/products/my-product?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-east1/products/my-product",
+              "displayName": "old-display-name",
+              "description": "old-des",
+              "productCategory": "toys",
+              "productLabels": [
+                {
+                  "key": "a",
+                  "value": "b"
+                }
+              ]
+            }
+    - api_call:
+        expect_request:
+          uri: https://vision.googleapis.com/v1/projects/fake-project/locations/us-east1/products/my-product?alt=json&updateMask=productLabels
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              productLabels:
+              - key: c
+                value: d
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-east1/products/my-product",
+              "displayName": "old-display-name",
+              "description": "old-des",
+              "productCategory": "toys",
+              "productLabels": [
+                {
+                  "key": "c",
+                  "value": "d"
+                }
+              ]
+            }
+    - expect_stderr: |
+        Updated product [my-product].
+    - expect_stdout: |
+        description: old-des
+        displayName: old-display-name
+        name: projects/fake-project/locations/us-east1/products/my-product
+        productCategory: toys
+        productLabels:
+        - key: c
+          value: d
+    - expect_exit:
+        code: 0
+
+- execute_command:
+    command: ml vision product-search products update my-product --location=us-east1
+      --remove-product-labels=a=b --add-product-labels=a=d
+    events:
+    - api_call:
+        expect_request:
+          uri: https://vision.googleapis.com/v1/projects/fake-project/locations/us-east1/products/my-product?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-east1/products/my-product",
+              "displayName": "old-display-name",
+              "description": "old-des",
+              "productCategory": "toys",
+              "productLabels": [
+                {
+                  "key": "a",
+                  "value": "b"
+                }
+              ]
+            }
+    - api_call:
+        expect_request:
+          uri: https://vision.googleapis.com/v1/projects/fake-project/locations/us-east1/products/my-product?alt=json&updateMask=productLabels
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              productLabels:
+              - key: a
+                value: d
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-east1/products/my-product",
+              "displayName": "old-display-name",
+              "description": "old-des",
+              "productCategory": "toys",
+              "productLabels": [
+                {
+                  "key": "a",
+                  "value": "d"
+                }
+              ]
+            }
+    - expect_stderr: |
+        Updated product [my-product].
+    - expect_stdout: |
+        description: old-des
+        displayName: old-display-name
+        name: projects/fake-project/locations/us-east1/products/my-product
+        productCategory: toys
+        productLabels:
+        - key: a
+          value: d
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: ml vision product-search products update my-product --location=us-east1
+      --remove-product-labels=a=b,c=d --add-product-labels=a=d,g=f --description=new-des --display-name=new-display-name
+    events:
+    - api_call:
+        expect_request:
+          uri: https://vision.googleapis.com/v1/projects/fake-project/locations/us-east1/products/my-product?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-east1/products/my-product",
+              "displayName": "old-display-name",
+              "description": "old-des",
+              "productCategory": "toys",
+              "productLabels": [
+                {
+                  "key": "a",
+                  "value": "b"
+                }
+              ]
+            }
+    - api_call:
+        expect_request:
+          uri: https://vision.googleapis.com/v1/projects/fake-project/locations/us-east1/products/my-product?alt=json&updateMask=description%2CdisplayName%2CproductLabels
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              description: new-des
+              displayName: new-display-name
+              productLabels:
+              - key: a
+                value: d
+              - key: g
+                value: f
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-east1/products/my-product",
+              "displayName": "new-display-name",
+              "description": "new-des",
+              "productCategory": "toys",
+              "productLabels": [
+                {
+                  "key": "a",
+                  "value": "d"
+                },
+                {
+                  "key": "g",
+                  "value": "f"
+                }
+              ]
+            }
+    - expect_stderr: |
+        Updated product [my-product].
+    - expect_stdout: |
+        description: new-des
+        displayName: new-display-name
+        name: projects/fake-project/locations/us-east1/products/my-product
+        productCategory: toys
+        productLabels:
+        - key: a
+          value: d
+        - key: g
+          value: f
+    - expect_exit:
+        code: 0

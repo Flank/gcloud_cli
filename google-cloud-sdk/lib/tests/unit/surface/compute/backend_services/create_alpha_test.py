@@ -1166,6 +1166,42 @@ class RegionalTest(test_base.BaseTest):
         )
     )],)
 
+  def testInternalManagedWithAllValidFlags(self):
+    messages = self.messages
+
+    self.Run("""compute backend-services create backend-service-1
+                --description cheesecake
+                --load-balancing-scheme internal_managed
+                --region alaska --health-checks my-health-check-1
+                --global-health-checks
+                --port-name https
+                --connection-draining-timeout 120""")
+
+    self.CheckRequests([(
+        self.compute.regionBackendServices, 'Insert',
+        messages.ComputeRegionBackendServicesInsertRequest(
+            backendService=messages.BackendService(
+                backends=[],
+                healthChecks=[
+                    (self.compute_uri + '/projects/'
+                     'my-project/global/healthChecks/my-health-check-1'),
+                ],
+                name='backend-service-1',
+                portName='https',
+                description='cheesecake',
+                loadBalancingScheme=(
+                    messages.BackendService.LoadBalancingSchemeValueValuesEnum
+                    .INTERNAL_MANAGED),
+                protocol=(messages.BackendService.ProtocolValueValuesEnum.TCP),
+                connectionDraining=messages.ConnectionDraining(
+                    drainingTimeoutSec=120),
+                timeoutSec=30,
+            ),
+            project='my-project',
+            region='alaska',
+        )
+    )],)
+
 
 class WithFailoverPolicyApiTest(CreateTestBase):
 
@@ -1252,6 +1288,88 @@ class WithFailoverPolicyApiTest(CreateTestBase):
         self.Run,
         self._create_service_cmd_line + ' --load-balancing-scheme INTERNAL' +
         ' --protocol SSL' + ' --connection-drain-on-failover')
+
+
+class WithLogConfigApiTest(CreateTestBase):
+
+  def SetUp(self):
+    self._create_service_cmd_line = (
+        """compute backend-services create my-backend-service
+           --global-health-checks --health-checks my-health-check-1
+           --description "My backend service"
+           --global""")
+
+  def CheckResults(self, expected_message=None):
+    messages = self.messages
+
+    self.CheckRequests([(
+        self.compute.backendServices, 'Insert',
+        messages.ComputeBackendServicesInsertRequest(
+            backendService=messages.BackendService(
+                backends=[],
+                description='My backend service',
+                logConfig=expected_message,
+                healthChecks=[
+                    self.resources.Create(
+                        'compute.healthChecks',
+                        healthCheck='my-health-check-1',
+                        project='my-project').SelfLink(),
+                ],
+                name='my-backend-service',
+                portName='http',
+                protocol=(messages.BackendService.ProtocolValueValuesEnum.HTTP),
+                timeoutSec=30),
+            project='my-project'))],)
+
+  def testEnableLogging(self):
+    self.Run(self._create_service_cmd_line + ' --load-balancing-scheme external'
+             ' --protocol HTTP'
+             ' --enable-logging'
+             ' --logging-sample-rate 0.7')
+    self.CheckResults(
+        self.messages.BackendServiceLogConfig(
+            enable=True,
+            sampleRate=0.7))
+
+  def testDisableLogging(self):
+    self.Run(self._create_service_cmd_line + ' --load-balancing-scheme external'
+             ' --protocol HTTP'
+             ' --no-enable-logging'
+             ' --logging-sample-rate 0.0')
+    self.CheckResults(
+        self.messages.BackendServiceLogConfig(
+            enable=False,
+            sampleRate=0.0))
+
+  def testCannotSpecifyLogConfigForRegionalBackendService(self):
+    self.assertRaisesRegex(
+        exceptions.InvalidArgumentException,
+        '^Invalid value for \\[--region\\]: cannot specify logging options'
+        ' for regional backend services.', self.Run,
+        'compute backend-services create backend-service-1'
+        ' --http-health-checks my-health-check-1'
+        ' --description "My backend service"'
+        ' --region us-central1'
+        ' --enable-logging')
+
+  def testInvalidLoadBalancingSchemeWithLogConfig(self):
+    self.assertRaisesRegex(
+        exceptions.InvalidArgumentException,
+        '^Invalid value for \\[--load-balancing-scheme\\]: can only specify '
+        '--enable-logging or --logging-sample-rate if the '
+        'load balancing scheme is EXTERNAL.', self.Run,
+        self._create_service_cmd_line +
+        ' --load-balancing-scheme internal_self_managed' +
+        ' --enable-logging')
+
+  def testInvalidProtocolWithLogConfig(self):
+    self.assertRaisesRegex(
+        exceptions.InvalidArgumentException,
+        '^Invalid value for \\[--protocol\\]: can only specify --enable-logging'
+        ' or --logging-sample-rate if the protocol is HTTP/HTTPS.',
+        self.Run,
+        self._create_service_cmd_line + ' --load-balancing-scheme external' +
+        ' --protocol TCP' + ' --enable-logging')
 
 
 if __name__ == '__main__':

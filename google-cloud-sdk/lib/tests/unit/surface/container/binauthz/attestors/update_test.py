@@ -22,12 +22,16 @@ from __future__ import unicode_literals
 import copy
 import datetime
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core.util import times
 from tests.lib import test_case
 from tests.lib.surface.container.binauthz import base
 
 
-class UpdateTest(base.BinauthzMockedBetaPolicyClientUnitTest):
+class UpdateTest(base.WithMockBetaBinauthz, base.BinauthzTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     self.name = 'bar'
@@ -47,13 +51,13 @@ class UpdateTest(base.BinauthzMockedBetaPolicyClientUnitTest):
     updated_attestor = copy.deepcopy(self.attestor)
     updated_attestor.description = 'msg'
 
-    self.client.projects_attestors.Get.Expect(
+    self.mock_client.projects_attestors.Get.Expect(
         self.messages.BinaryauthorizationProjectsAttestorsGetRequest(  # pylint: disable=line-too-long
             name=self.attestor.name,
         ),
         self.attestor)
-    self.client.projects_attestors.Update.Expect(
-        updated_attestor, updated_attestor)
+    self.mock_client.projects_attestors.Update.Expect(updated_attestor,
+                                                      updated_attestor)
 
     response = self.RunBinauthz(
         'attestors update {name} --description=msg'.format(name=self.name))
@@ -64,13 +68,13 @@ class UpdateTest(base.BinauthzMockedBetaPolicyClientUnitTest):
     updated_attestor = copy.deepcopy(self.attestor)
     updated_attestor.description = ''
 
-    self.client.projects_attestors.Get.Expect(
+    self.mock_client.projects_attestors.Get.Expect(
         self.messages.BinaryauthorizationProjectsAttestorsGetRequest(  # pylint: disable=line-too-long
             name=self.attestor.name,
         ),
         self.attestor)
-    self.client.projects_attestors.Update.Expect(
-        updated_attestor, updated_attestor)
+    self.mock_client.projects_attestors.Update.Expect(updated_attestor,
+                                                      updated_attestor)
 
     response = self.RunBinauthz(
         'attestors update {name} --description=""'.format(name=self.name))
@@ -78,18 +82,25 @@ class UpdateTest(base.BinauthzMockedBetaPolicyClientUnitTest):
     self.assertEqual(updated_attestor, response)
 
   def testSuccess_NoUpdate(self):
-    self.client.projects_attestors.Get.Expect(
+    self.mock_client.projects_attestors.Get.Expect(
         self.messages.BinaryauthorizationProjectsAttestorsGetRequest(  # pylint: disable=line-too-long
             name=self.attestor.name,
         ),
         self.attestor)
-    self.client.projects_attestors.Update.Expect(
-        self.attestor, self.attestor)
+    self.mock_client.projects_attestors.Update.Expect(self.attestor,
+                                                      self.attestor)
 
     response = self.RunBinauthz(
         'attestors update {name}'.format(name=self.name))
 
     self.assertEqual(self.attestor, response)
+
+
+class UpdateAlphaTest(base.WithMockAlphaBinauthz, UpdateTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
 
 if __name__ == '__main__':
   test_case.main()

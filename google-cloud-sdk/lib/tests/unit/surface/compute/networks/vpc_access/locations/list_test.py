@@ -23,20 +23,21 @@ from tests.lib import test_case
 from tests.lib.surface.compute.networks.vpc_access import base
 
 
-class LocationsListTest(base.VpcAccessUnitTestBase):
+class LocationsListTestBeta(base.VpcAccessUnitTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'v1beta1'
 
   def testZeroLocationsList(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
     self.locations_client.List.Expect(
         self.messages.VpcaccessProjectsLocationsListRequest(
             name=self.project_relative_name),
         self.messages.ListLocationsResponse(locations=[]))
-
     self.Run('compute networks vpc-access locations list')
     self.AssertErrContains('Listed 0 items.')
 
   def testLocationsList(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
     self._ExpectList()
     self.Run('compute networks vpc-access locations list')
     self.AssertOutputEquals(
@@ -48,7 +49,6 @@ class LocationsListTest(base.VpcAccessUnitTestBase):
         normalize_space=True)
 
   def testLocationsListUri(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
     self._ExpectList()
     self.Run('compute networks vpc-access locations list --uri')
 
@@ -72,6 +72,13 @@ class LocationsListTest(base.VpcAccessUnitTestBase):
             self.messages.Location(name=location_prefix + 'us-east1'),
             self.messages.Location(name=location_prefix + 'us-central1'),
         ]))
+
+
+class LocationsListTestAlpha(LocationsListTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'v1alpha1'
 
 
 if __name__ == '__main__':

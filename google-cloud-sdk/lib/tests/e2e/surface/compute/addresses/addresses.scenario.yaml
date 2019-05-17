@@ -1,6 +1,3 @@
-skip: !!omap
-- bug: b/121155171
-- reason: Failing
 title: AddressesTest
 summary:
 # This summary is generated automatically on update and should not be edited.
@@ -116,6 +113,9 @@ summary:
       Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/addresses/$$address3$$].
 actions:
 - define_reference:
+    reference: compute-uri
+    value: www.googleapis.com/compute
+- define_reference:
     reference: my-zone
     value: us-central1-f
 - define_reference:
@@ -142,7 +142,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$?alt=json
           method: GET
           headers: {}
           body:
@@ -169,7 +169,7 @@ actions:
             - Intel Ivy Bridge
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing?alt=json
           method: GET
           headers: {}
           body:
@@ -199,7 +199,7 @@ actions:
             defaultNetworkTier: PREMIUM
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances?alt=json
           method: POST
           headers: {}
           body:
@@ -257,7 +257,7 @@ actions:
         Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance1$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance1$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance1$$?alt=json
           method: GET
           headers: {}
           body:
@@ -337,7 +337,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses?alt=json
           method: POST
           headers: {}
           body:
@@ -367,7 +367,7 @@ actions:
         Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address1$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address1$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address1$$?alt=json
           method: GET
           headers: {}
           body:
@@ -404,7 +404,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address1$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address1$$?alt=json
           method: GET
           headers: {}
           body:
@@ -436,7 +436,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance1$$/deleteAccessConfig?accessConfig=external-nat&alt=json&networkInterface=nic0
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance1$$/deleteAccessConfig?accessConfig=external-nat&alt=json&networkInterface=nic0
           method: POST
           headers: {}
           body:
@@ -464,7 +464,7 @@ actions:
         Updated [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance1$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance1$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance1$$?alt=json
           method: GET
           headers: {}
           body:
@@ -536,7 +536,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance1$$/addAccessConfig?alt=json&networkInterface=nic0
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance1$$/addAccessConfig?alt=json&networkInterface=nic0
           method: POST
           headers: {}
           body:
@@ -568,7 +568,7 @@ actions:
         Updated [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance1$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance1$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance1$$?alt=json
           method: GET
           headers: {}
           body:
@@ -646,7 +646,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance1$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance1$$?alt=json
           method: GET
           headers: {}
           body:
@@ -727,7 +727,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address1$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address1$$?alt=json
           method: GET
           headers: {}
           body:
@@ -763,7 +763,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address1$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address1$$?alt=json
           method: DELETE
           headers: {}
           body:
@@ -797,7 +797,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance1$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance1$$?alt=json
           method: DELETE
           headers: {}
           body:
@@ -831,7 +831,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses?alt=json
           method: POST
           headers: {}
           body:
@@ -861,7 +861,7 @@ actions:
         Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address2$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address2$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address2$$?alt=json
           method: GET
           headers: {}
           body:
@@ -892,7 +892,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address2$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address2$$?alt=json
           method: GET
           headers: {}
           body:
@@ -933,7 +933,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$?alt=json
           method: GET
           headers: {}
           body:
@@ -960,7 +960,7 @@ actions:
             - Intel Ivy Bridge
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing?alt=json
           method: GET
           headers: {}
           body:
@@ -990,7 +990,7 @@ actions:
             defaultNetworkTier: PREMIUM
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances?alt=json
           method: POST
           headers: {}
           body:
@@ -1049,7 +1049,7 @@ actions:
         Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance2$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance2$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance2$$?alt=json
           method: GET
           headers: {}
           body:
@@ -1131,7 +1131,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance2$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance2$$?alt=json
           method: GET
           headers: {}
           body:
@@ -1213,7 +1213,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address2$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address2$$?alt=json
           method: GET
           headers: {}
           body:
@@ -1250,7 +1250,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address2$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/regions/$$my-region$$/addresses/$$address2$$?alt=json
           method: DELETE
           headers: {}
           body:
@@ -1285,7 +1285,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance2$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/$$my-zone$$/instances/$$instance2$$?alt=json
           method: DELETE
           headers: {}
           body:
@@ -1319,7 +1319,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/addresses?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/addresses?alt=json
           method: POST
           headers: {}
           body:
@@ -1349,7 +1349,7 @@ actions:
         Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/addresses/$$address3$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/addresses/$$address3$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/addresses/$$address3$$?alt=json
           method: GET
           headers: {}
           body:
@@ -1379,7 +1379,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/addresses/$$address3$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/addresses/$$address3$$?alt=json
           method: GET
           headers: {}
           body:
@@ -1413,7 +1413,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/addresses/$$address3$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/addresses/$$address3$$?alt=json
           method: DELETE
           headers: {}
           body:

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ from __future__ import unicode_literals
 import pkgutil
 import textwrap
 
-from googlecloudsdk import api_lib  # pytype: disable=import-error
+from googlecloudsdk import api_lib
 from googlecloudsdk.core.resource import resource_printer
 from googlecloudsdk.core.resource import resource_transform
 
@@ -52,16 +52,20 @@ def ResourceDescription(name):
   *--filter=*_EXPRESSION_ flags along with projections can be used to format and
   change the default output to a more meaningful result.
 
-  To change the default output format of a command, use the --format flag. \
+  Use the `--format` flag to change the default output format of a command. \
   {see_format}
 
-  To select resources to be listed, use the --filter flag. {see_filter}
+  Use the `--filter` flag to select resources to be listed. {see_filter}
 
-  To reach resource items through a unique path of names from the root,
-  use resource-keys. {see_key}
+  Use resource-keys to reach resource items through a unique path of names from the root. {see_key}
 
-  To list a subset of resource keys in a resource, use projections. \
+  Use projections to list a subset of resource keys in a resource. \
   {see_projection}
+
+  Note: To refer to a list of fields you can sort, filter, and format by for
+  each resource, you can run a list command with the format set to `text` or
+  `json`. For
+  example, $ gcloud compute instances list --limit=1 --format=text.
 
   To work through an interactive tutorial about using the filter and format
   flags instead, see: https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/cloud-shell-tutorials&page=editor&tutorial=cloudsdk/tutorial.md

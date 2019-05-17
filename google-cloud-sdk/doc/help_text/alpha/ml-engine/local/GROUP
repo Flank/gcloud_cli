@@ -1,15 +1,16 @@
 NAME
-    gcloud alpha ml-engine local - cloud ML Engine Local commands
+    gcloud alpha ml-engine local - AI Platform Local commands
 
 SYNOPSIS
     gcloud alpha ml-engine local COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Cloud ML Engine Local commands.
+    (ALPHA) AI Platform Local commands.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -20,7 +21,7 @@ COMMANDS
         (ALPHA) Run prediction locally.
 
      train
-        (ALPHA) Run a Cloud ML Engine training job locally.
+        (ALPHA) Run an AI Platform training job locally.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

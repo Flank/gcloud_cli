@@ -181,12 +181,6 @@ class ExecutionTests(sdk_test_base.WithLogCapture,
 
 class GetPythonExecutableTests(test_case.TestCase):
 
-  def SetUp(self):
-    self.old_executable = sys.executable
-
-  def TearDown(self):
-    sys.executable = self.old_executable
-
   def testGetPythonExecutableEnvironment(self):
     self.StartEnvPatch({'CLOUDSDK_PYTHON': '/env/python'}, clear=True)
     self.assertEqual(execution_utils.GetPythonExecutable(),
@@ -194,7 +188,7 @@ class GetPythonExecutableTests(test_case.TestCase):
 
   def testGetPythonExecutableNoEnvironment(self):
     self.StartEnvPatch({}, clear=True)
-    sys.executable = '/current/python'
+    self.StartObjectPatch(sys, 'executable', new='/current/python')
     self.assertEqual(execution_utils.GetPythonExecutable(), '/current/python')
 
 
@@ -225,6 +219,23 @@ class ArgsForPythonToolTests(test_case.TestCase):
     self.assertEqual(execution_utils.ArgsForPythonTool('foo.py',
                                                        python='/other/python'),
                      ['/other/python', 'foo.py'])
+
+
+class ArgsForGcloudTests(test_case.TestCase):
+
+  def testArgsForGcloudNormal(self):
+    self.StartEnvPatch({}, clear=True)
+    self.StartObjectPatch(sys, 'executable', new='/path/to/python')
+    gcloud_path_mock = self.StartObjectPatch(config, 'GcloudPath')
+    gcloud_path_mock.return_value = '/abc/def/gcloud.py'
+    self.assertEqual(execution_utils.ArgsForGcloud(), ['/path/to/python',
+                                                       '/abc/def/gcloud.py'])
+
+  def testArgsForGcloudHermeticPar(self):
+    self.StartEnvPatch({}, clear=True)
+    self.StartObjectPatch(sys, 'executable', new=None)
+    self.StartObjectPatch(sys, 'argv', new=['/abc/def/gcloud.par', 'info'])
+    self.assertEqual(execution_utils.ArgsForGcloud(), ['/abc/def/gcloud.par'])
 
 
 class RaisesKeyboardInterruptTest(test_case.TestCase):

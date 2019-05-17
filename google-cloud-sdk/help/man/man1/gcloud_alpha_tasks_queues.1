@@ -17,20 +17,17 @@ gcloud alpha tasks queues \- manage Cloud Tasks queues
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Commands for managing Google Cloud Tasks queues. If you have early
-access to Cloud Tasks, refer to the following guide for more information about
-the different queue target types:
-https://cloud.google.com/cloud\-tasks/docs/queue\-types. For access, sign up
-here: https://goo.gl/Ya0AZd
+\fB(ALPHA)\fR Commands for managing Google Cloud Tasks queues.
 
 
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -44,8 +41,12 @@ gcloud help\fR for details.
 \fB(ALPHA)\fR Add IAM policy binding for a tasks queue.
 
 .TP 2m
+\fBcreate\fR
+\fB(ALPHA)\fR Create a Cloud Tasks queue.
+
+.TP 2m
 \fBcreate\-app\-engine\-queue\fR
-\fB(ALPHA)\fR Create an App Engine queue.
+\fB(ALPHA)\fR \fB(DEPRECATED)\fR Create a Cloud Tasks queue.
 
 .TP 2m
 \fBcreate\-pull\-queue\fR
@@ -88,8 +89,12 @@ gcloud help\fR for details.
 \fB(ALPHA)\fR Set the IAM policy for a queue.
 
 .TP 2m
+\fBupdate\fR
+\fB(ALPHA)\fR Update a Cloud Tasks queue.
+
+.TP 2m
 \fBupdate\-app\-engine\-queue\fR
-\fB(ALPHA)\fR Update an App Engine queue.
+\fB(ALPHA)\fR \fB(DEPRECATED)\fR Update a Cloud Tasks queue.
 
 .TP 2m
 \fBupdate\-pull\-queue\fR
@@ -105,9 +110,10 @@ This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you will have to apply for early access and have your projects registered on the
 API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. This variant is also available:
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
+$ gcloud tasks queues
 $ gcloud beta tasks queues
 .RE
 

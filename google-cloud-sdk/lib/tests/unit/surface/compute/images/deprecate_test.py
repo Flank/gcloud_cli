@@ -27,6 +27,7 @@ import mock
 messages = core_apis.GetMessagesModule('compute', 'v1')
 
 DEPRECATED = messages.DeprecationStatus.StateValueValuesEnum.DEPRECATED
+ACTIVE = messages.DeprecationStatus.StateValueValuesEnum.ACTIVE
 
 
 class ImagesDeprecateTest(test_base.BaseTest):
@@ -55,23 +56,11 @@ class ImagesDeprecateTest(test_base.BaseTest):
         [(self.compute_v1.images,
           'Deprecate',
           messages.ComputeImagesDeprecateRequest(
-              deprecationStatus=messages.DeprecationStatus(),
+              deprecationStatus=messages.DeprecationStatus(
+                  state=ACTIVE),
               image='my-image',
               project='my-project'))],
     )
-
-  def testActiveFlagMustBeOnlyFlag(self):
-    with self.AssertRaisesToolExceptionRegexp(
-        r'If the state is set to \[ACTIVE\] then none of \[--delete-on\], '
-        r'\[--delete-in\], \[--obsolete-on\], \[--obsolete-in\], or '
-        r'\[--replacement\] may be provided.'):
-      self.Run("""
-          compute images deprecate my-image
-            --state ACTIVE
-             --replacement other-image
-        """)
-
-    self.CheckRequests()
 
   def testDeleteIn(self):
     self.Run("""
@@ -107,6 +96,46 @@ class ImagesDeprecateTest(test_base.BaseTest):
              deprecationStatus=messages.DeprecationStatus(
                  state=DEPRECATED,
                  deleted='2014-01-02T03:04:05',
+                 replacement=(
+                     'https://www.googleapis.com/compute/v1/projects/'
+                     'my-project/global/images/other-image')),
+             image='my-image',
+             project='my-project'))],)
+
+  def testDeprecateIn(self):
+    self.Run("""
+        compute images deprecate my-image
+          --state ACTIVE
+          --replacement other-image
+          --deprecate-in 1d
+        """)
+
+    self.CheckRequests([
+        (self.compute_v1.images, 'Deprecate',
+         messages.ComputeImagesDeprecateRequest(
+             deprecationStatus=messages.DeprecationStatus(
+                 state=ACTIVE,
+                 deprecated='2014-01-03T03:04:05',
+                 replacement=(
+                     'https://www.googleapis.com/compute/v1/projects/'
+                     'my-project/global/images/other-image')),
+             image='my-image',
+             project='my-project'))],)
+
+  def testDeprecateOn(self):
+    self.Run("""
+        compute images deprecate my-image
+          --state ACTIVE
+          --replacement other-image
+          --deprecate-on 2014-01-02T03:04:05
+        """)
+
+    self.CheckRequests([
+        (self.compute_v1.images, 'Deprecate',
+         messages.ComputeImagesDeprecateRequest(
+             deprecationStatus=messages.DeprecationStatus(
+                 state=ACTIVE,
+                 deprecated='2014-01-02T03:04:05',
                  replacement=(
                      'https://www.googleapis.com/compute/v1/projects/'
                      'my-project/global/images/other-image')),
@@ -160,6 +189,7 @@ class ImagesDeprecateTest(test_base.BaseTest):
         compute images deprecate my-image
           --state OBSOLETE
           --replacement other-image
+          --deprecate-in 1d
           --obsolete-in 2d
           --delete-in 3d
         """)
@@ -170,6 +200,7 @@ class ImagesDeprecateTest(test_base.BaseTest):
              deprecationStatus=messages.DeprecationStatus(
                  state=(
                      messages.DeprecationStatus.StateValueValuesEnum.OBSOLETE),
+                 deprecated='2014-01-03T03:04:05',
                  obsolete='2014-01-04T03:04:05',
                  deleted='2014-01-05T03:04:05',
                  replacement=(

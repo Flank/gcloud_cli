@@ -65,7 +65,7 @@ class InterconnectAttachmentsPartnerUpdateGaTest(test_base.BaseTest):
 
     self.Run('compute interconnects attachments provider update my-attachment '
              '--region us-central1 --description "this is my attachment" '
-             '--bandwidth BPS_10G --partner-interconnect-name '
+             '--bandwidth 10g --partner-interconnect-name '
              '"Test Update Partner Interconnect" --partner-name '
              '"Test Update Partner Name" '
              '--partner-portal-url https://update.example.com/portal-url')

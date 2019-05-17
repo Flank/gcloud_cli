@@ -31,11 +31,17 @@ from tests.lib.surface.filestore import base
 import six
 
 
+def _GetListCommandOuput(track_prefix=None):
+  if track_prefix:
+    return '$ gcloud {} filestore instances list'.format(track_prefix)
+  return '$ gcloud filestore instances list'
+
+
 class CloudFilestoreInstancesCreateTest(base.CloudFilestoreUnitTestBase,
                                         waiter.Base,
                                         parameterized.TestCase):
 
-  _TRACK = calliope_base.ReleaseTrack.BETA
+  _TRACK = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.SetUpTrack(self._TRACK)
@@ -81,6 +87,14 @@ class CloudFilestoreInstancesCreateTest(base.CloudFilestoreUnitTestBase,
   @parameterized.named_parameters(
       ('Single',
        ['instance_name',
+        '--zone=us-central1-c',
+        '--network=name=test_network,reserved-ip-range=10.0.0.0/29',
+        '--tier=STANDARD', '--file-share=name=my_vol,capacity=1TB',
+        '--description=test_description',
+        '--async'],
+       'test_network', '10.0.0.0/29', 'my_vol', 1024),
+      ('DeprecatedLocation',
+       ['instance_name',
         '--location=us-central1-c',
         '--network=name=test_network,reserved-ip-range=10.0.0.0/29',
         '--tier=STANDARD', '--file-share=name=my_vol,capacity=1TB',
@@ -89,7 +103,7 @@ class CloudFilestoreInstancesCreateTest(base.CloudFilestoreUnitTestBase,
        'test_network', '10.0.0.0/29', 'my_vol', 1024),
       ('NoRange',
        ['instance_name',
-        '--location=us-central1-c', '--async',
+        '--zone=us-central1-c', '--async',
         '--network=name=test_network',
         '--file-share=name=my_vol,capacity=1TB',
         '--description=test_description'],
@@ -107,8 +121,7 @@ class CloudFilestoreInstancesCreateTest(base.CloudFilestoreUnitTestBase,
             expected_vol_name, expected_capacity))
     self.ExpectCreateInstance(config)
     self.RunCreate(*args)
-    self.AssertErrContains('$ gcloud {} filestore instances list'
-                           .format(self._TRACK.prefix))
+    self.AssertErrContains(_GetListCommandOuput(self._TRACK.prefix))
 
   def testCreateValidPremiumInstanceWithLabels(self):
     config = self.messages.Instance(
@@ -120,12 +133,11 @@ class CloudFilestoreInstancesCreateTest(base.CloudFilestoreUnitTestBase,
         config, self.MakeFileShareConfig('my_vol', 2560))
     self.ExpectCreateInstance(config)
     self.RunCreate(
-        'instance_name', '--location=us-central1-c',
+        'instance_name', '--zone=us-central1-c',
         '--network=name=test_network,reserved-ip-range=10.0.0.0/29',
         '--tier=PREMIUM', '--file-share=name=my_vol,capacity=2560GB',
         '--description=test_description', '--labels=key1=value1', '--async')
-    self.AssertErrContains('$ gcloud {} filestore instances list'
-                           .format(self._TRACK.prefix))
+    self.AssertErrContains(_GetListCommandOuput(self._TRACK.prefix))
 
   def testWaitForCreate(self):
     config = self.messages.Instance(
@@ -139,7 +151,7 @@ class CloudFilestoreInstancesCreateTest(base.CloudFilestoreUnitTestBase,
             name=self.op_name),
         self.messages.Operation(name=self.op_name, done=True))
     self.RunCreate(
-        'instance_name', '--location=us-central1-c',
+        'instance_name', '--zone=us-central1-c',
         '--network=name=test_network', '--file-share=name=my_vol,capacity=1TB')
 
   def testUsingDefaultLocation(self):
@@ -160,22 +172,22 @@ class CloudFilestoreInstancesCreateTest(base.CloudFilestoreUnitTestBase,
        ['instance_name', '--network=name=test_network',
         '--file-share=name=my_vol,capacity=1TB', '--async']),
       ('MissingInstanceName', cli_test_base.MockArgumentError,
-       ['--location=us-central1-c', '--network=name=test_network',
+       ['--zone=us-central1-c', '--network=name=test_network',
         '--file-share=name=my_vol,capacity=1TB', '--async']),
       ('BadCapacityUnits', cli_test_base.MockArgumentError,
-       ['name', '--location=us-central1-c', '--network=name=test_network',
+       ['name', '--zone=us-central1-c', '--network=name=test_network',
         '--file-share=name=my_vol,capacity=1C', '--async']),
       ('BadCapacityTooLarge', cli_test_base.MockArgumentError,
-       ['name', '--location=us-central1-c', '--network=name=test_network',
+       ['name', '--zone=us-central1-c', '--network=name=test_network',
         '--file-share=name=my_vol,capacity=1PB', '--async']),
-      ('WithoutVolumeConfig', cli_test_base.MockArgumentError,
-       ['instance_name', '--location=us-central1-c',
+      ('WithoutFileShareConfig', cli_test_base.MockArgumentError,
+       ['instance_name', '--zone=us-central1-c',
         '--async', '--network=name=test_network']),
       ('WithoutNetworkConfig', cli_test_base.MockArgumentError,
-       ['instance_name', '--location=us-central1-c',
+       ['instance_name', '--zone=us-central1-c',
         '--async', '--file-share=name=my_vol,capacity=1TB']),
       ('InvalidTier', cli_test_base.MockArgumentError,
-       ['instance_name', '--location=us-central1-c',
+       ['instance_name', '--zone=us-central1-c',
         '--network=name=test_network,reserved-ip-range=10.0.0.0/29',
         '--tier=INVAlID_GARBAGE_Tier',
         '--file-share=name=my_vol,capacity=1TB',
@@ -192,7 +204,7 @@ class CloudFilestoreInstancesCreateTest(base.CloudFilestoreUnitTestBase,
                                expected):
     with self.assertRaisesRegexp(exception, expected):
       self.RunCreate(
-          'instance_name', '--location=us-central1-c',
+          'instance_name', '--zone=us-central1-c',
           '--network=name=test_network,reserved-ip-range=10.0.0.0/29',
           '--tier={}'.format(tier_arg),
           '--file-share=name=my_vol,capacity={}'.format(capacity_arg),
@@ -205,10 +217,39 @@ class CloudFilestoreInstancesCreateAlphaTest(
   _TRACK = calliope_base.ReleaseTrack.ALPHA
 
   def FileShareMsg(self):
-    return self.messages.VolumeConfig
+    return self.messages.FileShareConfig
 
   def AddInstanceFileShare(self, instance, file_shares):
-    instance.volumes = file_shares
+    instance.fileShares = file_shares
+
+  def MakeFileShareConfig(self, name, capacity, source_snapshot=None):
+    return [self.FileShareMsg()(capacityGb=capacity, name=name,
+                                sourceSnapshot=source_snapshot)]
+
+  @parameterized.named_parameters(
+      ('NoRange',
+       ['instance_name',
+        '--location=us-central1-c', '--async',
+        '--network=name=test_network',
+        '--file-share=name=my_vol,capacity=1TB,source-snapshot=snap',
+        '--description=test_description'],
+       'test_network', None, 'my_vol', 1024,
+       'projects/fake-project/locations/us-central1/snapshots/snap'))
+  def testCreateInstanceFromSnapshot(self, args, expected_network,
+                                     expected_range, expected_vol_name,
+                                     expected_capacity,
+                                     expected_source_snapshot):
+    config = self.messages.Instance(
+        tier=self.standard_tier,
+        description='test_description',
+        networks=self.MakeNetworkConfig(
+            expected_network, expected_range))
+    self.AddInstanceFileShare(
+        config, self.MakeFileShareConfig(
+            expected_vol_name, expected_capacity, expected_source_snapshot))
+    self.ExpectCreateInstance(config)
+    self.RunCreate(*args)
+    self.AssertErrContains(_GetListCommandOuput(self._TRACK.prefix))
 
 
 if __name__ == '__main__':

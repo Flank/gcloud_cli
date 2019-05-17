@@ -1,0 +1,193 @@
+
+.TH "GCLOUD_ALPHA_BUILDS_TRIGGERS_CREATE_CLOUD\-SOURCE\-REPOSITORIES" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha builds triggers create cloud\-source\-repositories \- create a build trigger from a Cloud Source Repository
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha builds triggers create cloud\-source\-repositories\fR (\fB\-\-trigger_config\fR=\fIPATH\fR\ |\ [\fB\-\-repo\fR=\fIREPO\fR\ (\fB\-\-branch_pattern\fR=\fIREGEX\fR\ |\ \fB\-\-tag_pattern\fR=\fIREGEX\fR)\ (\fB\-\-build_config\fR=\fIPATH\fR\ \fB\-\-substitutions\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-dockerfile\fR=\fIDOCKERFILE\fR\ \fB\-\-dockerfile_dir\fR=\fIDOCKERFILE_DIR\fR;\ default="/"\ \fB\-\-dockerfile_image\fR=\fIDOCKERFILE_IMAGE\fR)\ :\ \fB\-\-ignored_files\fR=[\fIGLOB\fR,...]\ \fB\-\-included_files\fR=[\fIGLOB\fR,...]]) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Create a build trigger from a Cloud Source Repository.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-trigger_config\fR=\fIPATH\fR
+Path to a YAML or JSON file containing the trigger configuration.
+
+For more details, see:
+https://cloud.google.com/cloud\-build/docs/api/reference/rest/v1/projects.triggers
+
+.TP 2m
+
+Flag based trigger configuration
+
+.RS 2m
+.TP 2m
+
+Repo resource \- Cloud Source Repository. This represents a Cloud resource.
+(NOTE) Some attributes are not given arguments in this group but can be set in
+other ways. To set the [project] attribute: provide the argument [\-\-repo] on
+the command line with a fully specified name; set the property [core/project].
+This must be specified.
+
+.RS 2m
+.TP 2m
+\fB\-\-repo\fR=\fIREPO\fR
+ID of the repo or fully qualified identifier for the repo.
+
+.RE
+.sp
+.TP 2m
+\fB\-\-ignored_files\fR=[\fIGLOB\fR,...]
+Glob filter. Changes only affecting ignored files won't trigger builds.
+
+.TP 2m
+\fB\-\-included_files\fR=[\fIGLOB\fR,...]
+Glob filter. Changes affecting at least one included file will trigger builds.
+
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-branch_pattern\fR=\fIREGEX\fR
+A regular expression specifying which git branches to match.
+
+This pattern is used as a regex search for any incoming pushes. For example,
+\-\-branch\-pattern=foo will match "foo", "foobar", and "barfoo". Events on a
+branch that does not match will be ignored.
+
+The syntax of the regular expressions accepted is the syntax accepted by RE2 and
+described at https://github.com/google/re2/wiki/Syntax.
+
+.TP 2m
+\fB\-\-tag_pattern\fR=\fIREGEX\fR
+A regular expression specifying which git tags to match.
+
+This pattern is used as a regex search for any incoming pushes. For example,
+\-\-tag\-pattern=foo will match "foo", "foobar", and "barfoo". Events on a tag
+that does not match will be ignored.
+
+The syntax of the regular expressions accepted is the syntax accepted by RE2 and
+described at https://github.com/google/re2/wiki/Syntax.
+
+.RE
+.sp
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+
+Build file configuration flags
+
+.RS 2m
+.TP 2m
+\fB\-\-build_config\fR=\fIPATH\fR
+Path to a YAML or JSON file containing the build configuration in the
+repository.
+
+For more details, see: https://cloud.google.com/cloud\-build/docs/build\-config
+
+.TP 2m
+\fB\-\-substitutions\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+Parameters to be substituted in the build specification.
+
+For example (using some nonsensical substitution keys; all keys must begin with
+an underscore):
+
+.RS 2m
+$ gcloud builds triggers create ... \-\-config config.yaml
+    \-\-substitutions _FAVORITE_COLOR=blue,_NUM_CANDIES=10
+.RE
+
+This will result in a build where every occurrence of \f5${_FAVORITE_COLOR}\fR
+in certain fields is replaced by "blue", and similarly for \f5${_NUM_CANDIES}\fR
+and "10".
+
+Only the following built\-in variables can be specified with the
+\f5\-\-substitutions\fR flag: REPO_NAME, BRANCH_NAME, TAG_NAME, REVISION_ID,
+COMMIT_SHA, SHORT_SHA.
+
+For more details, see:
+https://cloud.google.com/cloud\-build/docs/api/build\-requests#substitutions
+
+.RE
+.sp
+.TP 2m
+
+Dockerfile build configuration flags
+
+.RS 2m
+.TP 2m
+\fB\-\-dockerfile\fR=\fIDOCKERFILE\fR
+Path of Dockerfile to use for builds in the repository.
+
+If specified, a build config will be generated to run docker build using the
+specified file.
+
+The filename is relative to the Dockerfile directory.
+
+.TP 2m
+\fB\-\-dockerfile_dir\fR=\fIDOCKERFILE_DIR\fR; default="/"
+Location of the directory containing the Dockerfile in the repository.
+
+The directory will also be used as the Docker build context.
+
+.TP 2m
+\fB\-\-dockerfile_image\fR=\fIDOCKERFILE_IMAGE\fR
+Docker image name to build.
+
+If not specified, gcr.io/PROJECT/github.com/REPO_OWNER/REPO_NAME:$COMMIT_SHA
+will be used.
+
+Use a build configuration (cloudbuild.yaml) file for building multiple images in
+a single trigger.
+
+
+.RE
+.RE
+.RE
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/.
+

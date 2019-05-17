@@ -225,11 +225,42 @@ class ServiceDeployerTest(api_test_util.ApiTestBase):
     copy_files_mock.assert_called_once_with(
         None, None, None, max_file_size=None)
 
-  def testPossiblyUploadFiles_Standard(self):
+  def testPossiblyUploadFiles_Java8Standard(self):
     """Check the standard path, specifically file size limit."""
     mock_service_info = mock.MagicMock()
     mock_service_info.is_hermetic = False
     mock_service_info.env = env.STANDARD
+    mock_service_info.runtime = 'java8'
+    copy_files_mock = self.StartObjectPatch(deploy_app_command_util,
+                                            'CopyFilesToCodeBucket')
+    result = self.deployer._PossiblyUploadFiles(None, mock_service_info, None,
+                                                None, None, None)
+    self.assertIsNotNone(result)
+    # Check that the file size limitation is in effect
+    copy_files_mock.assert_called_once_with(
+        None, None, None, max_file_size=32 * 1024 * 1024)
+
+  def testPossiblyUploadFiles_PythonStandard(self):
+    """Check the standard path, specifically file size limit."""
+    mock_service_info = mock.MagicMock()
+    mock_service_info.is_hermetic = False
+    mock_service_info.env = env.STANDARD
+    mock_service_info.runtime = 'python27'
+    copy_files_mock = self.StartObjectPatch(deploy_app_command_util,
+                                            'CopyFilesToCodeBucket')
+    result = self.deployer._PossiblyUploadFiles(None, mock_service_info, None,
+                                                None, None, None)
+    self.assertIsNotNone(result)
+    # Check that the file size limitation is in effect
+    copy_files_mock.assert_called_once_with(
+        None, None, None, max_file_size=32 * 1024 * 1024)
+
+  def testPossiblyUploadFiles_Java11Standard(self):
+    """Check the standard path, specifically file size limit."""
+    mock_service_info = mock.MagicMock()
+    mock_service_info.is_hermetic = False
+    mock_service_info.env = env.STANDARD
+    mock_service_info.runtime = 'java8'
     copy_files_mock = self.StartObjectPatch(
         deploy_app_command_util, 'CopyFilesToCodeBucket')
     result = self.deployer._PossiblyUploadFiles(

@@ -1,0 +1,389 @@
+title: Create, list, and delete a regional GKE cluster
+release_tracks: [GA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- set_property: container/use_application_default_credentials True
+- execute:
+  - command: container clusters create $$cluster$$ --zone=us-central1-f -q --num-nodes=1
+      --network=gke-clusters-zonal-test-do-not-delete --timeout=1080 --no-enable-basic-auth
+      --no-issue-client-certificate --verbosity="none"
+  - stderr: |
+      This will enable the autorepair feature for nodes. Please see https://cloud.google.com/kubernetes-engine/docs/node-auto-repair for more information on node autorepairs.
+  - progress_tracker:
+    - message: Creating cluster $$cluster$$ in us-central1-f
+    - status: SUCCESS
+  - write_file: ~/.kube/config
+  - write_file: ~/.kube/config
+  - stderr: |
+      Created [https://container.googleapis.com/$$api-version$$/projects/fake-project/zones/us-central1-f/clusters/$$cluster$$].
+      To inspect the contents of your cluster, go to: https://console.cloud.google.com/kubernetes/workload_/gcloud/us-central1-f/$$cluster$$?project=fake-project
+      kubeconfig entry generated for $$cluster$$.
+  - stdout: .*$$cluster$$\s+us-central1-f.*RUNNING.*$
+- execute:
+  - command: container clusters list
+  - stdout: .*$$cluster$$\s+us-central1-f.*RUNNING.*$
+  - stderr: .*To upgrade nodes to the latest available version, run.*$
+- execute:
+  - command: container clusters delete $$cluster$$ --zone=us-central1-f -q --timeout=1080
+  - progress_tracker:
+    - message: Deleting cluster $$cluster$$
+    - status: SUCCESS
+  - write_file: ~/.kube/config
+  - stderr: |
+      Deleted [https://container.googleapis.com/$$api-version$$/projects/fake-project/zones/us-central1-f/clusters/$$cluster$$].
+actions:
+
+- set_property:
+    container/use_application_default_credentials: true
+
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1
+      BETA: v1beta1
+
+- generate_resource_id:
+    reference: cluster
+    prefix: container-cluster
+
+- execute_command:
+    command: container clusters create $$cluster$$ --zone=us-central1-f -q --num-nodes=1
+      --network=gke-clusters-zonal-test-do-not-delete --timeout=1080 --no-enable-basic-auth
+      --no-issue-client-certificate --verbosity="none"
+    events:
+    - expect_stderr: |
+        This will enable the autorepair feature for nodes. Please see https://cloud.google.com/kubernetes-engine/docs/node-auto-repair for more information on node autorepairs.
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://container.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1-f/clusters?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              cluster:
+                masterAuth:
+                  clientCertificateConfig:
+                    issueClientCertificate: false
+                  username: ''
+                name: $$cluster$$
+                nodePools:
+                - config:
+                    oauthScopes:
+                    - https://www.googleapis.com/auth/devstorage.read_only
+                    - https://www.googleapis.com/auth/logging.write
+                    - https://www.googleapis.com/auth/monitoring
+                    - https://www.googleapis.com/auth/service.management.readonly
+                    - https://www.googleapis.com/auth/servicecontrol
+                    - https://www.googleapis.com/auth/trace.append
+                  initialNodeCount: 1
+                  management:
+                    autoRepair: true
+                  name: default-pool
+              parent: projects/fake-project/locations/us-central1-f
+
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '469'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: operation-1534803360246-d53c38a3
+            zone: us-central1-f
+            operationType: CREATE_CLUSTER
+            status: RUNNING
+            selfLink: https://container.googleapis.com/$$api-version$$/projects/462803083913/zones/us-central1-f/operations/operation-1534803360246-d53c38a3
+            targetLink: https://container.googleapis.com/$$api-version$$/projects/462803083913/zones/us-central1-f/clusters/$$cluster$$
+            startTime: '2018-08-20T22:16:00.246215166Z'
+    - expect_progress_tracker:
+        message: Creating cluster $$cluster$$ in us-central1-f
+        status: SUCCESS
+    - api_call:
+        expect_request:
+          uri: https://container.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1-f/clusters/$$cluster$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '4507'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: $$cluster$$
+            nodeConfig:
+              machineType: n1-standard-1
+              diskSizeGb: 100
+              oauthScopes:
+              - https://www.googleapis.com/auth/devstorage.read_only
+              - https://www.googleapis.com/auth/logging.write
+              - https://www.googleapis.com/auth/monitoring
+              - https://www.googleapis.com/auth/service.management.readonly
+              - https://www.googleapis.com/auth/servicecontrol
+              - https://www.googleapis.com/auth/trace.append
+              imageType: COS
+              serviceAccount: default
+              diskType: pd-standard
+            masterAuth:
+              clusterCaCertificate: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURERENDQWZTZ0F3SUJBZ0lSQU9MaDBidllEcGpVek13S0U4N2pIZEF3RFFZSktvWklodmNOQVFFTEJRQXcKTHpFdE1Dc0dBMVVFQXhNa056YzJZV1k1TVRBdE5HUXlNeTAwTnpOaExXRXlNR010WW1OaE9HSmtNV0UwWTJZNApNQjRYRFRFNE1EZ3lNREl4TVRVMU9Gb1hEVEl6TURneE9USXlNVFUxT0Zvd0x6RXRNQ3NHQTFVRUF4TWtOemMyCllXWTVNVEF0TkdReU15MDBOek5oTFdFeU1HTXRZbU5oT0dKa01XRTBZMlk0TUlJQklqQU5CZ2txaGtpRzl3MEIKQVFFRkFBT0NBUThBTUlJQkNnS0NBUUVBbFhaSnVYOG13b3BEUmk2OC9yWDFvVGRrOUZLL3U1WlZheUZUc1EzMAp2N3F5TkpYNVpjcnRHRVZqcTZOa0FyOVhYRU5ONzIrREtoNkNnQWdLZjd3SnNmQXZhNnJCNkkrZGxVUU9mVXdhCmRsT0hQMFpBcldPY09kaGp5ZnRLMllEYjlxelpJN3RHTUJxREVaVzBZbndZQSswb1Nla29XdUVyL1RWQk90bisKSy9SQ3lsWGpYMmJtSEI3WXJyVlUycnJrby94bzA0ejZEVkh4VGxaMWhQODM5U3JmNEJkU0Y4dUZRMVpCajBqbwp0S2podlo1TWJ2UDVkbUpud0JNVTV5K3Rka09rdnhsK2txVDdnVXpYYkYyWVF0eFZjY3Z3Z3ltWXdNMTN4VGRBCmRSTnhMdmJKeUtYZ0lGNkxwbjJ5ZUFaUHJlS3BnSkR4YkdqNTlGUkZoREM5K1FJREFRQUJveU13SVRBT0JnTlYKSFE4QkFmOEVCQU1DQWdRd0R3WURWUjBUQVFIL0JBVXdBd0VCL3pBTkJna3Foa2lHOXcwQkFRc0ZBQU9DQVFFQQpmdzZGalhsS0tSTk52VzE5VlBxVmtmdGszNkxucmNWL3hxaHhzV3RUTUVEWk5udDI4TCtlWlE2SjZub1BBSjRMCjNlU08rVlZ0QUJacEg5ZkgrV2NLbUgzSk1HZWR1TC9PYitkQnY3YWhvTzRqdUdPRUl2anduRkxpSmRHM3FoSlAKeVZ2Vk94RkxlZTJOM2NDVlhQa0tTRHZxNzBEbDRldmJXVHhpMXdjLzJ2M2VzTnRISEJVY24xdjdjenRuaWdKLwo3RUV0T2g2bzZDTk5RajFMenZtRzFDdVZldzVvTTN1NmVrZm03emRDbDZZK2lIa0pqZEJYMTF3OExDU2dmV3pRCmRRUkVuYTJLQm85OTRSbDFGT1RLc3IzR1NKSVhuMk9TNUZPcTNDTm5FOFJNMWdzajEyQzlEaUI2YXhjMzMvamYKOCtRVnFJVlB4K0lSeTdOQjIrNHpoZz09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+            loggingService: logging.googleapis.com
+            monitoringService: monitoring.googleapis.com
+            network: default
+            clusterIpv4Cidr: 10.44.0.0/14
+            addonsConfig:
+              networkPolicyConfig:
+                disabled: true
+            nodePools:
+            - name: default-pool
+              config:
+                machineType: n1-standard-1
+                diskSizeGb: 100
+                oauthScopes:
+                - https://www.googleapis.com/auth/devstorage.read_only
+                - https://www.googleapis.com/auth/logging.write
+                - https://www.googleapis.com/auth/monitoring
+                - https://www.googleapis.com/auth/service.management.readonly
+                - https://www.googleapis.com/auth/servicecontrol
+                - https://www.googleapis.com/auth/trace.append
+                imageType: COS
+                serviceAccount: default
+                diskType: pd-standard
+              initialNodeCount: 1
+              management:
+                autoRepair: true
+              selfLink: https://container.googleapis.com/$$api-version$$/projects/fake-project/zones/us-central1-f/clusters/$$cluster$$/nodePools/default-pool
+              version: 1.9.7-gke.5
+              instanceGroupUrls:
+              - https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-central1-f/instanceGroupManagers/gke-container-cluster-20-default-pool-00096ca6-grp
+              status: RUNNING
+            locations:
+            - us-central1-f
+            labelFingerprint: a9dc16a7
+            legacyAbac: {}
+            networkConfig:
+              network: projects/fake-project/global/networks/default
+            selfLink: https://container.googleapis.com/$$api-version$$/projects/fake-project/zones/us-central1-f/clusters/$$cluster$$
+            zone: us-central1-f
+            endpoint: 35.226.94.45
+            initialClusterVersion: 1.9.7-gke.5
+            currentMasterVersion: 1.9.7-gke.5
+            currentNodeVersion: 1.9.7-gke.5
+            createTime: '2018-08-20T22:15:58+00:00'
+            status: RUNNING
+            nodeIpv4CidrSize: 24
+            servicesIpv4Cidr: 10.47.240.0/20
+            instanceGroupUrls:
+            - https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-central1-f/instanceGroupManagers/gke-container-cluster-20-default-pool-00096ca6-grp
+            currentNodeCount: 1
+    - expect_file_written:
+        path: ~/.kube/config
+        contents:
+          matches: '.*clusters: \[\].*'
+        is_private: true
+    - expect_file_written:
+        path: ~/.kube/config
+        contents:
+          matches: '.*name: gke_fake-project_us-central1-f_$$cluster$$.*'
+        is_private: true
+    - expect_stderr: |
+        Created [https://container.googleapis.com/$$api-version$$/projects/fake-project/zones/us-central1-f/clusters/$$cluster$$].
+        To inspect the contents of your cluster, go to: https://console.cloud.google.com/kubernetes/workload_/gcloud/us-central1-f/$$cluster$$?project=fake-project
+        kubeconfig entry generated for $$cluster$$.
+    - expect_stdout:
+        matches: .*$$cluster$$\s+us-central1-f.*RUNNING.*
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: container clusters list
+    events:
+    - api_call:
+        expect_request:
+          uri: https://container.googleapis.com/$$api-version$$/projects/fake-project/locations/-/clusters?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '12995'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            clusters:
+            - name: $$cluster$$
+              nodeConfig:
+                machineType: n1-standard-1
+                diskSizeGb: 100
+                oauthScopes:
+                - https://www.googleapis.com/auth/devstorage.read_only
+                - https://www.googleapis.com/auth/logging.write
+                - https://www.googleapis.com/auth/monitoring
+                - https://www.googleapis.com/auth/service.management.readonly
+                - https://www.googleapis.com/auth/servicecontrol
+                - https://www.googleapis.com/auth/trace.append
+                imageType: COS
+                serviceAccount: default
+                diskType: pd-standard
+              masterAuth:
+                clusterCaCertificate: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURERENDQWZTZ0F3SUJBZ0lSQU9MaDBidllEcGpVek13S0U4N2pIZEF3RFFZSktvWklodmNOQVFFTEJRQXcKTHpFdE1Dc0dBMVVFQXhNa056YzJZV1k1TVRBdE5HUXlNeTAwTnpOaExXRXlNR010WW1OaE9HSmtNV0UwWTJZNApNQjRYRFRFNE1EZ3lNREl4TVRVMU9Gb1hEVEl6TURneE9USXlNVFUxT0Zvd0x6RXRNQ3NHQTFVRUF4TWtOemMyCllXWTVNVEF0TkdReU15MDBOek5oTFdFeU1HTXRZbU5oT0dKa01XRTBZMlk0TUlJQklqQU5CZ2txaGtpRzl3MEIKQVFFRkFBT0NBUThBTUlJQkNnS0NBUUVBbFhaSnVYOG13b3BEUmk2OC9yWDFvVGRrOUZLL3U1WlZheUZUc1EzMAp2N3F5TkpYNVpjcnRHRVZqcTZOa0FyOVhYRU5ONzIrREtoNkNnQWdLZjd3SnNmQXZhNnJCNkkrZGxVUU9mVXdhCmRsT0hQMFpBcldPY09kaGp5ZnRLMllEYjlxelpJN3RHTUJxREVaVzBZbndZQSswb1Nla29XdUVyL1RWQk90bisKSy9SQ3lsWGpYMmJtSEI3WXJyVlUycnJrby94bzA0ejZEVkh4VGxaMWhQODM5U3JmNEJkU0Y4dUZRMVpCajBqbwp0S2podlo1TWJ2UDVkbUpud0JNVTV5K3Rka09rdnhsK2txVDdnVXpYYkYyWVF0eFZjY3Z3Z3ltWXdNMTN4VGRBCmRSTnhMdmJKeUtYZ0lGNkxwbjJ5ZUFaUHJlS3BnSkR4YkdqNTlGUkZoREM5K1FJREFRQUJveU13SVRBT0JnTlYKSFE4QkFmOEVCQU1DQWdRd0R3WURWUjBUQVFIL0JBVXdBd0VCL3pBTkJna3Foa2lHOXcwQkFRc0ZBQU9DQVFFQQpmdzZGalhsS0tSTk52VzE5VlBxVmtmdGszNkxucmNWL3hxaHhzV3RUTUVEWk5udDI4TCtlWlE2SjZub1BBSjRMCjNlU08rVlZ0QUJacEg5ZkgrV2NLbUgzSk1HZWR1TC9PYitkQnY3YWhvTzRqdUdPRUl2anduRkxpSmRHM3FoSlAKeVZ2Vk94RkxlZTJOM2NDVlhQa0tTRHZxNzBEbDRldmJXVHhpMXdjLzJ2M2VzTnRISEJVY24xdjdjenRuaWdKLwo3RUV0T2g2bzZDTk5RajFMenZtRzFDdVZldzVvTTN1NmVrZm03emRDbDZZK2lIa0pqZEJYMTF3OExDU2dmV3pRCmRRUkVuYTJLQm85OTRSbDFGT1RLc3IzR1NKSVhuMk9TNUZPcTNDTm5FOFJNMWdzajEyQzlEaUI2YXhjMzMvamYKOCtRVnFJVlB4K0lSeTdOQjIrNHpoZz09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+              loggingService: logging.googleapis.com
+              monitoringService: monitoring.googleapis.com
+              network: default
+              clusterIpv4Cidr: 10.44.0.0/14
+              addonsConfig:
+                networkPolicyConfig:
+                  disabled: true
+              nodePools:
+              - name: default-pool
+                config:
+                  machineType: n1-standard-1
+                  diskSizeGb: 100
+                  oauthScopes:
+                  - https://www.googleapis.com/auth/devstorage.read_only
+                  - https://www.googleapis.com/auth/logging.write
+                  - https://www.googleapis.com/auth/monitoring
+                  - https://www.googleapis.com/auth/service.management.readonly
+                  - https://www.googleapis.com/auth/servicecontrol
+                  - https://www.googleapis.com/auth/trace.append
+                  imageType: COS
+                  serviceAccount: default
+                  diskType: pd-standard
+                initialNodeCount: 1
+                management:
+                  autoRepair: true
+                selfLink: https://container.googleapis.com/$$api-version$$/projects/fake-project/zones/us-central1-f/clusters/$$cluster$$/nodePools/default-pool
+                version: 1.9.7-gke.5
+                instanceGroupUrls:
+                - https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-central1-f/instanceGroupManagers/gke-container-cluster-20-default-pool-00096ca6-grp
+                status: RUNNING
+              locations:
+              - us-central1-f
+              labelFingerprint: a9dc16a7
+              legacyAbac: {}
+              networkConfig:
+                network: projects/fake-project/global/networks/default
+              selfLink: https://container.googleapis.com/$$api-version$$/projects/fake-project/zones/us-central1-f/clusters/$$cluster$$
+              zone: us-central1-f
+              endpoint: 35.226.94.45
+              initialClusterVersion: 1.9.7-gke.5
+              currentMasterVersion: 1.9.7-gke.5
+              currentNodeVersion: 1.9.7-gke.5
+              createTime: '2018-08-20T22:15:58+00:00'
+              status: RUNNING
+              nodeIpv4CidrSize: 24
+              servicesIpv4Cidr: 10.47.240.0/20
+              instanceGroupUrls:
+              - https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-central1-f/instanceGroupManagers/gke-container-cluster-20-default-pool-00096ca6-grp
+              currentNodeCount: 1
+            - name: us-central1-composer-enviro-f1a6ba1a-gke
+              initialNodeCount: 3
+              nodeConfig:
+                machineType: n1-standard-1
+                diskSizeGb: 100
+                oauthScopes:
+                - https://www.googleapis.com/auth/cloud-platform
+                imageType: COS
+                serviceAccount: default
+                diskType: pd-standard
+              masterAuth:
+                username: admin
+                password: bx692h5h9y162aNn
+                clusterCaCertificate: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURDekNDQWZPZ0F3SUJBZ0lRRDB2alBKa0JTUXJ4SFp3UHA5bkRtVEFOQmdrcWhraUc5dzBCQVFzRkFEQXYKTVMwd0t3WURWUVFERXlRNE5tTTVabUZqT1MweU1ETTRMVFJtTWpVdFltTTBaUzFsTnpVeU5HWmxZV1kwTkRZdwpIaGNOTVRnd01URXlNVFl5TmpNd1doY05Nak13TVRFeE1UY3lOak13V2pBdk1TMHdLd1lEVlFRREV5UTRObU01ClptRmpPUzB5TURNNExUUm1NalV0WW1NMFpTMWxOelV5TkdabFlXWTBORFl3Z2dFaU1BMEdDU3FHU0liM0RRRUIKQVFVQUE0SUJEd0F3Z2dFS0FvSUJBUURJRjFRRUp6enoxUTcvWFhQcWUrekM2QUhMcnFVaEpkOXZXcWh0elQ5ZQoyQVhpdFE0Wnl5NnJYSjB6THlnVXVVc1VjcUsvQ3VNQ0lYREZYSTA3d2FHaW83NENKZ2I3WEdUakplUTRmQkVqCjFGRC9CYm5ZeWZ6K01wTWI5cE4vU0tQSnlLVlYwQ1FSMHFvTkVneDJURE5DNm5OU05Fb2hEVlk0VHBHZkI4aXcKU3F5NGJEVUFxZytyMHhraWJHaXlaWWhVeVlHUHp1QmNCM1ZNMUFxQi84YUxTc2lZQWY2VG4rOCtWT3l4WWRvMwpENkFjdjV4NWxBdDAyRU1aOTNVRU1ubk83bEl6a0ZCWmFta01TeFVyb2xOV2pFQm5JaGJMcXRtY1dUSFY4WDRzCnZvRFZVR0d1Q05rSzMvUE5nUFI4VFNiOXZjd2NWY2laOTJIU0lGcFlqVlYzQWdNQkFBR2pJekFoTUE0R0ExVWQKRHdFQi93UUVBd0lDQkRBUEJnTlZIUk1CQWY4RUJUQURBUUgvTUEwR0NTcUdTSWIzRFFFQkN3VUFBNElCQVFCawp5NTUrbWFpcTN5aGc4dHp0dHJVbTdMeUxaUmZiOVpvck91Z0w1ZnVLYVg2aXlBRkRCSnRka1oxbnh2Ymgybms1CitLNWRHY0I1UkVkdEJWSHhnRWZuYXBPMEw4cW9uM2YrdnZiRjdsaWs1QkZXdVVBd2E1NkdRclkyTVZRSGozeHYKVk9XZDF4RDJXTXdINGxHeVR2QTFMMVIrMXc1YVNXbzM0UmxpT3ZHL1RXM2tMM2ZLMTFjaFowYy8zNW1HNnBQYgpZQlJyUTloSlRmNENlN09zdGtOd0JVSnp3VGR2cC9VT3lvNjBRM0lmWVFxdjh0R29GL3FWYlJCTmlMcEVLRTcvCnBWUlZNY0lJalNLU2daUHpXM3VjQXB5UmFjV05xYURLbzZjbk50Q2I0WCtUY3pZOUx5a3dwdWxCcW11R1AwSysKSHlrRkp4cUFZWXorb1o0U05jdHYKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+                clientCertificate: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUMyakNDQWNLZ0F3SUJBZ0lRUlI4YmxvSlRBeWVSYjN1OUZYcG9yREFOQmdrcWhraUc5dzBCQVFzRkFEQXYKTVMwd0t3WURWUVFERXlRNE5tTTVabUZqT1MweU1ETTRMVFJtTWpVdFltTTBaUzFsTnpVeU5HWmxZV1kwTkRZdwpIaGNOTVRnd01URXlNVGN5TmpNeFdoY05Nak13TVRFeE1UY3lOak14V2pBUk1ROHdEUVlEVlFRREV3WmpiR2xsCmJuUXdnZ0VpTUEwR0NTcUdTSWIzRFFFQkFRVUFBNElCRHdBd2dnRUtBb0lCQVFET3k2YmsrSGxxNkVOSGFNcFEKaDJWeWRTZkl1eTR0UWJ6QlhpaERmdGJZYzNsd3lqQnNzbmNLMmI3bDNVdUNqcWo4eTJCRzNZYkdzLzI3K25XZQp2OXVmSTBYUlBGT29KT0c4Ym9NYk9XNDhEaWM0MzBjR1VTdTg3cXlFVllKK2pvT3B1UTd1LzNSWEdmTDRZRzZ5CmFZS0F5OTVnRExPYXI3Y0M5OVd0QXVVZW52ZlJxZW1Jck82ZVEwSFNianArSWc4Nk5KcTR3QUNmSjJwZzAzZkwKYUNKNHFLWHZ5U0g2V0JEMVdsdjlLa1ZNQzBYT0p0YlRuNWsyZDRaZnVBY09xMkhqc1hBQUc4cVo4VjhJNjl6Mgo1K2dmSEJjVVBMTEd1ZE5hZHlJUUhsMlV2SE8yNm9ZMFUrb2V1WHhKaXRNYjZzZ3RST1F1OHVQYXFxaG9zakpmCm9TUmxBZ01CQUFHakVEQU9NQXdHQTFVZEV3RUIvd1FDTUFBd0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFDeUEKUVFCV3BSb3FaR0xOT0dwMjV1bE02UkUyYnA5dDVBWWpoRElldmhjdkp1UjU2WCtHTkppQjh0TVRMUVpqQlZEdQpWRWRQeGc3T1RuR2YyMCsxaUtENzEyeEtEdkZQaTI1aTgzSG9BdGJKTitadmRDSGxkaHM2QkFtTXYvS2wvamxxCkxGUDd4ZnBMWGs2VTFPZXpSOEFMMzRkZHhIb0Z0Y2g3TC8vYmlJZnZZTGdNTk1FTWJFY0xYVHRpZGI2eWdYelAKSldNS0s0RlJJMWNzOW0vaVgrQ081d2R4T0tVZG9weVFZd250Wk05NmZCYmNaUlpIb3BQS2pXVWdZZWNCUDJBKwpuM1NvMFFObEVGZzY4TndpOXFvV1AwWktUVHNoMVNRdFhCcUdvaHIvbVZNRWZRa2RQZmI2bFRRdXl6UHBCbzl3Cm5OZmxIRTlEMFF6c2E5K20ySG89Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+                clientKey: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFb1FJQkFBS0NBUUVBenN1bTVQaDVhdWhEUjJqS1VJZGxjblVueUxzdUxVRzh3VjRvUTM3VzJITjVjTW93CmJMSjNDdG0rNWQxTGdvNm8vTXRnUnQyR3hyUDl1L3AxbnIvYm55TkYwVHhUcUNUaHZHNkRHemx1UEE0bk9OOUgKQmxFcnZPNnNoRldDZm82RHFia083djkwVnhueStHQnVzbW1DZ012ZVlBeXptcSszQXZmVnJRTGxIcDczMGFucAppS3p1bmtOQjBtNDZmaUlQT2pTYXVNQUFueWRxWU5OM3kyZ2llS2lsNzhraCtsZ1E5VnBiL1NwRlRBdEZ6aWJXCjA1K1pObmVHWDdnSERxdGg0N0Z3QUJ2S21mRmZDT3ZjOXVmb0h4d1hGRHl5eHJuVFduY2lFQjVkbEx4enR1cUcKTkZQcUhybDhTWXJURytySUxVVGtMdkxqMnFxb2FMSXlYNkVrWlFJREFRQUJBb0gvUFZMOGxiOXU3TnB6dzg2NgpNRkgyZzVBUDBZeGJPcENEL242QzhpdkFYKy9lZmlsM1hXODVzMmkwYzZEQnJtQjFQSUlUSUVZUlJ3WkQrR1ZpCisvQyttdDFGbHdiaUhXVjlOazZQWis0S3JVU0ZNbTJ1dDV1RlI1Y3FaeFAwaVdpUEl0citLQXh1aVJDVGtqOEcKbExjMVBDYzQ0Qmc1Z0JCdzlUQmU3UytEN1NXRC9LZ1VhZjVnMzdXY1laL3htcTY1Q3VGcGl4WFlPeUF3V1J6dgpYYUhlTGpYZHJ6ZVI0UTVDS2ZsRS9uQTZiSERYaDVQaEhKOVJoUUIrdTQ2N0p2SGdldldlSVpMeGVPcEpBaDhRClpPMHdtRWJ6WDFvL0MxVTZkb1Ryb3ZrR0V5VTVWV1pmTm0xM0FTekhlNTM4Wk1DU1Q2MW54bXdvV1FYZFF0emQKbzI5NUFvR0JBTzBCVjhCWHMzUFVCU1RDR2M2VWdZZ1NxVWJRbkF2UEFjekdzQnl6cEFYWkNsY1NOaVczdStyVwo4NFZOWHU0TGJVRFc4YTdNL0liaitpSHdnR2hTTHNMRGlDKzlhNkJ1c0dodi9UaGxxWC9FeU5YUFhnemFPRW5UCmE3RnhJUnRlUERWNSs3ejJQZG9DWjVmeWpoRGEwaW1ZaWxlY281Nk0xN21uZFMyU0NiMWRBb0dCQU45ZWZsWHEKTVluWlp1bFZPY0RaTHdWcGc1eXFDNXJ5aDYxdFNGWmpJWFpWdXRCOEVKVVdFVzJZKzIrcVVPb2Z1ekV2SG11cwpKV29VdGh0c2dzV20wV09GNEd1QzlIcnhqK2JXZ2UzYnZrTy80WkxSd2QyaGZZYlgrOUREVVpVN1JSRVE5V1k2CmpBejNtU2VIODVjNVJKTWdaUFFrdS9ldFVoTzdzZzJDcTRxcEFvR0FGeXh5Y0JRakw4Z2pXSnpCK1RqOEVWb0IKd3pMU2p6VUdjQWRkWVBFUHNLS3dLQ05YdUFobkQyZEZHRnVnVkpZNWNJV1R6QXV2QldGMUs2eGdZZExuVDVQZQoxUXdvWWQ5dzBFVmk5UWk3c2dxRHVLUTJCZnV3VlVlZTJCSy9zZlZjM2IyM3A1cE1JZXpxUkNrclN1cWFjZ2JBClFDREl2cy8ycCtoL3hKenE1dUVDZ1lBUUgrY28xcFlxNkZuSWdGR0IvV3VxalZwbDVkU2VvK0Z0Z0pVWFAySzgKQXlaUVJKU0IzcXoxWjNUSE05bFJmV2JxL3diSUtRNHVZVDVnTG00bVRJdVREcWdMdXRGaFNxempzaHFCRERybwo4eUlha2kvWGl2L2Z5eG12a1ZvRFZ0citoMlhmc2x4SDExdmtBYWx4QWo1VURLT2RDRVhWZEZxWGVCWTdhWEp1CnVRS0JnUURIVlpTbzRJWVRPOE9sS3NadHUwTjRrd2VieEppc1FNZmdQRVhOeXBQeHhkeXI3OEw5VjR2a1NiQlgKVnprYWtSZmtmRk0zck9zZkR2R0ZBYWZFL2JlYndjU0VLeEhycmdPcklIejVLbG12UDlBSjdmakY4UkU3U2VnNQpzU3dOb3VRVTBrNkdEY0NhVW1FbEpnZVNoUkh0YVhzemRjZlpTWmZSdW5GZlRENGFPQT09Ci0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tCg==
+              loggingService: logging.googleapis.com
+              monitoringService: monitoring.googleapis.com
+              network: default
+              clusterIpv4Cidr: 10.40.0.0/14
+              addonsConfig:
+                horizontalPodAutoscaling: {}
+                networkPolicyConfig:
+                  disabled: true
+              nodePools:
+              - name: default-pool
+                config:
+                  machineType: n1-standard-1
+                  diskSizeGb: 100
+                  oauthScopes:
+                  - https://www.googleapis.com/auth/cloud-platform
+                  imageType: COS
+                  serviceAccount: default
+                  diskType: pd-standard
+                initialNodeCount: 3
+                management: {}
+                selfLink: https://container.googleapis.com/$$api-version$$/projects/fake-project/zones/us-central1-c/clusters/us-central1-composer-enviro-f1a6ba1a-gke/nodePools/default-pool
+                version: 1.7.11-gke.1
+                instanceGroupUrls:
+                - https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-central1-c/instanceGroupManagers/gke-us-central1-composer-default-pool-cd7d1e63-grp
+                status: RUNNING
+              locations:
+              - us-central1-c
+              resourceLabels:
+                goog-composer-location: us-central1
+                goog-composer-environment: composer-environment1
+              labelFingerprint: d5acfb54
+              legacyAbac:
+                enabled: true
+              networkConfig:
+                network: projects/fake-project/global/networks/default
+              selfLink: https://container.googleapis.com/$$api-version$$/projects/fake-project/zones/us-central1-c/clusters/us-central1-composer-enviro-f1a6ba1a-gke
+              zone: us-central1-c
+              endpoint: 35.202.49.252
+              initialClusterVersion: 1.7.11-gke.1
+              currentMasterVersion: 1.8.10-gke.2
+              currentNodeVersion: 1.7.11-gke.1
+              createTime: '2018-01-12T17:26:30+00:00'
+              status: RUNNING
+              nodeIpv4CidrSize: 24
+              servicesIpv4Cidr: 10.43.240.0/20
+              instanceGroupUrls:
+              - https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/us-central1-c/instanceGroupManagers/gke-us-central1-composer-default-pool-cd7d1e63-grp
+    - expect_stdout:
+        matches: .*$$cluster$$\s+us-central1-f.*RUNNING.*
+    - expect_stderr:
+        matches: .*To upgrade nodes to the latest available version, run.*
+    - expect_exit:
+        code: 0
+
+
+- execute_command:
+    command: container clusters delete $$cluster$$ --zone=us-central1-f -q --timeout=1080
+    cleanup_for: cluster
+    events:
+    - api_call:
+        poll_operation: true
+        expect_request:
+          uri: https://container.googleapis.com/$$api-version$$/projects/fake-project/locations/us-central1-f/clusters/$$cluster$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '469'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: operation-1534803733735-ec89776c
+            zone: us-central1-f
+            operationType: DELETE_CLUSTER
+            status: RUNNING
+            selfLink: https://container.googleapis.com/$$api-version$$/projects/462803083913/zones/us-central1-f/operations/operation-1534803733735-ec89776c
+            targetLink: https://container.googleapis.com/$$api-version$$/projects/462803083913/zones/us-central1-f/clusters/$$cluster$$
+            startTime: '2018-08-20T22:22:13.735195309Z'
+    - expect_progress_tracker:
+        message: Deleting cluster $$cluster$$
+        status: SUCCESS
+    - expect_file_written:
+        path: ~/.kube/config
+        contents:
+          matches: '.*clusters: \[\].*'
+        is_private: true
+    - expect_stderr: |
+        Deleted [https://container.googleapis.com/$$api-version$$/projects/fake-project/zones/us-central1-f/clusters/$$cluster$$].
+    - expect_exit:
+        code: 0

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,8 +29,6 @@ string tuple
 
 where only one of the three elements need be present.
 """
-# Pytype fails to check this file.
-# type: ignore
 
 from __future__ import absolute_import
 from __future__ import division

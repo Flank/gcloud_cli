@@ -26,10 +26,10 @@ from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
 
 
-class LevelsDeleteTestBeta(accesscontextmanager.Base):
+class LevelsDeleteTestGA(accesscontextmanager.Base):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(True)
@@ -77,7 +77,13 @@ class LevelsDeleteTestBeta(accesscontextmanager.Base):
     self.AssertOutputEquals('')
 
 
-class LevelsDeleteTestAlpha(LevelsDeleteTestBeta):
+class LevelsDeleteTestBeta(LevelsDeleteTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class LevelsDeleteTestAlpha(LevelsDeleteTestGA):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA

@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.tasks import app
 from googlecloudsdk.command_lib.tasks import parsers
@@ -174,7 +175,144 @@ class UpdateAppEngineQueueTest(test_base.CloudTasksTestBase):
 
   def testUpdate_NoOptions(self):
     with self.assertRaises(parsers.NoFieldsSpecifiedError):
-      self.Run('tasks queues update-app-engine-queue my-queue')
+      self.Run('tasks queues update my-queue')
+
+  def testUpdate_AllOptions(self):
+    expected_queue = self.messages.Queue(
+        name=self.queue_name,
+        appEngineRoutingOverride=self.messages.AppEngineRouting(service='abc'),
+        retryConfig=self.messages.RetryConfig(maxAttempts=10,
+                                              maxRetryDuration='5s',
+                                              maxDoublings=4, minBackoff='1s',
+                                              maxBackoff='10s'),
+        rateLimits=self.messages.RateLimits(
+            maxDispatchesPerSecond=100, maxConcurrentDispatches=10))
+    self.queues_service.Patch.Expect(
+        self.messages.CloudtasksProjectsLocationsQueuesPatchRequest(
+            name=self.queue_name, queue=expected_queue,
+            updateMask=('retryConfig,rateLimits,appEngineRoutingOverride')),
+        response=expected_queue)
+
+    actual_queue = self.Run('tasks queues update my-queue '
+                            '--max-attempts=10 --max-retry-duration=5s '
+                            '--max-doublings=4 --min-backoff=1s '
+                            '--max-backoff=10s '
+                            '--max-dispatches-per-second=100 '
+                            '--max-concurrent-dispatches=10 '
+                            '--routing-override=service:abc')
+
+    self.assertEqual(actual_queue, expected_queue)
+
+  def testUpdate_AllOptions_MaxAttemptsUnlimited(self):
+    expected_queue = self.messages.Queue(
+        name=self.queue_name,
+        appEngineRoutingOverride=self.messages.AppEngineRouting(service='abc'),
+        retryConfig=self.messages.RetryConfig(maxAttempts=-1,
+                                              maxRetryDuration='5s',
+                                              maxDoublings=4, minBackoff='1s',
+                                              maxBackoff='10s'),
+        rateLimits=self.messages.RateLimits(
+            maxDispatchesPerSecond=100, maxConcurrentDispatches=10))
+    self.queues_service.Patch.Expect(
+        self.messages.CloudtasksProjectsLocationsQueuesPatchRequest(
+            name=self.queue_name, queue=expected_queue,
+            updateMask=('retryConfig,rateLimits,appEngineRoutingOverride')),
+        response=expected_queue)
+
+    actual_queue = self.Run('tasks queues update my-queue '
+                            '--max-attempts=unlimited --max-retry-duration=5s '
+                            '--max-doublings=4 --min-backoff=1s '
+                            '--max-backoff=10s '
+                            '--max-dispatches-per-second=100 '
+                            '--max-concurrent-dispatches=10 '
+                            '--routing-override=service:abc')
+
+    self.assertEqual(actual_queue, expected_queue)
+
+  def testUpdate_ClearAll(self):
+    expected_queue = self.messages.Queue(
+        name=self.queue_name,
+        appEngineRoutingOverride=self.messages.AppEngineRouting(),
+        retryConfig=self.messages.RetryConfig(),
+        rateLimits=self.messages.RateLimits())
+    self.queues_service.Patch.Expect(
+        self.messages.CloudtasksProjectsLocationsQueuesPatchRequest(
+            name=self.queue_name, queue=expected_queue,
+            updateMask=('retryConfig,rateLimits,appEngineRoutingOverride')),
+        response=expected_queue)
+
+    actual_queue = self.Run('tasks queues update my-queue '
+                            '--clear-max-attempts --clear-max-retry-duration '
+                            '--clear-max-doublings --clear-min-backoff '
+                            '--clear-max-backoff '
+                            '--clear-max-dispatches-per-second '
+                            '--clear-max-concurrent-dispatches '
+                            '--clear-routing-override')
+
+    self.assertEqual(actual_queue, expected_queue)
+
+  def testUpdate_NonExistentQueue(self):
+    properties.VALUES.core.user_output_enabled.Set(True)
+    expected_queue = self.messages.Queue(
+        name=self.queue_name,
+        appEngineRoutingOverride=self.messages.AppEngineRouting(service='abc'),
+        retryConfig=self.messages.RetryConfig(maxAttempts=-1,
+                                              maxRetryDuration='5s',
+                                              maxDoublings=4, minBackoff='1s',
+                                              maxBackoff='10s'),
+        rateLimits=self.messages.RateLimits(
+            maxDispatchesPerSecond=100, maxConcurrentDispatches=10))
+    self.queues_service.Patch.Expect(
+        self.messages.CloudtasksProjectsLocationsQueuesPatchRequest(
+            name=self.queue_name, queue=expected_queue,
+            updateMask=('retryConfig,rateLimits,appEngineRoutingOverride')),
+        exception=http_error.MakeDetailedHttpError(
+            code=404,
+            message='Requested entity was not found.'))
+
+    with self.assertRaises(exceptions.HttpException):
+      self.Run('tasks queues update my-queue '
+               '--max-attempts=unlimited --max-retry-duration=5s '
+               '--max-doublings=4 --min-backoff=1s --max-backoff=10s '
+               '--max-dispatches-per-second=100 '
+               '--max-concurrent-dispatches=10 --routing-override=service:abc')
+
+    self.AssertErrNotContains('Updated queue [my-queue].')
+    self.AssertErrContains('Requested entity was not found.')
+
+  def testUpdate_WrongQueueType(self):
+    properties.VALUES.core.user_output_enabled.Set(True)
+    expected_queue = self.messages.Queue(
+        name=self.queue_name,
+        appEngineRoutingOverride=self.messages.AppEngineRouting(service='abc'),
+        retryConfig=self.messages.RetryConfig(maxAttempts=-1,
+                                              maxRetryDuration='5s',
+                                              maxDoublings=4, minBackoff='1s',
+                                              maxBackoff='10s'),
+        rateLimits=self.messages.RateLimits(
+            maxDispatchesPerSecond=100, maxConcurrentDispatches=10))
+    self.queues_service.Patch.Expect(
+        self.messages.CloudtasksProjectsLocationsQueuesPatchRequest(
+            name=self.queue_name, queue=expected_queue,
+            updateMask=('retryConfig,rateLimits,appEngineRoutingOverride')),
+        exception=http_error.MakeDetailedHttpError(
+            code=400,
+            message='Queue.target_type is immutable.'))
+
+    with self.assertRaises(exceptions.HttpException):
+      self.Run('tasks queues update my-queue '
+               '--max-attempts=unlimited --max-retry-duration=5s '
+               '--max-doublings=4 --min-backoff=1s --max-backoff=10s '
+               '--max-dispatches-per-second=100 '
+               '--max-concurrent-dispatches=10 --routing-override=service:abc')
+
+    self.AssertErrNotContains('Updated queue [my-queue].')
+
+
+class UpdateAppEngineQueueTestBeta(UpdateAppEngineQueueTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testUpdate_AllOptions(self):
     expected_queue = self.messages.Queue(
@@ -195,7 +333,7 @@ class UpdateAppEngineQueueTest(test_base.CloudTasksTestBase):
                         'appEngineHttpQueue.appEngineRoutingOverride')),
         response=expected_queue)
 
-    actual_queue = self.Run('tasks queues update-app-engine-queue my-queue '
+    actual_queue = self.Run('tasks queues update my-queue '
                             '--max-attempts=10 --max-retry-duration=5s '
                             '--max-doublings=4 --min-backoff=1s '
                             '--max-backoff=10s '
@@ -224,7 +362,7 @@ class UpdateAppEngineQueueTest(test_base.CloudTasksTestBase):
                         'appEngineHttpQueue.appEngineRoutingOverride')),
         response=expected_queue)
 
-    actual_queue = self.Run('tasks queues update-app-engine-queue my-queue '
+    actual_queue = self.Run('tasks queues update my-queue '
                             '--max-attempts=unlimited --max-retry-duration=5s '
                             '--max-doublings=4 --min-backoff=1s '
                             '--max-backoff=10s '
@@ -247,7 +385,7 @@ class UpdateAppEngineQueueTest(test_base.CloudTasksTestBase):
                         'appEngineHttpQueue.appEngineRoutingOverride')),
         response=expected_queue)
 
-    actual_queue = self.Run('tasks queues update-app-engine-queue my-queue '
+    actual_queue = self.Run('tasks queues update my-queue '
                             '--clear-max-attempts --clear-max-retry-duration '
                             '--clear-max-doublings --clear-min-backoff '
                             '--clear-max-backoff '
@@ -280,7 +418,7 @@ class UpdateAppEngineQueueTest(test_base.CloudTasksTestBase):
             message='Requested entity was not found.'))
 
     with self.assertRaises(exceptions.HttpException):
-      self.Run('tasks queues update-app-engine-queue my-queue '
+      self.Run('tasks queues update my-queue '
                '--max-attempts=unlimited --max-retry-duration=5s '
                '--max-doublings=4 --min-backoff=1s --max-backoff=10s '
                '--max-dispatches-per-second=100 '
@@ -312,7 +450,7 @@ class UpdateAppEngineQueueTest(test_base.CloudTasksTestBase):
             message='Queue.target_type is immutable.'))
 
     with self.assertRaises(exceptions.HttpException):
-      self.Run('tasks queues update-app-engine-queue my-queue '
+      self.Run('tasks queues update my-queue '
                '--max-attempts=unlimited --max-retry-duration=5s '
                '--max-doublings=4 --min-backoff=1s --max-backoff=10s '
                '--max-dispatches-per-second=100 '

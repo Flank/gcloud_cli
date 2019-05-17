@@ -11,7 +11,7 @@ gcloud beta ml vision \- use Google Cloud Vision to analyze images
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta ml vision\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta ml vision\fR \fIGROUP\fR | \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -23,12 +23,30 @@ gcloud beta ml vision \- use Google Cloud Vision to analyze images
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
+
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBoperations\fR
+\fB(BETA)\fR Manage Google Cloud Vision operations.
+
+.TP 2m
+\fBproduct\-search\fR
+\fB(BETA)\fR Uses Google Cloud Vision to analyze product in images.
+
+
+.RE
+.sp
 
 .SH "COMMANDS"
 
@@ -60,12 +78,31 @@ gcloud help\fR for details.
 \fB(BETA)\fR Detect popular product logos within an image.
 
 .TP 2m
+\fBdetect\-objects\fR
+\fB(BETA)\fR Detect and extract multiple objects in an image with object
+localization.
+
+.TP 2m
+\fBdetect\-product\fR
+\fB(BETA)\fR detect products within an image.
+
+.TP 2m
 \fBdetect\-safe\-search\fR
 \fB(BETA)\fR Detect explicit content in an image.
 
 .TP 2m
 \fBdetect\-text\fR
 \fB(BETA)\fR Detect and extract text within an image.
+
+.TP 2m
+\fBdetect\-text\-pdf\fR
+\fB(BETA)\fR Detect and transcribe text from PDF files stored in Google Cloud
+Storage.
+
+.TP 2m
+\fBdetect\-text\-tiff\fR
+\fB(BETA)\fR Detect and transcribe text from TIFF files stored in Google Cloud
+Storage.
 
 .TP 2m
 \fBdetect\-web\fR

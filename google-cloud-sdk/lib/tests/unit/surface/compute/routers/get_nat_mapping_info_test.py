@@ -164,7 +164,19 @@ class AlphaGetNatMappingInfoTest(router_test_base.RouterTestBase):
 
   def SetUp(self):
     self.SelectApi(calliope_base.ReleaseTrack.ALPHA, 'alpha')
+    self.mappings = []
 
+  def testNatNameFilter(self):
+    self.mock_client.routers.GetNatMappingInfo.Expect(
+        request=self.messages.ComputeRoutersGetNatMappingInfoRequest(
+            project='fake-project', region='us-central1', router='my-router',
+            natName='my-nat'),
+        response=self.messages.VmEndpointNatMappingsList(result=self.mappings))
+
+    self.Run("""
+        compute routers get-nat-mapping-info my-router --region us-central1
+             --nat-name=my-nat
+        """)
 
 if __name__ == '__main__':
   test_case.main()

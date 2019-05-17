@@ -11,7 +11,7 @@ gcloud beta filestore operations describe \- describe a Cloud Filestore operatio
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta filestore operations describe\fR (\fIOPERATION\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta filestore operations describe\fR (\fIOPERATION\fR\ :\ \fB\-\-zone\fR=\fIZONE\fR) [\fB\-\-location\fR=\fILOCATION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -41,20 +41,34 @@ positional must be specified if any of the other arguments in this group are
 specified.
 
 .TP 2m
-\fB\-\-location\fR=\fILOCATION\fR
-The location of the operation.
+\fB\-\-zone\fR=\fIZONE\fR
+The zone of the operation.
 
 
 .RE
 .RE
 .sp
 
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+(DEPRECATED) Location of the Cloud Filestore instance.
+
+The \f5\-\-location\fR flag is deprecated. Use \f5\-\-zone\fR.
+
+
+.RE
+.sp
+
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -72,10 +86,11 @@ $ gcloud beta filestore operations describe NAME \e
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
+$ gcloud filestore operations describe
 $ gcloud alpha filestore operations describe
 .RE
 

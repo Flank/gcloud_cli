@@ -9,8 +9,9 @@ DESCRIPTION
     (ALPHA) Read and manipulate Google Compute Engine disks.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -45,7 +46,7 @@ COMMANDS
         (ALPHA) Move a disk between zones.
 
      remove-iam-policy-binding
-        (ALPHA) Remove IAM policy binding of a Google Compute Engine disk.
+        (ALPHA) Remove IAM policy binding from a Google Compute Engine disk.
 
      remove-labels
         (ALPHA) Remove labels from Google Compute Engine persistent disks.
@@ -57,7 +58,7 @@ COMMANDS
         (ALPHA) Resize a disk or disks.
 
      set-iam-policy
-        (ALPHA) Set IAM policy for a disk.
+        (ALPHA) Set the IAM policy for a Google Compute Engine disk.
 
      snapshot
         (ALPHA) Create snapshots of Google Compute Engine persistent disks.

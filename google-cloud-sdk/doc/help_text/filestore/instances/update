@@ -1,0 +1,110 @@
+NAME
+    gcloud filestore instances update - update a Cloud Filestore instance
+
+SYNOPSIS
+    gcloud filestore instances update (INSTANCE : --zone=ZONE) [--async]
+        [--description=DESCRIPTION]
+        [--file-share=[capacity=CAPACITY],[name=NAME],
+          [source-snapshot=SOURCE-SNAPSHOT],
+          [source-snapshot-region=SOURCE-SNAPSHOT-REGION]]
+        [--location=LOCATION] [--update-labels=[KEY=VALUE,...]]
+        [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Update a Cloud Filestore instance.
+
+POSITIONAL ARGUMENTS
+     Instance resource - The instance to update. The arguments in this group
+     can be used to specify the attributes of this resource. (NOTE) Some
+     attributes are not given arguments in this group but can be set in other
+     ways. To set the [project] attribute: provide the argument [instance] on
+     the command line with a fully specified name; provide the argument
+     [--project] on the command line; set the property [core/project]. This
+     must be specified.
+
+       INSTANCE
+          ID of the instance or fully qualified identifier for the instance.
+          This positional must be specified if any of the other arguments in
+          this group are specified.
+
+       --zone=ZONE
+          The zone of the instance.
+
+FLAGS
+     --async
+        Do not wait for the update operation to complete.
+
+     --description=DESCRIPTION
+        A description of the Cloud Filestore instance.
+
+     --file-share=[capacity=CAPACITY],[name=NAME],[source-snapshot=SOURCE-SNAPSHOT],[source-snapshot-region=SOURCE-SNAPSHOT-REGION]
+        File share configuration for an instance. Specifying both name and
+        capacity is required.
+
+         capacity
+            The desired size of the volume. The capacity must be a whole number
+            followed by a size unit such as TB for terabyte. If no size unit is
+            specified, GB is assumed. The minimum size for a standard instance
+            is 1TB. The minimum size for a premium instance is 2.5TB.
+
+         name
+            The desired logical name of the volume.
+
+     --location=LOCATION
+        (DEPRECATED) Location of the Cloud Filestore instance.
+
+        The --location flag is deprecated. Use --zone.
+
+     --update-labels=[KEY=VALUE,...]
+        List of label KEY=VALUE pairs to update. If a label exists its value is
+        modified, otherwise a new label is created.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
+     At most one of these may be specified:
+
+       --clear-labels
+          Remove all labels. If --update-labels is also specified then
+          --clear-labels is applied first.
+
+          For example, to remove all labels:
+
+              $ gcloud filestore instances update --clear-labels
+
+          To set the labels to exactly "foo" and "baz":
+
+              $ gcloud filestore instances update --clear-labels \
+                --update-labels foo=bar,baz=qux
+
+       --remove-labels=[KEY,...]
+          List of label keys to remove. If a label does not exist it is
+          silently ignored.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+EXAMPLES
+    The following command updates the Cloud Filestore instance NAME to change
+    the description to "A new description."
+
+        $ gcloud filestore instances update NAME \
+            --description "A new description."
+
+    The following command updates a Cloud Filestore instance named NAME to add
+    the label "key1=value1" and remove any metadata with the label "key2".
+
+        $ gcloud filestore instances update NAME \
+            --update-labels key1=value1 --remove-labels key2
+
+NOTES
+    This variant is also available:
+
+        $ gcloud beta filestore instances update
+

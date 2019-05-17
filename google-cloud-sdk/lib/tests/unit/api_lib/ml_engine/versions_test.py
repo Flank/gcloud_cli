@@ -146,6 +146,7 @@ class VersionsClientTest(base.MlGaPlatformTestBase):
           nodes: 10
         framework: SCIKIT_LEARN
         pythonVersion: '2.7'
+        serviceAccount: test@google.com
     """
     framework = self.short_msgs.Version.FrameworkValueValuesEnum.SCIKIT_LEARN
     self.assertEqual(
@@ -159,7 +160,8 @@ class VersionsClientTest(base.MlGaPlatformTestBase):
             runtimeVersion='1.0',
             manualScaling=self.short_msgs.ManualScaling(nodes=10),
             framework=framework,
-            pythonVersion='2.7'))
+            pythonVersion='2.7',
+            serviceAccount='test@google.com'))
 
   def testBuildVersion_YamlOverridden(self):
     test_yaml = """

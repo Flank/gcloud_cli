@@ -19,6 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from apitools.base.py import encoding
 from googlecloudsdk.api_lib.cloudiot import devices
 from googlecloudsdk.api_lib.cloudiot import registries
 from googlecloudsdk.command_lib.iot import flags
@@ -39,7 +40,6 @@ DEVICES_COLLECTION = 'cloudiot.projects.locations.registries.devices'
 DEVICE_CONFIGS_COLLECTION = 'cloudiot.projects.locations.registries.devices.configVersions'
 _PROJECT = lambda: properties.VALUES.core.project.Get(required=True)
 
-
 # Maximum number of public key credentials for a device.
 MAX_PUBLIC_KEY_NUM = 3
 
@@ -54,6 +54,16 @@ MAX_METADATA_VALUE_SIZE = 1024 * 32
 
 # Maximum size of metadata keys and values (256 KB).
 MAX_METADATA_SIZE = 1024 * 256
+
+# Mapping of apitools request message fields to  their json parameters
+# TODO (b/124063772): Remove this mapping fix once apitools base fix is applied
+# pylint: disable=line-too-long, for readability.
+_CUSTOM_JSON_FIELD_MAPPINGS = {
+    'gatewayListOptions_gatewayType': 'gatewayListOptions.gatewayType',
+    'gatewayListOptions_associationsGatewayId': 'gatewayListOptions.associationsGatewayId',
+    'gatewayListOptions_associationsDeviceId': 'gatewayListOptions.associationsDeviceId',
+}
+# pylint: enable=line-too-long
 
 
 class InvalidPublicKeySpecificationError(exceptions.Error):
@@ -149,8 +159,6 @@ def _ValidatePublicKeyDict(public_key):
 
 def _ConvertStringToFormatEnum(type_, messages):
   """Convert string values to Enum object type."""
-  # TODO(b/71388306): Enums aren't handled well by pytype.
-  # pytype: disable=attribute-error
   if (type_ == flags.KeyTypes.RS256.choice_name or
       type_ == flags.KeyTypes.RSA_X509_PEM.choice_name):
     return messages.PublicKeyCredential.FormatValueValuesEnum.RSA_X509_PEM
@@ -161,7 +169,6 @@ def _ConvertStringToFormatEnum(type_, messages):
   elif (type_ == flags.KeyTypes.ES256.choice_name or
         type_ == flags.KeyTypes.ES256_PEM.choice_name):
     return messages.PublicKeyCredential.FormatValueValuesEnum.ES256_PEM
-  # pytype: enable=attribute-error
   else:
     # Should have been caught by argument parsing
     raise ValueError('Invalid key type [{}]'.format(type_))
@@ -488,6 +495,22 @@ def AddUnBindArgsToRequest(ref, args, req):
   req.unbindDeviceFromGatewayRequest = unbind_request
   req.parent = registry_ref.RelativeName()
 
+  return req
+
+
+# TODO(b/124063772): Workaround for apitools issues with nested GET request
+# message fields.
+def RegistriesDevicesListRequestHook(ref, args, req):
+  """Add Api field query string mappings to list requests."""
+  del ref
+  del args
+  msg = devices.GetMessagesModule()
+  updated_requests_type = (
+      msg.CloudiotProjectsLocationsRegistriesDevicesListRequest)
+  for req_field, mapped_param in _CUSTOM_JSON_FIELD_MAPPINGS.items():
+    encoding.AddCustomJsonFieldMapping(updated_requests_type,
+                                       req_field,
+                                       mapped_param)
   return req
 
 

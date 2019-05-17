@@ -60,9 +60,6 @@ OPTIONAL FLAGS
         List of key value pairs to configure PySpark. For a list of available
         properties, see:
         https://spark.apache.org/docs/latest/configuration.html#available-properties.
-        Alternatively, to see examples of how to use the --properties flag,
-        see:
-        https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/cluster-properties#how_the_properties_flag_works
 
      --py-files=[PY_FILE,...]
         Comma separated list of Python files to be provided to the job. Must be
@@ -81,14 +78,16 @@ OPTIONAL FLAGS
         (Optional) List of step IDs to start this job after.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
         $ gcloud dataproc workflow-templates add-job pyspark
+        $ gcloud alpha dataproc workflow-templates add-job pyspark
 

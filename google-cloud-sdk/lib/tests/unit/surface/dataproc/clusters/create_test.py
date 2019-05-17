@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 
 import collections
 import copy
+import os
 import textwrap
 
 from apitools.base.py import encoding
@@ -29,7 +30,9 @@ from googlecloudsdk import calliope
 from googlecloudsdk.api_lib.dataproc import constants
 from googlecloudsdk.api_lib.dataproc import exceptions
 from googlecloudsdk.core import properties
+from googlecloudsdk.core import yaml
 from googlecloudsdk.core.console import console_io
+from googlecloudsdk.core.util import files
 from tests.lib import sdk_test_base
 from tests.lib.surface.dataproc import base
 from tests.lib.surface.dataproc import compute_base
@@ -210,6 +213,7 @@ class ClustersCreateUnitTest(
 
     self.AddEncryptionConfig(expected_request_cluster,
                              'projects/p/locations/l/keyRings/kr/cryptoKeys/k')
+    self.AddComponents(expected_request_cluster, ['ANACONDA', 'ZEPPELIN'])
     expected_response_cluster = copy.deepcopy(expected_request_cluster)
     expected_response_cluster.status = self.messages.ClusterStatus(
         state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
@@ -233,6 +237,7 @@ class ClustersCreateUnitTest(
         '--properties core:com.foo=foo,hdfs:com.bar=bar '
         '--tags tag1,tag2 '
         '--metadata key1=value1,key2=value2 '
+        '--optional-components=anaconda,zeppelin '
         '--gce-pd-kms-key-project=p '
         '--gce-pd-kms-key-location=l '
         '--gce-pd-kms-key-keyring=kr '
@@ -498,12 +503,11 @@ class ClustersCreateUnitTest(
       self.RunDataproc('clusters create {0}'.format(self.CLUSTER_NAME))
 
   def testCreateClusterWithImagesFlags(self):
-    project = 'foo-project'
+    project = 'fake-project'
     cluster_name = 'foo-cluster'
     zone = 'foo-zone'
     image = 'test-image'
-    image_uri = ('https://www.googleapis.com/compute/v1/projects/'
-                 'foo-project/global/images/test-image')
+    image_uri = self.ImageUri()
     expected_request_cluster = self.MakeCluster(
         clusterName=cluster_name,
         imageUri=image_uri,
@@ -644,7 +648,7 @@ class ClustersCreateUnitTest(
 class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
                                  base.DataprocTestBaseBeta):
 
-  def testBeta(self):
+  def testTrack(self):
     self.assertEqual(self.messages, self._beta_messages)
     self.assertEqual(self.track, calliope.base.ReleaseTrack.BETA)
 
@@ -675,7 +679,11 @@ class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
         workerBootDiskType='pd-ssd',
         secondaryWorkerBootDiskType='pd-standard',
         internalIpOnly=True,
-        zoneUri=zone)
+        zoneUri=zone,
+        enableHttpPortAccess=True)
+    autoscaling_policy_uri = ('projects/foo-project/regions/foo-region/'
+                              'autoscalingPolicies/foo-policy')
+    self.AddAutoscalingConfig(expected_request_cluster, autoscaling_policy_uri)
     self.AddMinCpuPlatform(expected_request_cluster, master_min_cpu_platform,
                            worker_min_cpu_platform)
     self.AddEncryptionConfig(expected_request_cluster,
@@ -706,7 +714,9 @@ class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
                '--gce-pd-kms-key-keyring=kr '
                '--gce-pd-kms-key=k '
                '--optional-components=anaconda,zeppelin '
-               '--zone {zone} ').format(
+               '--zone {zone} '
+               '--autoscaling-policy {autoscaling_policy_uri} '
+               '--enable-component-gateway ').format(
                    project=project,
                    cluster=cluster_name,
                    master_accelerator_type=master_accelerator_type,
@@ -715,7 +725,8 @@ class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
                    worker_machine_type=worker_machine_type,
                    master_min_cpu_platform=master_min_cpu_platform,
                    worker_min_cpu_platform=worker_min_cpu_platform,
-                   zone=zone)
+                   zone=zone,
+                   autoscaling_policy_uri=autoscaling_policy_uri)
 
     self.ExpectCreateCalls(
         request_cluster=expected_request_cluster,
@@ -838,49 +849,18 @@ class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
             name=self.CLUSTER_NAME, zone=self.ZONE))
     self.AssertMessagesEqual(expected_response_cluster, result)
 
-  def testCreateClusterWithImagesFlags(self):
+  def testCreateClusterReservationAffinity(self):
     project = 'foo-project'
     cluster_name = 'foo-cluster'
     zone = 'foo-zone'
-    image = 'test-image'
-    image_uri = ('https://www.googleapis.com/compute/beta/projects/'
-                 'foo-project/global/images/test-image')
-    expected_request_cluster = self.MakeCluster(
-        clusterName=cluster_name,
-        imageUri=image_uri,
-        projectId=project,
-        zoneUri=zone)
-
-    expected_response_cluster = copy.deepcopy(expected_request_cluster)
-    expected_response_cluster.status = self.messages.ClusterStatus(
-        state=self.messages.ClusterStatus.StateValueValuesEnum.RUNNING)
-
-    command = ('clusters --project {project} create {cluster} '
-               '--zone {zone} '
-               '--image {image} ').format(
-                   project=project,
-                   cluster=cluster_name,
-                   zone=zone,
-                   image=image)
-
-    self.ExpectCreateCalls(
-        request_cluster=expected_request_cluster,
-        response_cluster=expected_response_cluster)
-    result = self.RunDataproc(command)
-    self.AssertMessagesEqual(expected_response_cluster, result)
-
-  def testCreateClusterAllocationAffinity(self):
-    project = 'foo-project'
-    cluster_name = 'foo-cluster'
-    zone = 'foo-zone'
-    allocation_affinity = 'specific'
-    allocation_label = 'key=name,value=test'
-    allocation_label_key = 'name'
-    allocation_label_value = 'test'
+    reservation_affinity = 'specific'
+    reservation_label = 'key=name,value=test'
+    reservation_label_key = 'name'
+    reservation_label_value = 'test'
     expected_request_cluster = self.MakeCluster(
         clusterName=cluster_name, projectId=project, zoneUri=zone)
-    self.AddAllocationAffinity(expected_request_cluster, allocation_affinity,
-                               allocation_label_key, allocation_label_value)
+    self.AddReservationAffinity(expected_request_cluster, reservation_affinity,
+                                reservation_label_key, reservation_label_value)
 
     expected_response_cluster = copy.deepcopy(expected_request_cluster)
     expected_response_cluster.status = self.messages.ClusterStatus(
@@ -888,19 +868,262 @@ class ClustersCreateUnitTestBeta(ClustersCreateUnitTest,
 
     command = ('clusters --project {project} create {cluster} '
                '--zone {zone} '
-               '--allocation-affinity {allocation_affinity} '
-               '--allocation-label {allocation_label} ').format(
+               '--reservation-affinity {reservation_affinity} '
+               '--reservation-label {reservation_label} ').format(
                    project=project,
                    cluster=cluster_name,
                    zone=zone,
-                   allocation_affinity=allocation_affinity,
-                   allocation_label=allocation_label)
+                   reservation_affinity=reservation_affinity,
+                   reservation_label=reservation_label)
 
     self.ExpectCreateCalls(
         request_cluster=expected_request_cluster,
         response_cluster=expected_response_cluster)
     result = self.RunDataproc(command)
     self.AssertMessagesEqual(expected_response_cluster, result)
+
+  def testCreateKerberosFlagsMissingKmsKey(self):
+    password_uri = 'gs://my-bucket/password.encrypted'
+    error_msg = ('argument (--kerberos-kms-key : '
+                 '--kerberos-kms-key-keyring '
+                 '--kerberos-kms-key-location '
+                 '--kerberos-kms-key-project): '
+                 'Must be specified.')
+    with self.AssertRaisesArgumentErrorMatches(error_msg):
+      self.RunDataproc(
+          ('clusters create {name} '
+           '--zone={zone} '
+           '--kerberos-root-principal-password-uri={password_uri}').format(
+               name=self.CLUSTER_NAME,
+               zone=self.ZONE,
+               password_uri=password_uri))
+
+  def testCreateKerberosFlagsMissingRootPrincipalPasswordUri(self):
+    kms_project = 'my-project'
+    kms_location = 'global'
+    kms_keyring = 'my-keyring'
+    kms_key = 'my-key'
+    error_msg = ('argument --kerberos-root-principal-password-uri: '
+                 'Must be specified.')
+    with self.AssertRaisesArgumentErrorMatches(error_msg):
+      self.RunDataproc(('clusters create {name} '
+                        '--zone={zone} '
+                        '--kerberos-kms-key={kms_key} '
+                        '--kerberos-kms-key-project={kms_project} '
+                        '--kerberos-kms-key-location={kms_location} '
+                        '--kerberos-kms-key-keyring={kms_keyring}').format(
+                            name=self.CLUSTER_NAME,
+                            zone=self.ZONE,
+                            kms_key=kms_key,
+                            kms_project=kms_project,
+                            kms_location=kms_location,
+                            kms_keyring=kms_keyring))
+
+  def testCreateKerberosFlagsKmsKeyOneFlag(self):
+    password_uri = 'gs://my-bucket/password.encrypted'
+    kms_key_uri = ('projects/my-project/locations/global/'
+                   'keyRings/my-keyring/cryptoKeys/my-key')
+    expected_request_cluster = self.MakeCluster()
+    self.AddKerberosConfig(
+        expected_request_cluster,
+        enableKerberos=True,
+        kerberosRootPrincipalPasswordUri=password_uri,
+        kerberosKmsKeyUri=kms_key_uri)
+    expected_response_cluster = self.MakeRunningCluster()
+    self.AddKerberosConfig(
+        expected_response_cluster,
+        enableKerberos=True,
+        kerberosRootPrincipalPasswordUri=password_uri,
+        kerberosKmsKeyUri=kms_key_uri)
+    self.ExpectCreateCalls(
+        request_cluster=expected_request_cluster,
+        response_cluster=expected_response_cluster)
+    result = self.RunDataproc(
+        ('clusters create {name} '
+         '--zone={zone} '
+         '--kerberos-root-principal-password-uri={password_uri} '
+         '--kerberos-kms-key={kms_key_uri} ').format(
+             name=self.CLUSTER_NAME,
+             zone=self.ZONE,
+             password_uri=password_uri,
+             kms_key_uri=kms_key_uri))
+    self.AssertMessagesEqual(expected_response_cluster, result)
+
+  def testCreateKerberosFlags(self):
+    password_uri = 'gs://my-bucket/password.encrypted'
+    kms_project = 'my-project'
+    kms_location = 'global'
+    kms_keyring = 'my-keyring'
+    kms_key = 'my-key'
+    kms_key_uri = ('projects/{kms_project}/locations/{kms_location}/'
+                   'keyRings/{kms_keyring}/cryptoKeys/{kms_key}').format(
+                       kms_project=kms_project,
+                       kms_location=kms_location,
+                       kms_keyring=kms_keyring,
+                       kms_key=kms_key)
+    expected_request_cluster = self.MakeCluster()
+    self.AddKerberosConfig(
+        expected_request_cluster,
+        enableKerberos=True,
+        kerberosRootPrincipalPasswordUri=password_uri,
+        kerberosKmsKeyUri=kms_key_uri)
+    expected_response_cluster = self.MakeRunningCluster()
+    self.AddKerberosConfig(
+        expected_response_cluster,
+        enableKerberos=True,
+        kerberosRootPrincipalPasswordUri=password_uri,
+        kerberosKmsKeyUri=kms_key_uri)
+    self.ExpectCreateCalls(
+        request_cluster=expected_request_cluster,
+        response_cluster=expected_response_cluster)
+    result = self.RunDataproc(
+        ('clusters create {name} '
+         '--zone={zone} '
+         '--kerberos-root-principal-password-uri={password_uri} '
+         '--kerberos-kms-key={kms_key} '
+         '--kerberos-kms-key-project={kms_project} '
+         '--kerberos-kms-key-location={kms_location} '
+         '--kerberos-kms-key-keyring={kms_keyring}').format(
+             name=self.CLUSTER_NAME,
+             zone=self.ZONE,
+             password_uri=password_uri,
+             kms_key=kms_key,
+             kms_project=kms_project,
+             kms_location=kms_location,
+             kms_keyring=kms_keyring))
+    self.AssertMessagesEqual(expected_response_cluster, result)
+
+  def testCreateKerberosFromFile(self):
+    root_principal_password_uri = 'gs://my-bucket/password.encrypted'
+    kms_key_uri = ('projects/my-project/locations/global/'
+                   'keyRings/my-key-ring/cryptoKeys/my-key')
+    kdc_db_key_uri = 'gs://my-bucket/kdc_db_key.encrypted'
+    tgt_lifetime_hours = 10
+    keystore_uri = 'gs://my-bucket/keystore.jks'
+    keystore_password_uri = 'gs://my-bucket/keystore_password.encrypted'
+    key_password_uri = 'gs://my-bucket/key_password.encrypted'
+    truststore_uri = 'gs://my-bucket/truststore.jks'
+    truststore_password_uri = 'gs://my-bucket/truststore_password.encrypted'
+    cross_realm_trust_realm = 'REMOTE.REALM'
+    cross_realm_trust_kdc = 'kdc.remote.realm'
+    cross_realm_trust_admin_server = 'admin-server.remote.realm'
+    cross_realm_trust_shared_password_uri = \
+      'gs://my-bucket/shared_password.encrypted'
+    kerberos_config_data = dict(
+        root_principal_password_uri=root_principal_password_uri,
+        kms_key_uri=kms_key_uri,
+        kdc_db_key_uri=kdc_db_key_uri,
+        tgt_lifetime_hours=tgt_lifetime_hours,
+        ssl=dict(
+            keystore_uri=keystore_uri,
+            keystore_password_uri=keystore_password_uri,
+            key_password_uri=key_password_uri,
+            truststore_uri=truststore_uri,
+            truststore_password_uri=truststore_password_uri),
+        cross_realm_trust=dict(
+            realm=cross_realm_trust_realm,
+            kdc=cross_realm_trust_kdc,
+            admin_server=cross_realm_trust_admin_server,
+            shared_password_uri=cross_realm_trust_shared_password_uri))
+    file_name = os.path.join(self.temp_path, 'kerberos_config_file_all.yaml')
+    with files.FileWriter(file_name) as out_stream:
+      yaml.dump(kerberos_config_data, stream=out_stream)
+
+    expected_request_cluster = self.MakeCluster()
+    self.AddKerberosConfig(
+        expected_request_cluster,
+        enableKerberos=True,
+        kerberosRootPrincipalPasswordUri=root_principal_password_uri,
+        kerberosKmsKeyUri=kms_key_uri,
+        kerberosKdcDbKeyUri=kdc_db_key_uri,
+        kerberosTgtLifetimeHours=tgt_lifetime_hours,
+        kerberosKeystoreUri=keystore_uri,
+        kerberosKeystorePasswordUri=keystore_password_uri,
+        kerberosKeyPasswordUri=key_password_uri,
+        kerberosTruststoreUri=truststore_uri,
+        kerberosTruststorePasswordUri=truststore_password_uri,
+        kerberosCrossRealmTrustRealm=cross_realm_trust_realm,
+        kerberosCrossRealmTrustKdc=cross_realm_trust_kdc,
+        kerberosCrossRealmTrustAdminServer=cross_realm_trust_admin_server,
+        kerberosCrossRealmTrustSharedPasswordUri=cross_realm_trust_shared_password_uri
+    )
+
+    expected_response_cluster = self.MakeRunningCluster()
+    self.AddKerberosConfig(
+        expected_response_cluster,
+        enableKerberos=True,
+        kerberosRootPrincipalPasswordUri=root_principal_password_uri,
+        kerberosKmsKeyUri=kms_key_uri,
+        kerberosKdcDbKeyUri=kdc_db_key_uri,
+        kerberosTgtLifetimeHours=tgt_lifetime_hours,
+        kerberosKeystoreUri=keystore_uri,
+        kerberosKeystorePasswordUri=keystore_password_uri,
+        kerberosKeyPasswordUri=key_password_uri,
+        kerberosTruststoreUri=truststore_uri,
+        kerberosTruststorePasswordUri=truststore_password_uri,
+        kerberosCrossRealmTrustRealm=cross_realm_trust_realm,
+        kerberosCrossRealmTrustKdc=cross_realm_trust_kdc,
+        kerberosCrossRealmTrustAdminServer=cross_realm_trust_admin_server,
+        kerberosCrossRealmTrustSharedPasswordUri=cross_realm_trust_shared_password_uri
+    )
+
+    self.ExpectCreateCalls(
+        request_cluster=expected_request_cluster,
+        response_cluster=expected_response_cluster)
+    result = self.RunDataproc(
+        ('clusters create {name} '
+         '--zone={zone} '
+         '--kerberos-config-file={kerberos_config_file}').format(
+             name=self.CLUSTER_NAME,
+             zone=self.ZONE,
+             kerberos_config_file=file_name))
+    self.AssertMessagesEqual(expected_response_cluster, result)
+
+  def testCreateCluster_autoscalingPolicyIdOnly(self):
+    specified_policy = 'cool-policy'
+    expected_policy_uri = 'projects/fake-project/regions/global/autoscalingPolicies/cool-policy'
+
+    expected_request_cluster = self.MakeCluster()
+    self.AddAutoscalingConfig(expected_request_cluster, expected_policy_uri)
+    expected_response_cluster = self.MakeRunningCluster()
+    self.AddAutoscalingConfig(expected_response_cluster, expected_policy_uri)
+    self.ExpectCreateCalls(
+        request_cluster=expected_request_cluster,
+        response_cluster=expected_response_cluster)
+    result = self.RunDataproc(
+        'clusters create {name} --zone={zone} --autoscaling-policy {policy_uri}'
+        .format(
+            name=self.CLUSTER_NAME, zone=self.ZONE,
+            policy_uri=specified_policy))
+    self.AssertMessagesEqual(expected_response_cluster, result)
+
+  def testCreateCluster_autoscalingPolicyDifferentProject(self):
+    specified_policy = 'projects/another-project/regions/another-region/autoscalingPolicies/cool-policy'
+
+    expected_request_cluster = self.MakeCluster()
+    self.AddAutoscalingConfig(expected_request_cluster, specified_policy)
+    expected_response_cluster = self.MakeRunningCluster()
+    self.AddAutoscalingConfig(expected_response_cluster, specified_policy)
+    self.ExpectCreateCalls(
+        request_cluster=expected_request_cluster,
+        response_cluster=expected_response_cluster)
+    result = self.RunDataproc(
+        'clusters create {name} --zone={zone} --autoscaling-policy {policy_uri}'
+        .format(
+            name=self.CLUSTER_NAME, zone=self.ZONE,
+            policy_uri=specified_policy))
+    self.AssertMessagesEqual(expected_response_cluster, result)
+
+
+class ClustersCreateUnitTestAlpha(ClustersCreateUnitTestBeta,
+                                  base.DataprocTestBaseAlpha):
+
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.ALPHA
+
+  def testTrack(self):
+    self.assertEqual(self.messages, self._beta_messages)
+    self.assertEqual(self.track, calliope.base.ReleaseTrack.ALPHA)
 
 
 if __name__ == '__main__':

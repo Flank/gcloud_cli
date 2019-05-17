@@ -24,22 +24,21 @@ from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import parser_errors
 from googlecloudsdk.command_lib.compute.routers import router_utils
 from googlecloudsdk.core.console import console_io
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import router_test_base
 from tests.lib.surface.compute import router_test_utils
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'),
-                          (calliope_base.ReleaseTrack.BETA, 'beta'),
-                          (calliope_base.ReleaseTrack.GA, 'v1'))
-class UpdateBetaTest(parameterized.TestCase, router_test_base.RouterTestBase):
+class UpdateTestGA(router_test_base.RouterTestBase):
 
-  def testUpdate_noop(self, track, api_version):
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+    self.api_version = 'v1'
+
+  def testUpdate_noop(self):
     """Sanity test to verify no changes when no flags are specified."""
 
-    self.SelectApi(track, api_version)
+    self.SelectApi(self.track, self.api_version)
 
     orig = router_test_utils.CreateBaseRouterMessage(self.messages)
     updated = copy.deepcopy(orig)
@@ -55,10 +54,10 @@ class UpdateBetaTest(parameterized.TestCase, router_test_base.RouterTestBase):
     self.AssertOutputEquals('')
     self.AssertErrContains('Updating router [my-router]')
 
-  def testUpdate_async(self, track, api_version):
+  def testUpdate_async(self):
     """Test command with --async flag."""
 
-    self.SelectApi(track, api_version)
+    self.SelectApi(self.track, self.api_version)
 
     orig = router_test_utils.CreateBaseRouterMessage(self.messages)
     updated = copy.deepcopy(orig)
@@ -78,8 +77,8 @@ class UpdateBetaTest(parameterized.TestCase, router_test_base.RouterTestBase):
         'Run the [gcloud compute operations describe] command to check the '
         'status of this operation.\n')
 
-  def testUpdateAdvertisements_default(self, track, api_version):
-    self.SelectApi(track, api_version)
+  def testUpdateAdvertisements_default(self):
+    self.SelectApi(self.track, self.api_version)
 
     orig = router_test_utils.CreateBaseRouterMessage(self.messages)
     updated = copy.deepcopy(orig)
@@ -99,8 +98,8 @@ class UpdateBetaTest(parameterized.TestCase, router_test_base.RouterTestBase):
     self.AssertOutputEquals('')
     self.AssertErrContains('Updating router [my-router]')
 
-  def testUpdateAdvertisements_custom(self, track, api_version):
-    self.SelectApi(track, api_version)
+  def testUpdateAdvertisements_custom(self):
+    self.SelectApi(self.track, self.api_version)
 
     orig = router_test_utils.CreateDefaultRouterMessage(self.messages)
     updated = copy.deepcopy(orig)
@@ -132,9 +131,8 @@ class UpdateBetaTest(parameterized.TestCase, router_test_base.RouterTestBase):
     self.AssertOutputEquals('')
     self.AssertErrContains('Updating router [my-router]')
 
-  def testUpdateAdvertisements_incompatibleIncrementalFlagsError(
-      self, track, api_version):
-    self.SelectApi(track, api_version)
+  def testUpdateAdvertisements_incompatibleIncrementalFlagsError(self):
+    self.SelectApi(self.track, self.api_version)
 
     error_msg = ('--add/remove-advertisement flags are not compatible with '
                  '--set-advertisement flags.')
@@ -151,8 +149,8 @@ class UpdateBetaTest(parameterized.TestCase, router_test_base.RouterTestBase):
           --add-advertisement-ranges=10.10.10.10/30
           """)
 
-  def testUpdateAdvertisements_customWithDefaultError(self, track, api_version):
-    self.SelectApi(track, api_version)
+  def testUpdateAdvertisements_customWithDefaultError(self):
+    self.SelectApi(self.track, self.api_version)
 
     orig = router_test_utils.CreateEmptyCustomRouterMessage(self.messages)
     self.ExpectGet(orig)
@@ -168,8 +166,8 @@ class UpdateBetaTest(parameterized.TestCase, router_test_base.RouterTestBase):
           --set-advertisement-ranges=10.10.10.10/30=custom-range,10.10.10.20/30
           """)
 
-  def testSwitchAdvertiseMode_yes(self, track, api_version):
-    self.SelectApi(track, api_version)
+  def testSwitchAdvertiseMode_yes(self):
+    self.SelectApi(self.track, self.api_version)
 
     self.WriteInput('y\n')
     orig = router_test_utils.CreateFullCustomRouterMessage(self.messages)
@@ -196,8 +194,8 @@ class UpdateBetaTest(parameterized.TestCase, router_test_base.RouterTestBase):
     self.AssertErrContains(prompt_msg)
     self.AssertErrContains('Updating router [my-router]')
 
-  def testSwitchAdvertiseMode_no(self, track, api_version):
-    self.SelectApi(track, api_version)
+  def testSwitchAdvertiseMode_no(self):
+    self.SelectApi(self.track, self.api_version)
 
     self.WriteInput('n\n')
     orig = router_test_utils.CreateFullCustomRouterMessage(self.messages)
@@ -210,6 +208,41 @@ class UpdateBetaTest(parameterized.TestCase, router_test_base.RouterTestBase):
           compute routers update my-router --region us-central1
           --advertisement-mode=DEFAULT
           """)
+
+
+class UpdateTestBeta(UpdateTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
+
+
+class UpdateTestAlpha(UpdateTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
+
+  def testUpdateKeepaliveInterval(self):
+    self.SelectApi(self.track, self.api_version)
+
+    orig = router_test_utils.CreateMinimalRouterMessage(self.messages,
+                                                        self.api_version)
+    orig.bgp.keepaliveInterval = 40
+    updated = copy.deepcopy(orig)
+    updated.bgp.keepaliveInterval = 50
+
+    self.ExpectGet(orig)
+    self.ExpectPatch(updated)
+    self.ExpectOperationsGet()
+    self.ExpectGet(updated)
+
+    self.Run("""
+        compute routers update my-router --region us-central1
+        --keepalive-interval=50
+        """)
+    self.AssertOutputEquals('')
+    self.AssertErrContains('Updating router [my-router]')
 
 
 if __name__ == '__main__':

@@ -30,7 +30,7 @@ class Firebase(base.Group):
       $ {command} test --help
   """
 
-  category = 'Mobile'
+  category = base.MOBILE_CATEGORY
 
   def Filter(self, context, args):
     del context, args

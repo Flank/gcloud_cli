@@ -80,6 +80,8 @@ class _EnvironmentsCreateTestBase(base.EnvironmentsUnitTest):
                          'https://www.googleapis.com/auth/scope2']
     self.TAGS = ['tag1', 'tag2']
     self.PYTHON_VERSION = '2'
+    self.IMAGE_VERSION = 'composer-latest-airflow-7.8.9'
+    self.AIRFLOW_VERSION = '7.8.9'
 
     self.running_op = self.MakeOperation(
         self.TEST_PROJECT,
@@ -656,44 +658,6 @@ class EnvironmentsCreateGATest(_EnvironmentsCreateTestBase):
                            '--python-version', unsupported_version,
                            '--async', self.TEST_ENVIRONMENT_ID)
 
-
-class EnvironmentsCreateBetaTest(EnvironmentsCreateGATest):
-
-  def PreSetUp(self):
-    self.SetTrack(calliope_base.ReleaseTrack.BETA)
-
-  def _SetTestMessages(self):
-    # pylint: disable=invalid-name
-    super(EnvironmentsCreateBetaTest, self)._SetTestMessages()
-    self.IMAGE_VERSION = 'composer-latest-airflow-7.8.9'
-    self.AIRFLOW_VERSION = '7.8.9'
-
-  def testSuccessfulAsyncCreateWithBetaFeatures(self):
-    """Test that creating an environment with a beta features works."""
-    self._SetTestMessages()
-    node_config = self.messages.NodeConfig(diskSizeGb=self.DEFAULT_DISK_SIZE_GB)
-    software_config = self.messages.SoftwareConfig(
-        imageVersion=self.IMAGE_VERSION, pythonVersion=self.PYTHON_VERSION)
-    config = self.messages.EnvironmentConfig(
-        nodeConfig=node_config,
-        softwareConfig=software_config)
-    self.ExpectEnvironmentCreate(
-        self.TEST_PROJECT,
-        self.TEST_LOCATION,
-        self.TEST_ENVIRONMENT_ID,
-        config=config,
-        response=self.running_op)
-
-    actual_op = self.RunEnvironments('create', '--project', self.TEST_PROJECT,
-                                     '--location', self.TEST_LOCATION,
-                                     '--image-version', self.IMAGE_VERSION,
-                                     '--python-version', self.PYTHON_VERSION,
-                                     '--async', self.TEST_ENVIRONMENT_ID)
-    self.assertEqual(self.running_op, actual_op)
-    self.AssertErrMatches(
-        r'^Create in progress for environment \[{}] with operation \[{}]'
-        .format(self.TEST_ENVIRONMENT_NAME, self.TEST_OPERATION_NAME))
-
   def testAirflowVersion_SuccessfulAsyncCreate(self):
     """Test that creating an environment with an airflow version works."""
     self._SetTestMessages()
@@ -830,6 +794,214 @@ class EnvironmentsCreateBetaTest(EnvironmentsCreateGATest):
             '--async', self.TEST_ENVIRONMENT_ID)
 
 
+class EnvironmentsCreateBetaTest(EnvironmentsCreateGATest):
+
+  def PreSetUp(self):
+    self.SetTrack(calliope_base.ReleaseTrack.BETA)
+
+  # Even if empty, maintain structure for upcoming beta tests.
+  # def _SetTestMessages(self):
+  #   # pylint: disable=invalid-name
+  #   super(EnvironmentsCreateBetaTest, self)._SetTestMessages()
+
+  def testSuccessfulPrivateIpEnvironmentCreation(self):
+    self._SetTestMessages()
+
+    # TODO(b/128636528): Remove when API bug is addressed.
+    private_cluster_config = self.messages.PrivateClusterConfig(
+        masterIpv4CidrBlock='172.16.0.0/28')
+
+    private_environment_config = self.messages.PrivateEnvironmentConfig(
+        enablePrivateEnvironment=True,
+        privateClusterConfig=private_cluster_config)
+
+    ip_allocation_policy = self.messages.IPAllocationPolicy(useIpAliases=True)
+
+    node_config = self.messages.NodeConfig(
+        diskSizeGb=self.DEFAULT_DISK_SIZE_GB,
+        ipAllocationPolicy=ip_allocation_policy)
+
+    config = self.messages.EnvironmentConfig(
+        nodeConfig=node_config,
+        privateEnvironmentConfig=private_environment_config)
+
+    self.ExpectEnvironmentCreate(
+        self.TEST_PROJECT,
+        self.TEST_LOCATION,
+        self.TEST_ENVIRONMENT_ID,
+        config=config,
+        response=self.running_op)
+
+    actual_op = self.RunEnvironments('create', '--project', self.TEST_PROJECT,
+                                     '--location', self.TEST_LOCATION,
+                                     '--enable-ip-alias',
+                                     '--enable-private-environment', '--async',
+                                     self.TEST_ENVIRONMENT_ID)
+
+    self.assertEqual(self.running_op, actual_op)
+
+  def testPrivateIpEnvironmentCreationWithOptions(self):
+    self._SetTestMessages()
+    private_environment_config = self.messages.PrivateEnvironmentConfig(
+        enablePrivateEnvironment=True,
+        privateClusterConfig=self.messages.PrivateClusterConfig(
+            enablePrivateEndpoint=True,
+            masterIpv4CidrBlock=self.TEST_MASTER_IPV4_CIDR_BLOCK))
+
+    ip_allocation_policy = self.messages.IPAllocationPolicy(useIpAliases=True)
+
+    node_config = self.messages.NodeConfig(
+        diskSizeGb=self.DEFAULT_DISK_SIZE_GB,
+        ipAllocationPolicy=ip_allocation_policy)
+
+    config = self.messages.EnvironmentConfig(
+        nodeConfig=node_config,
+        privateEnvironmentConfig=private_environment_config)
+
+    self.ExpectEnvironmentCreate(
+        self.TEST_PROJECT,
+        self.TEST_LOCATION,
+        self.TEST_ENVIRONMENT_ID,
+        config=config,
+        response=self.running_op)
+
+    actual_op = self.RunEnvironments(
+        'create', '--project', self.TEST_PROJECT, '--location',
+        self.TEST_LOCATION, '--enable-ip-alias', '--enable-private-environment',
+        '--enable-private-endpoint', '--master-ipv4-cidr',
+        self.TEST_MASTER_IPV4_CIDR_BLOCK, '--async', self.TEST_ENVIRONMENT_ID)
+
+    self.assertEqual(self.running_op, actual_op)
+
+  def testPrivateIPEnvironmentFlagPrerequisites(self):
+    self._SetTestMessages()
+    required_dep = '--enable-private-environment'
+
+    with self.AssertRaisesExceptionRegexp(
+        command_util.Error,
+        r'Cannot specify {} without {}.'.format('--enable-private-endpoint',
+                                                required_dep)):
+
+      self.RunEnvironments('create', '--project', self.TEST_PROJECT,
+                           '--location', self.TEST_LOCATION, '--async',
+                           '--enable-private-endpoint',
+                           self.TEST_ENVIRONMENT_ID)
+
+    with self.AssertRaisesExceptionRegexp(
+        command_util.Error,
+        r'Cannot specify {} without {}.'.format('--master-ipv4-cidr',
+                                                required_dep)):
+
+      self.RunEnvironments('create', '--project', self.TEST_PROJECT,
+                           '--location', self.TEST_LOCATION, '--async',
+                           '--master-ipv4-cidr',
+                           self.TEST_MASTER_IPV4_CIDR_BLOCK,
+                           self.TEST_ENVIRONMENT_ID)
+
+  def testSuccessfulIpAliasEnvironmentCreation(self):
+    self._SetTestMessages()
+
+    ip_allocation_policy = self.messages.IPAllocationPolicy(
+        useIpAliases=True,
+        clusterSecondaryRangeName=self.TEST_CLUSTER_SECONDARY_RANGE_NAME,
+        servicesSecondaryRangeName=self.TEST_SERVICES_SECONDARY_RANGE_NAME,
+        clusterIpv4CidrBlock=self.TEST_CLUSTER_IPV4_CIDR_BLOCK,
+        servicesIpv4CidrBlock=self.TEST_SERVICES_IPV4_CIDR_BLOCK,
+    )
+
+    node_config = self.messages.NodeConfig(
+        diskSizeGb=self.DEFAULT_DISK_SIZE_GB,
+        ipAllocationPolicy=ip_allocation_policy)
+
+    config = self.messages.EnvironmentConfig(nodeConfig=node_config)
+
+    self.ExpectEnvironmentCreate(
+        self.TEST_PROJECT,
+        self.TEST_LOCATION,
+        self.TEST_ENVIRONMENT_ID,
+        config=config,
+        response=self.running_op)
+
+    actual_op = self.RunEnvironments(
+        'create', '--project', self.TEST_PROJECT, '--location',
+        self.TEST_LOCATION, '--enable-ip-alias',
+        '--cluster-secondary-range-name',
+        self.TEST_CLUSTER_SECONDARY_RANGE_NAME,
+        '--services-secondary-range-name',
+        self.TEST_SERVICES_SECONDARY_RANGE_NAME, '--cluster-ipv4-cidr',
+        self.TEST_CLUSTER_IPV4_CIDR_BLOCK, '--services-ipv4-cidr',
+        self.TEST_SERVICES_IPV4_CIDR_BLOCK, '--async', self.TEST_ENVIRONMENT_ID)
+
+    self.assertEqual(self.running_op, actual_op)
+
+  def testIpAliasEnvironmentFlagPrerequisites(self):
+    self._SetTestMessages()
+    required_dep = '--enable-ip-alias'
+
+    with self.AssertRaisesExceptionRegexp(
+        command_util.Error,
+        r'Cannot specify {} without {}.'.format('--enable-private-environment',
+                                                required_dep)):
+
+      self.RunEnvironments('create', '--project', self.TEST_PROJECT,
+                           '--location', self.TEST_LOCATION, '--async',
+                           '--enable-private-environment',
+                           self.TEST_ENVIRONMENT_ID)
+
+    with self.AssertRaisesExceptionRegexp(
+        command_util.Error,
+        r'Cannot specify {} without {}.'.format('--cluster-ipv4-cidr',
+                                                required_dep)):
+
+      self.RunEnvironments('create', '--project', self.TEST_PROJECT,
+                           '--location', self.TEST_LOCATION, '--async',
+                           '--cluster-ipv4-cidr',
+                           self.TEST_CLUSTER_IPV4_CIDR_BLOCK,
+                           self.TEST_ENVIRONMENT_ID)
+
+    with self.AssertRaisesExceptionRegexp(
+        command_util.Error, r'Cannot specify {} without {}.'.format(
+            '--cluster-secondary-range-name', required_dep)):
+
+      self.RunEnvironments('create', '--project', self.TEST_PROJECT,
+                           '--location', self.TEST_LOCATION, '--async',
+                           '--cluster-secondary-range-name',
+                           self.TEST_CLUSTER_SECONDARY_RANGE_NAME,
+                           self.TEST_ENVIRONMENT_ID)
+
+    with self.AssertRaisesExceptionRegexp(
+        command_util.Error,
+        r'Cannot specify {} without {}.'.format('--services-ipv4-cidr',
+                                                required_dep)):
+
+      self.RunEnvironments('create', '--project', self.TEST_PROJECT,
+                           '--location', self.TEST_LOCATION, '--async',
+                           '--services-ipv4-cidr',
+                           self.TEST_SERVICES_IPV4_CIDR_BLOCK,
+                           self.TEST_ENVIRONMENT_ID)
+
+    with self.AssertRaisesExceptionRegexp(
+        command_util.Error, r'Cannot specify {} without {}.'.format(
+            '--services-secondary-range-name', required_dep)):
+
+      self.RunEnvironments('create', '--project', self.TEST_PROJECT,
+                           '--location', self.TEST_LOCATION, '--async',
+                           '--services-secondary-range-name',
+                           self.TEST_SERVICES_SECONDARY_RANGE_NAME,
+                           self.TEST_ENVIRONMENT_ID)
+
+  def testIpv4CidrBlockFormatValidation(self):
+    """Test that IPV4 CIDR block format validation fails fast."""
+    self._SetTestMessages()
+    with self.assertRaisesRegex(
+        cli_test_base.MockArgumentError,
+        r'argument --services-ipv4-cidr: invalid Parse value: \'badIpv4Cidr\''):
+      self.RunEnvironments('create', '--project', self.TEST_PROJECT,
+                           '--location', self.TEST_LOCATION, '--async',
+                           '--services-ipv4-cidr', 'badIpv4Cidr',
+                           self.TEST_ENVIRONMENT_ID)
+
+
 class EnvironmentsCreateAlphaTest(EnvironmentsCreateBetaTest):
 
   def PreSetUp(self):
@@ -866,7 +1038,6 @@ class EnvironmentsCreateAlphaTest(EnvironmentsCreateBetaTest):
     self.AssertErrMatches(
         r'^Create in progress for environment \[{}] with operation \[{}]'
         .format(self.TEST_ENVIRONMENT_NAME, self.TEST_OPERATION_NAME))
-
 
 if __name__ == '__main__':
   test_case.main()

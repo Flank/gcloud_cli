@@ -6,7 +6,6 @@ SYNOPSIS
         [--[no-]assign-ip] [--async] [--availability-type=AVAILABILITY_TYPE]
         [--cpu=CPU] [--diff] [--[no-]enable-bin-log]
         [--[no-]enable-database-replication] [--follow-gae-app=FOLLOW_GAE_APP]
-        [--gce-zone=GCE_ZONE]
         [--maintenance-release-channel=MAINTENANCE_RELEASE_CHANNEL]
         [--maintenance-window-any]
         [--maintenance-window-day=MAINTENANCE_WINDOW_DAY]
@@ -19,6 +18,7 @@ SYNOPSIS
         [--authorized-networks=NETWORK,[NETWORK,...]
           | --clear-authorized-networks]
         [--clear-database-flags | --database-flags=FLAG=VALUE,[FLAG=VALUE,...]]
+        [--gce-zone=GCE_ZONE | --zone=ZONE]
         [--no-backup | --backup-start-time=BACKUP_START_TIME]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -39,8 +39,10 @@ FLAGS
         must be one of: always, never, on-demand.
 
      --[no-]assign-ip
-        If provided, instance must be assigned an IP address. Use --assign-ip
-        to enable and --no-assign-ip to disable.
+        Assign an IPv4 external address to this instance. This setting is
+        enabled by default. To create an instance which only has a private IP,
+        use --no-assign-ip and specify a private network. Use --assign-ip to
+        enable and --no-assign-ip to disable.
 
      --async
         Do not wait for the operation to complete.
@@ -79,10 +81,6 @@ FLAGS
         First Generation instances only. The App Engine app this instance
         should follow. It must be in the same region as the instance. WARNING:
         Instance may be restarted.
-
-     --gce-zone=GCE_ZONE
-        The preferred Compute Engine zone (e.g. us-central1-a, us-central1-b,
-        etc.). WARNING: Instance may be restarted.
 
      --maintenance-release-channel=MAINTENANCE_RELEASE_CHANNEL
         Which channel's updates to apply during the maintenance window. If not
@@ -148,6 +146,10 @@ FLAGS
         https://cloud.google.com/sql/pricing. WARNING: Instance will be
         restarted.
 
+        IMPORTANT: First Generation instances are deprecated. If you're
+        considering any First Generation tiers, we recommend using Second
+        Generation instead.
+
      At most one of these may be specified:
 
        --authorized-gae-apps=APP,[APP,...]
@@ -190,6 +192,19 @@ FLAGS
 
      At most one of these may be specified:
 
+       --gce-zone=GCE_ZONE
+          (DEPRECATED) Preferred Compute Engine zone (e.g. us-central1-a,
+          us-central1-b, etc.). WARNING: Instance may be restarted.
+
+          Flag --gce-zone is deprecated and will be removed by release 255.0.0.
+          Use --zone instead.
+
+       --zone=ZONE
+          Preferred Compute Engine zone (e.g. us-central1-a, us-central1-b,
+          etc.). WARNING: Instance may be restarted.
+
+     At most one of these may be specified:
+
        --no-backup
           Specified if daily backup should be disabled.
 
@@ -198,8 +213,9 @@ FLAGS
           in the UTC timezone.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

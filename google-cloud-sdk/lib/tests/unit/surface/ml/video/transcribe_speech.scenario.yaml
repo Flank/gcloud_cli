@@ -1,0 +1,459 @@
+title: ml video transcribe speech unit test scenario
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      ml video transcribe-speech gs://mockbucket/mock_video.mp4 --language-code en-US --async
+  - stderr: |
+      Check operation [us-east1.1234] for status.
+  - stdout: |
+      name: us-east1.1234
+- execute:
+  - command: |
+      ml video transcribe-speech gs://mockbucket/mock_video.mp4 --language-code en-US
+      --enable-automatic-punctuation --async
+  - stderr: |
+      Check operation [us-east1.1234] for status.
+  - stdout: |
+      name: us-east1.1234
+- execute:
+  - command: |
+      ml video transcribe-speech gs://mockbucket/mock_video.mp4 --language-code en-US
+      --enable-speaker-diarization --async
+  - stderr: |
+      Check operation [us-east1.1234] for status.
+  - stdout: |
+      name: us-east1.1234
+- execute:
+  - command: |
+      ml video transcribe-speech gs://mockbucket/mock_video.mp4 --language-code en-US
+      --enable-speaker-diarization --diarization-speaker-count 4 --async
+  - stderr: |
+      Check operation [us-east1.1234] for status.
+  - stdout: |
+      name: us-east1.1234
+- execute:
+  - command: |
+      ml video transcribe-speech gs://mockbucket/mock_video.mp4 --language-code en-US
+      --max-alternatives 10 --async
+  - stderr: |
+      Check operation [us-east1.1234] for status.
+  - stdout: |
+      name: us-east1.1234
+- execute:
+  - command: |
+      ml video transcribe-speech gs://mockbucket/mock_video.mp4 --language-code en-US
+      --filter-profanity --async
+  - stderr: |
+      Check operation [us-east1.1234] for status.
+  - stdout: |
+      name: us-east1.1234
+- execute:
+  - command: |
+      ml video transcribe-speech gs://mockbucket/mock_video.mp4 --language-code en-US
+      --enable-word-confidence --async
+  - stderr: |
+      Check operation [us-east1.1234] for status.
+  - stdout: |
+      name: us-east1.1234
+- execute:
+  - command: |
+      ml video transcribe-speech gs://mockbucket/mock_video.mp4 --language-code en-US
+      --audio-tracks 3,4 --async
+  - stderr: |
+      Check operation [us-east1.1234] for status.
+  - stdout: |
+      name: us-east1.1234
+- execute:
+  - command: |
+      ml video transcribe-speech gs://mockbucket/mock_video.mp4 --language-code en-US
+      --audio-tracks 3,4,5 --async
+  - error: '1: Can not specify more than two audio tracks.'
+- execute:
+  - command: |
+      ml video transcribe-speech gs://mockbucket/mock_video.mp4 --language-code en-US
+      --hints "surface spec,scenario test" --async
+  - stderr: |
+      Check operation [us-east1.1234] for status.
+  - stdout: |
+      name: us-east1.1234
+- execute:
+  - command: |
+      ml video transcribe-speech gs://mockbucket/mock_video.mp4 --language-code en-US
+  - progress_tracker:
+    - message: Waiting for operation [us-east1.1234] to complete
+    - status: SUCCESS
+  - stdout: |
+      '@type': type.googleapis.com/google.cloud.videointelligence.v1.AnnotateVideoResponse
+      annotationResults: []
+actions:
+- execute_command:
+    command: |
+      ml video transcribe-speech gs://mockbucket/mock_video.mp4 --language-code en-US --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://videointelligence.googleapis.com/v1/videos:annotate?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              features:
+              - SPEECH_TRANSCRIPTION
+              inputUri: gs://mockbucket/mock_video.mp4
+              videoContext:
+                speechTranscriptionConfig:
+                  enableAutomaticPunctuation: false
+                  enableSpeakerDiarization: false
+                  enableWordConfidence: false
+                  filterProfanity: false
+                  languageCode: en-US
+        return_response:
+          headers:
+            status: '200'
+          body: {name: us-east1.1234}
+    - expect_stderr: |
+        Check operation [us-east1.1234] for status.
+    - expect_stdout: |
+        name: us-east1.1234
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      ml video transcribe-speech gs://mockbucket/mock_video.mp4 --language-code en-US
+      --enable-automatic-punctuation --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://videointelligence.googleapis.com/v1/videos:annotate?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              features:
+              - SPEECH_TRANSCRIPTION
+              inputUri: gs://mockbucket/mock_video.mp4
+              videoContext:
+                speechTranscriptionConfig:
+                  enableAutomaticPunctuation: true
+                  enableSpeakerDiarization: false
+                  enableWordConfidence: false
+                  filterProfanity: false
+                  languageCode: en-US
+        return_response:
+          headers:
+            status: '200'
+          body: {name: us-east1.1234}
+    - expect_stderr: |
+        Check operation [us-east1.1234] for status.
+    - expect_stdout: |
+        name: us-east1.1234
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      ml video transcribe-speech gs://mockbucket/mock_video.mp4 --language-code en-US
+      --enable-speaker-diarization --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://videointelligence.googleapis.com/v1/videos:annotate?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              features:
+              - SPEECH_TRANSCRIPTION
+              inputUri: gs://mockbucket/mock_video.mp4
+              videoContext:
+                speechTranscriptionConfig:
+                  enableAutomaticPunctuation: false
+                  enableSpeakerDiarization: true
+                  enableWordConfidence: false
+                  filterProfanity: false
+                  languageCode: en-US
+        return_response:
+          headers:
+            status: '200'
+          body: {name: us-east1.1234}
+    - expect_stderr: |
+        Check operation [us-east1.1234] for status.
+    - expect_stdout: |
+        name: us-east1.1234
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      ml video transcribe-speech gs://mockbucket/mock_video.mp4 --language-code en-US
+      --enable-speaker-diarization --diarization-speaker-count 4 --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://videointelligence.googleapis.com/v1/videos:annotate?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              features:
+              - SPEECH_TRANSCRIPTION
+              inputUri: gs://mockbucket/mock_video.mp4
+              videoContext:
+                speechTranscriptionConfig:
+                  diarizationSpeakerCount: 4
+                  enableAutomaticPunctuation: false
+                  enableSpeakerDiarization: true
+                  enableWordConfidence: false
+                  filterProfanity: false
+                  languageCode: en-US
+        return_response:
+          headers:
+            status: '200'
+          body: {name: us-east1.1234}
+    - expect_stderr: |
+        Check operation [us-east1.1234] for status.
+    - expect_stdout: |
+        name: us-east1.1234
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      ml video transcribe-speech gs://mockbucket/mock_video.mp4 --language-code en-US
+      --max-alternatives 10 --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://videointelligence.googleapis.com/v1/videos:annotate?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              features:
+              - SPEECH_TRANSCRIPTION
+              inputUri: gs://mockbucket/mock_video.mp4
+              videoContext:
+                speechTranscriptionConfig:
+                  enableAutomaticPunctuation: false
+                  enableSpeakerDiarization: false
+                  enableWordConfidence: false
+                  filterProfanity: false
+                  languageCode: en-US
+                  maxAlternatives: 10
+        return_response:
+          headers:
+            status: '200'
+          body: {name: us-east1.1234}
+    - expect_stderr: |
+        Check operation [us-east1.1234] for status.
+    - expect_stdout: |
+        name: us-east1.1234
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      ml video transcribe-speech gs://mockbucket/mock_video.mp4 --language-code en-US
+      --filter-profanity --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://videointelligence.googleapis.com/v1/videos:annotate?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              features:
+              - SPEECH_TRANSCRIPTION
+              inputUri: gs://mockbucket/mock_video.mp4
+              videoContext:
+                speechTranscriptionConfig:
+                  enableAutomaticPunctuation: false
+                  enableSpeakerDiarization: false
+                  enableWordConfidence: false
+                  filterProfanity: true
+                  languageCode: en-US
+        return_response:
+          headers:
+            status: '200'
+          body: {name: us-east1.1234}
+    - expect_stderr: |
+        Check operation [us-east1.1234] for status.
+    - expect_stdout: |
+        name: us-east1.1234
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      ml video transcribe-speech gs://mockbucket/mock_video.mp4 --language-code en-US
+      --enable-word-confidence --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://videointelligence.googleapis.com/v1/videos:annotate?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              features:
+              - SPEECH_TRANSCRIPTION
+              inputUri: gs://mockbucket/mock_video.mp4
+              videoContext:
+                speechTranscriptionConfig:
+                  enableAutomaticPunctuation: false
+                  enableSpeakerDiarization: false
+                  enableWordConfidence: true
+                  filterProfanity: false
+                  languageCode: en-US
+        return_response:
+          headers:
+            status: '200'
+          body: {name: us-east1.1234}
+    - expect_stderr: |
+        Check operation [us-east1.1234] for status.
+    - expect_stdout: |
+        name: us-east1.1234
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      ml video transcribe-speech gs://mockbucket/mock_video.mp4 --language-code en-US
+      --audio-tracks 3,4 --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://videointelligence.googleapis.com/v1/videos:annotate?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              features:
+              - SPEECH_TRANSCRIPTION
+              inputUri: gs://mockbucket/mock_video.mp4
+              videoContext:
+                speechTranscriptionConfig:
+                  audioTracks:
+                  - 3
+                  - 4
+                  enableAutomaticPunctuation: false
+                  enableSpeakerDiarization: false
+                  enableWordConfidence: false
+                  filterProfanity: false
+                  languageCode: en-US
+        return_response:
+          headers:
+            status: '200'
+          body: {name: us-east1.1234}
+    - expect_stderr: |
+        Check operation [us-east1.1234] for status.
+    - expect_stdout: |
+        name: us-east1.1234
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      ml video transcribe-speech gs://mockbucket/mock_video.mp4 --language-code en-US
+      --audio-tracks 3,4,5 --async
+    events:
+    - expect_exit:
+        code: 1
+        message: Can not specify more than two audio tracks.
+- execute_command:
+    command: |
+      ml video transcribe-speech gs://mockbucket/mock_video.mp4 --language-code en-US
+      --hints "surface spec,scenario test" --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://videointelligence.googleapis.com/v1/videos:annotate?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              features:
+              - SPEECH_TRANSCRIPTION
+              inputUri: gs://mockbucket/mock_video.mp4
+              videoContext:
+                speechTranscriptionConfig:
+                  enableAutomaticPunctuation: false
+                  enableSpeakerDiarization: false
+                  enableWordConfidence: false
+                  filterProfanity: false
+                  languageCode: en-US
+                  speechContexts:
+                  - phrases:
+                    - surface spec
+                    - scenario test
+        return_response:
+          headers:
+            status: '200'
+          body: {name: us-east1.1234}
+    - expect_stderr: |
+        Check operation [us-east1.1234] for status.
+    - expect_stdout: |
+        name: us-east1.1234
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      ml video transcribe-speech gs://mockbucket/mock_video.mp4 --language-code en-US
+    events:
+    - api_call:
+        expect_request:
+          uri: https://videointelligence.googleapis.com/v1/videos:annotate?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              features:
+              - SPEECH_TRANSCRIPTION
+              inputUri: gs://mockbucket/mock_video.mp4
+              videoContext:
+                speechTranscriptionConfig:
+                  enableAutomaticPunctuation: false
+                  enableSpeakerDiarization: false
+                  enableWordConfidence: false
+                  filterProfanity: false
+                  languageCode: en-US
+                  speechContexts:
+                  - {}
+        return_response:
+          headers:
+            status: '200'
+          body: {name: us-east1.1234}
+    - api_call:
+        expect_request:
+          uri: https://videointelligence.googleapis.com/v1/operations/us-east1.1234?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |-
+            {
+              "name": "us-east1.1234",
+              "metadata": {
+              "@type": "type.googleapis.com/google.cloud.videointelligence.v1.AnnotateVideoProgress",
+              "annotationProgress": [
+                {
+                  "inputUri": "/wfaris-ml-speech-test/g.mp4",
+                  "progressPercent": 100,
+                  "startTime": "2019-03-25T13:22:05.802959Z",
+                  "updateTime": "2019-03-25T13:23:15.818159Z"
+                }
+              ]
+              },
+              "done": true,
+              "response": {
+                "@type": "type.googleapis.com/google.cloud.videointelligence.v1.AnnotateVideoResponse",
+                "annotationResults": []
+              }
+            }
+        repeatable: true
+    - expect_progress_tracker:
+        message: Waiting for operation [us-east1.1234] to complete
+        status: SUCCESS
+    - expect_stdout: |
+        '@type': type.googleapis.com/google.cloud.videointelligence.v1.AnnotateVideoResponse
+        annotationResults: []
+    - expect_exit:
+        code: 0

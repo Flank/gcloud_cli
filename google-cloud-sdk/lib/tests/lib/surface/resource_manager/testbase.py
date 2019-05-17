@@ -31,7 +31,7 @@ from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib.apitools import http_error
 
-_URL_ROOT = 'http://cloudresourcemanager.googleapis.com/v2alpha1/folders/'
+_URL_ROOT = 'http://cloudresourcemanager.googleapis.com/v2/folders/'
 _BAD_ID_URL = _URL_ROOT + 'BAD_ID?someParam=true&other=false'
 _SECRET_ID_URL = _URL_ROOT + 'SECRET_ID?someParam=true&other=false'
 
@@ -101,7 +101,7 @@ class FoldersUnitTestBase(CrmUnitTestBase):
       lifecycleState=ACTIVE)
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def _GetTestIamPolicy(self, clear_fields=None):
     """Creates a test IAM policy.

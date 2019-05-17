@@ -10,8 +10,9 @@ DESCRIPTION
     instances.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -21,6 +22,10 @@ GROUPS
      network-interfaces
         (ALPHA) Read and manipulate Google Compute Engine instance network
         interfaces.
+
+     os-inventory
+        (ALPHA) Read Google Compute Engine OS Inventory Data and Related
+        Resources.
 
 COMMANDS
     COMMAND is one of the following:
@@ -76,9 +81,12 @@ COMMANDS
      get-serial-port-output
         (ALPHA) Read output from a virtual machine instance's serial port.
 
-     get-shielded-vm-identity
-        (ALPHA) Get the Shielded-VM identity for a Google Compute Engine
-        instance.
+     get-shielded-identity
+        (ALPHA) Get the Shielded identity for a Google Compute Engine instance.
+
+     import
+        (ALPHA) create Google Compute Engine virtual machine instances from
+        virtual appliance in OVA/OVF format.
 
      list
         (ALPHA) List Google Compute Engine instances.
@@ -88,7 +96,8 @@ COMMANDS
         zones.
 
      remove-iam-policy-binding
-        (ALPHA) Remove IAM policy binding of a Google Compute Engine instance.
+        (ALPHA) Remove IAM policy binding from a Google Compute Engine
+        instance.
 
      remove-labels
         (ALPHA) Remove labels from Google Compute Engine virtual machine
@@ -114,7 +123,7 @@ COMMANDS
         (ALPHA) Set auto-delete behavior for disks.
 
      set-iam-policy
-        (ALPHA) Set IAM policy for an instance.
+        (ALPHA) Set IAM policy for a Google Compute Engine instance.
 
      set-machine-type
         (ALPHA) Set machine type for Google Compute Engine virtual machines.

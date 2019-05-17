@@ -140,6 +140,11 @@ def _ErrorFromInvalidMatrix(matrix):
           'The app declares one or more permissions that are not allowed',
       enum_values.INVALID_ROBO_DIRECTIVES:
           'Cannot have multiple robo-directives with the same resource name',
+      enum_values.INVALID_DIRECTIVE_ACTION:
+          'Robo Directive includes at least one invalid action definition.',
+      enum_values.INVALID_RESOURCE_NAME:
+          'Robo Directive resource name contains invalid characters: ":" '
+          ' (colon) or " " (space)',
       enum_values.TEST_LOOP_INTENT_FILTER_NOT_FOUND:
           'The app does not have a correctly formatted game-loop intent filter',
       enum_values.SCENARIO_LABEL_NOT_DECLARED:
@@ -176,6 +181,9 @@ def _ErrorFromInvalidMatrix(matrix):
           'incompatible with the selected devices.',
       enum_values.PLIST_CANNOT_BE_PARSED:
           'One or more of the Info.plist files in the zip could not be parsed',
+      enum_values.INVALID_PACKAGE_NAME:
+          'The APK application ID (aka package name) is invalid. See also '
+          'https://developer.android.com/studio/build/application-id',
   }
   details_enum = matrix.invalidMatrixDetails
   if details_enum in error_dict:

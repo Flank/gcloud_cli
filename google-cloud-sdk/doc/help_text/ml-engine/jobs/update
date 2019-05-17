@@ -1,12 +1,12 @@
 NAME
-    gcloud ml-engine jobs update - update a Cloud ML Engine jobs
+    gcloud ml-engine jobs update - update an AI Platform job
 
 SYNOPSIS
     gcloud ml-engine jobs update JOB [--update-labels=[KEY=VALUE,...]]
         [--clear-labels | --remove-labels=[KEY,...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    Update a Cloud ML Engine jobs.
+    Update an AI Platform job.
 
 POSITIONAL ARGUMENTS
      JOB
@@ -42,8 +42,9 @@ FLAGS
           silently ignored.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

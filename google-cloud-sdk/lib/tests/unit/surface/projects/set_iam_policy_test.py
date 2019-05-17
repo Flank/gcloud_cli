@@ -22,25 +22,23 @@ from apitools.base.py import encoding
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import exceptions
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.projects import base
 from tests.lib.surface.projects import util as test_util
 
 
 # TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA,
-                          calliope_base.ReleaseTrack.GA)
-class ProjectsSetIamPolicyTest(base.ProjectsUnitTestBase):
+class ProjectsSetIamPolicyTestGA(base.ProjectsUnitTestBase):
 
-  def testSetIamPolicyProject(self, track):
-    self.track = track
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def testSetIamPolicyProject(self):
     new_policy = test_util.GetTestIamPolicy()
     json = encoding.MessageToJson(new_policy)
     temp_file = self.Touch(self.temp_path, 'good.json', contents=json)
 
-    test_project = test_util.GetTestActiveProject(True)
+    test_project = test_util.GetTestActiveProject()
     self.mock_client.projects.SetIamPolicy.Expect(
         self.messages.CloudresourcemanagerProjectsSetIamPolicyRequest(
             resource=test_project.projectId,
@@ -52,13 +50,12 @@ class ProjectsSetIamPolicyTest(base.ProjectsUnitTestBase):
     self.assertEqual(response, new_policy)
     self.AssertErrContains('Updated IAM policy for project')
 
-  def testClearBindingsAndEtagSetIamPolicyProject(self, track):
-    self.track = track
+  def testClearBindingsAndEtagSetIamPolicyProject(self):
     new_policy = test_util.GetTestIamPolicy(clear_fields=['bindings', 'etag'])
     json = encoding.MessageToJson(new_policy)
     temp_file = self.Touch(self.temp_path, 'good.json', contents=json)
 
-    test_project = test_util.GetTestActiveProject(True)
+    test_project = test_util.GetTestActiveProject()
     self.mock_client.projects.SetIamPolicy.Expect(
         self.messages.CloudresourcemanagerProjectsSetIamPolicyRequest(
             resource=test_project.projectId,
@@ -69,14 +66,13 @@ class ProjectsSetIamPolicyTest(base.ProjectsUnitTestBase):
                                 temp_file)
     self.assertEqual(response, new_policy)
 
-  def testAuditConfigsPreservedSetIamPolicyProject(self, track):
-    self.track = track
+  def testAuditConfigsPreservedSetIamPolicyProject(self):
     start_policy = test_util.GetTestIamPolicy()
     new_policy = test_util.GetTestIamPolicy(clear_fields=['auditConfigs'])
     json = encoding.MessageToJson(new_policy)
     temp_file = self.Touch(self.temp_path, 'good.json', contents=json)
 
-    test_project = test_util.GetTestActiveProject(True)
+    test_project = test_util.GetTestActiveProject()
     self.mock_client.projects.SetIamPolicy.Expect(
         self.messages.CloudresourcemanagerProjectsSetIamPolicyRequest(
             resource=test_project.projectId,
@@ -87,23 +83,32 @@ class ProjectsSetIamPolicyTest(base.ProjectsUnitTestBase):
                                 temp_file)
     self.assertEqual(response, start_policy)
 
-  def testBadJsonOrYamlSetIamPolicyProject(self, track):
-    self.track = track
+  def testBadJsonOrYamlSetIamPolicyProject(self):
     temp_file = self.Touch(self.temp_path, 'bad', contents='bad')
 
     with self.assertRaises(exceptions.Error):
       self.RunProjects('set-iam-policy',
                        test_util.GetTestActiveProject().projectId, temp_file)
 
-  def testBadJsonSetIamPolicyProject(self, track):
-    self.track = track
+  def testBadJsonSetIamPolicyProject(self):
     file_path = '/some/bad/path/to/non/existend/file'
     with self.assertRaisesRegex(
         exceptions.Error, r'Failed to load YAML from \[{}\]'.format(file_path)):
       self.RunProjects('set-iam-policy',
-                       test_util.GetTestActiveProject(True).projectId,
+                       test_util.GetTestActiveProject().projectId,
                        file_path)
 
+
+class ProjectsSetIamPolicyTestBeta(ProjectsSetIamPolicyTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class ProjectsSetIamPolicyTestAlpha(ProjectsSetIamPolicyTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 if __name__ == '__main__':
   test_case.main()

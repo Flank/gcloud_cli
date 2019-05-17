@@ -11,7 +11,7 @@ gcloud compute instance\-groups managed \- read and manipulate Google Compute En
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute instance\-groups managed\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute instance\-groups managed\fR \fIGROUP\fR | \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -23,12 +23,26 @@ Read and manipulate Google Compute Engine managed instance groups.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
+
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBrolling\-action\fR
+Manipulate rolling actions on Google Compute Engine managed instance groups.
+
+
+.RE
+.sp
 
 .SH "COMMANDS"
 
@@ -94,6 +108,10 @@ Set target pools of managed instance group.
 .TP 2m
 \fBstop\-autoscaling\fR
 Stop autoscaling a managed instance group.
+
+.TP 2m
+\fBupdate\fR
+Update Google Compute Engine managed instance groups.
 
 .TP 2m
 \fBwait\-until\-stable\fR

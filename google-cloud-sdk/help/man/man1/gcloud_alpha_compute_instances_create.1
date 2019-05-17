@@ -11,7 +11,7 @@ gcloud alpha compute instances create \- create Google Compute Engine virtual ma
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute instances create\fR \fIINSTANCE_NAMES\fR [\fIINSTANCE_NAMES\fR\ ...] [\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-async\fR] [\fB\-\-no\-boot\-disk\-auto\-delete\fR] [\fB\-\-boot\-disk\-device\-name\fR=\fIBOOT_DISK_DEVICE_NAME\fR] [\fB\-\-boot\-disk\-size\fR=\fIBOOT_DISK_SIZE\fR] [\fB\-\-boot\-disk\-type\fR=\fIBOOT_DISK_TYPE\fR] [\fB\-\-can\-ip\-forward\fR] [\fB\-\-create\-disk\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-deletion\-protection\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIboot\fR=\fIBOOT\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIname\fR=\fINAME\fR],[\fIscope\fR=\fISCOPE\fR]] [\fB\-\-enable\-display\-device\fR] [\fB\-\-hostname\fR=\fIHOSTNAME\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-local\-nvdimm\fR=[\fIsize\fR=\fISIZE\fR]] [\fB\-\-local\-ssd\fR=[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fIinterface\fR=\fIINTERFACE\fR],[\fIsize\fR=\fISIZE\fR]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-interface\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-preemptible\fR] [\fB\-\-private\-network\-ip\fR=\fIPRIVATE_NETWORK_IP\fR] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-resource\-policies\fR=[\fIRESOURCE_POLICY\fR,...]] [\fB\-\-no\-restart\-on\-failure\fR] [\fB\-\-shielded\-vm\-integrity\-monitoring\fR] [\fB\-\-shielded\-vm\-secure\-boot\fR] [\fB\-\-shielded\-vm\-vtpm\fR] [\fB\-\-source\-instance\-template\fR=\fISOURCE_INSTANCE_TEMPLATE\fR] [\fB\-\-source\-machine\-image\fR=\fISOURCE_MACHINE_IMAGE\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-address\fR=\fIADDRESS\fR\ |\ \fB\-\-no\-address\fR] [\fB\-\-allocation\-affinity\fR=\fIALLOCATION_AFFINITY\fR;\ default="any"\ \fB\-\-allocation\-label\fR=[\fIkey\fR=\fIKEY\fR],[\fIvalue\fR=\fIVALUE\fR]] [\fB\-\-boot\-disk\-kms\-key\fR=\fIBOOT_DISK_KMS_KEY\fR\ :\ \fB\-\-boot\-disk\-kms\-keyring\fR=\fIBOOT_DISK_KMS_KEYRING\fR\ \fB\-\-boot\-disk\-kms\-location\fR=\fIBOOT_DISK_KMS_LOCATION\fR\ \fB\-\-boot\-disk\-kms\-project\fR=\fIBOOT_DISK_KMS_PROJECT\fR] [\fB\-\-custom\-cpu\fR=\fICUSTOM_CPU\fR\ \fB\-\-custom\-memory\fR=\fICUSTOM_MEMORY\fR\ :\ \fB\-\-custom\-extensions\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR] [\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR\ |\ \fB\-\-on\-host\-maintenance\fR=\fIMAINTENANCE_POLICY\fR] [\fB\-\-node\fR=\fINODE\fR\ |\ \fB\-\-node\-affinity\-file\fR=\fINODE_AFFINITY_FILE\fR\ |\ \fB\-\-node\-group\fR=\fINODE_GROUP\fR] [\fB\-\-public\-dns\fR\ |\ \fB\-\-no\-public\-dns\fR] [\fB\-\-public\-ptr\fR\ |\ \fB\-\-no\-public\-ptr\fR] [\fB\-\-public\-ptr\-domain\fR=\fIPUBLIC_PTR_DOMAIN\fR\ |\ \fB\-\-no\-public\-ptr\-domain\fR] [\fB\-\-scopes\fR=[\fISCOPE\fR,...]\ |\ \fB\-\-no\-scopes\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-service\-account\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute instances create\fR \fIINSTANCE_NAMES\fR [\fIINSTANCE_NAMES\fR\ ...] [\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-async\fR] [\fB\-\-no\-boot\-disk\-auto\-delete\fR] [\fB\-\-boot\-disk\-device\-name\fR=\fIBOOT_DISK_DEVICE_NAME\fR] [\fB\-\-boot\-disk\-size\fR=\fIBOOT_DISK_SIZE\fR] [\fB\-\-boot\-disk\-type\fR=\fIBOOT_DISK_TYPE\fR] [\fB\-\-can\-ip\-forward\fR] [\fB\-\-create\-disk\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-deletion\-protection\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIboot\fR=\fIBOOT\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIname\fR=\fINAME\fR],[\fIscope\fR=\fISCOPE\fR]] [\fB\-\-enable\-display\-device\fR] [\fB\-\-hostname\fR=\fIHOSTNAME\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-local\-nvdimm\fR=[\fIsize\fR=\fISIZE\fR]] [\fB\-\-local\-ssd\fR=[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fIinterface\fR=\fIINTERFACE\fR],[\fIsize\fR=\fISIZE\fR]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-interface\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-preemptible\fR] [\fB\-\-private\-network\-ip\fR=\fIPRIVATE_NETWORK_IP\fR] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-resource\-policies\fR=[\fIRESOURCE_POLICY\fR,...]] [\fB\-\-no\-restart\-on\-failure\fR] [\fB\-\-shielded\-integrity\-monitoring\fR] [\fB\-\-shielded\-secure\-boot\fR] [\fB\-\-shielded\-vtpm\fR] [\fB\-\-source\-instance\-template\fR=\fISOURCE_INSTANCE_TEMPLATE\fR] [\fB\-\-source\-machine\-image\fR=\fISOURCE_MACHINE_IMAGE\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-address\fR=\fIADDRESS\fR\ |\ \fB\-\-no\-address\fR] [\fB\-\-boot\-disk\-kms\-key\fR=\fIBOOT_DISK_KMS_KEY\fR\ :\ \fB\-\-boot\-disk\-kms\-keyring\fR=\fIBOOT_DISK_KMS_KEYRING\fR\ \fB\-\-boot\-disk\-kms\-location\fR=\fIBOOT_DISK_KMS_LOCATION\fR\ \fB\-\-boot\-disk\-kms\-project\fR=\fIBOOT_DISK_KMS_PROJECT\fR] [\fB\-\-custom\-cpu\fR=\fICUSTOM_CPU\fR\ \fB\-\-custom\-memory\fR=\fICUSTOM_MEMORY\fR\ :\ \fB\-\-custom\-extensions\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR] [\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR\ |\ \fB\-\-on\-host\-maintenance\fR=\fIMAINTENANCE_POLICY\fR] [\fB\-\-node\fR=\fINODE\fR\ |\ \fB\-\-node\-affinity\-file\fR=\fINODE_AFFINITY_FILE\fR\ |\ \fB\-\-node\-group\fR=\fINODE_GROUP\fR] [\fB\-\-public\-dns\fR\ |\ \fB\-\-no\-public\-dns\fR] [\fB\-\-public\-ptr\fR\ |\ \fB\-\-no\-public\-ptr\fR] [\fB\-\-public\-ptr\-domain\fR=\fIPUBLIC_PTR_DOMAIN\fR\ |\ \fB\-\-no\-public\-ptr\-domain\fR] [\fB\-\-reservation\fR=\fIRESERVATION\fR\ \fB\-\-reservation\-affinity\fR=\fIRESERVATION_AFFINITY\fR;\ default="any"] [\fB\-\-scopes\fR=[\fISCOPE\fR,...]\ |\ \fB\-\-no\-scopes\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-service\-account\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -66,8 +66,7 @@ learn about all available accelerator types.
 
 .TP 2m
 \fBcount\fR
-The number of pieces of the accelerator to attach to the instances. The default
-value is 1.
+Number of accelerators to attach to each instance. The default value is 1.
 
 .RE
 .sp
@@ -233,11 +232,26 @@ https://www.googleapis.com/compute/v1/projects/myproject/global/snapshots/snapsh
 .RS 2m
 .IP "\(bu" 2m
 snapshot
+
+.RE
+.RE
+.sp
+.TP 2m
+\fBdisk\-resource\-policy\fR
+Resource policy that will be applied to created disk. You can provide full or
+partial URL. See
+.RS 2m
+.IP "\(bu" 2m
+https://cloud.google.com/sdk/gcloud/reference/beta/compute/resource\-policies/
+.RS 2m
+.IP "\(bu" 2m
+https://cloud.google.com/compute/docs/disks/scheduled\-snapshots
 .RE
 .RE
 .RE
 .RE
 .sp
+for more details about resource\-policies.
 
 .RS 2m
 .TP 2m
@@ -294,7 +308,7 @@ used.
 \fBauto\-delete\fR
 If \f5\fIyes\fR\fR, this persistent disk will be automatically deleted when the
 instance is deleted. However, if the disk is later detached from the instance,
-this option won't apply. The default value for this is \f5\fIno\fR\fR.
+this option won't apply. The default value for this is \f5\fIyes\fR\fR.
 
 .TP 2m
 \fBscope\fR
@@ -351,8 +365,8 @@ This flag is currently in BETA and may change without notice.
 .TP 2m
 \fBdevice\-name\fR
 Optional. A name that indicates the disk name the guest operating system will
-see. If omitted, a device name of the form \f5\fIlocal\-ssd\-N\fR\fR will be
-used.
+see. Can only be specified if \f5interface\fR is \f5SCSI\fR. If omitted, a
+device name of the form \f5\fIlocal\-ssd\-N\fR\fR will be used.
 
 .TP 2m
 \fBinterface\fR
@@ -436,7 +450,8 @@ neither is specified, this defaults to the "default" network.
 \fB\-\-network\-interface\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]
 Adds a network interface to the instance. Mutually exclusive with any of these
 flags: \fB\-\-address\fR, \fB\-\-network\fR, \fB\-\-network\-tier\fR,
-\fB\-\-subnet\fR, \fB\-\-private\-network\-ip\fR.
+\fB\-\-subnet\fR, \fB\-\-private\-network\-ip\fR. This flag can be repeated to
+specify multiple network interfaces.
 
 The following keys are allowed:
 .RS 2m
@@ -538,7 +553,7 @@ does not affect terminations performed by the user. Enabled by default, use
 \fB\-\-no\-restart\-on\-failure\fR to disable.
 
 .TP 2m
-\fB\-\-shielded\-vm\-integrity\-monitoring\fR
+\fB\-\-shielded\-integrity\-monitoring\fR
 Enables monitoring and attestation of the boot integrity of the instance. The
 attestation is performed against the integrity policy baseline. This baseline is
 initially derived from the implicitly trusted boot image when the instance is
@@ -546,11 +561,11 @@ created. This baseline can be updated by using
 \f5\-\-shielded\-vm\-learn\-integrity\-policy\fR.
 
 .TP 2m
-\fB\-\-shielded\-vm\-secure\-boot\fR
+\fB\-\-shielded\-secure\-boot\fR
 The instance will boot with secure boot enabled.
 
 .TP 2m
-\fB\-\-shielded\-vm\-vtpm\fR
+\fB\-\-shielded\-vtpm\fR
 The instance will boot with the TPM (Trusted Platform Module) enabled. A TPM is
 a hardware module that can be used for different security operations such as
 remote attestation, encryption and sealing of keys.
@@ -637,41 +652,12 @@ only be used when creating a single instance.
 If provided, the instances will not be assigned external IP addresses.
 
 .RE
-.RE
-.sp
-Manage the configuration of desired allocation which this instance could take
-capacity from.
-
-
-
-.RS 2m
-.TP 2m
-\fB\-\-allocation\-affinity\fR=\fIALLOCATION_AFFINITY\fR; default="any"
-Specifies the configuration of desired allocation which this instance could take
-capacity from. Choices are 'any', 'none' and 'specific', default is 'any'.
-\fIALLOCATION_AFFINITY\fR must be one of: \fBany\fR, \fBnone\fR, \fBspecific\fR.
-
-.RS 2m
-.TP 2m
-\fB\-\-allocation\-label\fR=[\fIkey\fR=\fIKEY\fR],[\fIvalue\fR=\fIVALUE\fR]
-The key and values of the label of the allocation resource. Required if the
-value of \f5\-\-allocation\-affinity\fR is \f5specific\fR.
-
-.TP 2m
-\fBkey\fR
-The label key of allocation resource.
-
-.TP 2m
-\fBvalue\fR
-The label value of allocation resource.
-.RE
 .sp
 .TP 2m
 
 Key resource \- The Cloud KMS (Key Management Service) cryptokey that will be
 used to protect the disk. The arguments in this group can be used to specify the
 attributes of this resource.
-
 
 .RS 2m
 .TP 2m
@@ -697,7 +683,6 @@ The Cloud project for the key.
 
 Custom machine type extensions.
 
-
 .RS 2m
 .TP 2m
 \fB\-\-custom\-cpu\fR=\fICUSTOM_CPU\fR
@@ -720,17 +705,18 @@ Use the extended custom machine type.
 .sp
 .TP 2m
 \fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR
-
 The project against which all image and image family references will be
 resolved. It is best practice to define image\-project.
-.IP "\(bu" 2m
+.RS 2m
+.IP "\(em" 2m
 If specifying one of our public images, image\-project must be provided.
-.IP "\(bu" 2m
+.IP "\(em" 2m
 If there are several of the same image\-family value in multiple projects,
 image\-project must be specified to clarify the image to be used.
-.IP "\(bu" 2m
+.IP "\(em" 2m
 If not specified and either image or image\-family is provided, the current
 default project is used.
+.RE
 .RE
 .sp
 
@@ -738,7 +724,6 @@ default project is used.
 .TP 2m
 
 At most one of these may be specified:
-
 
 .RS 2m
 .TP 2m
@@ -767,11 +752,13 @@ By default, \f5\fIdebian\-9\fR\fR is assumed for this flag.
 The name of the source disk snapshot that the instance boot disk will be created
 from. You can provide this as a full URL to the snapshot or just the snapshot
 name. For example, the following are valid values:
-.IP "\(em" 2m
+.RS 2m
+.IP "\(bu" 2m
 
 https://www.googleapis.com/compute/v1/projects/myproject/global/snapshots/snapshot
-.IP "\(em" 2m
+.IP "\(bu" 2m
 snapshot
+.RE
 .RE
 .RE
 .sp
@@ -780,7 +767,6 @@ snapshot
 .TP 2m
 
 Maintenance Behavior. At most one of these may be specified:
-
 
 .RS 2m
 .TP 2m
@@ -827,7 +813,6 @@ The instances should be terminated.
 
 Sole Tenancy At most one of these may be specified:
 
-
 .RS 2m
 .TP 2m
 \fB\-\-node\fR=\fINODE\fR
@@ -865,7 +850,6 @@ The name of the node group to schedule this instance on.
 
 At most one of these may be specified:
 
-
 .RS 2m
 .TP 2m
 \fB\-\-public\-dns\fR
@@ -880,7 +864,6 @@ If provided, the instance will not be assigned a public DNS name.
 .TP 2m
 
 At most one of these may be specified:
-
 
 .RS 2m
 .TP 2m
@@ -898,7 +881,6 @@ Mutually exclusive with public\-ptr\-domain.
 
 At most one of these may be specified:
 
-
 .RS 2m
 .TP 2m
 \fB\-\-public\-ptr\-domain\fR=\fIPUBLIC_PTR_DOMAIN\fR
@@ -915,8 +897,24 @@ of the instance.
 .sp
 .TP 2m
 
-At most one of these may be specified:
+Specifies the reservation for the instance.
 
+.RS 2m
+.TP 2m
+\fB\-\-reservation\fR=\fIRESERVATION\fR
+The name of the reservation, required when
+\f5\-\-reservation\-affinity=specific\fR.
+
+.TP 2m
+\fB\-\-reservation\-affinity\fR=\fIRESERVATION_AFFINITY\fR; default="any"
+The type of reservation for the instance. \fIRESERVATION_AFFINITY\fR must be one
+of: \fBany\fR, \fBnone\fR, \fBspecific\fR.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
 
 .RS 2m
 .TP 2m
@@ -987,7 +985,6 @@ Create instance without scopes
 
 At most one of these may be specified:
 
-
 .RS 2m
 .TP 2m
 \fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR
@@ -1010,10 +1007,11 @@ Create instance without service account
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

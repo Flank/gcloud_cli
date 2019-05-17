@@ -20,21 +20,16 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface import redis_test_base
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,
-                           calliope_base.ReleaseTrack.BETA,
-                           calliope_base.ReleaseTrack.GA])
-class DescribeTest(redis_test_base.InstancesUnitTestBase,
-                   parameterized.TestCase):
+class DescribeTestGA(redis_test_base.InstancesUnitTestBase):
 
-  def testDescribe(self, track):
-    self.SetUpForTrack(track)
-    self.SetUpInstancesForTrack()
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def testDescribe(self):
     expected_instance = self.messages.Instance(name=self.instance_relative_name)
     self._ExpectDescribe(expected_instance)
 
@@ -43,9 +38,7 @@ class DescribeTest(redis_test_base.InstancesUnitTestBase,
 
     self.assertEqual(actual_instance, expected_instance)
 
-  def testDescribe_UsingRegionProperty(self, track):
-    self.SetUpForTrack(track)
-    self.SetUpInstancesForTrack()
+  def testDescribe_UsingRegionProperty(self):
     expected_instance = self.messages.Instance(name=self.instance_relative_name)
     self._ExpectDescribe(expected_instance)
 
@@ -55,9 +48,7 @@ class DescribeTest(redis_test_base.InstancesUnitTestBase,
 
     self.assertEqual(actual_instance, expected_instance)
 
-  def testDescribe_UsingRelativeInstanceName(self, track):
-    self.SetUpForTrack(track)
-    self.SetUpInstancesForTrack()
+  def testDescribe_UsingRelativeInstanceName(self):
     expected_instance = self.messages.Instance(name=self.instance_relative_name)
     self._ExpectDescribe(expected_instance)
 
@@ -71,6 +62,18 @@ class DescribeTest(redis_test_base.InstancesUnitTestBase,
         request=self.messages.RedisProjectsLocationsInstancesGetRequest(
             name=expected_instance.name),
         response=expected_instance)
+
+
+class DescribeTestBeta(DescribeTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class DescribeTestAlpha(DescribeTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

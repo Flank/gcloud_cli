@@ -113,6 +113,7 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
         sourceUploadUrl=source_upload_url,
         eventTrigger=trigger,
         labels=labels,
+        runtime='nodejs6'
     )
 
   def GetFunctionsCreateRequest(self, function, location):
@@ -175,6 +176,7 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
             resource=self.GetTopicRelativeName(project, topic),
         ),
         labels=labels,
+        runtime='nodejs6'
     )
     if memory:
       result.availableMemoryMb = memory
@@ -204,6 +206,7 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
         sourceRepository=source_repository,
         entryPoint=entry_point,
         labels=labels,
+        runtime='nodejs6'
     )
     if memory:
       result.availableMemoryMb = memory
@@ -225,6 +228,7 @@ class FunctionsDeployTestBase(base.FunctionsTestBase):
         httpsTrigger=https_trigger,
         entryPoint=entry_point,
         labels=labels,
+        runtime='nodejs6'
     )
     if timeout:
       result.timeout = timeout
@@ -371,7 +375,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
       result = self.Run(
           'functions deploy my-test --region {} '
           '--trigger-topic topic '
-          '--quiet'.format(region))
+          '--quiet --runtime=nodejs6'.format(region))
     self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESFULL_DEPLOY_STDERR)
 
@@ -419,7 +423,8 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
           'functions deploy my-test '
           '--trigger-topic topic '
           '--retry '
-          '--quiet')
+          '--quiet '
+          '--runtime=nodejs6')
     self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESFULL_DEPLOY_STDERR)
 
@@ -469,7 +474,8 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
           'functions deploy my-test '
           '--trigger-topic topic '
           '--update-labels=foo=bar,boo=baz '
-          '--quiet')
+          '--quiet '
+          '--runtime=nodejs6')
     self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESFULL_DEPLOY_STDERR)
 
@@ -524,7 +530,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
           file_utils, 'TemporaryDirectory', return_value=mock_zip)
       result = self.Run(
           'functions deploy my-test --trigger-topic topic '
-          '--source my/functions/directory --quiet')
+          '--source my/functions/directory --quiet --runtime=nodejs6')
     self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESFULL_DEPLOY_STDERR)
 
@@ -536,7 +542,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
         'argument --source: Provided directory does not exist.'):
       self.Run(
           'functions deploy my-test --trigger-topic topic --stage-bucket buck '
-          '--source my/functions/directory --quiet')
+          '--source my/functions/directory --quiet --runtime=nodejs6')
 
   def testDeployFromGcsWithSourceFlag(self):
     self.MockUnpackedSourcesDirSize()
@@ -567,7 +573,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
 
     result = self.Run(
         'functions deploy my-test --trigger-topic topic '
-        '--source gs://my-bucket/function.zip --quiet')
+        '--source gs://my-bucket/function.zip --quiet --runtime=nodejs6')
     self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESFULL_DEPLOY_STDERR)
 
@@ -605,7 +611,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
         '--source '
         'https://source.developers.google.com/projects/my-project/'
         'repos/my-repo/fixed-aliases/rc0.0.9 '
-        '--quiet')
+        '--quiet --runtime=nodejs6')
     self.assertEqual(result, function)
     self.AssertErrContains(_SUCCESFULL_DEPLOY_STDERR)
 
@@ -619,7 +625,8 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
           '--trigger-http '
           '--stage-bucket buck '
           '--retry '
-          '--quiet')
+          '--quiet '
+          '--runtime=nodejs6')
 
   def testUpdateTopic(self):
     self.MockUnpackedSourcesDirSize()
@@ -944,7 +951,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
     self.Run(
         'functions deploy my-test '
         '--source  https://source.developers.google.com/projects/p/repos/r '
-        '--trigger-http')
+        '--trigger-http --runtime=nodejs6')
 
   def testUpdate_ImplicitKeepHttpTrigger(self):
     self.MockUnpackedSourcesDirSize()
@@ -978,8 +985,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
         updated_function=updated_function,
         update_mask='eventTrigger,httpsTrigger,timeout',
     )
-    self.Run(
-        'functions deploy my-test --timeout 512 --trigger-topic foo')
+    self.Run('functions deploy my-test --timeout 512 --trigger-topic foo')
 
   def testUpdate_TopicTriggerToHttpTrigger(self):
     self.MockUnpackedSourcesDirSize()
@@ -995,9 +1001,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
         updated_function=updated_function,
         update_mask='eventTrigger,httpsTrigger',
     )
-    self.Run(
-        'functions deploy my-test --trigger-http',
-    )
+    self.Run('functions deploy my-test --trigger-http')
 
   def testUpdate_ExplicitKeepHttpTrigger(self):
     self.MockUnpackedSourcesDirSize()
@@ -1013,24 +1017,23 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
         updated_function=updated_function,
         update_mask=('eventTrigger,httpsTrigger,timeout'),
     )
-    self.Run(
-        'functions deploy my-test --timeout 512 --trigger-http')
+    self.Run('functions deploy my-test --timeout 512 --trigger-http')
 
   def testManuallySettingDeploymentLabel(self):
     with self.assertRaisesRegex(
         calliope_exceptions.InvalidArgumentException,
         'Label keys starting with `deployment` are reserved for use by '
         'deployment tools and cannot be specified manually.'):
-      self.Run(
-          'functions deploy my-test --update-labels=deployment=contingency ')
+      self.Run('functions deploy my-test '
+               '--update-labels=deployment=contingency --runtime=nodejs6')
 
   def testManuallyRemovingDeploymentLabel(self):
     with self.assertRaisesRegex(
         calliope_exceptions.InvalidArgumentException,
         'Label keys starting with `deployment` are reserved for use by '
         'deployment tools and cannot be specified manually.'):
-      self.Run(
-          'functions deploy my-test --remove-labels=deployment ')
+      self.Run('functions deploy my-test --remove-labels=deployment '
+               '--runtime=nodejs6')
 
   def testCreateOversized(self):
     self.StartObjectPatch(
@@ -1043,7 +1046,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
         r'\d+B.'):
       self.Run(
           'functions deploy my-test --trigger-topic topic --stage-bucket buck '
-          '--quiet')
+          '--quiet --runtime=nodejs6')
 
   def testSourceFilesAndFailedUpload(self):
     self.StartObjectPatch(
@@ -1062,7 +1065,7 @@ class FunctionsDeployTest(FunctionsDeployTestBase,
       with self.assertRaisesRegex(Exception, _OP_FAILED_UPLOAD):
         self.Run(
             'functions deploy my-test --source {0} --trigger-topic topic '
-            '--stage-bucket buck'
+            '--stage-bucket buck --runtime=nodejs6'
             .format(t))
 
 if __name__ == '__main__':

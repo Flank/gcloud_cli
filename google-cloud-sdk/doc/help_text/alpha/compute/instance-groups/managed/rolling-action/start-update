@@ -9,6 +9,7 @@ SYNOPSIS
           target-size=FIXED_OR_PERCENT,[name=NAME],...]]
         [--type=TYPE; default="proactive"] [--force] [--max-surge=MAX_SURGE]
         [--max-unavailable=MAX_UNAVAILABLE] [--min-ready=MIN_READY]
+        [--replacement-method=REPLACEMENT_METHOD]
         [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -60,6 +61,16 @@ OTHER FLAGS
         considered available. For example 10s for 10 seconds. See $ gcloud
         topic datetimes for information on duration formats.
 
+     --replacement-method=REPLACEMENT_METHOD
+        Type of replacement method. Specifies what action will be taken to
+        update instances. REPLACEMENT_METHOD must be one of:
+
+         recreate
+            Updated instances will be recreated with the same name.
+         substitute
+            Updated instances will be deleted and created again with another
+            name.
+
      At most one of these may be specified:
 
        --region=REGION
@@ -85,8 +96,9 @@ OTHER FLAGS
           invocation.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -95,8 +107,9 @@ NOTES
     command fails with API permission errors despite specifying the right
     project, you will have to apply for early access and have your projects
     registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    https://cloud.google.com/support/. These variants are also available:
 
+        $ gcloud compute instance-groups managed rolling-action start-update
         $ gcloud beta compute instance-groups managed rolling-action \
             start-update
 

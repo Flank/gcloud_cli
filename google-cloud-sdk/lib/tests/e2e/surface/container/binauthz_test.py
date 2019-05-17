@@ -24,8 +24,8 @@ from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
 from googlecloudsdk.core.util import retry
-from tests.lib import cli_test_base
 from tests.lib import e2e_base
+from tests.lib import e2e_utils
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.container.binauthz import base as binauthz_test_base
@@ -68,9 +68,8 @@ def _ReRunUntilResultPredicate(
 class BinauthzTest(
     e2e_base.WithServiceAuth,
     sdk_test_base.WithTempCWD,
-    cli_test_base.CliTestBase,
     binauthz_test_base.WithEarlyCleanup,
-    binauthz_test_base.BinauthzUnitTestBase,
+    binauthz_test_base.BinauthzTestBase,
 ):
 
   def SetUp(self):
@@ -80,9 +79,11 @@ class BinauthzTest(
     # CliTestBase sets this to True in its SetUp, but we only need to consume
     # the result of calling self.Run in their structured format.
     properties.VALUES.core.user_output_enabled.Set(False)
-    self.containeranalysis_client = apis.GetClientInstance(
-        containeranalysis.API_NAME,
-        containeranalysis.DEFAULT_VERSION)
+    self.ca_client = apis.GetClientInstance(containeranalysis.API_NAME,
+                                            containeranalysis.DEFAULT_VERSION)
+    self.ca_messages = self.ca_client.MESSAGES_MODULE
+    self.note_id_generator = e2e_utils.GetResourceNameGenerator(
+        prefix='test-aa-note')
     self.client = containeranalysis.Client()
     self.artifact_url = self.GenerateArtifactUrl()
     self.project_ref = resources.REGISTRY.Parse(
@@ -104,9 +105,9 @@ class BinauthzTest(
         run_fn=RunAndUnwind, result_predicate=result_predicate)
 
   def CleanUpAttestor(self, note_name, attestor_id):
-    self.containeranalysis_client.projects_notes.Delete(
-        self.containeranalysis_messages.
-        ContaineranalysisProjectsNotesDeleteRequest(name=note_name))
+    self.ca_client.projects_notes.Delete(
+        self.ca_messages.ContaineranalysisProjectsNotesDeleteRequest(
+            name=note_name))
 
     self.RunBinauthz([
         'attestors',
@@ -115,22 +116,22 @@ class BinauthzTest(
     ])
 
   def CleanUpAttestation(self, occurrence_name):
-    self.containeranalysis_client.projects_occurrences.Delete(
-        self.containeranalysis_messages.
-        ContaineranalysisProjectsOccurrencesDeleteRequest(name=occurrence_name))
+    self.ca_client.projects_occurrences.Delete(
+        self.ca_messages.ContaineranalysisProjectsOccurrencesDeleteRequest(
+            name=occurrence_name))
 
   def CreateAttestor(self, note_id, attestor_id):
     # There is no surface to create the note so we use the client directly.
-    request = self.ProjectsNotesCreateRequest(
+    request = self.ca_messages.ContaineranalysisProjectsNotesCreateRequest(
         parent=self.project_ref.RelativeName(),
         noteId=note_id,
-        note=self.Note(
-            kind=self.Note.KindValueValuesEnum.ATTESTATION,
+        note=self.ca_messages.Note(
+            kind=(self.ca_messages.Note.KindValueValuesEnum.ATTESTATION),
             shortDescription='Attestation Authority Note',
-            attestationAuthority=self.Authority(),
+            attestationAuthority=self.ca_messages.Authority(),
         ),
     )
-    note = self.containeranalysis_client.projects_notes.Create(request)
+    note = self.ca_client.projects_notes.Create(request)
 
     self.RunBinauthz([
         'attestors',
@@ -146,10 +147,65 @@ class BinauthzTest(
                          note_name=note.name,
                          attestor_id=attestor_id)
 
+  def AddKeys(self, attestor_id):
+    pgp_key_path = self.Resource('tests', 'e2e', 'surface', 'container',
+                                 'testdata', 'pgp_key.pgp')
+    pkix_key_path = self.Resource('tests', 'e2e', 'surface', 'container',
+                                  'testdata', 'pkix_key.pem')
+    self.RunBinauthz([
+        'attestors',
+        'public-keys',
+        'add',
+        '--attestor',
+        attestor_id,
+        '--public-key-file',
+        pgp_key_path
+    ])
+    self.RunBinauthz([
+        'attestors',
+        'public-keys',
+        'remove',
+        '--attestor',
+        attestor_id,
+        '3356AA351744C9E234E7ABA534760FCB7CD7EF32'
+    ])
+    self.RunBinauthz([
+        'attestors',
+        'public-keys',
+        'add',
+        '--attestor',
+        attestor_id,
+        '--pgp-public-key-file',
+        pgp_key_path
+    ], track=calliope_base.ReleaseTrack.ALPHA)
+    self.RunBinauthz([
+        'attestors',
+        'public-keys',
+        'add',
+        '--attestor',
+        attestor_id,
+        '--keyversion',
+        ('projects/{proj}/locations/us-west1/keyRings/foo/cryptoKeys/bar/cryptoKeyVersions/1'
+         .format(proj=self.Project())),
+    ], track=calliope_base.ReleaseTrack.ALPHA)
+    self.RunBinauthz([
+        'attestors',
+        'public-keys',
+        'add',
+        '--attestor',
+        attestor_id,
+        '--pkix-public-key-file',
+        pkix_key_path,
+        '--pkix-public-key-algorithm',
+        'ecdsa-p256-sha256',
+        '--public-key-id-override',
+        '//example.com'
+    ], track=calliope_base.ReleaseTrack.ALPHA)
+
   def GetOccurrence(self, occurrence_name):
-    return self.containeranalysis_client.projects_occurrences.Get(
-        self.containeranalysis_messages.
-        ContaineranalysisProjectsOccurrencesGetRequest(name=occurrence_name))
+    return self.ca_client.projects_occurrences.Get(
+        self.ca_messages.ContaineranalysisProjectsOccurrencesGetRequest(
+            name=occurrence_name))
 
   def CreateAttestation(
       self,
@@ -179,6 +235,18 @@ class BinauthzTest(
   def testAttestations(self):
     self.CreateAttestor(self.note_id, self.attestor_id)
 
+    # Do some operations with `attestors public-keys` that will add 3 keys, one
+    # to exercise each group of flags offered by `add`.
+    self.AddKeys(self.attestor_id)
+
+    # Verify that the keys appear as expected.
+    attestor = self.RunBinauthz([
+        'attestors',
+        'describe',
+        self.attestor_id,
+    ], track=calliope_base.ReleaseTrack.ALPHA)
+    self.assertEqual(len(attestor.userOwnedDrydockNote.publicKeys), 3)
+
     attestation = self.CreateAttestation(
         attestor_ref=self.attestor_relative_name,
         pgp_key_fingerprint='bogus_pk_id',
@@ -204,8 +272,24 @@ class BinauthzTest(
         artifact_url=artifact_url2,
     )
 
-    def HasAtLeastTwoElements(result):
-      return len(result) >= 2
+    # Create an attestation with the all-in-one command.
+    artifact_url3 = self.GenerateArtifactUrl()
+    occurrence = self.RunBinauthz([
+        'attestations',
+        'sign-and-create',
+        '--artifact-url',
+        artifact_url3,
+        '--attestor',
+        self.attestor_relative_name,
+        '--keyversion',
+        ('projects/{proj}/locations/us-west1/keyRings/foo/cryptoKeys/bar/cryptoKeyVersions/1'
+         .format(proj=self.Project())),
+    ], track=calliope_base.ReleaseTrack.ALPHA)
+    self.AddEarlyCleanup(self.CleanUpAttestation,
+                         occurrence_name=occurrence.name)
+
+    def HasAtLeastThreeElements(result):
+      return len(result) >= 3
 
     # Verify that the bare listing gets attestations for both the artifacts.
     occurrences = self.RunAndUnwindWithRetry(
@@ -217,10 +301,10 @@ class BinauthzTest(
             '--attestor',
             self.attestor_id,
         ],
-        result_predicate=HasAtLeastTwoElements)
+        result_predicate=HasAtLeastThreeElements)
     self.assertEqual(
         set(occ.resource.uri for occ in occurrences),
-        set([self.artifact_url, artifact_url2]),
+        set([self.artifact_url, artifact_url2, artifact_url3]),
     )
 
     # Verify that artifact-based filtering works.
@@ -234,6 +318,8 @@ class BinauthzTest(
             self.attestor_id,
             '--artifact-url',
             self.artifact_url,
+            '--sort-by',
+            'createTime'
         ]))
     self.assertEqual(1, len(occurrences))
     self.assertEqual(
@@ -242,6 +328,26 @@ class BinauthzTest(
     self.assertEqual(
         occurrences[0].attestation.attestation.pgpSignedAttestation.signature,
         'bogus_sig')
+    occurrences = list(self.RunAndUnwindWithRetry(
+        [
+            'container',
+            'binauthz',
+            'attestations',
+            'list',
+            '--attestor',
+            self.attestor_id,
+            '--artifact-url',
+            artifact_url3,
+            '--sort-by',
+            'createTime'
+        ]))
+    self.assertEqual(1, len(occurrences))
+    self.assertEqual(
+        (occurrences[0].attestation.attestation.genericSignedAttestation.
+         signatures[0].publicKeyId),
+        ('//cloudkms.googleapis.com/v1/projects/{proj}/locations/us-west1/keyRings/foo/cryptoKeys/bar/cryptoKeyVersions/1'
+         .format(proj=self.Project())),
+    )
 
 
 if __name__ == '__main__':

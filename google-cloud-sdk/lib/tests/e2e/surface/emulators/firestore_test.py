@@ -40,7 +40,6 @@ def IsCloudFirestoreEmulatorComponentInstalled():
   return True
 
 
-@test_case.Filters.SkipOnWindows('Failing on Windows', 'b/117842934')
 class FirestoreTests(sdk_test_base.BundledBase, cli_test_base.CliTestBase):
 
   def SetUp(self):

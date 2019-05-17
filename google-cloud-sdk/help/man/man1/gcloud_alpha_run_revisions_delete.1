@@ -38,7 +38,7 @@ specified.
 
 .TP 2m
 \fB\-\-namespace\fR=\fINAMESPACE\fR
-Specific to Cloud Run on Kubernetes Engine: The Kubernetes namespace for the
+Specific to Cloud Run on Kubernetes Engine: Kubernetes namespace for the
 revision
 
 
@@ -51,17 +51,19 @@ revision
 .RS 2m
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
-The region in which to create the service.
+Region in which the resource can be found. Alternatively, set the property
+[run/region].
 
 .TP 2m
 
-Cluster resource \- Specific to Cloud Run on Kubernetes Engine: The Kubernetes
+Cluster resource \- Specific to Cloud Run on Kubernetes Engine: Kubernetes
 Engine cluster to connect to. The arguments in this group can be used to specify
 the attributes of this resource. (NOTE) Some attributes are not given arguments
 in this group but can be set in other ways. To set the [project] attribute:
 provide the argument [\-\-cluster] on the command line with a fully specified
-name; set the property [run/cluster] with a fully specified name; provide the
-argument [\-\-project] on the command line; set the property [core/project].
+name; set the property [run/cluster] with a fully specified name; specify the
+cluster from a list of available clusters with a fully specified name; provide
+the argument [\-\-project] on the command line; set the property [core/project].
 
 .RS 2m
 .TP 2m
@@ -70,7 +72,8 @@ ID of the cluster or fully qualified identifier for the cluster.
 
 .TP 2m
 \fB\-\-cluster\-location\fR=\fICLUSTER_LOCATION\fR
-Specific to Cloud Run on Kubernetes Engine: The location of the cluster.
+Specific to Cloud Run on Kubernetes Engine: Zone in which the cluster is
+located. Alternatively, set the property [run/cluster_location].
 
 
 .RE
@@ -79,10 +82,11 @@ Specific to Cloud Run on Kubernetes Engine: The location of the cluster.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -102,5 +106,9 @@ This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you will have to apply for early access and have your projects registered on the
 API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+https://cloud.google.com/support/. This variant is also available:
+
+.RS 2m
+$ gcloud beta run revisions delete
+.RE
 

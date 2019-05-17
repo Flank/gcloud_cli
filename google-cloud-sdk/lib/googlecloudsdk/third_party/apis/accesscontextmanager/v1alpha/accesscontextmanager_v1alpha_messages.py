@@ -98,32 +98,18 @@ class AccessZone(_messages.Message):
     resources: A list of GCP resources that are inside of the access zone.
       Currently only projects are allowed. Format: `projects/{project_number}`
     restrictedServices: GCP services that Access Zone restrictions will be
-      applied to. May contain list of services or a single wildcard "*". Only
-      resources for services matching the restricted_services will be subject
-      to access zone protection. For example, if `storage.googleapis.com` is
-      specified, then storage buckets that belong to the access zone could be
-      accessed through Storage service only if access conditions are met.
-      Wildcard means that unless explicitly specified by
-      "unrestricted_services" list, any service is treated as restricted. One
-      of the fields "restricted_services", "unrestricted_services" must
-      contain a wildcard "*", otherwise the Access Zone specification is
-      invalid. It also means that both field being empty is invalid as well.
-      "restricted_services" can be empty if and only if
-      "unrestricted_services" list contains a "*" wildcard. For bridge access
+      applied to. Must contain list of services. Only resources for services
+      matching the restricted_services will be subject to access zone
+      protection. For example, if `storage.googleapis.com` is specified, then
+      storage buckets that belong to the access zone could be accessed through
+      Storage service only if access conditions are met.  For bridge access
       zones, must be empty.
     title: Human readable title. Must be unique within the Policy.
     unrestrictedServices: GCP services exempt from the Access Zone
-      restrictions. May contain list of services or a single wildcard "*".
-      Services matching the unrestricted_services are excluded from Access
-      Zone restrictions. For example, if `logging.googleapis.com` is
-      unrestricted, users can read logs in projects from anywhere, even though
-      the projects are inside access zone. Wildcard means that unless
-      explicitly specified by "restricted_services" list, any service is
-      treated as unrestricted. One of the fields "restricted_services",
-      "unrestricted_services" must contain a wildcard "*", otherwise the
-      Access Zone specification is invalid. It also means that both field
-      being empty is invalid as well. "unrestricted_services" can be empty if
-      and only if "restricted_services" list contains a "*" wildcard. For
+      restrictions. Deprecated. Must be the single wildcard "*". Services
+      matching the unrestricted_services are excluded from Access Zone
+      restrictions.  Wildcard means that unless explicitly specified by
+      "restricted_services" list, any service is treated as unrestricted.  For
       bridge access zones, must be empty.
     updateTime: Output only. Time the `AccessZone` was updated in UTC.
     zoneType: Zone type indicator. A single project is allowed to be a member
@@ -475,13 +461,15 @@ class Condition(_messages.Message):
       is accepted whereas "2001:db8::1/32" is not. The originating IP of a
       request must be in one of the listed subnets in order for this Condition
       to be true. If empty, all IP addresses are allowed.
-    members: The signed-in user originating the request must be a part of one
-      of the provided members. Syntax: `user:{emailid}` `group:{emailid}`
+    members: The request must be made by one of the provided user or service
+      accounts. Groups are not supported. Syntax: `user:{emailid}`
       `serviceAccount:{emailid}` If not specified, a request may come from any
-      user (logged in/not logged in, not present in any groups, etc.).
+      user.
     negate: Whether to negate the Condition. If true, the Condition becomes a
       NAND over its non-empty fields, each field must be false for the
       Condition overall to be satisfied. Defaults to false.
+    regions: The request must originate from one of the provided
+      countries/regions. Must be valid ISO 3166-1 alpha-2 codes.
     requiredAccessLevels: A list of other access levels defined in the same
       `Policy`, referenced by resource name. Referencing an `AccessLevel`
       which does not exist is an error. All access levels listed must be
@@ -493,7 +481,8 @@ class Condition(_messages.Message):
   ipSubnetworks = _messages.StringField(2, repeated=True)
   members = _messages.StringField(3, repeated=True)
   negate = _messages.BooleanField(4)
-  requiredAccessLevels = _messages.StringField(5, repeated=True)
+  regions = _messages.StringField(5, repeated=True)
+  requiredAccessLevels = _messages.StringField(6, repeated=True)
 
 
 class DevicePolicy(_messages.Message):
@@ -518,6 +507,9 @@ class DevicePolicy(_messages.Message):
       allows all statuses.
     osConstraints: Allowed OS versions, an empty list allows all types and all
       versions.
+    requireAdminApproval: Whether the device needs to be approved by the
+      customer admin.
+    requireCorpOwned: Whether the device needs to be corp owned.
     requireScreenlock: Whether or not screenlock is required for the
       DevicePolicy to be true. Defaults to `false`.
   """
@@ -553,7 +545,9 @@ class DevicePolicy(_messages.Message):
   allowedDeviceManagementLevels = _messages.EnumField('AllowedDeviceManagementLevelsValueListEntryValuesEnum', 1, repeated=True)
   allowedEncryptionStatuses = _messages.EnumField('AllowedEncryptionStatusesValueListEntryValuesEnum', 2, repeated=True)
   osConstraints = _messages.MessageField('OsConstraint', 3, repeated=True)
-  requireScreenlock = _messages.BooleanField(4)
+  requireAdminApproval = _messages.BooleanField(4)
+  requireCorpOwned = _messages.BooleanField(5)
+  requireScreenlock = _messages.BooleanField(6)
 
 
 class ListAccessLevelsResponse(_messages.Message):
@@ -626,7 +620,8 @@ class Operation(_messages.Message):
       if any.
     name: The server-assigned name, which is only unique within the same
       service that originally returns it. If you use the default HTTP mapping,
-      the `name` should have the format of `operations/some/unique/name`.
+      the `name` should be a resource name ending with
+      `operations/{unique_id}`.
     response: The normal response of the operation in case of success.  If the
       original method returns no data on success, such as `Delete`, the
       response is `google.protobuf.Empty`.  If the original method is standard
@@ -713,6 +708,10 @@ class OsConstraint(_messages.Message):
       this OS satisfies the constraint. Format: `"major.minor.patch"`.
       Examples: `"10.5.301"`, `"9.2.1"`.
     osType: Required. The allowed OS type.
+    requireVerifiedChromeOs: Only allows requests from devices with a verified
+      Chrome OS. Verifications includes requirements that the device is
+      enterprise-managed, conformant to Dasher domain policies, and the caller
+      has permission to call the API targeted by the request.
   """
 
   class OsTypeValueValuesEnum(_messages.Enum):
@@ -725,19 +724,16 @@ class OsConstraint(_messages.Message):
       DESKTOP_WINDOWS: A desktop Windows operating system.
       DESKTOP_LINUX: A desktop Linux operating system.
       DESKTOP_CHROME_OS: A desktop ChromeOS operating system.
-      ANDROID: An Android operating system.
-      IOS: An iOS operating system.
     """
     OS_UNSPECIFIED = 0
     DESKTOP_MAC = 1
     DESKTOP_WINDOWS = 2
     DESKTOP_LINUX = 3
     DESKTOP_CHROME_OS = 4
-    ANDROID = 5
-    IOS = 6
 
   minimumVersion = _messages.StringField(1)
   osType = _messages.EnumField('OsTypeValueValuesEnum', 2)
+  requireVerifiedChromeOs = _messages.BooleanField(3)
 
 
 class StandardQueryParameters(_messages.Message):

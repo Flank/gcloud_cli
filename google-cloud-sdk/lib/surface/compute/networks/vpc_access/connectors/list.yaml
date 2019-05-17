@@ -1,18 +1,22 @@
-- help_text:
+- release_tracks: [BETA, ALPHA]
+  help_text:
     brief: |
       List VPC Access connectors.
-    DESCRIPTION: |
+    description: |
       List all VPC Access connectors under the specified project and region.
 
       You can specify the maximum number of connectors to list using the
       `--limit` flag.
-    EXAMPLES: |
+    examples: |
       The following command lists a maximum of five instances in us-central1:
 
           $ {command} --region=us-central1 --limit=5
 
   request:
     collection: vpcaccess.projects.locations.connectors
+    api_version: v1beta1
+    ALPHA:
+      api_version: v1alpha1
 
   response:
     id_field: name
@@ -27,8 +31,20 @@
       table(
          name.basename():label=CONNECTOR_ID:sort=1,
          name.segment(3):label=REGION,
-         type,
          network,
          ipCidrRange,
-         status
+         minThroughput,
+         maxThroughput,
+         state
        )
+  ALPHA:
+    output:
+      format: |
+        table(
+           name.basename():label=CONNECTOR_ID:sort=1,
+           name.segment(3):label=REGION,
+           type,
+           network,
+           ipCidrRange,
+           status
+         )

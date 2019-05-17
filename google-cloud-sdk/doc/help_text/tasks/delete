@@ -1,0 +1,35 @@
+NAME
+    gcloud tasks delete - delete a task from a queue
+
+SYNOPSIS
+    gcloud tasks delete TASK [--queue=QUEUE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Delete a task from a queue.
+
+POSITIONAL ARGUMENTS
+     TASK
+        The task to delete.
+
+FLAGS
+     --queue=QUEUE
+        The queue the task belongs to.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+EXAMPLES
+    To delete a task:
+
+        $ gcloud tasks delete --queue=my-queue my-task
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha tasks delete
+        $ gcloud beta tasks delete
+

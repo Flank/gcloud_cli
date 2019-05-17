@@ -29,7 +29,7 @@ from tests.lib.surface.pubsub import base
 class SnapshotsCreateTest(base.CloudPubsubTestBase):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
     self.svc = self.client.projects_snapshots.Create
 
   def testSnapshotsCreate(self):

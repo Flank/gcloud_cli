@@ -48,7 +48,7 @@ Welcome to the gcloud interactive shell environment.
       o start by typing commands to get auto-suggestions and inline help
       o use tab, up-arrow, or down-arrow to navigate completion dropdowns
       o use space or / to accept the highlighted dropdown item
-      o run gcloud alpha interactive --help for more info
+      o run gcloud beta interactive --help for more info
 
     Run $ gcloud feedback to report bugs or request new features.
 

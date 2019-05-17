@@ -73,13 +73,17 @@ def SetUpClass(test_obj, api_version):
   ]
 
 
-class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
+class InstanceGroupManagersUpdateInstancesZonalTest(test_base.BaseTest):
+
+  def PreSetUp(self):
+    self.api_version = 'v1'
+    self.track = calliope_base.ReleaseTrack.GA
+    self.should_list_per_instance_configs = False
 
   def SetUp(self):
-    SetUpClass(self, 'beta')
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.igms = test_resources.MakeInstanceGroupManagersWithVersions('beta',
-                                                                     self.ZONE)
+    SetUpClass(self, self.api_version)
+    self.igms = test_resources.MakeInstanceGroupManagersWithVersions(
+        self.api_version, self.ZONE)
     self.StartPatch('datetime.datetime', test_base.FakeDateTime)
 
   def generateGetRequestStub(self, igm_name):
@@ -97,14 +101,31 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
         project=self.PROJECT_NAME,
         zone=self.ZONE)
 
+  def generateListPerInstanceConfigsRequestStub(self, get_request):
+    return (self.messages.
+            ComputeInstanceGroupManagersListPerInstanceConfigsRequest(
+                instanceGroupManager=get_request.instanceGroupManager,
+                project=get_request.project,
+                zone=get_request.zone))
+
   def checkUpdateRequest(self, expected_get_request, expected_update_request):
-    self.CheckRequests(
-        [(self.compute.instanceGroupManagers, 'Get', expected_get_request)],
-        [(self.compute.instanceGroupManagers, 'Patch',
-          expected_update_request)])
+    if self.should_list_per_instance_configs:
+      expected_list_pics_request = (
+          self.generateListPerInstanceConfigsRequestStub(expected_get_request))
+      self.CheckRequests(
+          [(self.compute.instanceGroupManagers, 'Get', expected_get_request)],
+          [(self.compute.instanceGroupManagers, 'ListPerInstanceConfigs',
+            expected_list_pics_request)],
+          [(self.compute.instanceGroupManagers, 'Patch',
+            expected_update_request)])
+    else:
+      self.CheckRequests(
+          [(self.compute.instanceGroupManagers, 'Get', expected_get_request)],
+          [(self.compute.instanceGroupManagers, 'Patch',
+            expected_update_request)])
 
   def testRestartOneVersionDefault(self):
-    self.make_requests.side_effect = iter([[self.igms[0]], []])
+    self.make_requests.side_effect = iter([[self.igms[0]], [], []])
     self.Run('compute instance-groups managed rolling-action restart {} '
              '--zone {}'.format(self.IGM_NAME_A, self.ZONE))
 
@@ -119,7 +140,7 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
     self.checkUpdateRequest(get_request, update_request)
 
   def testRestartTwoVersionsAsFastAsPossible(self):
-    self.make_requests.side_effect = iter([[self.igms[1]], []])
+    self.make_requests.side_effect = iter([[self.igms[1]], [], []])
     self.Run('compute instance-groups managed rolling-action restart {} '
              '--max-unavailable 100% --zone {}'.format(self.IGM_NAME_B,
                                                        self.ZONE))
@@ -142,7 +163,7 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
     self.checkUpdateRequest(get_request, update_request)
 
   def testRestartInstanceTemplateDefault(self):
-    self.make_requests.side_effect = iter([[self.igms[2]], []])
+    self.make_requests.side_effect = iter([[self.igms[2]], [], []])
     self.Run('compute instance-groups managed rolling-action restart {} '
              '--zone {}'.format(self.IGM_NAME_C, self.ZONE))
 
@@ -163,13 +184,17 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
                '--zone {}'.format(self.IGM_NAME_A, self.ZONE))
 
 
-class InstanceGroupManagersUpdateInstancesBetaRegionalTest(test_base.BaseTest):
+class InstanceGroupManagersUpdateInstancesRegionalTest(test_base.BaseTest):
+
+  def PreSetUp(self):
+    self.api_version = 'v1'
+    self.track = calliope_base.ReleaseTrack.GA
+    self.should_list_per_instance_configs = False
 
   def SetUp(self):
-    SetUpClass(self, 'beta')
-    self.track = calliope_base.ReleaseTrack.BETA
+    SetUpClass(self, self.api_version)
     self.igms = test_resources.MakeInstanceGroupManagersWithVersions(
-        'beta', self.REGION, 'region')
+        self.api_version, self.REGION, 'region')
     self.StartPatch('datetime.datetime', test_base.FakeDateTime)
 
   def generateGetRequestStub(self, igm_name):
@@ -187,14 +212,33 @@ class InstanceGroupManagersUpdateInstancesBetaRegionalTest(test_base.BaseTest):
         project=self.PROJECT_NAME,
         region=self.REGION)
 
+  def generateListPerInstanceConfigsRequestStub(self, get_request):
+    return (self.messages.
+            ComputeRegionInstanceGroupManagersListPerInstanceConfigsRequest(
+                instanceGroupManager=get_request.instanceGroupManager,
+                project=get_request.project,
+                region=get_request.region))
+
   def checkUpdateRequest(self, expected_get_request, expected_update_request):
-    self.CheckRequests([(self.compute.regionInstanceGroupManagers, 'Get',
-                         expected_get_request)],
-                       [(self.compute.regionInstanceGroupManagers, 'Patch',
-                         expected_update_request)])
+    if self.should_list_per_instance_configs:
+      expected_list_pics_request = (
+          self.generateListPerInstanceConfigsRequestStub(expected_get_request))
+      self.CheckRequests(
+          [(self.compute.regionInstanceGroupManagers, 'Get',
+            expected_get_request)],
+          [(self.compute.regionInstanceGroupManagers, 'ListPerInstanceConfigs',
+            expected_list_pics_request)],
+          [(self.compute.regionInstanceGroupManagers, 'Patch',
+            expected_update_request)])
+    else:
+      self.CheckRequests(
+          [(self.compute.regionInstanceGroupManagers, 'Get',
+            expected_get_request)],
+          [(self.compute.regionInstanceGroupManagers, 'Patch',
+            expected_update_request)])
 
   def testRestartDefault(self):
-    self.make_requests.side_effect = iter([[self.igms[0]], []])
+    self.make_requests.side_effect = iter([[self.igms[0]], [], []])
     self.Run('compute instance-groups managed rolling-action restart {} '
              '--region {}'.format(self.IGM_NAME_A, self.REGION))
 
@@ -209,7 +253,7 @@ class InstanceGroupManagersUpdateInstancesBetaRegionalTest(test_base.BaseTest):
     self.checkUpdateRequest(get_request, update_request)
 
   def testRestartAllAsFastAsPossible(self):
-    self.make_requests.side_effect = iter([[self.igms[0]], []])
+    self.make_requests.side_effect = iter([[self.igms[0]], [], []])
     self.Run('compute instance-groups managed rolling-action restart {} '
              '--region {} '
              '--max-unavailable 100%'.format(self.IGM_NAME_A, self.REGION))
@@ -227,7 +271,7 @@ class InstanceGroupManagersUpdateInstancesBetaRegionalTest(test_base.BaseTest):
     self.checkUpdateRequest(get_request, update_request)
 
   def testRestartAllTwoAtATime(self):
-    self.make_requests.side_effect = iter([[self.igms[0]], []])
+    self.make_requests.side_effect = iter([[self.igms[0]], [], []])
     self.Run('compute instance-groups managed rolling-action restart {} '
              '--region {} '
              '--max-unavailable 2'.format(self.IGM_NAME_A, self.REGION))
@@ -245,24 +289,82 @@ class InstanceGroupManagersUpdateInstancesBetaRegionalTest(test_base.BaseTest):
     self.checkUpdateRequest(get_request, update_request)
 
 
+class InstanceGroupManagersUpdateInstancesBetaZonalTest(
+    InstanceGroupManagersUpdateInstancesZonalTest):
+
+  def PreSetUp(self):
+    self.api_version = 'beta'
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class InstanceGroupManagersUpdateInstancesBetaRegionalTest(
+    InstanceGroupManagersUpdateInstancesRegionalTest):
+
+  def PreSetUp(self):
+    self.api_version = 'beta'
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
 class InstanceGroupManagersUpdateInstancesAlphaZonalTest(
     InstanceGroupManagersUpdateInstancesBetaZonalTest):
 
-  def SetUp(self):
-    SetUpClass(self, 'alpha')
+  def PreSetUp(self):
+    self.api_version = 'alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
-    self.igms = test_resources.MakeInstanceGroupManagersWithVersions('alpha',
-                                                                     self.ZONE)
+    self.should_list_per_instance_configs = True
+
+  def testRestartIgmWithStatefulPolicy(self):
+    igm = test_resources.MakeStatefulInstanceGroupManager(
+        self.api_version, self.ZONE)
+    self.make_requests.side_effect = iter([[igm], [], []])
+    self.Run('compute instance-groups managed rolling-action restart {0} '
+             '--zone {1} --max-unavailable 1'
+             .format(igm.name, self.ZONE))
+
+    get_request = self.generateGetRequestStub(igm.name)
+    update_request = self.generateUpdateRequestStub(igm.name)
+    (update_request.instanceGroupManagerResource.updatePolicy.maxUnavailable
+    ) = self.FixedOrPercent(fixed=1)
+    (update_request.instanceGroupManagerResource.updatePolicy.maxSurge
+    ) = self.FixedOrPercent(fixed=0)
+    (update_request.instanceGroupManagerResource.updatePolicy.minimalAction
+    ) = self.MinimalActionValueValuesEnum.RESTART
+    (update_request.instanceGroupManagerResource.versions[0].instanceTemplate
+    ) = self.TEMPLATE_A_NAME
+    (update_request.instanceGroupManagerResource.versions[0].name
+    ) = '0/' + TIME_NOW_STR
+    self.checkUpdateRequest(get_request, update_request)
+
+  def testRestartIgmWithPerInstanceConfigs(self):
+    pics = self.messages.InstanceGroupManagersListPerInstanceConfigsResp(
+        items=[self.messages.PerInstanceConfig(instance='instance123')])
+    self.make_requests.side_effect = iter([[self.igms[0]], [pics], []])
+    self.Run('compute instance-groups managed rolling-action restart {0} '
+             '--zone {1} --max-unavailable 1'
+             .format(self.IGM_NAME_A, self.ZONE))
+
+    get_request = self.generateGetRequestStub(self.IGM_NAME_A)
+    update_request = self.generateUpdateRequestStub(self.IGM_NAME_A)
+    (update_request.instanceGroupManagerResource.updatePolicy.maxUnavailable
+    ) = self.FixedOrPercent(fixed=1)
+    (update_request.instanceGroupManagerResource.updatePolicy.maxSurge
+    ) = self.FixedOrPercent(fixed=0)
+    (update_request.instanceGroupManagerResource.updatePolicy.minimalAction
+    ) = self.MinimalActionValueValuesEnum.RESTART
+    (update_request.instanceGroupManagerResource.versions[0].instanceTemplate
+    ) = self.TEMPLATE_A_NAME
+    (update_request.instanceGroupManagerResource.versions[0].name
+    ) = '0/' + TIME_NOW_STR
+    self.checkUpdateRequest(get_request, update_request)
 
 
 class InstanceGroupManagersUpdateInstancesAlphaRegionalTest(
     InstanceGroupManagersUpdateInstancesBetaRegionalTest):
 
-  def SetUp(self):
-    SetUpClass(self, 'alpha')
+  def PreSetUp(self):
+    self.api_version = 'alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
-    self.igms = test_resources.MakeInstanceGroupManagersWithVersions(
-        'alpha', self.REGION, 'region')
+    self.should_list_per_instance_configs = True
 
 if __name__ == '__main__':
   test_case.main()

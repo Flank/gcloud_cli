@@ -3,16 +3,25 @@ NAME
         Engine managed instance groups
 
 SYNOPSIS
-    gcloud compute instance-groups managed COMMAND [GCLOUD_WIDE_FLAG ...]
+    gcloud compute instance-groups managed GROUP | COMMAND
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Read and manipulate Google Compute Engine managed instance groups.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
+
+GROUPS
+    GROUP is one of the following:
+
+     rolling-action
+        Manipulate rolling actions on Google Compute Engine managed instance
+        groups.
 
 COMMANDS
     COMMAND is one of the following:
@@ -61,6 +70,9 @@ COMMANDS
 
      stop-autoscaling
         Stop autoscaling a managed instance group.
+
+     update
+        Update Google Compute Engine managed instance groups.
 
      wait-until-stable
         Waits until state of managed instance group is stable.

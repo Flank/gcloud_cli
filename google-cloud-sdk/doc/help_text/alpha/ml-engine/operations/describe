@@ -1,20 +1,21 @@
 NAME
-    gcloud alpha ml-engine operations describe - describe a Cloud ML Engine
+    gcloud alpha ml-engine operations describe - describe an AI Platform
         operation
 
 SYNOPSIS
     gcloud alpha ml-engine operations describe OPERATION [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Describe a Cloud ML Engine operation.
+    (ALPHA) Describe an AI Platform operation.
 
 POSITIONAL ARGUMENTS
      OPERATION
         Name of the operation.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

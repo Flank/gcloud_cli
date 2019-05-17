@@ -1,11 +1,33 @@
 title: ml-engine models remove-iam-policy-binding-condition scenario test
 release_tracks: [ALPHA]
-
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: ml-engine models remove-iam-policy-binding my_model --member=user:owner@gmail.com
+      --role=roles/non-primitive --condition='expression=expr,title=title,description=descr'
+  - stderr: |
+      WARNING: The `gcloud ml-engine` commands have been renamed and will soon be removed. Please use `gcloud ai-platform` instead.
+  - stderr: |
+      Updated IAM policy for model [my_model].
+  - stdout: |
+      bindings:
+      - condition:
+          description: descr
+          expression: expr
+          title: title
+        members:
+        - user:newowner@gmail.com
+        role: roles/non-primitive
+      etag: etag
+      version: 1
 actions:
 # remove binding with condition to a policy with condition
 - execute_command:
-    command: ml-engine models remove-iam-policy-binding my_model --member=user:owner@gmail.com --role=roles/non-primitive --condition='expression=expr,title=title,description=descr'
+    command: ml-engine models remove-iam-policy-binding my_model --member=user:owner@gmail.com
+      --role=roles/non-primitive --condition='expression=expr,title=title,description=descr'
     events:
+    - expect_stderr: |
+        WARNING: The `gcloud ml-engine` commands have been renamed and will soon be removed. Please use `gcloud ai-platform` instead.
     - api_call:
         expect_request:
           uri: https://ml.googleapis.com/v1/projects/fake-project/models/my_model:getIamPolicy?alt=json
@@ -41,13 +63,13 @@ actions:
             json:
               policy:
                 bindings:
-                - role: 'roles/non-primitive'
+                - role: roles/non-primitive
                   members: ['user:newowner@gmail.com']
                   condition:
-                    expression: 'expr'
-                    title: 'title'
-                    description: 'descr'
-                etag: 'etag'
+                    expression: expr
+                    title: title
+                    description: descr
+                etag: etag
                 version: 1
         return_response:
           headers:

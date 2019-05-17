@@ -58,10 +58,11 @@ operation to complete.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -78,6 +79,13 @@ To run the same command asynchronously (non\-blocking), run:
 
 .RS 2m
 $ gcloud alpha services enable my\-consumed\-service \-\-async
+.RE
+
+To enable services called \f5service1\fR, \f5service2\fR, and \f5service3\fR on
+the current project, run:
+
+.RS 2m
+$ gcloud alpha services enable service1 service2 service3
 .RE
 
 

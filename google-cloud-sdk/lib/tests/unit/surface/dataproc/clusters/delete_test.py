@@ -20,7 +20,6 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.dataproc import exceptions
-from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core.console import console_io
 from tests.lib import sdk_test_base
 from tests.lib.surface.dataproc import base
@@ -130,7 +129,11 @@ class ClustersDeleteUnitTestBeta(ClustersDeleteUnitTest,
 
   def testBeta(self):
     self.assertEqual(self.messages, self._beta_messages)
-    self.assertEqual(self.track, calliope_base.ReleaseTrack.BETA)
+
+
+class ClustersDeleteUnitTestAlpha(ClustersDeleteUnitTestBeta,
+                                  base.DataprocTestBaseAlpha):
+  pass
 
 
 if __name__ == '__main__':

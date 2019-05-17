@@ -9,8 +9,9 @@ DESCRIPTION
     (ALPHA) Create and manage Google Binary Authorization attestations.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -22,6 +23,10 @@ COMMANDS
 
      list
         (ALPHA) List Binary Authorization attestations.
+
+     sign-and-create
+        (ALPHA) Sign and create a Binary Authorization Attestation using a
+        Cloud KMS key.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

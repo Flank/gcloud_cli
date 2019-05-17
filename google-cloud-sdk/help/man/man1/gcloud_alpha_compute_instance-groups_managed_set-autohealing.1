@@ -17,9 +17,14 @@ gcloud alpha compute instance\-groups managed set\-autohealing \- set autohealin
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR \fBgcloud alpha compute instance\-groups managed
-set\-autohealing\fR updates the autohealing policy for an existing managed
-instance group.
+\fB(ALPHA)\fR \fB(DEPRECATED)\fR Set autohealing policy for managed instance
+group.
+
+This command is deprecated and will not be promoted to GA. Please use \f5gcloud
+beta instance\-groups managed update\fR instead.
+
+\fBgcloud alpha compute instance\-groups managed set\-autohealing\fR updates the
+autohealing policy for an existing managed instance group.
 
 If health check is specified, the resulting autohealing policy will be triggered
 by the health\-check signal i.e. the autohealing action (RECREATE) on an
@@ -46,7 +51,7 @@ Name of the managed instance group to operate on.
 .RS 2m
 .TP 2m
 \fB\-\-initial\-delay\fR=\fIINITIAL_DELAY\fR
-Specifies the length of the period during which the instance is known to be
+Specifies the length of time during which the instance is known to be
 initializing and should not be autohealed even if unhealthy. This value cannot
 be greater than 1 hour. See $ gcloud topic datetimes for information on duration
 formats.
@@ -62,15 +67,15 @@ Name of the health check to operate on.
 
 .TP 2m
 \fB\-\-http\-health\-check\fR=\fIHTTP_HEALTH_CHECK\fR
-(DEPRECATED) Specifies the HTTP health check object used for autohealing
-instances in this group.
+(DEPRECATED) HTTP health check object used for autohealing instances in this
+group.
 
 HttpHealthCheck is deprecated. Use \-\-health\-check instead.
 
 .TP 2m
 \fB\-\-https\-health\-check\fR=\fIHTTPS_HEALTH_CHECK\fR
-(DEPRECATED) Specifies the HTTPS health check object used for autohealing
-instances in this group.
+(DEPRECATED) HTTPS health check object used for autohealing instances in this
+group.
 
 HttpsHealthCheck is deprecated. Use \-\-health\-check instead.
 
@@ -116,10 +121,11 @@ invocation.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

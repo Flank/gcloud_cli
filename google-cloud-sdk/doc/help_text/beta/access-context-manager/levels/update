@@ -1,6 +1,5 @@
 NAME
-    gcloud beta access-context-manager levels update - update an existing
-        access level
+    gcloud beta access-context-manager levels update -
 
 SYNOPSIS
     gcloud beta access-context-manager levels update (LEVEL : --policy=POLICY)
@@ -9,7 +8,7 @@ SYNOPSIS
         [--title=TITLE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Update an existing access level.
+    (BETA)
 
 POSITIONAL ARGUMENTS
      Level resource - The access level to update. The arguments in this group
@@ -49,11 +48,16 @@ FLAGS
         Short human-readable title of the access level.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud access-context-manager levels update
+        $ gcloud alpha access-context-manager levels update
 

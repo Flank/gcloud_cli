@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2019 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,141 +18,187 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import copy
-
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from tests.lib import test_case
-from tests.lib.surface.compute import vpn_tunnels_labels_test_base
+from tests.lib.surface.compute import vpn_tunnels_test_base
 
 
-class UpdateLabelsTestBeta(
-    vpn_tunnels_labels_test_base.VpnTunnelsLabelsTestBase):
+class ClassicVpnTunnelsUpdateLabelsBetaTest(
+    vpn_tunnels_test_base.VpnTunnelsTestBase):
 
-  def SetUp(self):
-    super(vpn_tunnels_labels_test_base.VpnTunnelsLabelsTestBase, self).SetUp()
-    self.vpn_tunnel_ref = self._GetVpnTunnelRef('gw-1', region='us-central1')
+  _TARGET_VPN_GATEWAY_NAME = 'my-target-vpn-gateway'
+  _IKE_VERSION = 2
+  _PEER_IP_ADDRESS = '71.72.73.74'
+  _SHARED_SECRET = 'shared-secret'
+  _VPN_TUNNEL_NAME = 'my-vpn-tunnel'
+  _FINGERPRINT_1 = b'fingerprint-9876'
+  _FINGERPRINT_2 = b'fingerprint-9875'
 
-  def testUpdateMissingNameOrLabels(self):
-    with self.assertRaisesRegex(exceptions.RequiredArgumentException,
-                                'At least one of --update-labels or '
-                                '--remove-labels must be specified.'):
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def _MakeVpnTunnel(self, vpn_tunnel_ref, fingerprint, labels=None):
+    vpn_tunnel = self.messages.VpnTunnel(
+        name=vpn_tunnel_ref.Name(),
+        ikeVersion=self._IKE_VERSION,
+        peerIp=self._PEER_IP_ADDRESS,
+        sharedSecret=self._SHARED_SECRET,
+        targetVpnGateway=self.GetTargetVpnGatewayRef(
+            self._TARGET_VPN_GATEWAY_NAME).SelfLink(),
+        labelFingerprint=fingerprint)
+    if labels:
+      vpn_tunnel.labels = self.MakeLabelsMessage(
+          self.messages.VpnTunnel.LabelsValue, labels)
+    return vpn_tunnel
+
+  def _ExpectSetLabels(self, vpn_tunnel_ref, existing_labels,
+                       labels_after_update):
+    existing_vpn_tunnel = self._MakeVpnTunnel(
+        vpn_tunnel_ref, self._FINGERPRINT_1, existing_labels)
+    updated_vpn_tunnel = self._MakeVpnTunnel(
+        vpn_tunnel_ref, self._FINGERPRINT_2, labels_after_update)
+    operation_ref = self.GetOperationRef('operation-1')
+    operation = self.MakeOperationMessage(
+        operation_ref, resource_ref=vpn_tunnel_ref)
+
+    self.ExpectGetRequest(vpn_tunnel_ref, existing_vpn_tunnel)
+    self.ExpectSetLabelsRequest(vpn_tunnel_ref, labels_after_update,
+                                self._FINGERPRINT_1, operation)
+    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectGetRequest(vpn_tunnel_ref, updated_vpn_tunnel)
+    return updated_vpn_tunnel
+
+  def _ExpectNoSetLabels(self, vpn_tunnel_ref, existing_labels):
+    existing_vpn_tunnel = self._MakeVpnTunnel(
+        vpn_tunnel_ref, self._FINGERPRINT_1, existing_labels)
+    self.ExpectGetRequest(vpn_tunnel_ref, existing_vpn_tunnel)
+    return existing_vpn_tunnel
+
+  def testWithoutFlags(self):
+    vpn_tunnel_ref = self.GetVpnTunnelRef(self._VPN_TUNNEL_NAME)
+    with self.assertRaisesRegex(
+        exceptions.RequiredArgumentException,
+        'At least one of --update-labels or '
+        '--remove-labels must be specified.'):
       self.Run('compute vpn-tunnels update {0} --region {1}'.format(
-          self.vpn_tunnel_ref.Name(), self.vpn_tunnel_ref.region))
+          vpn_tunnel_ref.Name(), vpn_tunnel_ref.region))
 
   def testUpdateAndRemoveLabels(self):
-    vpn_tunnel_labels = (('key1', 'value1'), ('key2', 'value2'), ('key3',
-                                                                  'value3'))
-    update_labels = (('key2', 'update2'), ('key4', 'value4'))
-    edited_labels = (('key2', 'update2'), ('key3', 'value3'), ('key4',
-                                                               'value4'))
+    existing_labels = (('key1', 'value1'), ('key2', 'value2'), ('key3',
+                                                                'value3'))
+    labels_to_remove = ('key1', 'key0')
+    labels_to_update = (('key2', 'update2'), ('key4', 'value4'))
+    labels_after_update = (('key2', 'update2'), ('key3', 'value3'), ('key4',
+                                                                     'value4'))
+    vpn_tunnel_ref = self.GetVpnTunnelRef(self._VPN_TUNNEL_NAME)
+    expected_updated_vpn_tunnel = self._ExpectSetLabels(
+        vpn_tunnel_ref, existing_labels, labels_after_update)
 
-    vpn_tunnel = self._MakeVpnTunnelProto(
-        labels=vpn_tunnel_labels, fingerprint=b'fingerprint-42')
-    updated_vpn_tunnel = self._MakeVpnTunnelProto(labels=edited_labels)
+    labels_to_update_cmd = ','.join(
+        '{0}={1}'.format(pair[0], pair[1]) for pair in labels_to_update)
+    labels_to_remove_cmd = ','.join(labels_to_remove)
+    response = self.Run('compute vpn-tunnels update {} '
+                        '--region {} '
+                        '--update-labels {} '
+                        '--remove-labels {}'.format(
+                            vpn_tunnel_ref.Name(), vpn_tunnel_ref.region,
+                            labels_to_update_cmd, labels_to_remove_cmd))
+    self.assertEqual(response, expected_updated_vpn_tunnel)
 
-    operation_ref = self._GetOperationRef('operation-1', 'us-central1')
-    operation = self._MakeOperationMessage(operation_ref, self.vpn_tunnel_ref)
+  def testClearLabels(self):
+    existing_labels = (('key1', 'value1'), ('key2', 'value2'), ('key3',
+                                                                'value3'))
+    labels_after_update = ()
 
-    self._ExpectGetRequest(self.vpn_tunnel_ref, vpn_tunnel)
-    self._ExpectLabelsSetRequest(self.vpn_tunnel_ref, edited_labels,
-                                 b'fingerprint-42', operation)
-    self._ExpectOperationGetRequest(operation_ref, operation)
-    self._ExpectGetRequest(self.vpn_tunnel_ref, updated_vpn_tunnel)
+    vpn_tunnel_ref = self.GetVpnTunnelRef(self._VPN_TUNNEL_NAME)
+    expected_updated_vpn_tunnel = self._ExpectSetLabels(
+        vpn_tunnel_ref, existing_labels, labels_after_update)
 
-    response = self.Run(
-        'compute vpn-tunnels update {0} --update-labels {1} '
-        '--remove-labels key1,key0'.format(
-            self.vpn_tunnel_ref.SelfLink(), ','.join(
-                '{0}={1}'.format(pair[0], pair[1]) for pair in update_labels)))
-    self.assertEqual(response, updated_vpn_tunnel)
+    response = self.Run('compute vpn-tunnels update {} '
+                        '--region {} '
+                        '--clear-labels'.format(vpn_tunnel_ref.Name(),
+                                                vpn_tunnel_ref.region))
+    self.assertEqual(response, expected_updated_vpn_tunnel)
 
-  def testUpdateClearLabels(self):
-    vpn_tunnel_labels = (('key1', 'value1'), ('key2', 'value2'), ('key3',
-                                                                  'value3'))
-    edited_labels = ()
+  def testUpdateWithNoExistingLabels(self):
+    existing_labels = ()
+    labels_to_update = (('key2', 'update2'), ('key4', 'value4'))
+    labels_after_update = labels_to_update
 
-    vpn_tunnel = self._MakeVpnTunnelProto(
-        labels=vpn_tunnel_labels, fingerprint=b'fingerprint-42')
-    updated_vpn_tunnel = self._MakeVpnTunnelProto(labels=edited_labels)
+    vpn_tunnel_ref = self.GetVpnTunnelRef(self._VPN_TUNNEL_NAME)
+    expected_updated_vpn_tunnel = self._ExpectSetLabels(
+        vpn_tunnel_ref, existing_labels, labels_after_update)
 
-    operation_ref = self._GetOperationRef('operation-1', 'us-central1')
-    operation = self._MakeOperationMessage(operation_ref, self.vpn_tunnel_ref)
+    labels_to_update_cmd = ','.join(
+        '{0}={1}'.format(pair[0], pair[1]) for pair in labels_to_update)
+    response = self.Run('compute vpn-tunnels update {} '
+                        '--region {} '
+                        '--update-labels {}'.format(vpn_tunnel_ref.Name(),
+                                                    vpn_tunnel_ref.region,
+                                                    labels_to_update_cmd))
+    self.assertEqual(response, expected_updated_vpn_tunnel)
 
-    self._ExpectGetRequest(self.vpn_tunnel_ref, vpn_tunnel)
-    self._ExpectLabelsSetRequest(self.vpn_tunnel_ref, edited_labels,
-                                 b'fingerprint-42', operation)
-    self._ExpectOperationGetRequest(operation_ref, operation)
-    self._ExpectGetRequest(self.vpn_tunnel_ref, updated_vpn_tunnel)
+  def testRemoveNonExistingLabels(self):
+    existing_labels = (('key1', 'value1'), ('key2', 'value2'))
 
-    response = self.Run('compute vpn-tunnels update {0} --clear-labels'.format(
-        self.vpn_tunnel_ref.SelfLink()))
-    self.assertEqual(response, updated_vpn_tunnel)
+    vpn_tunnel_ref = self.GetVpnTunnelRef(self._VPN_TUNNEL_NAME)
+    existing_vpn_tunnel = self._ExpectNoSetLabels(vpn_tunnel_ref,
+                                                  existing_labels)
 
-  def testUpdateWithNoLabels(self):
-    update_labels = (('key2', 'update2'), ('key4', 'value4'))
-
-    vpn_tunnel = self._MakeVpnTunnelProto(
-        labels=(), fingerprint=b'fingerprint-42')
-    updated_vpn_tunnel = self._MakeVpnTunnelProto(labels=update_labels)
-    operation_ref = self._GetOperationRef('operation-1', 'us-central1')
-    operation = self._MakeOperationMessage(operation_ref, self.vpn_tunnel_ref)
-
-    self._ExpectGetRequest(self.vpn_tunnel_ref, vpn_tunnel)
-    self._ExpectLabelsSetRequest(self.vpn_tunnel_ref, update_labels,
-                                 b'fingerprint-42', operation)
-    self._ExpectOperationGetRequest(operation_ref, operation)
-    self._ExpectGetRequest(self.vpn_tunnel_ref, updated_vpn_tunnel)
-
-    response = self.Run(
-        'compute vpn-tunnels update {0} --update-labels {1} '.format(
-            self.vpn_tunnel_ref.SelfLink(), ','.join(
-                '{0}={1}'.format(pair[0], pair[1]) for pair in update_labels)))
-    self.assertEqual(response, updated_vpn_tunnel)
-
-  def testRemoveWithNoLabelsOnVpnTunnel(self):
-    vpn_tunnel = self._MakeVpnTunnelProto(
-        labels={}, fingerprint=b'fingerprint-42')
-
-    self._ExpectGetRequest(self.vpn_tunnel_ref, vpn_tunnel)
-
-    response = self.Run(
-        'compute vpn-tunnels update {0} --remove-labels DoesNotExist'.format(
-            self.vpn_tunnel_ref.SelfLink()))
-    self.assertEqual(response, vpn_tunnel)
+    response = self.Run('compute vpn-tunnels update {} '
+                        '--region {} '
+                        '--remove-labels DoesNotExist'.format(
+                            vpn_tunnel_ref.Name(), vpn_tunnel_ref.region))
+    self.assertEqual(response, existing_vpn_tunnel)
 
   def testNoNetUpdate(self):
-    vpn_tunnel_labels = (('key1', 'value1'), ('key2', 'value2'), ('key3',
-                                                                  'value3'))
-    update_labels = copy.deepcopy(vpn_tunnel_labels)
+    existing_labels = (('key1', 'value1'), ('key2', 'value2'), ('key3',
+                                                                'value3'))
+    labels_to_remove = ('key4')
+    labels_to_update = existing_labels
+    vpn_tunnel_ref = self.GetVpnTunnelRef(self._VPN_TUNNEL_NAME)
+    existing_vpn_tunnel = self._ExpectNoSetLabels(vpn_tunnel_ref,
+                                                  existing_labels)
 
-    vpn_tunnel = self._MakeVpnTunnelProto(
-        labels=vpn_tunnel_labels, fingerprint=b'fingerprint-42')
+    labels_to_update_cmd = ','.join(
+        '{0}={1}'.format(pair[0], pair[1]) for pair in labels_to_update)
+    labels_to_remove_cmd = ','.join(labels_to_remove)
+    response = self.Run('compute vpn-tunnels update {} '
+                        '--region {} '
+                        '--update-labels {} '
+                        '--remove-labels {}'.format(
+                            vpn_tunnel_ref.Name(), vpn_tunnel_ref.region,
+                            labels_to_update_cmd, labels_to_remove_cmd))
+    self.assertEqual(response, existing_vpn_tunnel)
 
-    self._ExpectGetRequest(self.vpn_tunnel_ref, vpn_tunnel)
 
-    response = self.Run(
-        'compute vpn-tunnels update {0} --update-labels {1} '
-        '--remove-labels key4'.format(self.vpn_tunnel_ref.SelfLink(), ','.join(
-            '{0}={1}'.format(pair[0], pair[1]) for pair in update_labels)))
-    self.assertEqual(response, vpn_tunnel)
+class ClassicVpnTunnelsUpdateLabelsAlphaTest(
+    ClassicVpnTunnelsUpdateLabelsBetaTest):
 
-  def testScopePrompt(self):
-    vpn_tunnel = self._MakeVpnTunnelProto(labels=[])
-    self._ExpectGetRequest(self.vpn_tunnel_ref, vpn_tunnel)
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
-    self.StartPatch(
-        'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
-    self.StartPatch(
-        'googlecloudsdk.api_lib.compute.regions.service.List',
-        return_value=[
-            self.messages.Region(name='us-central1'),
-            self.messages.Region(name='us-central2')
-        ],
-    )
-    self.WriteInput('1\n')
-    self.Run('compute vpn-tunnels update gw-1 --remove-labels key0')
-    self.AssertErrContains('PROMPT_CHOICE')
-    self.AssertErrContains('"choices": ["us-central1", "us-central2"]')
+
+class HighAvailabilityVpnTunnelsUpdateLabelsAlphaTest(
+    ClassicVpnTunnelsUpdateLabelsAlphaTest):
+
+  _VPN_GATEWAY_NAME = 'my-vpn-gateway'
+  _VPN_INTERFACE = 1
+
+  def _MakeVpnTunnel(self, vpn_tunnel_ref, fingerprint, labels=None):
+    vpn_tunnel = self.messages.VpnTunnel(
+        name=vpn_tunnel_ref.Name(),
+        ikeVersion=self._IKE_VERSION,
+        peerIp=self._PEER_IP_ADDRESS,
+        sharedSecret=self._SHARED_SECRET,
+        vpnGateway=self.GetVpnGatewayRef(self._VPN_GATEWAY_NAME).SelfLink(),
+        vpnGatewayInterface=self._VPN_INTERFACE,
+        labelFingerprint=fingerprint)
+    if labels:
+      vpn_tunnel.labels = self.MakeLabelsMessage(
+          self.messages.VpnTunnel.LabelsValue, labels)
+    return vpn_tunnel
 
 
 if __name__ == '__main__':

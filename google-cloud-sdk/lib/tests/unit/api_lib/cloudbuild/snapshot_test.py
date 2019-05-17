@@ -154,8 +154,38 @@ class SnapshotTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
         self.assertEqual(tf.getmember('Dockerfile').size, 5)
         tf.close()
 
-  @test_case.Filters.SkipOnWindows('tarfile read frequently fails',
-                                   'b/72631464')
+  @test_case.Filters.DoNotRunOnWindows(
+      'Symlinks don\'t work on Windows without binary extensions to Python.')
+  def testMakeTarball_Symlink(self):
+    """Test basic tarball with file resolved from symlink."""
+    proj = self.CreateTempDir('project')  # Directory to snapshot.
+    self._writeFile(os.path.join(proj, 'Dockerfile'), 'empty')
+    os.symlink(os.path.join(proj, 'Dockerfile'), os.path.join(proj, 'link'))
+    with files.ChDir(proj):
+      with files.TemporaryDirectory() as tmp:
+        archive_path = os.path.join(tmp, 'file.tgz')
+        tf = snapshot.Snapshot(proj)._MakeTarball(archive_path)
+        self.assertEqual(len(tf.getmembers()), 2)
+        self.assertEqual(tf.getmember('Dockerfile').size, 5)
+        self.assertEqual(tf.getmember('link').size, 0)
+        tf.close()
+
+  @test_case.Filters.DoNotRunOnWindows(
+      'Symlinks don\'t work on Windows without binary extensions to Python.')
+  def testMakeTarball_BrokenSymlink(self):
+    """Test basic tarball excluding a broken symlink."""
+    proj = self.CreateTempDir('project')  # Directory to snapshot.
+    self._writeFile(os.path.join(proj, 'Dockerfile'), 'empty')
+    os.symlink(os.path.join(proj, 'does-not-exist'), os.path.join(proj, 'link'))
+    with files.ChDir(proj):
+      with files.TemporaryDirectory() as tmp:
+        archive_path = os.path.join(tmp, 'file.tgz')
+        tf = snapshot.Snapshot(proj)._MakeTarball(archive_path)
+        self.assertEqual(len(tf.getmembers()), 1)
+        self.assertEqual(tf.getmember('Dockerfile').size, 5)
+        os.remove('link')  # Delete the broken symlink, it breaks test cleanup.
+        tf.close()
+
   def testCopyTarballToGcs(self):
     object_ = resources.REGISTRY.Create(collection='storage.objects',
                                         bucket='bucket', object='object')
@@ -179,8 +209,6 @@ class SnapshotTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
     self.AssertLogContains('Using default gcloudignore file')
     self.AssertLogContains('#!include:.gitignore')
 
-  @test_case.Filters.SkipOnWindows('tarfile read frequently fails',
-                                   'b/72631464')
   def testCopyTarballToGcs_gcloudignore(self):
     object_ = resources.REGISTRY.Create(collection='storage.objects',
                                         bucket='bucket', object='object')
@@ -204,8 +232,6 @@ class SnapshotTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
     self.AssertErrNotContains('Check the gcloud log')
     self.AssertLogContains('Using .gcloudignore file')
 
-  @test_case.Filters.SkipOnWindows('tarfile read frequently fails',
-                                   'b/72631464')
   def testCopyTarballToGcs_NoIgnoredFiles(self):
     object_ = resources.REGISTRY.Create(collection='storage.objects',
                                         bucket='bucket', object='object')

@@ -3,11 +3,12 @@ NAME
 
 SYNOPSIS
     gcloud beta GROUP | COMMAND [--account=ACCOUNT]
-        [--configuration=CONFIGURATION] [--flags-file=YAML_FILE]
-        [--flatten=[KEY,...]] [--format=FORMAT] [--help] [--project=PROJECT_ID]
-        [--quiet, -q] [--verbosity=VERBOSITY; default="warning"]
-        [--version, -v] [-h] [--log-http] [--trace-token=TRACE_TOKEN]
-        [--no-user-output-enabled]
+        [--billing-project=BILLING_PROJECT] [--configuration=CONFIGURATION]
+        [--flags-file=YAML_FILE] [--flatten=[KEY,...]] [--format=FORMAT]
+        [--help] [--project=PROJECT_ID] [--quiet, -q]
+        [--verbosity=VERBOSITY; default="warning"] [--version, -v] [-h]
+        [--impersonate-service-account=SERVICE_ACCOUNT_EMAIL] [--log-http]
+        [--trace-token=TRACE_TOKEN] [--no-user-output-enabled]
 
 DESCRIPTION
     (BETA) Beta versions of gcloud commands.
@@ -16,6 +17,15 @@ GLOBAL FLAGS
      --account=ACCOUNT
         Google Cloud Platform user account to use for invocation. Overrides the
         default core/account property value for this command invocation.
+
+     --billing-project=BILLING_PROJECT
+        The Google Cloud Platform project that will be charged quota for
+        operations performed in gcloud. If you need to operate on one project,
+        but need quota against a different project, you can use this flag to
+        specify the billing project. If both billing/quota_project and
+        --billing-project are specified, --billing-project takes precedence.
+        Run $ gcloud config set --help to see more information about
+        billing/quota_project.
 
      --configuration=CONFIGURATION
         The configuration to use for this command invocation. For more
@@ -80,6 +90,18 @@ GLOBAL FLAGS
         Print a summary help and exit.
 
 OTHER FLAGS
+     --impersonate-service-account=SERVICE_ACCOUNT_EMAIL
+        For this gcloud invocation, all API requests will be made as the given
+        service account instead of the currently selected account. This is done
+        without needing to create, download, and activate a key for the
+        account. In order to perform operations as the service account, your
+        currently selected account must have an IAM role that includes the
+        iam.serviceAccounts.getAccessToken permission for the service account.
+        The roles/iam.serviceAccountTokenCreator role has this permission or
+        you may create a custom role. Overrides the default
+        auth/impersonate_service_account property value for this command
+        invocation.
+
      --log-http
         Log all HTTP server requests and responses to stderr. Overrides the
         default core/log_http property value for this command invocation.
@@ -100,8 +122,14 @@ GROUPS
      access-context-manager
         (BETA) Manage Access Context Manager resources.
 
+     ai-platform
+        (BETA) Manage AI Platform jobs and models.
+
      app
         (BETA) Manage your App Engine deployments.
+
+     asset
+        (BETA) Manage the Cloud Asset Inventory.
 
      auth
         (BETA) Manage oauth2 credentials for the Google Cloud SDK.
@@ -126,6 +154,9 @@ GROUPS
 
      container
         (BETA) Deploy and manage clusters of machines for running containers.
+
+     data-catalog
+        (BETA) Manage Cloud Data Catalog resources.
 
      dataflow
         (BETA) Manage Google Cloud Dataflow jobs.
@@ -185,7 +216,7 @@ GROUPS
         (BETA) Use Google Cloud machine learning capabilities.
 
      ml-engine
-        (BETA) Manage Cloud ML Engine jobs and models.
+        (BETA) Manage AI Platform jobs and models.
 
      organizations
         (BETA) Create and manage Google Cloud Platform Organizations.
@@ -194,13 +225,16 @@ GROUPS
         (BETA) Create and manage project access policies.
 
      pubsub
-        (BETA) Manage Cloud Pub/Sub topics and subscriptions.
+        (BETA) Manage Cloud Pub/Sub topics, subscriptions, and snapshots.
 
      redis
         (BETA) Manage Cloud Memorystore Redis resources.
 
      resource-manager
         (BETA) Manage Cloud Resources.
+
+     run
+        (BETA) Manage your Cloud Run applications.
 
      runtime-config
         (BETA) Manage runtime configuration resources.

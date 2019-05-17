@@ -96,6 +96,38 @@ class SubscriptionsCreateTest(SubscriptionsCreateTestBase):
     self.assertEqual(result[0].name, sub_ref.RelativeName())
     self.assertEqual(result[0].topic, topic_ref.RelativeName())
 
+  def testNoExpirationSubscriptionCreate(self):
+    sub_ref = util.ParseSubscription('subs1', self.Project())
+    topic_ref = util.ParseTopic('topic1', self.Project())
+    req_subscription = self.msgs.Subscription(
+        name=sub_ref.RelativeName(),
+        topic=topic_ref.RelativeName(),
+        expirationPolicy=self.msgs.ExpirationPolicy())
+
+    result = self.ExpectCreatedSubscriptions(
+        ('pubsub subscriptions create subs1 --topic topic1'
+         ' --expiration-period never'), [req_subscription])
+
+    self.assertEqual(result[0].name, sub_ref.RelativeName())
+    self.assertEqual(result[0].topic, topic_ref.RelativeName())
+    self.assertEqual(result[0].expirationPolicy.ttl, None)
+
+  def testExpirationSubscriptionCreate(self):
+    sub_ref = util.ParseSubscription('subs1', self.Project())
+    topic_ref = util.ParseTopic('topic1', self.Project())
+    req_subscription = self.msgs.Subscription(
+        name=sub_ref.RelativeName(),
+        topic=topic_ref.RelativeName(),
+        expirationPolicy=self.msgs.ExpirationPolicy(ttl='604800s'))
+
+    result = self.ExpectCreatedSubscriptions(
+        ('pubsub subscriptions create subs1 --topic topic1'
+         ' --expiration-period 7d'), [req_subscription])
+
+    self.assertEqual(result[0].name, sub_ref.RelativeName())
+    self.assertEqual(result[0].topic, topic_ref.RelativeName())
+    self.assertEqual(result[0].expirationPolicy.ttl, '604800s')
+
   def testSubscriptionProjectFlags(self):
     sub_ref = util.ParseSubscription('subs1', 'proj1')
     topic_ref = util.ParseTopic('topic1', 'proj2')
@@ -296,47 +328,6 @@ class SubscriptionsCreateGATest(SubscriptionsCreateTestBase):
     self.assertEqual(result[0].ackDeadlineSeconds, 180)
     self.assertEqual(result[0].topic, topic_ref.RelativeName())
 
-
-class SubscriptionsCreateBetaTest(SubscriptionsCreateTest):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-
-  def testPullSubscriptionsCreateWithLegacyOutput(self):
-    properties.VALUES.pubsub.legacy_output.Set(True)
-    sub_ref = util.ParseSubscription('subs1', self.Project())
-    topic_ref = util.ParseTopic('topic1', self.Project())
-    req_subscription = self.msgs.Subscription(
-        name=sub_ref.RelativeName(),
-        ackDeadlineSeconds=180,
-        topic=topic_ref.RelativeName())
-
-    result = self.ExpectCreatedSubscriptions(
-        'pubsub subscriptions create subs1 --topic topic1 --ack-deadline=180',
-        [req_subscription])
-
-    self.assertEqual(result[0]['subscriptionId'], sub_ref.RelativeName())
-    self.assertEqual(result[0]['ackDeadlineSeconds'], 180)
-    self.assertEqual(result[0]['topic'], topic_ref.RelativeName())
-
-  def testSubscriptionsCreateLabels(self):
-    sub_ref = util.ParseSubscription('subs1', self.Project())
-    topic_ref = util.ParseTopic('topic1', self.Project())
-    labels = self.msgs.Subscription.LabelsValue(additionalProperties=[
-        self.msgs.Subscription.LabelsValue.AdditionalProperty(
-            key='key1', value='value1')])
-    req_subscription = self.msgs.Subscription(
-        name=sub_ref.RelativeName(),
-        topic=topic_ref.RelativeName(),
-        labels=labels)
-
-    result = self.ExpectCreatedSubscriptions(
-        'pubsub subscriptions create subs1 --topic topic1 --labels key1=value1',
-        [req_subscription])
-
-    self.assertEqual(result[0].name, sub_ref.RelativeName())
-    self.assertEqual(result[0].topic, topic_ref.RelativeName())
-
   def testRetentionPullSubscriptionsCreate(self):
     sub_ref = util.ParseSubscription('subs1', self.Project())
     topic_ref = util.ParseTopic('topic1', self.Project())
@@ -417,45 +408,103 @@ class SubscriptionsCreateBetaTest(SubscriptionsCreateTest):
     self.AssertErrEquals(
         'Created subscription [{}].\n'.format(sub_ref.RelativeName()))
 
-  def testNoExpirationSubscriptionCreate(self):
+
+class SubscriptionsCreateBetaTest(SubscriptionsCreateTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def testPullSubscriptionsCreateWithLegacyOutput(self):
+    properties.VALUES.pubsub.legacy_output.Set(True)
+    sub_ref = util.ParseSubscription('subs1', self.Project())
+    topic_ref = util.ParseTopic('topic1', self.Project())
+    req_subscription = self.msgs.Subscription(
+        name=sub_ref.RelativeName(),
+        ackDeadlineSeconds=180,
+        topic=topic_ref.RelativeName())
+
+    result = self.ExpectCreatedSubscriptions(
+        'pubsub subscriptions create subs1 --topic topic1 --ack-deadline=180',
+        [req_subscription])
+
+    self.assertEqual(result[0]['subscriptionId'], sub_ref.RelativeName())
+    self.assertEqual(result[0]['ackDeadlineSeconds'], 180)
+    self.assertEqual(result[0]['topic'], topic_ref.RelativeName())
+
+  def testSubscriptionsCreateLabels(self):
+    sub_ref = util.ParseSubscription('subs1', self.Project())
+    topic_ref = util.ParseTopic('topic1', self.Project())
+    labels = self.msgs.Subscription.LabelsValue(additionalProperties=[
+        self.msgs.Subscription.LabelsValue.AdditionalProperty(
+            key='key1', value='value1')])
+    req_subscription = self.msgs.Subscription(
+        name=sub_ref.RelativeName(),
+        topic=topic_ref.RelativeName(),
+        labels=labels)
+
+    result = self.ExpectCreatedSubscriptions(
+        'pubsub subscriptions create subs1 --topic topic1 --labels key1=value1',
+        [req_subscription])
+
+    self.assertEqual(result[0].name, sub_ref.RelativeName())
+    self.assertEqual(result[0].topic, topic_ref.RelativeName())
+
+  def testSubscriptionsCreateAuthenticatedPush(self):
     sub_ref = util.ParseSubscription('subs1', self.Project())
     topic_ref = util.ParseTopic('topic1', self.Project())
     req_subscription = self.msgs.Subscription(
         name=sub_ref.RelativeName(),
         topic=topic_ref.RelativeName(),
-        expirationPolicy=self.msgs.ExpirationPolicy())
+        pushConfig=self.msgs.PushConfig(
+            pushEndpoint='https://example.com/push',
+            oidcToken=self.msgs.OidcToken(
+                serviceAccountEmail='account@example.com',
+                audience='my-audience')))
 
     result = self.ExpectCreatedSubscriptions(
-        ('pubsub subscriptions create subs1 --topic topic1'
-         ' --expiration-period never'),
-        [req_subscription])
+        'pubsub subscriptions create subs1 --topic topic1 '
+        '--push-endpoint=https://example.com/push '
+        '--push-auth-service-account=account@example.com '
+        '--push-auth-token-audience=my-audience', [req_subscription])
 
     self.assertEqual(result[0].name, sub_ref.RelativeName())
     self.assertEqual(result[0].topic, topic_ref.RelativeName())
-    self.assertEqual(result[0].expirationPolicy.ttl, None)
+    self.assertEqual(result[0].pushConfig.pushEndpoint,
+                     'https://example.com/push')
+    self.assertEqual(result[0].pushConfig.oidcToken.serviceAccountEmail,
+                     'account@example.com')
+    self.assertEqual(result[0].pushConfig.oidcToken.audience, 'my-audience')
 
-  def testExpirationSubscriptionCreate(self):
+  def testSubscriptionsCreateAuthenticatedPushNoAudience(self):
     sub_ref = util.ParseSubscription('subs1', self.Project())
     topic_ref = util.ParseTopic('topic1', self.Project())
     req_subscription = self.msgs.Subscription(
         name=sub_ref.RelativeName(),
         topic=topic_ref.RelativeName(),
-        expirationPolicy=self.msgs.ExpirationPolicy(ttl='604800s'))
+        pushConfig=self.msgs.PushConfig(
+            pushEndpoint='https://example.com/push',
+            oidcToken=self.msgs.OidcToken(
+                serviceAccountEmail='account@example.com')))
 
     result = self.ExpectCreatedSubscriptions(
-        ('pubsub subscriptions create subs1 --topic topic1'
-         ' --expiration-period 7d'),
-        [req_subscription])
+        'pubsub subscriptions create subs1 --topic topic1 '
+        '--push-endpoint=https://example.com/push '
+        '--push-auth-service-account=account@example.com', [req_subscription])
 
     self.assertEqual(result[0].name, sub_ref.RelativeName())
     self.assertEqual(result[0].topic, topic_ref.RelativeName())
-    self.assertEqual(result[0].expirationPolicy.ttl, '604800s')
+    self.assertEqual(result[0].pushConfig.pushEndpoint,
+                     'https://example.com/push')
+    self.assertEqual(result[0].pushConfig.oidcToken.serviceAccountEmail,
+                     'account@example.com')
+    self.assertEqual(result[0].pushConfig.oidcToken.audience, None)
 
 
 class SubscriptionsCreateAlphaTest(SubscriptionsCreateBetaTest):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
+
 
 if __name__ == '__main__':
   test_case.main()

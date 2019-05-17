@@ -31,8 +31,10 @@ import six
 class CloudFilestoreInstancesUpdateTest(base.CloudFilestoreUnitTestBase,
                                         parameterized.TestCase):
 
+  _TRACK = calliope_base.ReleaseTrack.GA
+
   def SetUp(self):
-    self.SetUpTrack(calliope_base.ReleaseTrack.BETA)
+    self.SetUpTrack(self._TRACK)
     self.name = (
         'projects/{}/locations/us-central1-c/instances/instance_name'.format(
             self.Project()))
@@ -84,14 +86,14 @@ class CloudFilestoreInstancesUpdateTest(base.CloudFilestoreUnitTestBase,
     existing_config = self.MakeConfig(self.name, self.DefaultFileShare())
     self.ExpectInstanceGetRequest(existing_config)
 
-    new_file_shares = self.DefaultFileShare() + [
-        self.messages.FileShareConfig(name='my_vol', capacityGb=2048)]
+    new_file_shares = [self.messages.FileShareConfig(name='my_vol',
+                                                     capacityGb=2048)]
     update_mask = 'fileShares'
     config = self.MakeConfig(self.name, new_file_shares)
     self.ExpectInstancePatchRequest(config, update_mask)
 
     self.RunUpdate(
-        'instance_name', '--location=us-central1-c',
+        'instance_name', '--zone=us-central1-c',
         '--file-share=name=my_vol,capacity=2TB', '--async')
 
   @parameterized.named_parameters(
@@ -105,7 +107,7 @@ class CloudFilestoreInstancesUpdateTest(base.CloudFilestoreUnitTestBase,
                                           name='my_vol',
                                           capacityGb=2048)])
     self.ExpectInstanceGetRequest(existing_config)
-    final_args = ['instance_name', '--location=us-central1-c'] + args
+    final_args = ['instance_name', '--zone=us-central1-c'] + args
     with self.assertRaisesRegex(exceptions.InvalidArgumentException,
                                 expected_regex):
       self.RunUpdate(*final_args)
@@ -124,11 +126,26 @@ class CloudFilestoreInstancesUpdateTest(base.CloudFilestoreUnitTestBase,
     self.ExpectInstancePatchRequest(config, update_mask)
 
     self.RunUpdate(
-        'instance_name', '--location=us-central1-c',
+        'instance_name', '--zone=us-central1-c',
         '--remove-labels', 'key1', '--update-labels', 'key2=value2',
         '--description', 'New description', '--async')
 
   def testClearLabels(self):
+    existing_config = self.MakeConfig(
+        self.name, self.DefaultFileShare(),
+        labels=self.MakeLabels({'key1': 'value1'}))
+    self.ExpectInstanceGetRequest(existing_config)
+
+    config = self.MakeConfig(self.name, self.DefaultFileShare(),
+                             labels=self.messages.Instance.LabelsValue())
+    update_mask = 'labels'
+    self.ExpectInstancePatchRequest(config, update_mask)
+
+    self.RunUpdate(
+        'instance_name', '--zone=us-central1-c',
+        '--clear-labels', '--async')
+
+  def testClearLabelsWithDeprecatedLocation(self):
     existing_config = self.MakeConfig(
         self.name, self.DefaultFileShare(),
         labels=self.MakeLabels({'key1': 'value1'}))
@@ -147,8 +164,8 @@ class CloudFilestoreInstancesUpdateTest(base.CloudFilestoreUnitTestBase,
     existing_config = self.MakeConfig(self.name, self.DefaultFileShare())
     self.ExpectInstanceGetRequest(existing_config)
 
-    new_file_shares = self.DefaultFileShare() + [
-        self.messages.FileShareConfig(name='my_vol', capacityGb=2048)]
+    new_file_shares = [self.messages.FileShareConfig(name='my_vol',
+                                                     capacityGb=2048)]
     update_mask = 'fileShares'
     config = self.MakeConfig(self.name, new_file_shares)
     op_name = 'projects/{}/locations/us-central1-c/operations/op'.format(
@@ -159,15 +176,20 @@ class CloudFilestoreInstancesUpdateTest(base.CloudFilestoreUnitTestBase,
         self.messages.Operation(name=op_name, done=True))
 
     self.RunUpdate(
-        'instance_name', '--location=us-central1-c',
+        'instance_name', '--zone=us-central1-c',
         '--file-share=name=my_vol,capacity=2TB')
 
   def testUsingInvalidCapacity(self):
     # Argparse throws error if the value is below the minimum.
     with self.assertRaisesRegexp(cli_test_base.MockArgumentError, '1TB'):
       self.RunUpdate(
-          'instance_name', '--location=us-central1-c',
+          'instance_name', '--zone=us-central1-c',
           '--file-share=name=my_vol,capacity=100GB')
+
+
+class CloudFilestoreInstancesUpdateBetaTest(CloudFilestoreInstancesUpdateTest):
+
+  _TRACK = calliope_base.ReleaseTrack.BETA
 
 
 if __name__ == '__main__':

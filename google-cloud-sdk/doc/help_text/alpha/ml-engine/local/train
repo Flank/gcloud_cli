@@ -1,5 +1,5 @@
 NAME
-    gcloud alpha ml-engine local train - run a Cloud ML Engine training job
+    gcloud alpha ml-engine local train - run an AI Platform training job
         locally
 
 SYNOPSIS
@@ -11,11 +11,11 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) This command runs the specified module in an environment similar to
-    that of a live Cloud ML Engine Training Job.
+    that of a live AI Platform Training Job.
 
     This is especially useful in the case of testing distributed models, as it
-    allows you to validate that you are properly interacting with the Cloud ML
-    Engine cluster configuration. If your model expects a specific number of
+    allows you to validate that you are properly interacting with the AI
+    Platform cluster configuration. If your model expects a specific number of
     parameter servers or workers (i.e. you expect to use the CUSTOM machine
     type), use the --parameter-server-count and --worker-count flags to further
     specify the desired cluster configuration, just as you would in your cloud
@@ -52,8 +52,8 @@ OPTIONAL FLAGS
         outputs and other data needed for training.
 
         This path will be passed to your TensorFlow program as the --job_dir
-        command-line arg. The benefit of specifying this field is that Cloud ML
-        Engine will validate the path for use in training.
+        command-line arg. The benefit of specifying this field is that AI
+        Platform will validate the path for use in training.
 
      --package-path=PACKAGE_PATH
         Path to a Python package to build. This should point to a directory
@@ -78,8 +78,9 @@ OPTIONAL FLAGS
         specified. Default: 2
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

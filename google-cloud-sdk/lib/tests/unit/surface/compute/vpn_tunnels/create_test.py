@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2019 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,141 +12,156 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 """Tests for the vpn-tunnels create subcommand."""
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import copy
+
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.calliope import exceptions
 from tests.lib import test_case
-from tests.lib.surface.compute import test_base
+from tests.lib.surface.compute import vpn_tunnels_test_base
 
 _LONG_SECRET = ('So long as you are praised think only that you are not '
                 'yet on your own path but on that of another.'
                 '- Friedrich Nietzsche !@#$%^&*()_+=')
 
 
-class VpnTunnelsCreateTest(test_base.BaseTest):
+class ClassicVpnTunnelsCreateGATest(vpn_tunnels_test_base.VpnTunnelsTestBase):
 
-  def SetUp(self):
-    self.SelectApi('v1')
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
-  def testSimpleInvocationMakesRightRequest(self):
-    messages = self.messages
-    self.make_requests.side_effect = [[
-        messages.VpnTunnel(
-            name='my-tunnel',
-            region='my-region',
-            targetVpnGateway='my-gateway',
-            peerIp='1.2.3.4')
-    ]]
+  def testSimpleCase(self):
+    name = 'my-tunnel'
+    description = 'My tunnel description.'
+    ike_version = 2
+    peer_ip_address = '71.72.73.74'
+    shared_secret = 'secret-xyz'
+    target_vpn_gateway = 'my-gateway'
 
-    self.Run("""\
-        compute vpn-tunnels create my-tunnel
-          --region my-region
-          --description "foo bar"
-          --ike-version 2
-          --peer-address 1.2.3.4
-          --shared-secret secret-xyz
-          --target-vpn-gateway my-gateway
-        """)
+    vpn_tunnel_ref = self.GetVpnTunnelRef(name)
+    vpn_tunnel_to_insert = self.messages.VpnTunnel(
+        name=name,
+        description=description,
+        ikeVersion=ike_version,
+        peerIp=peer_ip_address,
+        sharedSecret=shared_secret,
+        targetVpnGateway=self.GetTargetVpnGatewayRef(
+            target_vpn_gateway).SelfLink())
+    created_vpn_tunnel = copy.deepcopy(vpn_tunnel_to_insert)
+    created_vpn_tunnel.selfLink = vpn_tunnel_ref.SelfLink()
 
-    self.CheckRequests(
-        [(self.compute.vpnTunnels,
-          'Insert',
-          messages.ComputeVpnTunnelsInsertRequest(
-              project='my-project',
-              region='my-region',
-              vpnTunnel=messages.VpnTunnel(
-                  name='my-tunnel',
-                  description='foo bar',
-                  ikeVersion=2,
-                  peerIp='1.2.3.4',
-                  sharedSecret='secret-xyz',
-                  targetVpnGateway=(self.compute_uri +
-                                    '/projects/my-project/regions'
-                                    '/my-region/targetVpnGateways/my-gateway')
-                  )))]
-    )
+    operation_ref = self.GetOperationRef('operation-1')
+    operation = self.MakeOperationMessage(
+        operation_ref, resource_ref=vpn_tunnel_ref)
 
-    self.AssertOutputEquals("""\
-      NAME       REGION     GATEWAY     PEER_ADDRESS
-      my-tunnel  my-region  my-gateway  1.2.3.4
-      """, normalize_space=True)
+    self.ExpectInsertRequest(vpn_tunnel_ref, vpn_tunnel_to_insert, operation)
+    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectGetRequest(vpn_tunnel_ref, created_vpn_tunnel)
 
-  def TemplateTestWithDefaultValuesForOptionalArgs(self, cmd,
-                                                   list_regions=False):
-    messages = self.messages
-    self.Run(cmd)
-
-    self.CheckRequests(
-        ([self.regions_list_request] if list_regions else []) +
-        [(self.compute.vpnTunnels,
-          'Insert',
-          messages.ComputeVpnTunnelsInsertRequest(
-              project='my-project',
-              region='my-region',
-              vpnTunnel=messages.VpnTunnel(
-                  name='my-tunnel',
-                  peerIp='1.2.3.4',
-                  sharedSecret='secret-xyz',
-                  targetVpnGateway=(self.compute_uri +
-                                    '/projects/my-project/regions'
-                                    '/my-region/targetVpnGateways/my-gateway')
-                  )))])
+    response = self.Run('compute vpn-tunnels create {} '
+                        '--description "{}" '
+                        '--ike-version {} '
+                        '--peer-address {} '
+                        '--shared-secret {} '
+                        '--target-vpn-gateway {} '
+                        '--region {} '
+                        '--format=disable'.format(
+                            name, description, ike_version, peer_ip_address,
+                            shared_secret, target_vpn_gateway, self.REGION))
+    resources = list(response)
+    self.assertEqual(resources[0], created_vpn_tunnel)
 
   def testFlagsAcceptUris(self):
-    self.TemplateTestWithDefaultValuesForOptionalArgs("""\
-        compute vpn-tunnels create {uri}/projects/my-project/regions/my-region/vpnTunnels/my-tunnel
-          --region {uri}/projects/my-project/regions/my-region
-          --peer-address 1.2.3.4
-          --shared-secret secret-xyz
-          --target-vpn-gateway {uri}/projects/my-project/regions/my-region/targetVpnGateways/my-gateway
-        """.format(uri=self.compute_uri))
+    name = 'my-tunnel'
+    peer_ip_address = '71.72.73.74'
+    shared_secret = 'secret-xyz'
+    target_vpn_gateway = 'my-gateway'
+
+    vpn_tunnel_ref = self.GetVpnTunnelRef(name)
+    vpn_tunnel_to_insert = self.messages.VpnTunnel(
+        name=name,
+        peerIp=peer_ip_address,
+        sharedSecret=shared_secret,
+        targetVpnGateway=self.GetTargetVpnGatewayRef(
+            target_vpn_gateway).SelfLink())
+    created_vpn_tunnel = copy.deepcopy(vpn_tunnel_to_insert)
+    created_vpn_tunnel.selfLink = vpn_tunnel_ref.SelfLink()
+
+    operation_ref = self.GetOperationRef('operation-1')
+    operation = self.MakeOperationMessage(
+        operation_ref, resource_ref=vpn_tunnel_ref)
+
+    self.ExpectInsertRequest(vpn_tunnel_ref, vpn_tunnel_to_insert, operation)
+    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectGetRequest(vpn_tunnel_ref, created_vpn_tunnel)
+
+    response = self.Run(
+        'compute vpn-tunnels create '
+        '{base_uri}/regions/{region}/vpnTunnels/{vpn_tunnel_name} '
+        '--peer-address {peer_address} '
+        '--shared-secret {shared_secret} '
+        '--target-vpn-gateway '
+        '{base_uri}/regions/{region}/targetVpnGateways/{gateway_name} '
+        '--format=disable'.format(
+            vpn_tunnel_name=name,
+            peer_address=peer_ip_address,
+            shared_secret=shared_secret,
+            gateway_name=target_vpn_gateway,
+            base_uri=self.base_uri,
+            region=self.REGION))
+    resources = list(response)
+    self.assertEqual(resources[0], created_vpn_tunnel)
 
   def testInvocationWithoutOptionalArgsOk(self):
-    self.TemplateTestWithDefaultValuesForOptionalArgs("""\
-        compute vpn-tunnels create my-tunnel
-          --region my-region
-          --peer-address 1.2.3.4
-          --shared-secret secret-xyz
-          --target-vpn-gateway my-gateway
-        """)
+    name = 'my-tunnel'
+    peer_ip_address = '71.72.73.74'
+    shared_secret = 'secret-xyz'
+    target_vpn_gateway = 'my-gateway'
 
-  def testInvocationWithoutRegionPrompts(self):
-    self.StartPatch('googlecloudsdk.core.console.console_io.CanPrompt',
-                    return_value=True)
-    messages = self.messages
-    self.WriteInput('2\n')
-    self.make_requests.side_effect = iter([
-        [
-            messages.Region(name='us-central1'),
-            messages.Region(name='my-region'),
-        ],
+    vpn_tunnel_ref = self.GetVpnTunnelRef(name)
+    vpn_tunnel_to_insert = self.messages.VpnTunnel(
+        name=name,
+        peerIp=peer_ip_address,
+        sharedSecret=shared_secret,
+        targetVpnGateway=self.GetTargetVpnGatewayRef(
+            target_vpn_gateway).SelfLink())
+    created_vpn_tunnel = copy.deepcopy(vpn_tunnel_to_insert)
+    created_vpn_tunnel.selfLink = vpn_tunnel_ref.SelfLink()
 
-        [],
-    ])
+    operation_ref = self.GetOperationRef('operation-1')
+    operation = self.MakeOperationMessage(
+        operation_ref, resource_ref=vpn_tunnel_ref)
 
-    self.Run("""\
-        compute vpn-tunnels create my-tunnel
-          --peer-address 1.2.3.4
-          --shared-secret secret-xyz
-          --target-vpn-gateway my-gateway
-        """)
+    self.ExpectInsertRequest(vpn_tunnel_ref, vpn_tunnel_to_insert, operation)
+    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectGetRequest(vpn_tunnel_ref, created_vpn_tunnel)
+
+    response = self.Run(
+        'compute vpn-tunnels create {} '
+        '--peer-address {} '
+        '--shared-secret {} '
+        '--target-vpn-gateway {} '
+        '--region {} '
+        '--format=disable'.format(name, peer_ip_address, shared_secret,
+                                  target_vpn_gateway, self.REGION))
+    resources = list(response)
+    self.assertEqual(resources[0], created_vpn_tunnel)
 
   def testInvocationWithoutPeerAddressFails(self):
     with self.AssertRaisesArgumentErrorMatches(
         'argument --peer-address: Must be specified.'):
       self.Run("""\
           compute vpn-tunnels create my-tunnel
-            --region my-region
             --shared-secret secret-xyz
             --target-vpn-gateway my-gateway
+            --region my-region
+            --router my-router
           """)
-
-    self.CheckRequests()
 
   def testInvocationWithoutSharedSecretFails(self):
     with self.AssertRaisesArgumentErrorMatches(
@@ -154,109 +169,466 @@ class VpnTunnelsCreateTest(test_base.BaseTest):
       self.Run("""\
           compute vpn-tunnels create my-tunnel
             --region my-region
-            --peer-address 1.2.3.4
+            --peer-address 71.72.73.74
             --target-vpn-gateway my-gateway
           """)
 
-    self.CheckRequests()
-
   def testInvocationWithBadSharedSecretFails(self):
-    with self.AssertRaisesArgumentError():
+    with self.AssertRaisesArgumentErrorMatches(
+        'The argument to --shared-secret is not valid it contains '
+        'non-printable charcters.'):
       self.Run("""\
           compute vpn-tunnels create my-tunnel
             --region my-region
-            --peer-address 1.2.3.4
+            --peer-address 71.72.73.74
             --target-vpn-gateway my-gateway
             --shared-secret '\n'
           """)
 
-    self.CheckRequests()
-    self.AssertErrContains(
-        'The argument to --shared-secret is not valid it contains '
-        'non-printable charcters.')
-
-  def testInvocationWithoutTargetVpnGatewayFails(self):
+  def testInvocationWithoutAnyVpnGatewayTypeFails(self):
     with self.AssertRaisesArgumentErrorMatches(
         'argument --target-vpn-gateway: Must be specified.'):
       self.Run("""\
           compute vpn-tunnels create my-tunnel
             --region my-region
-            --peer-address 1.2.3.4
+            --peer-address 71.72.73.74
             --shared-secret secret-xyz
           """)
 
-    self.CheckRequests()
-
   def testRemoteTrafficSelector(self):
-    messages = self.messages
-    self.Run("""\
-        compute vpn-tunnels create my-tunnel
-          --region my-region
-          --description "foo bar"
-          --ike-version 2
-          --remote-traffic-selector 192.168.100.14/24,10.0.0.0/8
-          --peer-address 1.2.3.4
-          --shared-secret secret-xyz
-          --target-vpn-gateway my-gateway
-        """)
+    name = 'my-tunnel'
+    ike_version = 2
+    peer_ip_address = '71.72.73.74'
+    shared_secret = 'secret-xyz'
+    target_vpn_gateway = 'my-gateway'
+    remote_traffic_selector = ['192.168.100.14/24', '10.0.0.0/8']
 
-    self.CheckRequests(
-        [(self.compute.vpnTunnels,
-          'Insert',
-          messages.ComputeVpnTunnelsInsertRequest(
-              project='my-project',
-              region='my-region',
-              vpnTunnel=messages.VpnTunnel(
-                  name='my-tunnel',
-                  description='foo bar',
-                  ikeVersion=2,
-                  remoteTrafficSelector=['192.168.100.14/24', '10.0.0.0/8'],
-                  peerIp='1.2.3.4',
-                  sharedSecret='secret-xyz',
-                  targetVpnGateway=(self.compute_uri +
-                                    '/projects/my-project/regions'
-                                    '/my-region/targetVpnGateways/my-gateway')
-                  )))]
-    )
+    vpn_tunnel_ref = self.GetVpnTunnelRef(name)
+    vpn_tunnel_to_insert = self.messages.VpnTunnel(
+        name=name,
+        ikeVersion=ike_version,
+        peerIp=peer_ip_address,
+        sharedSecret=shared_secret,
+        remoteTrafficSelector=remote_traffic_selector,
+        targetVpnGateway=self.GetTargetVpnGatewayRef(
+            target_vpn_gateway).SelfLink())
+    created_vpn_tunnel = copy.deepcopy(vpn_tunnel_to_insert)
+    created_vpn_tunnel.selfLink = vpn_tunnel_ref.SelfLink()
 
+    operation_ref = self.GetOperationRef('operation-1')
+    operation = self.MakeOperationMessage(
+        operation_ref, resource_ref=vpn_tunnel_ref)
 
-class VpnTunnelsCreateTestBeta(VpnTunnelsCreateTest):
+    self.ExpectInsertRequest(vpn_tunnel_ref, vpn_tunnel_to_insert, operation)
+    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectGetRequest(vpn_tunnel_ref, created_vpn_tunnel)
 
-  def SetUp(self):
-    self.SelectApi('beta')
-    self.track = calliope_base.ReleaseTrack.BETA
+    response = self.Run('compute vpn-tunnels create {} '
+                        '--ike-version {} '
+                        '--peer-address {} '
+                        '--shared-secret {} '
+                        '--remote-traffic-selector {} '
+                        '--target-vpn-gateway {} '
+                        '--region {} '
+                        '--format=disable'.format(
+                            name, ike_version, peer_ip_address, shared_secret,
+                            ','.join(remote_traffic_selector),
+                            target_vpn_gateway, self.REGION))
+    resources = list(response)
+    self.assertEqual(resources[0], created_vpn_tunnel)
 
   def testLocalTrafficSelector(self):
-    messages = self.messages
-    self.Run("""\
-        compute vpn-tunnels create my-tunnel
-          --region my-region
-          --description "foo bar"
-          --ike-version 2
-          --local-traffic-selector 192.168.100.14/24,10.0.0.0/8
-          --peer-address 1.2.3.4
-          --shared-secret secret-xyz
-          --target-vpn-gateway my-gateway
-        """)
+    name = 'my-tunnel'
+    ike_version = 2
+    peer_ip_address = '71.72.73.74'
+    shared_secret = 'secret-xyz'
+    target_vpn_gateway = 'my-gateway'
+    local_traffic_selector = ['192.168.100.14/24', '10.0.0.0/8']
 
-    self.CheckRequests(
-        [(self.compute.vpnTunnels,
-          'Insert',
-          messages.ComputeVpnTunnelsInsertRequest(
-              project='my-project',
-              region='my-region',
-              vpnTunnel=messages.VpnTunnel(
-                  name='my-tunnel',
-                  description='foo bar',
-                  ikeVersion=2,
-                  localTrafficSelector=['192.168.100.14/24', '10.0.0.0/8'],
-                  peerIp='1.2.3.4',
-                  sharedSecret='secret-xyz',
-                  targetVpnGateway=(self.compute_uri +
-                                    '/projects/my-project/regions'
-                                    '/my-region/targetVpnGateways/my-gateway')
-                  )))]
-    )
+    vpn_tunnel_ref = self.GetVpnTunnelRef(name)
+    vpn_tunnel_to_insert = self.messages.VpnTunnel(
+        name=name,
+        ikeVersion=ike_version,
+        peerIp=peer_ip_address,
+        sharedSecret=shared_secret,
+        localTrafficSelector=local_traffic_selector,
+        targetVpnGateway=self.GetTargetVpnGatewayRef(
+            target_vpn_gateway).SelfLink())
+    created_vpn_tunnel = copy.deepcopy(vpn_tunnel_to_insert)
+    created_vpn_tunnel.selfLink = vpn_tunnel_ref.SelfLink()
+
+    operation_ref = self.GetOperationRef('operation-1')
+    operation = self.MakeOperationMessage(
+        operation_ref, resource_ref=vpn_tunnel_ref)
+
+    self.ExpectInsertRequest(vpn_tunnel_ref, vpn_tunnel_to_insert, operation)
+    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectGetRequest(vpn_tunnel_ref, created_vpn_tunnel)
+
+    response = self.Run('compute vpn-tunnels create {} '
+                        '--ike-version {} '
+                        '--peer-address {} '
+                        '--shared-secret {} '
+                        '--local-traffic-selector {} '
+                        '--target-vpn-gateway {} '
+                        '--region {} '
+                        '--format=disable'.format(
+                            name, ike_version, peer_ip_address, shared_secret,
+                            ','.join(local_traffic_selector),
+                            target_vpn_gateway, self.REGION))
+    resources = list(response)
+    self.assertEqual(resources[0], created_vpn_tunnel)
+
+
+class ClassicVpnTunnelsCreateBetaTest(ClassicVpnTunnelsCreateGATest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def testInvocationWithoutAnyVpnGatewayTypeFails(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'Exactly one of (--target-vpn-gateway | --target-vpn-gateway-region | '
+        + '--vpn-gateway | --vpn-gateway-region) ' + 'must be specified.'):
+      self.Run("""\
+          compute vpn-tunnels create my-tunnel
+            --region my-region
+            --peer-address 71.72.73.74
+            --shared-secret secret-xyz
+          """)
+
+  def testInvocationWithoutPeerAddressFails(self):
+    with self.AssertRaisesExceptionMatches(
+        exceptions.InvalidArgumentException,
+        'When creating Classic VPN tunnels, the peer address '
+        'must be specified.'):
+      self.Run("""\
+          compute vpn-tunnels create my-tunnel
+            --shared-secret secret-xyz
+            --target-vpn-gateway my-gateway
+            --region my-region
+            --router my-router
+            --peer-gcp-gateway peer-gateways
+          """)
+
+
+class ClassicVpnTunnelsCreateAlphaTest(ClassicVpnTunnelsCreateBetaTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class HighAvailabilityVpnTunnelsCreateBetaTest(
+    vpn_tunnels_test_base.VpnTunnelsTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def testSimpleCaseWithPeerGcpGateway(self):
+    name = 'my-tunnel'
+    description = 'My tunnel description.'
+    ike_version = 2
+    shared_secret = 'secret-xyz'
+    vpn_gateway = 'my-gateway'
+    interface = 0
+    router = 'my-router'
+    peer_gcp_gateway = 'peer-gateway'
+
+    vpn_tunnel_ref = self.GetVpnTunnelRef(name)
+    vpn_tunnel_to_insert = self.messages.VpnTunnel(
+        name=name,
+        description=description,
+        ikeVersion=ike_version,
+        peerGcpGateway=self.GetVpnGatewayRef(peer_gcp_gateway).SelfLink(),
+        sharedSecret=shared_secret,
+        vpnGateway=self.GetVpnGatewayRef(vpn_gateway).SelfLink(),
+        vpnGatewayInterface=interface,
+        router=self.GetRouterRef(router).SelfLink())
+    created_vpn_tunnel = copy.deepcopy(vpn_tunnel_to_insert)
+    created_vpn_tunnel.selfLink = vpn_tunnel_ref.SelfLink()
+
+    operation_ref = self.GetOperationRef('operation-1')
+    operation = self.MakeOperationMessage(
+        operation_ref, resource_ref=vpn_tunnel_ref)
+
+    self.ExpectInsertRequest(vpn_tunnel_ref, vpn_tunnel_to_insert, operation)
+    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectGetRequest(vpn_tunnel_ref, created_vpn_tunnel)
+
+    response = self.Run(
+        'compute vpn-tunnels create {} '
+        '--description "{}" '
+        '--ike-version {} '
+        '--peer-gcp-gateway {} '
+        '--shared-secret {} '
+        '--vpn-gateway {} '
+        '--interface {} '
+        '--router {} '
+        '--region {} '
+        '--format=disable'.format(name, description, ike_version,
+                                  peer_gcp_gateway, shared_secret, vpn_gateway,
+                                  interface, router, self.REGION))
+    resources = list(response)
+    self.assertEqual(resources[0], created_vpn_tunnel)
+
+  def testSimpleCaseWithPeerExternalGateway(self):
+    name = 'my-tunnel'
+    description = 'My tunnel description.'
+    ike_version = 2
+    shared_secret = 'secret-xyz'
+    vpn_gateway = 'my-gateway'
+    interface = 0
+    router = 'my-router'
+    peer_external_gateway = 'external-gateway'
+    peer_external_gateway_interface = 3
+
+    vpn_tunnel_ref = self.GetVpnTunnelRef(name)
+    vpn_tunnel_to_insert = self.messages.VpnTunnel(
+        name=name,
+        description=description,
+        ikeVersion=ike_version,
+        peerExternalGateway=self.GetExternalVpnGatewayRef(
+            peer_external_gateway).SelfLink(),
+        peerExternalGatewayInterface=3,
+        sharedSecret=shared_secret,
+        vpnGateway=self.GetVpnGatewayRef(vpn_gateway).SelfLink(),
+        vpnGatewayInterface=interface,
+        router=self.GetRouterRef(router).SelfLink())
+    created_vpn_tunnel = copy.deepcopy(vpn_tunnel_to_insert)
+    created_vpn_tunnel.selfLink = vpn_tunnel_ref.SelfLink()
+
+    operation_ref = self.GetOperationRef('operation-1')
+    operation = self.MakeOperationMessage(
+        operation_ref, resource_ref=vpn_tunnel_ref)
+
+    self.ExpectInsertRequest(vpn_tunnel_ref, vpn_tunnel_to_insert, operation)
+    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectGetRequest(vpn_tunnel_ref, created_vpn_tunnel)
+
+    response = self.Run('compute vpn-tunnels create {} '
+                        '--description "{}" '
+                        '--ike-version {} '
+                        '--peer-external-gateway {} '
+                        '--peer-external-gateway-interface {} '
+                        '--shared-secret {} '
+                        '--vpn-gateway {} '
+                        '--interface {} '
+                        '--router {} '
+                        '--region {} '
+                        '--format=disable'.format(
+                            name, description, ike_version,
+                            peer_external_gateway,
+                            peer_external_gateway_interface, shared_secret,
+                            vpn_gateway, interface, router, self.REGION))
+    resources = list(response)
+    self.assertEqual(resources[0], created_vpn_tunnel)
+
+  def testFlagsAcceptUris(self):
+    name = 'my-tunnel'
+    peer_gcp_gateway = 'peer-gateway'
+    shared_secret = 'secret-xyz'
+    vpn_gateway = 'my-gateway'
+    interface = 1
+    router = 'my-router'
+
+    vpn_tunnel_ref = self.GetVpnTunnelRef(name)
+    vpn_tunnel_to_insert = self.messages.VpnTunnel(
+        name=name,
+        peerGcpGateway=self.GetVpnGatewayRef(peer_gcp_gateway).SelfLink(),
+        sharedSecret=shared_secret,
+        vpnGateway=self.GetVpnGatewayRef(vpn_gateway).SelfLink(),
+        vpnGatewayInterface=interface,
+        router=self.GetRouterRef(router).SelfLink())
+    created_vpn_tunnel = copy.deepcopy(vpn_tunnel_to_insert)
+    created_vpn_tunnel.selfLink = vpn_tunnel_ref.SelfLink()
+
+    operation_ref = self.GetOperationRef('operation-1')
+    operation = self.MakeOperationMessage(
+        operation_ref, resource_ref=vpn_tunnel_ref)
+
+    self.ExpectInsertRequest(vpn_tunnel_ref, vpn_tunnel_to_insert, operation)
+    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectGetRequest(vpn_tunnel_ref, created_vpn_tunnel)
+
+    response = self.Run(
+        'compute vpn-tunnels create '
+        '{base_uri}/regions/{region}/vpnTunnels/{vpn_tunnel_name} '
+        '--peer-gcp-gateway '
+        'projects/{project}/regions/{region}/vpnGateways/{peer_gcp_gateway} '
+        '--shared-secret {shared_secret} '
+        '--vpn-gateway {base_uri}/regions/{region}/vpnGateways/{gateway_name} '
+        '--interface {vpn_gateway_interface} '
+        '--router {router} '
+        '--format=disable'.format(
+            vpn_tunnel_name=name,
+            peer_gcp_gateway=peer_gcp_gateway,
+            shared_secret=shared_secret,
+            gateway_name=vpn_gateway,
+            vpn_gateway_interface=interface,
+            router=router,
+            base_uri=self.base_uri,
+            region=self.REGION,
+            project=self.Project()))
+    resources = list(response)
+    self.assertEqual(resources[0], created_vpn_tunnel)
+
+  def testInvocationWithoutOptionalArgsOk(self):
+    name = 'my-tunnel'
+    peer_gcp_gateway = 'peer-gateway'
+    shared_secret = 'secret-xyz'
+    vpn_gateway = 'my-gateway'
+    interface = 0
+    router = 'my-router'
+
+    vpn_tunnel_ref = self.GetVpnTunnelRef(name)
+    vpn_tunnel_to_insert = self.messages.VpnTunnel(
+        name=name,
+        peerGcpGateway=self.GetVpnGatewayRef(peer_gcp_gateway).SelfLink(),
+        sharedSecret=shared_secret,
+        vpnGateway=self.GetVpnGatewayRef(vpn_gateway).SelfLink(),
+        vpnGatewayInterface=interface,
+        router=self.GetRouterRef(router).SelfLink())
+    created_vpn_tunnel = copy.deepcopy(vpn_tunnel_to_insert)
+    created_vpn_tunnel.selfLink = vpn_tunnel_ref.SelfLink()
+
+    operation_ref = self.GetOperationRef('operation-1')
+    operation = self.MakeOperationMessage(
+        operation_ref, resource_ref=vpn_tunnel_ref)
+
+    self.ExpectInsertRequest(vpn_tunnel_ref, vpn_tunnel_to_insert, operation)
+    self.ExpectOperationGetRequest(operation_ref, operation)
+    self.ExpectGetRequest(vpn_tunnel_ref, created_vpn_tunnel)
+
+    response = self.Run(
+        'compute vpn-tunnels create {} '
+        '--peer-gcp-gateway {} '
+        '--shared-secret {} '
+        '--vpn-gateway {} '
+        '--interface {} '
+        '--router {} '
+        '--region {} '
+        '--format=disable'.format(name, peer_gcp_gateway, shared_secret,
+                                  vpn_gateway, interface, router, self.REGION))
+    resources = list(response)
+    self.assertEqual(resources[0], created_vpn_tunnel)
+
+  def testInvocationWithoutSharedSecretFails(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --shared-secret: Must be specified.'):
+      self.Run("""\
+          compute vpn-tunnels create my-tunnel
+            --region my-region
+            --peer-gcp-gateway peer-gateway
+            --vpn-gateway my-gateway
+            --interface 1
+            --router my-router
+          """)
+
+  def testInvocationWithBadSharedSecretFails(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'The argument to --shared-secret is not valid it contains '
+        'non-printable charcters.'):
+      self.Run("""\
+          compute vpn-tunnels create my-tunnel
+            --region my-region
+            --peer-gcp-gateway peer-gateway
+            --vpn-gateway my-gateway
+            --interface 1
+            --router my-router
+            --shared-secret '\n'
+          """)
+
+  def testInvocationWithoutAnyVpnGatewayTypeFails(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'Exactly one of (--target-vpn-gateway | --target-vpn-gateway-region | '
+        + '--vpn-gateway | --vpn-gateway-region) ' + 'must be specified.'):
+      self.Run("""\
+          compute vpn-tunnels create my-tunnel
+            --region my-region
+            --peer-gcp-gateway peer-gateway
+            --interface 1
+            --router my-router
+            --shared-secret secret-xyz
+          """)
+
+  def testInvocationWithoutInterfaceFails(self):
+    with self.AssertRaisesToolExceptionMatches(
+        'Invalid value for [--interface]: When creating High Availability VPN '
+        'tunnels, the VPN gateway interface must be specified using the '
+        '--interface flag.'):
+      self.Run("""\
+          compute vpn-tunnels create my-tunnel
+            --region my-region
+            --peer-gcp-gateway peer-gateway
+            --shared-secret secret-xyz
+            --vpn-gateway my-gateway
+            --router my-router
+          """)
+
+  def testInvocationWithoutRouterFails(self):
+    with self.AssertRaisesToolExceptionMatches(
+        'Invalid value for [--router]: When creating High Availability VPN '
+        'tunnels, a Cloud Router must be specified using the --router flag.'):
+      self.Run("""\
+          compute vpn-tunnels create my-tunnel
+            --region my-region
+            --peer-gcp-gateway peer-gateway
+            --shared-secret secret-xyz
+            --vpn-gateway my-gateway
+            --interface 1
+          """)
+
+  def testInvocationWithRemoteTrafficSelectorFails(self):
+    with self.AssertRaisesToolExceptionMatches(
+        'Invalid value for [--remote-traffic-selector]: Cannot specify remote '
+        'traffic selector with High Availability VPN tunnels.'):
+      self.Run("""\
+          compute vpn-tunnels create my-tunnel
+            --region my-region
+            --peer-gcp-gateway peer-gateway
+            --shared-secret secret-xyz
+            --vpn-gateway my-gateway
+            --interface 0
+            --router my-router
+            --remote-traffic-selector 192.168.100.14/24,10.0.0.0/8
+          """)
+
+  def testInvocationWithLocalTrafficSelectorFails(self):
+    with self.AssertRaisesToolExceptionMatches(
+        'Invalid value for [--local-traffic-selector]: Cannot specify local '
+        'traffic selector with High Availability VPN tunnels.'):
+      self.Run("""\
+          compute vpn-tunnels create my-tunnel
+            --region my-region
+            --peer-gcp-gateway peer-gateway
+            --shared-secret secret-xyz
+            --vpn-gateway my-gateway
+            --interface 0
+            --router my-router
+            --local-traffic-selector 192.168.100.14/24,10.0.0.0/8
+          """)
+
+  def testInvocationWithoutPeerAddressFails(self):
+    with self.AssertRaisesExceptionMatches(
+        exceptions.InvalidArgumentException,
+        'When creating High Availability VPN tunnels, either '
+        '--peer-gcp-gateway or --peer-external-gateway must be specified.'):
+      self.Run("""\
+          compute vpn-tunnels create my-tunnel
+            --shared-secret secret-xyz
+            --vpn-gateway my-gateway
+            --interface 0
+            --peer-address 71.72.73.74
+            --region my-region
+            --router my-router
+          """)
+
+
+class HighAvailabilityVpnTunnelsCreateAlphaTest(
+    HighAvailabilityVpnTunnelsCreateBetaTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
 
 if __name__ == '__main__':
   test_case.main()

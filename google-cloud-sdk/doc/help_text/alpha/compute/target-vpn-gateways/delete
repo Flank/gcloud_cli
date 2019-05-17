@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha compute target-vpn-gateways delete - delete target vpn
-        gateways
+    gcloud alpha compute target-vpn-gateways delete - delete Cloud VPN Classic
+        Target VPN Gateways
 
 SYNOPSIS
     gcloud alpha compute target-vpn-gateways delete NAME [NAME ...]
@@ -8,7 +8,7 @@ SYNOPSIS
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute target-vpn-gateways delete deletes one or more
-    Google Compute Engine target vpn gateways.
+    Google Compute Engine Cloud VPN Classic Target VPN Gateways.
 
 POSITIONAL ARGUMENTS
      NAME [NAME ...]
@@ -36,8 +36,9 @@ FLAGS
         CLOUDSDK_COMPUTE_REGION.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

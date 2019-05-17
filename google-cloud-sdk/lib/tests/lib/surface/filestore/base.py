@@ -32,9 +32,11 @@ class CloudFilestoreUnitTestBase(sdk_test_base.WithFakeAuth,
 
   def SetUpTrack(self, track):
     if track == calliope_base.ReleaseTrack.ALPHA:
-      self.api_version = 'v1alpha1'
+      self.api_version = 'v1p1alpha1'
     elif track == calliope_base.ReleaseTrack.BETA:
       self.api_version = 'v1beta1'
+    else:
+      self.api_version = 'v1'
     self.track = track
     self.messages = core_apis.GetMessagesModule('file', self.api_version)
     self.mock_client = mock.Client(

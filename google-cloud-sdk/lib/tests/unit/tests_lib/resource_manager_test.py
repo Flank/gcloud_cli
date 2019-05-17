@@ -92,7 +92,7 @@ class TestResourceParameters(unittest.TestCase):
         mock.call(mock_matchers.RegexMatcher(expected_delete)),
     ])
 
-  def testCreateDeleteInstanceParametrized(self):
+  def testCreateDeleteInstanceParameterized(self):
     runner = mock.MagicMock()
     instance_ref = self.registry.Parse(
         'bob', collection='compute.instances',

@@ -23,19 +23,19 @@ import textwrap
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.container.binauthz import util as binauthz_command_util
-from tests.lib import cli_test_base
 from tests.lib import sdk_test_base
 from tests.lib.surface.container.binauthz import base as binauthz_test_base
 
 
-class BinauthzAttestationsSurfaceTest(sdk_test_base.WithFakeAuth,
-                                      cli_test_base.CliTestBase,
-                                      binauthz_test_base.BinauthzUnitTestBase):
+class CreateSignaturePayloadTest(
+    sdk_test_base.WithFakeAuth,
+    binauthz_test_base.BinauthzTestBase,
+):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
-    # We don't get our track from the base binauthz test because `CliTestBase`
-    # clobbers it in its SetUp.
-    self.track = calliope_base.ReleaseTrack.ALPHA
     self.artifact_url = self.GenerateArtifactUrl()
 
   def testGoodUrl(self):
@@ -77,6 +77,12 @@ class BinauthzAttestationsSurfaceTest(sdk_test_base.WithFakeAuth,
           '--artifact-url',
           'docker.io/nginblah@sha256:123',
       ])
+
+
+class CreateSignaturePayloadAlphaTest(CreateSignaturePayloadTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

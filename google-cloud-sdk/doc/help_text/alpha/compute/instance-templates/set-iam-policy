@@ -31,8 +31,9 @@ POSITIONAL ARGUMENTS
         (https://cloud.google.com/iam/reference/rest/v1/Policy).
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -43,9 +44,10 @@ API REFERENCE
 
 EXAMPLES
     The following command will read am IAM policy defined in a JSON file
-    'policy.json' and set it for the instance template my_template:
+    'policy.json' and set it for the instance template my-template:
 
-    $ gcloud alpha compute instance-templates set-iam-policy \        my_template policy.json
+        $ gcloud alpha compute instance-templates set-iam-policy \
+            my-template policy.json
 
     See https://cloud.google.com/iam/docs/managing-policies for details of the
     policy file format and contents.
@@ -55,7 +57,8 @@ NOTES
     command fails with API permission errors despite specifying the right
     project, you will have to apply for early access and have your projects
     registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    https://cloud.google.com/support/. These variants are also available:
 
+        $ gcloud compute instance-templates set-iam-policy
         $ gcloud beta compute instance-templates set-iam-policy
 

@@ -19,10 +19,12 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import collections
+import datetime
 from apitools.base.protorpclite import messages
 from apitools.base.py import exceptions as api_exceptions
 from googlecloudsdk.api_lib.run import condition
 from googlecloudsdk.api_lib.run import configuration
+from googlecloudsdk.api_lib.run import domain_mapping
 from googlecloudsdk.api_lib.run import revision
 from googlecloudsdk.api_lib.run import service
 from googlecloudsdk.api_lib.services import enable_api
@@ -32,6 +34,9 @@ from googlecloudsdk.command_lib.run import deployable as deployable_pkg
 from googlecloudsdk.command_lib.run import exceptions as serverless_exceptions
 from googlecloudsdk.command_lib.run import serverless_operations
 from googlecloudsdk.command_lib.run import source_ref
+from googlecloudsdk.command_lib.run import stages
+from googlecloudsdk.core import exceptions
+from googlecloudsdk.core.console import progress_tracker
 from googlecloudsdk.core.util import retry
 from tests.lib import parameterized
 from tests.lib import test_case
@@ -75,6 +80,19 @@ class _FakeResource(object):
     self.conditions = conditions
 
 
+def _Stagify(keys):
+  return [progress_tracker.Stage(k) for k in keys]
+
+
+def _MakeMockTracker(stage_names):
+  tracker = progress_tracker.NoOpStagedProgressTracker(_Stagify(stage_names))
+  ret = unittest_mock.Mock(wraps=tracker)
+  # HACK: Mock isn't iterable, even if it's wrapping an iterable thing. Give it
+  # the iterable nature explicitly.
+  ret.__iter__ = lambda _: iter(tracker)
+  return ret
+
+
 class ConditionPollerTest(test_case.TestCase):
   """Tests for the ConditionPoller class itself.
 
@@ -94,8 +112,7 @@ class ConditionPollerTest(test_case.TestCase):
 
   def testTwoConditionsSuccess(self):
     """Test the normal path of going from unknown to done, no deps."""
-    tracker = unittest_mock.Mock()
-    stages = {'one': 'stage_one', 'two': 'stage_two'}
+    tracker = _MakeMockTracker(['one', 'two'])
     # Condition one goes to True immediately.
     # Condition two goes from Unknown to True, along with Ready
     self.conditions_series = iter([
@@ -110,24 +127,23 @@ class ConditionPollerTest(test_case.TestCase):
             _Cond('two', 'True', None, None),
         ], ready_condition='Ready')])
     poller = serverless_operations.ConditionPoller(
-        self._ResourceGetter, tracker, stages)
-    tracker.StartStage.assert_any_call('stage_one')
-    tracker.StartStage.assert_any_call('stage_two')
+        self._ResourceGetter, tracker)
+    tracker.StartStage.assert_any_call('one')
+    tracker.StartStage.assert_any_call('two')
     self.assertEqual(tracker.StartStage.call_count, 2)
     tracker.CompleteStage.assert_not_called()
     self._ResetMockTracker(tracker)
     poller.Poll(None)
     tracker.StartStage.assert_not_called()
-    tracker.CompleteStage.assert_called_once_with('stage_one', None)
+    tracker.CompleteStage.assert_called_once_with('one', None)
     self._ResetMockTracker(tracker)
     poller.Poll(None)
-    tracker.CompleteStage.assert_called_once_with('stage_two', None)
+    tracker.CompleteStage.assert_called_once_with('two', None)
     tracker.UpdateHeaderMessage.assert_any_call('Done.')
 
   def testTwoConditionsFailure(self):
     """Test showing failures right."""
-    tracker = unittest_mock.Mock()
-    stages = {'one': 'stage_one', 'two': 'stage_two'}
+    tracker = _MakeMockTracker(['one', 'two'])
     # Condition one goes to True immediately.
     # Condition two goes from Unknown to False, along with Ready
     self.conditions_series = iter([
@@ -142,26 +158,25 @@ class ConditionPollerTest(test_case.TestCase):
             _Cond('two', 'False', 'Oops.', ''),
         ], ready_condition='Ready')])
     poller = serverless_operations.ConditionPoller(
-        self._ResourceGetter, tracker, stages)
-    tracker.StartStage.assert_any_call('stage_one')
-    tracker.StartStage.assert_any_call('stage_two')
+        self._ResourceGetter, tracker)
+    tracker.StartStage.assert_any_call('one')
+    tracker.StartStage.assert_any_call('two')
     self.assertEqual(tracker.StartStage.call_count, 2)
     tracker.CompleteStage.assert_not_called()
     self._ResetMockTracker(tracker)
     poller.Poll(None)
     tracker.StartStage.assert_not_called()
-    tracker.CompleteStage.assert_called_once_with('stage_one', None)
+    tracker.CompleteStage.assert_called_once_with('one', None)
     tracker.FailStage.assert_not_called()
     self._ResetMockTracker(tracker)
-    with self.assertRaises(serverless_exceptions.DeploymentFailedError):
+    with self.assertRaises(exceptions.Error):
       poller.Poll(None)
     tracker.FailStage.assert_called_once()
     tracker.UpdateHeaderMessage.assert_any_call('Oops.')
 
   def testTwoConditionsSuccessWithDeps(self):
     """Test when one stage is dependent on another to start."""
-    tracker = unittest_mock.Mock()
-    stages = {'one': 'stage_one', 'two': 'stage_two'}
+    tracker = _MakeMockTracker(['one', 'two'])
     # Make sure condition two doesn't Start until condition One is marked True
     self.conditions_series = iter([
         condition.Conditions([
@@ -175,22 +190,22 @@ class ConditionPollerTest(test_case.TestCase):
             _Cond('two', 'True', None, None),
         ], ready_condition='Ready')])
     poller = serverless_operations.ConditionPoller(
-        self._ResourceGetter, tracker, stages, dependencies={'two': {'one'}})
-    tracker.StartStage.assert_called_once_with('stage_one')
+        self._ResourceGetter, tracker,
+        dependencies={'two': {'one'}, 'one': set()})
+    tracker.StartStage.assert_called_once_with('one')
     tracker.CompleteStage.assert_not_called()
     self._ResetMockTracker(tracker)
     poller.Poll(None)
-    tracker.StartStage.assert_called_once_with('stage_two')
-    tracker.CompleteStage.assert_called_once_with('stage_one', None)
+    tracker.StartStage.assert_called_once_with('two')
+    tracker.CompleteStage.assert_called_once_with('one', None)
     self._ResetMockTracker(tracker)
     poller.Poll(None)
-    tracker.CompleteStage.assert_called_once_with('stage_two', None)
+    tracker.CompleteStage.assert_called_once_with('two', None)
     tracker.UpdateHeaderMessage.assert_any_call('Done.')
 
   def testDontStartTilUnblockedPrevTrue(self):
     """One stage dependent on another to start, and True before that happens."""
-    tracker = unittest_mock.Mock()
-    stages = {'one': 'stage_one', 'two': 'stage_two'}
+    tracker = _MakeMockTracker(['one', 'two'])
     # Condition one goes Unknown -> True -> True
     # Condition two goes True -> Unknown -> True
     # Because of the dependencies, two should not Start until the second poll.
@@ -211,8 +226,11 @@ class ConditionPollerTest(test_case.TestCase):
             _Cond('two', 'True', None, None),
         ], ready_condition='Ready')])
     poller = serverless_operations.ConditionPoller(
-        self._ResourceGetter, tracker, stages, dependencies={'two': {'one'}})
-    tracker.StartStage.assert_called_once_with('stage_one')
+        self._ResourceGetter, tracker, dependencies={
+            'two': {'one'},
+            'one': set(),
+        })
+    tracker.StartStage.assert_called_once_with('one')
     tracker.CompleteStage.assert_not_called()
     self._ResetMockTracker(tracker)
     poller.Poll(None)
@@ -220,17 +238,16 @@ class ConditionPollerTest(test_case.TestCase):
     tracker.CompleteStage.assert_not_called()
     self._ResetMockTracker(tracker)
     poller.Poll(None)
-    tracker.StartStage.assert_called_once_with('stage_two')
-    tracker.CompleteStage.assert_called_once_with('stage_one', None)
+    tracker.StartStage.assert_called_once_with('two')
+    tracker.CompleteStage.assert_called_once_with('one', None)
     self._ResetMockTracker(tracker)
     poller.Poll(None)
-    tracker.CompleteStage.assert_called_once_with('stage_two', None)
+    tracker.CompleteStage.assert_called_once_with('two', None)
     tracker.UpdateHeaderMessage.assert_any_call('Done.')
 
   def testNotDoneTilReady(self):
     """Update top line to "Done." only when we are Ready."""
-    tracker = unittest_mock.Mock()
-    stages = {'one': 'stage_one', 'two': 'stage_two'}
+    tracker = _MakeMockTracker(['one', 'two'])
     # Ready spends the first round at Unknown while both conditions are True.
     self.conditions_series = iter([
         condition.Conditions([
@@ -244,14 +261,14 @@ class ConditionPollerTest(test_case.TestCase):
             _Cond('two', 'True', None, None),
         ], ready_condition='Ready')])
     poller = serverless_operations.ConditionPoller(
-        self._ResourceGetter, tracker, stages)
-    tracker.StartStage.assert_any_call('stage_one')
-    tracker.StartStage.assert_any_call('stage_two')
+        self._ResourceGetter, tracker)
+    tracker.StartStage.assert_any_call('one')
+    tracker.StartStage.assert_any_call('two')
     self.assertEqual(tracker.StartStage.call_count, 2)
     self._ResetMockTracker(tracker)
     poller.Poll(None)
-    tracker.CompleteStage.assert_any_call('stage_one', None)
-    tracker.CompleteStage.assert_any_call('stage_two', None)
+    tracker.CompleteStage.assert_any_call('one', None)
+    tracker.CompleteStage.assert_any_call('two', None)
     self.assertEqual(tracker.CompleteStage.call_count, 2)
     tracker.UpdateHeaderMessage.assert_called_once_with('Not yet.')
     self._ResetMockTracker(tracker)
@@ -268,9 +285,13 @@ class ServerlessConfigurationWaitTest(base.ServerlessBase):
     self.readiness_type = configuration.Configuration.READY_CONDITION
     self.orig_timeout = serverless_operations.MAX_WAIT_MS
     serverless_operations.MAX_WAIT_MS = 5000  # smaller timeout for faster test
-    self.serverless_client = (
-        serverless_operations.ServerlessOperations(
-            self.mock_serverless_client, 'serverless', 'v1alpha1'))
+
+  def _MockPoller(self):
+    return serverless_operations.ConditionPoller(
+        unittest_mock.Mock,
+        _MakeMockTracker([
+            stages.SERVICE_CONFIGURATIONS_READY,
+            stages.SERVICE_ROUTES_READY]))
 
   def TearDown(self):
     serverless_operations.MAX_WAIT_MS = self.orig_timeout
@@ -288,7 +309,7 @@ class ServerlessConfigurationWaitTest(base.ServerlessBase):
     with unittest_mock.patch.object(
         self.poller_class, 'GetConditions',
         side_effect=[pending_cond, terminal_cond]):
-      self.serverless_client.WaitForCondition(unittest_mock.Mock)
+      self.serverless_client.WaitForCondition(self._MockPoller())
       self.assertEqual(2, self.poller_class.GetConditions.call_count)
 
   def testWaitNoneGuard(self):
@@ -301,7 +322,7 @@ class ServerlessConfigurationWaitTest(base.ServerlessBase):
     with unittest_mock.patch.object(
         self.poller_class, 'GetConditions',
         side_effect=[pending_cond, terminal_cond]):
-      self.serverless_client.WaitForCondition(unittest_mock.Mock)
+      self.serverless_client.WaitForCondition(self._MockPoller())
       self.assertEqual(2, self.poller_class.GetConditions.call_count)
 
   def testWaitFail_withReadyTypeCondition(self):
@@ -316,20 +337,22 @@ class ServerlessConfigurationWaitTest(base.ServerlessBase):
     with unittest_mock.patch.object(
         self.poller_class, 'GetConditions', side_effect=[terminal_cond]):
       with self.assertRaisesRegexp(
-          serverless_exceptions.DeploymentFailedError, expected_error_message):
-        self.serverless_client.WaitForCondition(unittest_mock.Mock)
+          exceptions.Error,
+          expected_error_message):
+        self.serverless_client.WaitForCondition(self._MockPoller())
 
   def testWaitTimeout_WithReadyTypeCondition(self):
     """Test error of polling timeout while returning ready type condition."""
     pending_cond = condition.Conditions(
         [self.cond_class(type=self.readiness_type,
                          status='Unknown', message='This is why it fail'),
-         self.cond_class(type='ConfigurationsReady', status='False')],
+         self.cond_class(type=stages.SERVICE_CONFIGURATIONS_READY,
+                         status='False')],
         ready_condition=self.readiness_type)
     with unittest_mock.patch.object(
         self.poller_class, 'GetConditions', side_effect=[pending_cond] * 4):
-      with self.assertRaises(serverless_exceptions.DeploymentFailedError):
-        self.serverless_client.WaitForCondition(unittest_mock.Mock)
+      with self.assertRaises(exceptions.Error):
+        self.serverless_client.WaitForCondition(self._MockPoller())
 
   def testWaitTimeout_WithNoService(self):
     """Test error of polling timeout while returning no Service."""
@@ -339,7 +362,7 @@ class ServerlessConfigurationWaitTest(base.ServerlessBase):
     with unittest_mock.patch.object(
         self.poller_class, 'GetConditions', return_value=None):
       with self.assertRaises(retry.WaitException):
-        self.serverless_client.WaitForCondition(unittest_mock.Mock)
+        self.serverless_client.WaitForCondition(self._MockPoller())
 
 
 class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
@@ -351,38 +374,45 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
     self.nonce = 'itsthenoncelol'
     self.StartObjectPatch(serverless_operations,
                           '_Nonce', return_value=self.nonce)
-    self.serverless_client = (
-        serverless_operations.ServerlessOperations(
-            self.mock_serverless_client, 'serverless', 'v1alpha1'))
     self.serverless_client.WaitForCondition = unittest_mock.Mock()
     dummy_config = configuration.Configuration.New(self.mock_serverless_client,
                                                    self.Project())
     self.is_source_branch = hasattr(dummy_config.Message().spec, 'build')
+
+    self.fake_image = 'gcr.io/my-image'
+    fake_source_ref = unittest_mock.Mock(source_path=self.fake_image)
+    self.fake_deployable = deployable_pkg.ServerlessContainer(fake_source_ref)
 
   def _ExpectRevisionsList(self, serv_name):
     """List call for two revisions against the Serverless API."""
 
     request = (
         self.
-        serverless_messages.ServerlessNamespacesRevisionsListRequest(
+        serverless_messages.RunNamespacesRevisionsListRequest(
             parent=self.namespace.RelativeName(),
             labelSelector='serving.knative.dev/service = {}'.format(
                 serv_name),
         ))
-    revisions_responses = self.serverless_messages.ListRevisionsResponse(
-        items=[
-            self.serverless_messages.Revision(
-                metadata=self.serverless_messages.ObjectMeta(
-                    name='r1'
-                )
-            ),
-            self.serverless_messages.Revision(
-                metadata=self.serverless_messages.ObjectMeta(
-                    name='r2'
-                )
-            ),
-        ]
-    )
+
+    def _GetLabels():
+      return self.serverless_messages.ObjectMeta.LabelsValue(
+          additionalProperties=[
+              self.serverless_messages.ObjectMeta.LabelsValue.
+              AdditionalProperty(key='serving.knative.dev/service', value='s1')
+          ])
+
+    def _GetMetadata(i):
+      return self.serverless_messages.ObjectMeta(
+          name='r{}'.format(i),
+          creationTimestamp=datetime.datetime.utcfromtimestamp(i).isoformat() +
+          'Z',
+          labels=_GetLabels(),
+      )
+
+    revisions_responses = self.serverless_messages.ListRevisionsResponse(items=[
+        self.serverless_messages.Revision(metadata=_GetMetadata(i))
+        for i in range(2)
+    ])
 
     self.mock_serverless_client.namespaces_revisions.List.Expect(
         request, response=revisions_responses)
@@ -390,7 +420,7 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
   def testListServices(self):
     """Test the list services api call."""
     expected_request = (
-        self.serverless_messages.ServerlessNamespacesServicesListRequest(
+        self.serverless_messages.RunNamespacesServicesListRequest(
             parent='namespaces/{}'.format(self.namespace.namespacesId)))
 
     expected_response = self.serverless_messages.ListServicesResponse(
@@ -407,7 +437,7 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
   def testDeleteService(self):
     """Test the delete services api call."""
     expected_request = (
-        self.serverless_messages.ServerlessNamespacesServicesDeleteRequest(
+        self.serverless_messages.RunNamespacesServicesDeleteRequest(
             name=self._ServiceRef('s1').RelativeName()))
 
     expected_response = self.serverless_messages.Empty()
@@ -422,7 +452,7 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
   def testDeleteServiceNotFound(self):
     """Test the delete services api call with a non-existent service name."""
     expected_request = (
-        self.serverless_messages.ServerlessNamespacesServicesDeleteRequest(
+        self.serverless_messages.RunNamespacesServicesDeleteRequest(
             name=self._ServiceRef('s1').RelativeName()))
 
     self.mock_serverless_client.namespaces_services.Delete.Expect(
@@ -436,14 +466,15 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
     """Test the list revisions call against the Serverless API."""
     self._ExpectRevisionsList('default')
     revisions = self.serverless_client.ListRevisions(self.namespace, 'default')
+    # Most recently created revision comes first
     self.assertEqual(revisions[0].metadata.name, 'r1')
-    self.assertEqual(revisions[1].metadata.name, 'r2')
+    self.assertEqual(revisions[1].metadata.name, 'r0')
 
   def testDeleteRevision(self):
     """Test the delete revision api call."""
-    revision_ref = self._RevisionRef('r1')
+    revision_ref = self._RevisionRef('r0')
     expected_request = (
-        self.serverless_messages.ServerlessNamespacesRevisionsDeleteRequest(
+        self.serverless_messages.RunNamespacesRevisionsDeleteRequest(
             name=revision_ref.RelativeName()))
 
     expected_response = self.serverless_messages.Empty()
@@ -456,9 +487,9 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
 
   def testDeleteRevisionNotFound(self):
     """Test the delete revision api call with a non-existent revision name."""
-    revision_ref = self._RevisionRef('r1')
+    revision_ref = self._RevisionRef('r0')
     expected_request = (
-        self.serverless_messages.ServerlessNamespacesRevisionsDeleteRequest(
+        self.serverless_messages.RunNamespacesRevisionsDeleteRequest(
             name=revision_ref.RelativeName()))
     self.mock_serverless_client.namespaces_revisions.Delete.Expect(
         expected_request,
@@ -480,6 +511,55 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
         self._ServiceRef('foo'),
         [fake_deployable])
 
+  def testReleaseServiceAllowUnauthenticated(self):
+    """Test the release flow for a new service with unauthenticated access."""
+    fake_source_ref = unittest_mock.Mock()
+    fake_source_ref.source_path = 'gcr.io/fakething'
+    fake_deployable = deployable_pkg.ServerlessContainer(fake_source_ref)
+    self._ExpectCreate(
+        image='gcr.io/fakething',
+        annotations={
+            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/fakething'})
+    self._ExpectGetIamPolicy('foo', bindings=[])
+    binding = self.serverless_messages.Binding(
+        members=['allUsers'], role='roles/run.invoker')
+    self._ExpectSetIamPolicy(service='foo', bindings=[binding])
+
+    self.serverless_client.ReleaseService(
+        self._ServiceRef('foo'),
+        [fake_deployable],
+        allow_unauthenticated=True)
+
+  def testReleaseServiceAllowUnauthenticatedSetIamFail(self):
+    """Test the release flow for a new service with unauthenticated access."""
+    fake_source_ref = unittest_mock.Mock()
+    fake_source_ref.source_path = 'gcr.io/fakething'
+    fake_deployable = deployable_pkg.ServerlessContainer(fake_source_ref)
+    self._ExpectCreate(
+        image='gcr.io/fakething',
+        annotations={
+            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/fakething'})
+    self._ExpectGetIamPolicy('foo', bindings=[])
+    binding = self.serverless_messages.Binding(
+        members=['allUsers'], role='roles/run.invoker')
+    self._ExpectSetIamPolicy(
+        service='foo',
+        bindings=[binding],
+        exception=api_exceptions.HttpError(None, None, None))
+    with progress_tracker.StagedProgressTracker(
+        'Deloying...',
+        stages.ServiceStages(True),
+        failure_message='Deployment failed',
+        suppress_output=False) as tracker:
+      self.serverless_client.ReleaseService(
+          self._ServiceRef('foo'),
+          [fake_deployable],
+          tracker=tracker,
+          allow_unauthenticated=True)
+    self.AssertErrContains('"status": "WARNING"')
+    self.assertTrue(stages.SERVICE_IAM_POLICY_SET in
+                    tracker._completed_with_warnings_stages)
+
   def testReleaseServiceNotFound(self):
     """Test the flow for a configuration update on a nonexistent service."""
     env_changes = config_changes.EnvVarChanges(
@@ -488,7 +568,7 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
     # Expect that it does not exist.
     self.mock_serverless_client.namespaces_services.Get.Expect(
         (self.serverless_messages.
-         ServerlessNamespacesServicesGetRequest(
+         RunNamespacesServicesGetRequest(
              name=self._ServiceRef('foo').RelativeName())),
         exception=api_exceptions.HttpNotFoundError(None, None, None),
     )
@@ -496,6 +576,76 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
       self.serverless_client.ReleaseService(
           self._ServiceRef('foo'),
           [env_changes])
+
+  def testReleaseServicePrivateEndpointNew(self):
+    """Test the flow for releasing a new service with private endpoint."""
+    self._ExpectCreate(
+        image=self.fake_image,
+        annotations={
+            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/my-image'},
+        labels={
+            service.ENDPOINT_VISIBILITY: service.CLUSTER_LOCAL})
+
+    self.serverless_client.ReleaseService(
+        self._ServiceRef('foo'), [self.fake_deployable], private_endpoint=True)
+
+  def testReleaseServicePublicEndpointNew(self):
+    """Test the flow for releasing a new service with public endpoint."""
+    self._ExpectCreate(
+        image=self.fake_image,
+        annotations={
+            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/my-image'})
+
+    self.serverless_client.ReleaseService(
+        self._ServiceRef('foo'), [self.fake_deployable], private_endpoint=False)
+
+  def testReleaseServicePublicEndpoint(self):
+    """Test the flow for updating a service from private to public."""
+    self._ExpectExisting(
+        image='gcr.io/my-image',
+        annotations={
+            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/my-image'},
+        labels={service.ENDPOINT_VISIBILITY: service.CLUSTER_LOCAL})
+
+    self._ExpectUpdate(
+        image='gcr.io/my-image',
+        annotations={
+            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/my-image'})
+
+    self.serverless_client.ReleaseService(
+        self._ServiceRef('foo'), [self.fake_deployable], private_endpoint=False)
+
+  def testReleaseServiceVisibilityUnchangedPrivate(self):
+    """Test the flow for leaving private visibility unchanged."""
+    self._ExpectExisting(
+        image='gcr.io/my-image',
+        annotations={
+            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/my-image'},
+        labels={service.ENDPOINT_VISIBILITY: service.CLUSTER_LOCAL})
+
+    self._ExpectUpdate(
+        image='gcr.io/my-image',
+        annotations={
+            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/my-image'},
+        labels={service.ENDPOINT_VISIBILITY: service.CLUSTER_LOCAL})
+
+    self.serverless_client.ReleaseService(
+        self._ServiceRef('foo'), [self.fake_deployable])
+
+  def testReleaseServiceVisibilityUnchangedPublic(self):
+    """Test the flow for leaving public visibility unchanged."""
+    self._ExpectExisting(
+        image='gcr.io/my-image',
+        annotations={
+            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/my-image'})
+
+    self._ExpectUpdate(
+        image='gcr.io/my-image',
+        annotations={
+            configuration.USER_IMAGE_ANNOTATION: 'gcr.io/my-image'})
+
+    self.serverless_client.ReleaseService(
+        self._ServiceRef('foo'), [self.fake_deployable])
 
   def testUpdateNoNonce(self):
     """Test the flow for update when configuration has no nonce."""
@@ -802,6 +952,77 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
         self._ServiceRef('foo'),
         [fake_deployable])
 
+  def testListDomainMappings(self):
+    """Test the list domainmappings api call."""
+    expected_request = (
+        self.serverless_messages.RunNamespacesDomainmappingsListRequest(
+            parent='namespaces/{}'.format(self.namespace.namespacesId)))
+    expected_response = self.serverless_messages.ListDomainMappingsResponse(
+        items=[self.serverless_messages.DomainMapping()])
+    self.mock_serverless_client.namespaces_domainmappings.List.Expect(
+        expected_request, expected_response)
+
+    domainmappings = self.serverless_client.ListDomainMappings(self.namespace)
+    self.assertListEqual(
+        [dm.Message() for dm in domainmappings],
+        [self.serverless_messages.DomainMapping()])
+
+  def testCreateDomainMappings(self):
+    """Test the create domainmappings api call."""
+    new_domain_mapping = domain_mapping.DomainMapping.New(
+        self.mock_serverless_client, self.namespace.namespacesId)
+    new_domain_mapping.name = 'foo'
+    new_domain_mapping.route_name = 'myapp'
+
+    gotten_domain_mapping = domain_mapping.DomainMapping.New(
+        self.mock_serverless_client, self.namespace.namespacesId)
+    gotten_domain_mapping.name = 'foo'
+    gotten_domain_mapping.route_name = 'myapp'
+    gotten_domain_mapping.status.resourceRecords.append(
+        self.serverless_messages.ResourceRecord(
+            rrdata='216.239.32.21',
+            type=self.serverless_messages.ResourceRecord.TypeValueValuesEnum.A))
+
+    create_request = (
+        self.serverless_messages.
+        RunNamespacesDomainmappingsCreateRequest(
+            parent=self.namespace.RelativeName(),
+            domainMapping=new_domain_mapping.Message()))
+    self.mock_serverless_client.namespaces_domainmappings.Create.Expect(
+        create_request,
+        response=new_domain_mapping.Message())
+
+    domain_mapping_name = self._registry.Parse(
+        'foo',
+        params={'namespacesId': 'fake-project'},
+        collection='run.namespaces.domainmappings').RelativeName()
+    # Model one unready GET and one GET with the resource ready.
+    get_request = (
+        self.serverless_messages.
+        RunNamespacesDomainmappingsGetRequest(name=domain_mapping_name))
+    self.mock_serverless_client.namespaces_domainmappings.Get.Expect(
+        get_request,
+        response=new_domain_mapping.Message())
+    self.mock_serverless_client.namespaces_domainmappings.Get.Expect(
+        get_request,
+        response=gotten_domain_mapping.Message())
+    records = self.serverless_client.CreateDomainMapping(
+        self._DomainmappingRef('foo'), 'myapp')
+    self.assertEqual(records[0].rrdata, '216.239.32.21')
+
+  def testDeleteDomainMappings(self):
+    """Test the delete domainmappings api call."""
+    expected_request = (
+        self.serverless_messages.RunNamespacesDomainmappingsDeleteRequest(
+            name=self._DomainmappingRef('dm1').RelativeName()))
+    expected_response = self.serverless_messages.Empty()
+    self.mock_serverless_client.namespaces_domainmappings.Delete.Expect(
+        expected_request, expected_response)
+    delete_response = self.serverless_client.DeleteDomainMapping(
+        self._DomainmappingRef('dm1'))
+
+    self.assertEqual(delete_response, None)
+
   def _MakeService(self, **kwargs):
     new_service = service.Service.New(
         self.mock_serverless_client, self.namespace.namespacesId)
@@ -880,7 +1101,7 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
     # Expect that it does not exist.
     self.mock_serverless_client.namespaces_services.Get.Expect(
         (self.serverless_messages.
-         ServerlessNamespacesServicesGetRequest(
+         RunNamespacesServicesGetRequest(
              name=self._ServiceRef('foo').RelativeName())),
         exception=api_exceptions.HttpNotFoundError(None, None, None),
     )
@@ -888,7 +1109,7 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
     new_service = self._MakeService(**kwargs)
     create_request = (
         self.serverless_messages.
-        ServerlessNamespacesServicesCreateRequest(
+        RunNamespacesServicesCreateRequest(
             parent=self.namespace.RelativeName(),
             service=new_service.Message()))
     self.mock_serverless_client.namespaces_services.Create.Expect(
@@ -899,7 +1120,7 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
     new_service = self._MakeService(**kwargs)
     update_request = (
         self.serverless_messages.
-        ServerlessNamespacesServicesReplaceServiceRequest(
+        RunNamespacesServicesReplaceServiceRequest(
             service=new_service.Message(),
             name=self._ServiceRef('foo').RelativeName()))
     if exception:
@@ -915,7 +1136,7 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
     old_service = self._MakeService(**kwargs)
     self.mock_serverless_client.namespaces_services.Get.Expect(
         (self.serverless_messages.
-         ServerlessNamespacesServicesGetRequest(
+         RunNamespacesServicesGetRequest(
              name=self._ServiceRef('foo').RelativeName())),
         response=old_service.Message(),
     )
@@ -937,7 +1158,7 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
     for i in range(polls):
       self.mock_serverless_client.namespaces_revisions.List.Expect(
           (self.serverless_messages.
-           ServerlessNamespacesRevisionsListRequest(
+           RunNamespacesRevisionsListRequest(
                parent=self.namespace.RelativeName(),
                labelSelector='{} = {}'.format(serverless_operations.NONCE_LABEL,
                                               self.nonce))),
@@ -948,18 +1169,13 @@ class ServerlessOperationsTest(base.ServerlessBase, parameterized.TestCase):
       # We fall back to getting a revision
       self.mock_serverless_client.namespaces_revisions.Get.Expect(
           (self.serverless_messages.
-           ServerlessNamespacesRevisionsGetRequest(
+           RunNamespacesRevisionsGetRequest(
                name=self._RevisionRef(rev.name).RelativeName())),
           response=rev.Message())
 
 
 class UploadSourceTest(base.ServerlessBase):
   """Tests upload source calls."""
-
-  def SetUp(self):
-    self.serverless_client = (
-        serverless_operations.ServerlessOperations(
-            self.mock_serverless_client, 'serverless', 'v1alpha1'))
 
   def testUpload(self):
 

@@ -353,20 +353,20 @@ class DeletionProtectionTest(UpdateTestBaseClass, parameterized.TestCase):
         'Setting deletion protection of instance [instance-1] to')
 
 
-class InstancesSetShieldedVMConfigAlphaTest(UpdateTestBaseClass,
-                                            parameterized.TestCase):
+class InstancesSetShieldedInstanceConfigGATest(UpdateTestBaseClass,
+                                               parameterized.TestCase):
 
   def PreSetUp(self):
-    self.api_version = 'alpha'
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'v1'
+    self.track = calliope_base.ReleaseTrack.GA
 
-  def ExpectShieldedVMConfig(self, client, shielded_vm_config):
+  def ExpectShieldedInstanceConfig(self, client, shielded_instance_config):
     messages = self.messages
-    client.instances.UpdateShieldedVmConfig.Expect(
-        messages.ComputeInstancesUpdateShieldedVmConfigRequest(
+    client.instances.UpdateShieldedInstanceConfig.Expect(
+        messages.ComputeInstancesUpdateShieldedInstanceConfigRequest(
             instance='instance-1',
             project=self.Project(),
-            shieldedVmConfig=shielded_vm_config,
+            shieldedInstanceConfig=shielded_instance_config,
             zone='central2-a'),
         self._GetOperationMessage(
             self._GetOperationRef('operation-X', 'central2-a'),
@@ -379,43 +379,40 @@ class InstancesSetShieldedVMConfigAlphaTest(UpdateTestBaseClass,
         """)
     self.AssertOutputEquals('')
     self.AssertErrNotContains(
-        'Setting shieldedVMConfig  of instance [instance-1]')
+        'Setting shieldedInstanceConfig  of instance [instance-1]')
 
   @parameterized.named_parameters(
-      ('-EnableSecureBoot', '--shielded-vm-secure-boot', True, None, None),
-      ('-EnableVtpm', '--shielded-vm-vtpm', None, True, None),
-      ('-EnableIntegrity', '--shielded-vm-integrity-monitoring', None, None,
-       True),
-      ('-DisableSecureBoot', '--no-shielded-vm-secure-boot', False, None, None),
-      ('-DisableVtpm', '--no-shielded-vm-vtpm', None, False, None),
-      ('-DisableIntegrity', '--no-shielded-vm-integrity-monitoring', None, None,
-       False),
-      ('-ESecureBootEvtpm', '--shielded-vm-secure-boot --shielded-vm-vtpm',
-       True, True, None), ('-DSecureBootDvtpm',
-                           '--no-shielded-vm-secure-boot --no-shielded-vm-vtpm',
-                           False, False, None),
-      ('-ESecureBootDvtpm', '--shielded-vm-secure-boot --no-shielded-vm-vtpm',
+      ('-InstanceEnableSecureBoot', '--shielded-secure-boot', True, None, None),
+      ('-InstanceEnableVtpm', '--shielded-vtpm', None, True, None),
+      ('-InstanceEnableIntegrity', '--shielded-integrity-monitoring', None,
+       None, True), ('-InstanceDisableSecureBoot', '--no-shielded-secure-boot',
+                     False, None, None),
+      ('-InstanceDisableVtpm', '--no-shielded-vtpm', None, False, None),
+      ('-InstanceDisableIntegrity', '--no-shielded-integrity-monitoring', None,
+       None, False),
+      ('-InstanceESecureBootEvtpm', '--shielded-secure-boot --shielded-vtpm',
+       True, True, None),
+      ('-InstanceDSecureBootDvtpm',
+       '--no-shielded-secure-boot --no-shielded-vtpm', False, False, None),
+      ('-InstanceESecureBootDvtpm', '--shielded-secure-boot --no-shielded-vtpm',
        True, False, None),
-      ('-DSecureBootEvtpm', '--no-shielded-vm-secure-boot --shielded-vm-vtpm',
+      ('-InstanceDSecureBootEvtpm', '--no-shielded-secure-boot --shielded-vtpm',
        False, True, None),
-      ('-DSecureBootEvtpmEintegrity',
-       ('--no-shielded-vm-secure-boot --shielded-vm-vtpm '
-        '--shielded-vm-integrity-monitoring'), False, True, True),
-      ('-ESecureBootEvtpmEintegrity',
-       ('--shielded-vm-secure-boot --shielded-vm-vtpm '
-        '--shielded-vm-integrity-monitoring'), True, True, True))
-  def testShieldedVMConfig(self, cmd_flag, enable_secure_boot, enable_vtpm,
-                           enable_integrity_monitoring):
+      ('-InstanceDSecureBootEvtpmEIntegrity',
+       ('--no-shielded-secure-boot --shielded-vtpm'
+        ' --shielded-integrity-monitoring'), False, True, True))
+  def testShieldedInstanceConfig(self, cmd_flag, enable_secure_boot,
+                                 enable_vtpm, enable_integrity_monitoring):
 
     messages = self.messages
-    shieldedvmconfig = messages.ShieldedVmConfig(
+    shieldedinstanceconfig = messages.ShieldedInstanceConfig(
         enableSecureBoot=enable_secure_boot,
         enableVtpm=enable_vtpm,
         enableIntegrityMonitoring=enable_integrity_monitoring)
 
     with self.Client() as client:
-      self.ExpectShieldedVMConfig(client,
-                                  shielded_vm_config=shieldedvmconfig)
+      self.ExpectShieldedInstanceConfig(
+          client, shielded_instance_config=shieldedinstanceconfig)
 
       client.zoneOperations.Get.Expect(
           self.messages.ComputeZoneOperationsGetRequest(
@@ -435,32 +432,40 @@ class InstancesSetShieldedVMConfigAlphaTest(UpdateTestBaseClass,
                '--zone central2-a {}'.format(cmd_flag))
     self.AssertOutputEquals('')
     self.AssertErrContains(
-        'Setting shieldedVMConfig  of instance [instance-1]')
+        'Setting shieldedInstanceConfig  of instance [instance-1]')
 
 
-class InstancesSetShieldedVMConfigBetaTest(
-    InstancesSetShieldedVMConfigAlphaTest):
+class InstancesSetShieldedInstanceConfigBetaTest(
+    InstancesSetShieldedInstanceConfigGATest):
 
   def PreSetUp(self):
     self.api_version = 'beta'
     self.track = calliope_base.ReleaseTrack.BETA
 
 
-class InstancesSetShieldedVMIntegrityPolicyAlphaTest(UpdateTestBaseClass,
-                                                     parameterized.TestCase):
+class InstancesSetShieldedInstanceConfigAlphaTest(
+    InstancesSetShieldedInstanceConfigGATest):
 
   def PreSetUp(self):
     self.api_version = 'alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
 
-  def ExpectShieldedVMIntegrityPolicy(self, client,
-                                      shielded_vm_integrity_policy):
+
+class InstancesSetShieldedInstanceIntegrityPolicyGATest(
+    UpdateTestBaseClass, parameterized.TestCase):
+
+  def PreSetUp(self):
+    self.api_version = 'v1'
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def ExpectShieldedInstanceIntegrityPolicy(self, client,
+                                            shielded_instance_integrity_policy):
     messages = self.messages
-    client.instances.SetShieldedVmIntegrityPolicy.Expect(
-        messages.ComputeInstancesSetShieldedVmIntegrityPolicyRequest(
+    client.instances.SetShieldedInstanceIntegrityPolicy.Expect(
+        messages.ComputeInstancesSetShieldedInstanceIntegrityPolicyRequest(
             instance='instance-1',
             project=self.Project(),
-            shieldedVmIntegrityPolicy=shielded_vm_integrity_policy,
+            shieldedInstanceIntegrityPolicy=shielded_instance_integrity_policy,
             zone='central2-a'),
         self._GetOperationMessage(
             self._GetOperationRef('operation-X', 'central2-a'),
@@ -473,19 +478,23 @@ class InstancesSetShieldedVMIntegrityPolicyAlphaTest(UpdateTestBaseClass,
         """)
     self.AssertOutputEquals('')
     self.AssertErrNotContains(
-        'Setting shieldedVMIntegrityPolicy of instance [instance-1]')
+        'Setting shieldedInstanceIntegrityPolicy of instance [instance-1]')
 
   @parameterized.named_parameters(
-      ('-LearnIntegrityPolicy', '--shielded-vm-learn-integrity-policy', True),)
-  def testShieldedVMIntegrityPolicy(self, cmd_flag, learn_integrity_policy):
+      ('-InstanceLearnIntegrityPolicy', '--shielded-learn-integrity-policy',
+       True),
+  )
+  def testShieldedInstanceIntegrityPolicy(self, cmd_flag,
+                                          learn_integrity_policy):
 
     messages = self.messages
-    shieldedvm_integrity_policy = messages.ShieldedVmIntegrityPolicy(
+    shieldedinstance_integrity_policy = messages.ShieldedInstanceIntegrityPolicy(
         updateAutoLearnPolicy=learn_integrity_policy)
 
     with self.Client() as client:
-      self.ExpectShieldedVMIntegrityPolicy(
-          client, shielded_vm_integrity_policy=shieldedvm_integrity_policy)
+      self.ExpectShieldedInstanceIntegrityPolicy(
+          client,
+          shielded_instance_integrity_policy=shieldedinstance_integrity_policy)
 
       client.zoneOperations.Get.Expect(
           self.messages.ComputeZoneOperationsGetRequest(
@@ -505,22 +514,30 @@ class InstancesSetShieldedVMIntegrityPolicyAlphaTest(UpdateTestBaseClass,
                '--zone central2-a {}'.format(cmd_flag))
     self.AssertOutputEquals('')
     self.AssertErrContains(
-        'Setting shieldedVMIntegrityPolicy of instance [instance-1]')
+        'Setting shieldedInstanceIntegrityPolicy of instance [instance-1]')
 
 
-class InstancesSetShieldedVMIntegrityPolicyBetaTest(
-    InstancesSetShieldedVMIntegrityPolicyAlphaTest):
+class InstancesSetShieldedInstanceIntegrityPolicyBetaTest(
+    InstancesSetShieldedInstanceIntegrityPolicyGATest):
 
   def PreSetUp(self):
     self.api_version = 'beta'
     self.track = calliope_base.ReleaseTrack.BETA
 
 
-class DisplayDeviceTest(UpdateTestBaseClass, parameterized.TestCase):
+class InstancesSetShieldedInstanceIntegrityPolicyAlphaTest(
+    InstancesSetShieldedInstanceIntegrityPolicyGATest):
 
   def PreSetUp(self):
     self.api_version = 'alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class DisplayDeviceTest(UpdateTestBaseClass, parameterized.TestCase):
+
+  def PreSetUp(self):
+    self.api_version = 'beta'
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def ExpectUpdateDisplayDevice(self, client, enable_display):
     messages = self.messages

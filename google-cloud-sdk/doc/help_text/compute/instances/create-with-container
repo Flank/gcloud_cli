@@ -4,7 +4,8 @@ NAME
 
 SYNOPSIS
     gcloud compute instances create-with-container INSTANCE_NAMES
-        [INSTANCE_NAMES ...] [--no-boot-disk-auto-delete]
+        [INSTANCE_NAMES ...] [--accelerator=[count=COUNT],[type=TYPE]]
+        [--no-boot-disk-auto-delete]
         [--boot-disk-device-name=BOOT_DISK_DEVICE_NAME]
         [--boot-disk-size=BOOT_DISK_SIZE] [--boot-disk-type=BOOT_DISK_TYPE]
         [--can-ip-forward] [--container-arg=CONTAINER_ARG]
@@ -12,6 +13,8 @@ SYNOPSIS
         [--container-env=[KEY=VALUE, ...,...]]
         [--container-env-file=CONTAINER_ENV_FILE]
         [--container-image=CONTAINER_IMAGE]
+        [--container-mount-disk=[mode=MODE],
+          [mount-path=MOUNT-PATH],[name=NAME],[partition=PARTITION]]
         [--container-mount-host-path=[host-path=HOSTPATH,
           mount-path=MOUNTPATH[,mode=MODE],...]]
         [--container-mount-tmpfs=[mount-path=MOUNTPATH,...]]
@@ -59,6 +62,19 @@ POSITIONAL ARGUMENTS
         Names of the instances to create.
 
 FLAGS
+     --accelerator=[count=COUNT],[type=TYPE]
+        Attaches accelerators (e.g. GPUs) to the instances.
+
+         type
+            The specific type (e.g. nvidia-tesla-k80 for nVidia Tesla K80) of
+            accelerator to attach to the instances. Use 'gcloud compute
+            accelerator-types list' to learn about all available accelerator
+            types.
+
+         count
+            Number of accelerators to attach to each instance. The default
+            value is 1.
+
      --boot-disk-auto-delete
         Automatically delete boot disks when their instances are deleted.
         Enabled by default, use --no-boot-disk-auto-delete to disable.
@@ -138,6 +154,28 @@ FLAGS
         Full container image name, which should be pulled onto VM instance, eg.
         docker.io/tomcat.
 
+     --container-mount-disk=[mode=MODE],[mount-path=MOUNT-PATH],[name=NAME],[partition=PARTITION]
+        Mounts a disk to the specified mount path in the container. Multiple '
+        flags are allowed. Must be used with --disk or --create-disk.
+
+         name
+            Name of the disk. If exactly one additional disk is attached to the
+            instance using --disk or --create-disk, specifying disk name here
+            is optional. The name of the single additional disk will be used by
+            default.
+
+         mount-path
+            Path on container to mount to. Mount paths with spaces and commas
+            (and other special characters) are not supported by this command.
+
+         partition
+            Optional. The partition of the disk to mount. Multiple partitions
+            of a disk may be mounted. May not be used with --create-disk.
+
+         mode
+            Volume mount mode: rw (read/write) or ro (read-only). Defaults to
+            rw. Fails if the disk mode is ro and volume mount mode is rw.
+
      --container-mount-host-path=[host-path=HOSTPATH,mount-path=MOUNTPATH[,mode=MODE],...]
         Mounts a volume by using host-path.
 
@@ -184,7 +222,8 @@ FLAGS
 
          name
             Specifies the name of the disk. This option cannot be specified if
-            more than one instance is being created.
+            more than one instance is being created. Must specify this option
+            if attaching the disk to a container with --container-mount-disk.
 
          description
             Optional textual description for the disk being created.
@@ -192,7 +231,8 @@ FLAGS
          mode
             Specifies the mode of the disk. Supported options are ro for
             read-only and rw for read-write. If omitted, rw is used as a
-            default.
+            default. It is an error to create a disk in ro mode if attaching it
+            to a container with --container-mount-disk.
 
          image
             Specifies the name of the image that the disk will be initialized
@@ -234,8 +274,12 @@ FLAGS
 
          device-name
             An optional name that indicates the disk name the guest operating
-            system will see. If omitted, a device name of the form
-            persistent-disk-N will be used.
+            system will see. Must be the same as name if used with
+            --container-mount-disk. If omitted, a device name of the form
+            persistent-disk-N will be used. If omitted and used with
+            --container-mount-disk (where the name of the container mount disk
+            is the same as in this flag), a device name equal to disk name will
+            be used.
 
          auto-delete
             If yes, this persistent disk will be automatically deleted when the
@@ -269,14 +313,18 @@ FLAGS
 
          device-name
             An optional name that indicates the disk name the guest operating
-            system will see. If omitted, a device name of the form
-            persistent-disk-N will be used.
+            system will see. Must be the same as name if used with
+            --container-mount-disk. If omitted, a device name of the form
+            persistent-disk-N will be used. If omitted and used with
+            --container-mount-disk (where the name of the container mount disk
+            is the same as in this flag), a device name equal to disk name will
+            be used.
 
          auto-delete
             If yes, this persistent disk will be automatically deleted when the
             instance is deleted. However, if the disk is later detached from
             the instance, this option won't apply. The default value for this
-            is no.
+            is yes.
 
          scope
             Can be zonal or regional. If zonal, the disk is interpreted as a
@@ -359,7 +407,8 @@ FLAGS
      --network-interface=[PROPERTY=VALUE,...]
         Adds a network interface to the instance. Mutually exclusive with any
         of these flags: --address, --network, --network-tier, --subnet,
-        --private-network-ip.
+        --private-network-ip. This flag can be repeated to specify multiple
+        network interfaces.
 
         The following keys are allowed:
          address
@@ -644,8 +693,9 @@ FLAGS
           Create instance without service account
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

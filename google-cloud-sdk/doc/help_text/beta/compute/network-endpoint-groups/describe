@@ -6,9 +6,6 @@ SYNOPSIS
     gcloud beta compute network-endpoint-groups describe NAME [--zone=ZONE]
         [GCLOUD_WIDE_FLAG ...]
 
-DESCRIPTION
-    (BETA) Describes a Google Compute Engine network endpoint group.
-
 POSITIONAL ARGUMENTS
      NAME
         Name of the network endpoint group to operate on.
@@ -36,14 +33,22 @@ FLAGS
         CLOUDSDK_COMPUTE_ZONE.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
-NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+EXAMPLES
+    To describe a network endpoint group:
 
+        $ gcloud beta compute network-endpoint-groups describe my-neg \
+            --zone=us-central1-a
+
+NOTES
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud compute network-endpoint-groups describe
         $ gcloud alpha compute network-endpoint-groups describe
 

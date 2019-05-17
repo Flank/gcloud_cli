@@ -9,8 +9,9 @@ DESCRIPTION
     (ALPHA) Deploy and manage clusters of machines for running containers.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -24,8 +25,14 @@ GROUPS
      clusters
         (ALPHA) Deploy and teardown Google Kubernetes Engine clusters.
 
+     hub
+        (ALPHA) Manage clusters registered with Google Cloud Platform.
+
      images
         (ALPHA) List and manipulate Google Container Registry images.
+
+     memberships
+        (ALPHA) Manage Google Kubernetes Hub memberships.
 
      node-pools
         (ALPHA) Create and delete operations for Google Kubernetes Engine node
@@ -33,9 +40,6 @@ GROUPS
 
      operations
         (ALPHA) Get and list operations for Google Kubernetes Engine clusters.
-
-     policy
-        (ALPHA) Manage Kubernetes Policies.
 
      subnets
         (ALPHA) Manage subnets to be used by Google Kubernetes Engine clusters.

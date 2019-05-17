@@ -1,0 +1,500 @@
+title: test resource policies for scheduled snapshots
+release_tracks: [BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute resource-policies create-snapshot-schedule $$policy$$ --region=us-central1
+      --start-time 04:00Z --daily-schedule --max-retention-days=1
+  - stderr: |
+      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$].
+- execute:
+  - command: compute disks create $$disk$$ --zone=us-central1-a --resource-policies=$$policy$$
+  - stderr: |
+      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/disks/$$disk$$].
+  - stdout: |
+      NAME                                      ZONE           SIZE_GB  TYPE         STATUS
+      $$disk$$  us-central1-a  500      pd-standard  READY
+  - stderr: |2+
+
+      New disks are unformatted. You must format and mount a disk before it
+      can be used. You can find instructions on how to do this at:
+
+      https://cloud.google.com/compute/docs/disks/add-persistent-disk#formatting
+
+- execute:
+  - command: compute disks remove-resource-policies $$disk$$ --zone=us-central1-a
+      --resource-policies=$$policy$$
+  - stderr: |
+      Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/disks/$$disk$$].
+- execute:
+  - command: compute disks add-resource-policies $$disk$$ --zone=us-central1-a --resource-policies=$$policy$$
+  - stderr: |
+      Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/disks/$$disk$$].
+- execute:
+  - command: compute disks remove-resource-policies $$disk$$ --zone=us-central1-a
+      --resource-policies=$$policy$$
+  - stderr: |
+      Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/disks/$$disk$$].
+- execute:
+  - command: compute resource-policies delete $$policy$$ --region=us-central1
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$].
+- execute:
+  - command: compute disks delete $$disk$$ --zone=us-central1-a
+  - prompt:
+    - message: |
+        The following disks will be deleted:
+         - [$$disk$$] in [us-central1-a]
+    - input: y
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/disks/$$disk$$].
+actions:
+- define_reference:
+    reference: compute-uri
+    value: www.googleapis.com/compute
+- define_reference:
+    reference: api-version
+    track_values:
+      BETA: beta
+      ALPHA: alpha
+- generate_resource_id:
+    reference: disk
+    prefix: gcloud-compute-test
+- generate_resource_id:
+    reference: policy
+    prefix: gcloud-compute-test
+- execute_command:
+    command: compute resource-policies create-snapshot-schedule $$policy$$ --region=us-central1
+      --start-time 04:00Z --daily-schedule --max-retention-days=1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              name: $$policy$$
+              region: us-central1
+              snapshotSchedulePolicy:
+                retentionPolicy:
+                  maxRetentionDays: 1
+                schedule:
+                  dailySchedule:
+                    daysInCycle: 1
+                    startTime: 04:00
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '839'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '4820895007186527775'
+            name: operation-1549998319320-581b71b39bd7f-4e8a08fb-c89f2b61
+            operationType: insert
+            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$
+            targetId: '6671661677060990495'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2019-02-12T11:05:20.288-08:00'
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1549998319320-581b71b39bd7f-4e8a08fb-c89f2b61
+            region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+        poll_operation: true
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$].
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '718'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"utL1PxnlpbOvlUh4hVNES5MP7R0=/6WYh-4fPAlGiRrYNYTBmMo3F7ds="'
+            status: '200'
+          body:
+            kind: compute#resourcePolicy
+            id: '6671661677060990495'
+            creationTimestamp: '2019-02-12T11:05:20.282-08:00'
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$
+            region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+            name: $$policy$$
+            snapshotSchedulePolicy:
+              schedule:
+                dailySchedule:
+                  daysInCycle: 1
+                  startTime: 04:00
+                  duration: PT14400S
+              retentionPolicy:
+                maxRetentionDays: 1
+                onSourceDiskDelete: KEEP_AUTO_SNAPSHOTS
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute disks create $$disk$$ --zone=us-central1-a --resource-policies=$$policy$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '516'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"RfcKdXOWpMGrfN20iOV_DbxWIS0=/ii3SWC83gJJLVOYdY_jns_bFroc="'
+            status: '200'
+          body:
+            kind: compute#zone
+            id: '2000'
+            creationTimestamp: '1969-12-31T16:00:00.000-08:00'
+            name: us-central1-a
+            description: us-central1-a
+            status: UP
+            region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a
+            availableCpuPlatforms:
+            - Intel Skylake
+            - Intel Broadwell
+            - Intel Haswell
+            - Intel Sandy Bridge
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/disks?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              name: $$disk$$
+              resourcePolicies:
+              - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$
+              sizeGb: '500'
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '826'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '6475958447086937625'
+            name: operation-1549998324792-581b71b8d3e87-fa47c6ea-b69f6d4b
+            zone: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a
+            operationType: insert
+            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/disks/$$disk$$
+            targetId: '1523975138936006170'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2019-02-12T11:05:26.196-08:00'
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/operations/operation-1549998324792-581b71b8d3e87-fa47c6ea-b69f6d4b
+        poll_operation: true
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/disks/$$disk$$].
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/disks/$$disk$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '870'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"ywhXNCiQRjP3nBRTH5dFqaftaSE=/fGteAGhDMawilceyYmjz8g1luyI="'
+            status: '200'
+          body:
+            kind: compute#disk
+            id: '1523975138936006170'
+            creationTimestamp: '2019-02-12T11:05:26.187-08:00'
+            name: $$disk$$
+            sizeGb: '500'
+            zone: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a
+            status: READY
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/disks/$$disk$$
+            type: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/diskTypes/pd-standard
+            labelFingerprint: 42WmSpB8rSM=
+            physicalBlockSizeBytes: '4096'
+            resourcePolicies:
+            - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$
+    - expect_stdout: |
+        NAME                                      ZONE           SIZE_GB  TYPE         STATUS
+        $$disk$$  us-central1-a  500      pd-standard  READY
+    - expect_stderr: |2+
+
+        New disks are unformatted. You must format and mount a disk before it
+        can be used. You can find instructions on how to do this at:
+
+        https://cloud.google.com/compute/docs/disks/add-persistent-disk#formatting
+
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute disks remove-resource-policies $$disk$$ --zone=us-central1-a
+      --resource-policies=$$policy$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/disks/$$disk$$/removeResourcePolicies?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              resourcePolicies:
+              - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '842'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '3407039473250117141'
+            name: operation-1549998330372-581b71be2632a-e054ff45-8edfe265
+            zone: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a
+            operationType: removeResourcePolicies
+            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/disks/$$disk$$
+            targetId: '1523975138936006170'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2019-02-12T11:05:30.935-08:00'
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/operations/operation-1549998330372-581b71be2632a-e054ff45-8edfe265
+        poll_operation: true
+    - expect_stderr: |
+        Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/disks/$$disk$$].
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/disks/$$disk$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '682'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"5jF-O8yITTfo-RPerG44BJ-6oD8=/3kKMS9DZMkAVPOQnqsgpCJQfD_E="'
+            status: '200'
+          body:
+            kind: compute#disk
+            id: '1523975138936006170'
+            creationTimestamp: '2019-02-12T11:05:26.187-08:00'
+            name: $$disk$$
+            sizeGb: '500'
+            zone: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a
+            status: READY
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/disks/$$disk$$
+            type: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/diskTypes/pd-standard
+            labelFingerprint: 42WmSpB8rSM=
+            physicalBlockSizeBytes: '4096'
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute disks add-resource-policies $$disk$$ --zone=us-central1-a --resource-policies=$$policy$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/disks/$$disk$$/addResourcePolicies?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              resourcePolicies:
+              - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '839'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '8677649336891254288'
+            name: operation-1549998335154-581b71c2b58df-5086f27c-79cf7183
+            zone: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a
+            operationType: addResourcePolicies
+            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/disks/$$disk$$
+            targetId: '1523975138936006170'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2019-02-12T11:05:35.873-08:00'
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/operations/operation-1549998335154-581b71c2b58df-5086f27c-79cf7183
+        poll_operation: true
+    - expect_stderr: |
+        Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/disks/$$disk$$].
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/disks/$$disk$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '870'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"xSTSIrFVWwAMkBbl7GhRWxgrOQM=/ftHSxtOWWq-of2sZZbaUHT-kQUo="'
+            status: '200'
+          body:
+            kind: compute#disk
+            id: '1523975138936006170'
+            creationTimestamp: '2019-02-12T11:05:26.187-08:00'
+            name: $$disk$$
+            sizeGb: '500'
+            zone: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a
+            status: READY
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/disks/$$disk$$
+            type: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/diskTypes/pd-standard
+            labelFingerprint: 42WmSpB8rSM=
+            physicalBlockSizeBytes: '4096'
+            resourcePolicies:
+            - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute disks remove-resource-policies $$disk$$ --zone=us-central1-a
+      --resource-policies=$$policy$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/disks/$$disk$$/removeResourcePolicies?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              resourcePolicies:
+              - https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '842'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '2060112998802827243'
+            name: operation-1549998340238-581b71c78ee21-75f04c7e-84257606
+            zone: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a
+            operationType: removeResourcePolicies
+            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/disks/$$disk$$
+            targetId: '1523975138936006170'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2019-02-12T11:05:40.818-08:00'
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/operations/operation-1549998340238-581b71c78ee21-75f04c7e-84257606
+        poll_operation: true
+    - expect_stderr: |
+        Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/disks/$$disk$$].
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/disks/$$disk$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '682'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"dDiRU9oQJQ8NwNqbj_0GoHowrOA=/cbX8OF0rTvxoRTTDRg_Pn_fppvA="'
+            status: '200'
+          body:
+            kind: compute#disk
+            id: '1523975138936006170'
+            creationTimestamp: '2019-02-12T11:05:26.187-08:00'
+            name: $$disk$$
+            sizeGb: '500'
+            zone: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a
+            status: READY
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/disks/$$disk$$
+            type: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/diskTypes/pd-standard
+            labelFingerprint: 42WmSpB8rSM=
+            physicalBlockSizeBytes: '4096'
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute resource-policies delete $$policy$$ --region=us-central1
+    cleanup_for: policy
+    events:
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '838'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '431944923282843622'
+            name: operation-1549998345011-581b71cc1c0da-2806231a-275a2410
+            operationType: delete
+            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$
+            targetId: '6671661677060990495'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2019-02-12T11:05:45.810-08:00'
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1549998345011-581b71cc1c0da-2806231a-275a2410
+            region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+        poll_operation: true
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute disks delete $$disk$$ --zone=us-central1-a
+    cleanup_for: disk
+    events:
+    - expect_prompt_continue:
+        message: |
+          The following disks will be deleted:
+           - [$$disk$$] in [us-central1-a]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/disks/$$disk$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '826'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '5842328020761618430'
+            name: operation-1549998353147-581b71d3de757-a87a8e0f-eae9ffc2
+            zone: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a
+            operationType: delete
+            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/disks/$$disk$$
+            targetId: '1523975138936006170'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2019-02-12T11:05:53.927-08:00'
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/operations/operation-1549998353147-581b71d3de757-a87a8e0f-eae9ffc2
+        poll_operation: true
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-a/disks/$$disk$$].
+    - expect_exit:
+        code: 0

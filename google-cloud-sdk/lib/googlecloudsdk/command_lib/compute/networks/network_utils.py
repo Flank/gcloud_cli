@@ -29,7 +29,7 @@ RANGE_HELP_TEXT = """\
     This flag only works if mode is
     [legacy](https://cloud.google.com/compute/docs/vpc/legacy).
 
-    Using legacy networks is **not recommended**, given that many newer Google
+    Using legacy networks is **DEPRECATED**, given that many newer Google
     Cloud Platform features are not supported on legacy networks. Please be
     advised that legacy networks may not be supported in the future.
     """
@@ -48,12 +48,18 @@ _BGP_ROUTING_MODE_CHOICES = {
                 'learned BGP routes.',
 }
 
+_MULTICAST_MODE_CHOICES = {
+    'disabled': 'Multicast is disabled for this network.',
+    'zonal': 'Multicast is allowed within a zone.',
+}
+
 _CREATE_SUBNET_MODE_CHOICES = {
     'auto': 'Subnets are created automatically.  This is the recommended '
             'selection.',
     'custom': 'Create subnets manually.',
-    'legacy': 'Create an old style network that has a range and cannot have '
-              'subnets.  This is not recommended for new networks.',
+    'legacy':
+        '[Deprecated] Create an old style network that has a range and cannot '
+        'have subnets.  This is not recommended for new networks.',
 }
 
 
@@ -90,6 +96,17 @@ def AddCreateBgpRoutingModeArg(parser):
               to regional.""")
 
 
+def AddMulticastModeArg(parser):
+  """Adds the --multicast-mode flag."""
+  parser.add_argument(
+      '--multicast-mode',
+      choices=_MULTICAST_MODE_CHOICES,
+      type=lambda mode: mode.lower(),
+      hidden=True,
+      help="""The multicast mode for this network. If not specified, defaults to
+              disabled.""")
+
+
 def AddUpdateArgs(parser):
   """Adds arguments for updating a network."""
 
@@ -106,6 +123,19 @@ def AddUpdateArgs(parser):
       type=lambda mode: mode.lower(),
       metavar='MODE',
       help="""The target BGP routing mode for this network.""")
+
+
+def AddUpdateArgsAlpha(parser):
+  """Adds arguments for updating a network."""
+
+  AddUpdateArgs(parser)
+
+  parser.add_argument(
+      '--multicast-mode',
+      choices=_MULTICAST_MODE_CHOICES,
+      type=lambda mode: mode.lower(),
+      hidden=True,
+      help="""The multicast mode for this network.""")
 
 
 def CheckRangeLegacyModeOrRaise(args):

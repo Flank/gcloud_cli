@@ -1,0 +1,154 @@
+
+.TH "GCLOUD_ALPHA_DIALOGFLOW_ENTITY\-TYPES_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha dialogflow entity\-types update \- update a Dialogflow entity type
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha dialogflow entity\-types update\fR \fIENTITY_TYPE\fR [\fB\-\-auto\-expand\fR] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-add\-entities\fR=\fIADD_ENTITIES\fR\ \fB\-\-clear\-entities\fR\ |\ \fB\-\-remove\-entities\fR=[\fIREMOVE_ENTITIES\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Update a Dialogflow entity type.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+EntityType resource \- Entity type to update. This represents a Cloud resource.
+(NOTE) Some attributes are not given arguments in this group but can be set in
+other ways. To set the [project] attribute: provide the argument [entity_type]
+on the command line with a fully specified name; set the property
+[core/project]; provide the argument [\-\-project] on the command line. This
+must be specified.
+
+.RS 2m
+.TP 2m
+\fIENTITY_TYPE\fR
+ID of the entityType or fully qualified identifier for the entityType.
+
+
+.RE
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-auto\-expand\fR
+Whether or not the entity type can be automatically expanded to idenitify
+entities not explicitly included.
+
+.TP 2m
+\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
+A human readable name for the entity type.
+
+.TP 2m
+
+Use these flags for adding and removing entities:
+
+.RS 2m
+.TP 2m
+\fB\-\-add\-entities\fR=\fIADD_ENTITIES\fR
+Comma separated list of entities, or a map of entities to synonyms, to be added
+to existing list of entities.
+
+If specified with \f5\-\-remove\-entities\fR or \f5\-\-clear\-entities\fR,
+entities will be removed in a separate request before entities are added. If an
+entity with a given value exists, it will be overwritten.
+
+If a list, the entities can contain references to other entity types (with or
+without aliases).
+
+To specify a map, set this flag with \f5\-\-flags\-file\fR as a map, where each
+key is the canonical name and each value is a list of synonyms to map to the
+canonical name. The canonical name must be explicitly included in the list of
+synonyms. For more information on \f5\-\-flags\-file\fR, see \f5gcloud topics
+flags\-file\fR.
+
+For example, use \f5\-\-flags\-file=flags.yaml\fR, where \f5flags.yaml\fR
+contains:
+
+.RS 2m
+\-\-entities:
+  red:
+  \- red
+  \- cherry
+  \- rose
+  blue:
+  \- blue
+  \- azure
+  \- cyan
+.RE
+
+For more information, see
+https://cloud.google.com/dialogflow\-enterprise/docs/reference/rest/v2/Entity.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-entities\fR
+If true, remove all existing entities.
+
+Can be used with \f5\-\-add\-entities\fR to replace existing entities.
+
+.TP 2m
+\fB\-\-remove\-entities\fR=[\fIREMOVE_ENTITIES\fR,...]
+A comma separated list of entities to be removed.
+
+
+.RE
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBdialogflow/v2\fR API. The full documentation for this
+API can be found at: https://cloud.google.com/dialogflow\-enterprise/
+
+
+
+.SH "EXAMPLES"
+
+To update the display name of an entity type:
+
+.RS 2m
+$ gcloud alpha dialogflow entity\-types update \-\-display\-name="color"
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/.
+

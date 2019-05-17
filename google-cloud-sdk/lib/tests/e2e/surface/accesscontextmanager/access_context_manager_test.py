@@ -48,7 +48,7 @@ class AccessContextManagerE2eTests(e2e_base.WithServiceAuth,
   # needs to belong to one regular perimeter).
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   @contextlib.contextmanager
   def _SetPolicyProperty(self, policy):
@@ -89,16 +89,15 @@ class AccessContextManagerE2eTests(e2e_base.WithServiceAuth,
         '    {}'.format(level_id))
 
   @contextlib.contextmanager
-  def _CreateZone(self):
-    perimeter_id = _GetResourceName('ZONE')
+  def _CreatePerimeter(self):
+    perimeter_id = _GetResourceName('PERIMETER')
     try:
-      self.Run(
-          'access-context-manager perimeters create'
-          '    --perimeter-type bridge '
-          '    --title "My Zone {perimeter}" '
-          '    --resources projects/{project} '
-          '   {perimeter}'.format(project=self.PROJECT_NUMBER,
-                                  perimeter=perimeter_id))
+      self.Run('access-context-manager perimeters create'
+               '    --perimeter-type bridge '
+               '    --title "My Perimeter {perimeter}" '
+               '    --resources projects/{project} '
+               '   {perimeter}'.format(
+                   project=self.PROJECT_NUMBER, perimeter=perimeter_id))
       yield perimeter_id
     finally:
       self.Run(
@@ -106,19 +105,18 @@ class AccessContextManagerE2eTests(e2e_base.WithServiceAuth,
           '    --quiet '
           '   {}'.format(perimeter_id))
 
-  def _UpdateZone(self, perimeter_id, new_title):
+  def _UpdatePerimeter(self, perimeter_id, new_title):
     return self.Run(
         'access-context-manager perimeters update '
         '    --title "{}" '
         '    {}'.format(new_title, perimeter_id))
 
-  def _DescribeZone(self, perimeter_id):
+  def _DescribePerimeter(self, perimeter_id):
     return self.Run(
         'access-context-manager perimeters describe '
         '    --format disable '  # Disable format to get a return value
         '    {}'.format(perimeter_id))
 
-  @test_case.Filters.skip('Failing', 'b/110040923')
   def testAccessContextManager(self):
     policies = list(self.Run(
         'access-context-manager policies list '
@@ -135,12 +133,25 @@ class AccessContextManagerE2eTests(e2e_base.WithServiceAuth,
         self._UpdateLevel(level_id, 'My Level Redux ' + level_id)
         level = self._DescribeLevel(level_id)
         self.assertEqual(level.title, 'My Level Redux ' + level_id)
-        with self._CreateZone() as perimeter_id:
-          perimeter = self._DescribeZone(perimeter_id)
-          self.assertEqual(perimeter.title, 'My Zone ' + perimeter_id)
-          self._UpdateZone(perimeter_id, 'My Zone Redux ' + perimeter_id)
-          perimeter = self._DescribeZone(perimeter_id)
-          self.assertEqual(perimeter.title, 'My Zone Redux ' + perimeter_id)
+      with self._CreatePerimeter() as perimeter_id:
+        perimeter = self._DescribePerimeter(perimeter_id)
+        self.assertEqual(perimeter.title, 'My Perimeter ' + perimeter_id)
+        self._UpdatePerimeter(perimeter_id,
+                              'My Perimeter Redux ' + perimeter_id)
+        perimeter = self._DescribePerimeter(perimeter_id)
+        self.assertEqual(perimeter.title, 'My Perimeter Redux ' + perimeter_id)
+
+
+class AccessContextManagerE2eTestsBeta(AccessContextManagerE2eTests):
+
+  # Beta has support for regions.
+  LEVEL_SPEC = ('[{"ipSubnetworks": ["8.8.8.8/32"]}, '
+                '{"regions": ["CA", "US"]}, '
+                '{"members": ["user:example@example.com"]}, '
+                '{"devicePolicy": {"requireScreenlock": true}}]')
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 if __name__ == '__main__':

@@ -56,7 +56,7 @@ class DataprocIntegrationTestBase(
   DEFAULT_ZONE = 'us-central1-f'
   # Smallest VM allowed by API
   WORKER_MACHINE_TYPE = 'n1-standard-1'
-  WORKER_DISK_SIZE = '10GB'
+  WORKER_DISK_SIZE = '20GB'
   # Namenode tends to fall over with less (b/26403628)
   MASTER_MACHINE_TYPE = 'n1-standard-2'
   MASTER_DISK_SIZE = '20GB'
@@ -79,9 +79,11 @@ class DataprocIntegrationTestBase(
     if not self.zone:
       self.zone = self.DEFAULT_ZONE
     # TODO(b/36052524): Clean up clusters after beta release
-    cluster_name_generator = e2e_utils.GetResourceNameGenerator(
+    name_generator = e2e_utils.GetResourceNameGenerator(
         prefix='gcloud-dataproc-test')
-    self.cluster_name = next(cluster_name_generator)
+    self.cluster_name = next(name_generator)
+    self.autoscaling_policy_id = next(name_generator)
+    self.another_autoscaling_policy_id = next(name_generator)
 
   def TearDown(self):
     """Tears down the cluster."""
@@ -117,6 +119,7 @@ class DataprocIntegrationTestBase(
     self.assertEqual(self.messages.ClusterStatus.StateValueValuesEnum.RUNNING,
                      result.status.state)
     self.assertEqual(2, result.config.workerConfig.numInstances)
+    return result
 
   def CreateClusterWithRetries(self, max_retrials=1, args=''):
     def CleanUpFailure(result, unused_status):

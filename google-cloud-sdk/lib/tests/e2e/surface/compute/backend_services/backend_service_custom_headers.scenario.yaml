@@ -1,5 +1,5 @@
 title: Test setting custom request headers on a backend service.
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 
 
 summary:
@@ -41,7 +41,9 @@ summary:
 
 
 actions:
-
+- define_reference:
+    reference: compute-uri
+    value: www.googleapis.com/compute
 
 - define_reference:
     reference: api-version
@@ -84,7 +86,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$http-bs$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$http-bs$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -117,7 +119,7 @@ actions:
               drainingTimeoutSec: 0
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$http-bs$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$http-bs$$?alt=json
           method: PATCH
           headers: {}
           body:
@@ -163,7 +165,7 @@ actions:
         Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$http-bs$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$http-bs$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$http-bs$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -210,7 +212,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$http-bs$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$http-bs$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -245,7 +247,7 @@ actions:
             - 'Test:'
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$http-bs$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$http-bs$$?alt=json
           method: PATCH
           headers: {}
           body:
@@ -290,7 +292,7 @@ actions:
         Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$http-bs$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$http-bs$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/backendServices/$$http-bs$$?alt=json
           method: GET
           headers: {}
           body: null

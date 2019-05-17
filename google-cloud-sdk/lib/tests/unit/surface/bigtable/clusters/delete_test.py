@@ -19,19 +19,18 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.calliope.concepts import concepts_test_base
 from tests.lib.command_lib.util.concepts import resource_completer_test_base
 from tests.lib.surface.bigtable import base
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA)
-class DeleteCommandTest(base.BigtableV2TestBase,
-                        resource_completer_test_base.ResourceCompleterBase,
-                        concepts_test_base.ConceptsTestBase):
+class DeleteCommandTestGA(base.BigtableV2TestBase,
+                          resource_completer_test_base.ResourceCompleterBase,
+                          concepts_test_base.ConceptsTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.svc = self.client.projects_instances_clusters.Delete
@@ -39,12 +38,23 @@ class DeleteCommandTest(base.BigtableV2TestBase,
         name='projects/{0}/instances/{1}/clusters/{2}'.format(
             self.Project(), 'theinstance', 'thecluster'))
 
-  def testDelete(self, track):
-    self.track = track
+  def testDelete(self):
     self.svc.Expect(request=self.msg, response=self.msgs.Empty())
     self.WriteInput('y\n')
     self.Run('bigtable clusters delete thecluster --instance theinstance')
     self.AssertLogContains('Deleted cluster [thecluster]')
+
+
+class DeleteCommandTestBeta(DeleteCommandTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class DeleteCommandTestAlpha(DeleteCommandTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

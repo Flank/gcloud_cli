@@ -1,10 +1,11 @@
 """Generated message classes for datacatalog version v1beta1.
 
-Datahub APIs provides features to attach metadata to Google Cloud Platform
-resources like Bigquery Tables.<br> Key critical resources include -<br>     -
-Entries  (Datahub representation of a cloud resource)<br>     - Tag Templates
-(Definition of columns and value types for attaching metadata)<br>     - Tags
-(Values associated with Tag templates and attached to Entries.)<br> Datahub
+Google Cloud Data Catalog API provides features to attach metadata to Google
+Cloud Platform resources like BigQuery Tables.<br> Key critical resources
+include: <ul>     <li>Entries (Data Catalog representation of a cloud
+resource)</li>     <li>Tag Templates (Definition of columns and value types
+for attaching metadata)</li>     <li>Tags (Values associated with Tag
+templates and attached to Entries.)</li> </ul> Google Cloud Data Catalog API
 also provides rich search functionality to search resources for Entries and
 tags.
 """
@@ -17,160 +18,74 @@ from apitools.base.py import encoding
 package = 'datacatalog'
 
 
-class DatacatalogCatalogSearchRequest(_messages.Message):
-  r"""A DatacatalogCatalogSearchRequest object.
-
-  Fields:
-    orderBy: Specifies the ordering of results following syntax at
-      https://cloud.google.com/apis/design/design_patterns#sorting_order. We
-      only support ordering by a single metrics field and currently supported
-      choices are :  * 'relevance'  * 'last_access_timestamp'  *
-      'last_modified_timestamp' and  * 'title'.
-    pageSize: Number of results in the search page. If <=0 then defaults to
-      10. Max limit for page_size is 1000. Throws an invalid argument for
-      page_size > 1000.
-    pageToken: Token that specifies which page is requested. If empty then the
-      first page is returned.
-    query: Required. The query string in search query syntax. The query must
-      be non-empty. Query strings can be simple as "x" or more qualified as: *
-      name:x * column:x * desc:x OR description:y * column_desc:x OR
-      column_description:x
-  """
-
-  orderBy = _messages.StringField(1)
-  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(3)
-  query = _messages.StringField(4)
-
-
 class DatacatalogEntriesLookupRequest(_messages.Message):
   r"""A DatacatalogEntriesLookupRequest object.
 
   Fields:
-    fullResourceName: Required. The full name of the cloud resource the entry
-      belongs to. See:
+    linkedResource: The full name of the Google Cloud Platform resource the
+      Data Catalog entry represents. See:
       https://cloud.google.com/apis/design/resource_names#full_resource_name
-      Example: "//bigquery.googleapis.com/projects/projectId/datasets/datasetI
-      d/tables/tableId".
+      Full names are case-sensitive.  Examples: "//bigquery.googleapis.com/pro
+      jects/projectId/datasets/datasetId/tables/tableId".
+      "//pubsub.googleapis.com/projects/projectId/topics/topicId"
+    sqlResource: The SQL name of the entry. SQL names are case-sensitive.
+      Examples: <ul>   <li>cloud_pubsub.project_id.topic_id</li>
+      <li>pubsub.project_id.`topic.id.with.dots`</li>
+      <li>bigquery.project_id.dataset_id.table_id</li>
+      <li>datacatalog.project_id.location_id.entry_group_id.entry_id</li>
+      </ul> *_ids shoud satisfy the standard SQL rules for identifiers.
+      https://cloud.google.com/bigquery/docs/reference/standard-sql/lexical
   """
 
-  fullResourceName = _messages.StringField(1)
+  linkedResource = _messages.StringField(1)
+  sqlResource = _messages.StringField(2)
 
 
-class DatacatalogProjectsDatasetsEntriesListRequest(_messages.Message):
-  r"""A DatacatalogProjectsDatasetsEntriesListRequest object.
+class DatacatalogProjectsLocationsEntryGroupsEntriesGetRequest(_messages.Message):
+  r"""A DatacatalogProjectsLocationsEntryGroupsEntriesGetRequest object.
 
   Fields:
-    pageSize: Optional. The maximum number of items to return. Default is 10.
-      Max limit is 1000. Throws an invalid argument for page_size > 1000.
-    pageToken: Optional. Token that specifies which page is requested. If
-      empty, the first page is returned.
-    parent: Required. The dataset name that contains the entries, which can be
-      provided in URL format, for example, "projects/a/datasets/b".
+    name: Required. The name of the entry. For example, "projects/{project_id}
+      /locations/{location}/entryGroups/{entry_group_id}/entries/{entry_id}".
   """
 
-  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(2)
-  parent = _messages.StringField(3, required=True)
+  name = _messages.StringField(1, required=True)
 
 
-class GoogleCloudDatacatalogV1beta1Entry(_messages.Message):
-  r"""Entry Metadata.
+class DatacatalogProjectsLocationsEntryGroupsEntriesPatchRequest(_messages.Message):
+  r"""A DatacatalogProjectsLocationsEntryGroupsEntriesPatchRequest object.
+
+  Fields:
+    googleCloudDatacatalogV1beta1Entry: A GoogleCloudDatacatalogV1beta1Entry
+      resource to be passed as the request body.
+    name: The Data Catalog resource name of the entry in URL format. For
+      example, "projects/{project_id}/locations/{location}/entryGroups/{entry_
+      group_id}/entries/{entry_id}".
+    updateMask: The fields to update on the entry.  If absent or empty, all
+      modifiable fields are updated.  Modifiable fields in synced entries:  1.
+      schema (Pub/Sub topics only)  Modifiable fields in native entries:  1.
+      display_name 2. description 3. schema
+  """
+
+  googleCloudDatacatalogV1beta1Entry = _messages.MessageField('GoogleCloudDatacatalogV1beta1Entry', 1)
+  name = _messages.StringField(2, required=True)
+  updateMask = _messages.StringField(3)
+
+
+class GoogleCloudDatacatalogV1beta1BigQueryTableSpec(_messages.Message):
+  r"""Describes a BigQuery table.
 
   Enums:
-    TypeValueValuesEnum: Type of entry.
+    TableSourceTypeValueValuesEnum: The table source type.
 
   Fields:
-    createTime: Output only. The creation time.
-    description: Entry description, which can consist of several sentences or
-      paragraphs that describe entry contents.
-    displayName: Display information such as title and description. A short
-      name to identify the entry, for example, "Analytics Data - Jan 2011".
-    fullResourceName: The full name of the cloud resource the entry belongs
-      to. See:
-      https://cloud.google.com/apis/design/resource_names#full_resource_name
-      Example: "//bigquery.googleapis.com/projects/projectId/datasets/datasetI
-      d/tables/tableId".
-    type: Type of entry.
-    updateTime: Output only. The last-modified time.
+    tableSourceType: The table source type.
+    viewSpec: Table view specification. This field should only be populated if
+      table_source_type is BIGQUERY_VIEW.
   """
-
-  class TypeValueValuesEnum(_messages.Enum):
-    r"""Type of entry.
-
-    Values:
-      ENTRY_TYPE_UNSPECIFIED: Default unknown type
-      TABLE: The type of entry that has a GoogleSQL schema, including logical
-        views.
-    """
-    ENTRY_TYPE_UNSPECIFIED = 0
-    TABLE = 1
-
-  createTime = _messages.StringField(1)
-  description = _messages.StringField(2)
-  displayName = _messages.StringField(3)
-  fullResourceName = _messages.StringField(4)
-  type = _messages.EnumField('TypeValueValuesEnum', 5)
-  updateTime = _messages.StringField(6)
-
-
-class GoogleCloudDatacatalogV1beta1ListEntriesResponse(_messages.Message):
-  r"""Response to request to list entries in a dataset.
-
-  Fields:
-    entries: Entry details.
-    nextPageToken: Token to retrieve the next page of results. It is set to
-      empty if no items remain in results.
-  """
-
-  entries = _messages.MessageField('GoogleCloudDatacatalogV1beta1Entry', 1, repeated=True)
-  nextPageToken = _messages.StringField(2)
-
-
-class GoogleCloudDatacatalogV1beta1SearchCatalogResponse(_messages.Message):
-  r"""Response to a search request.
-
-  Fields:
-    nextPageToken: The token that can be used to retrieve the next page of
-      results.
-    results: Search results in descending order of relevance.
-  """
-
-  nextPageToken = _messages.StringField(1)
-  results = _messages.MessageField('GoogleCloudDatacatalogV1beta1SearchCatalogResult', 2, repeated=True)
-
-
-class GoogleCloudDatacatalogV1beta1SearchCatalogResult(_messages.Message):
-  r"""A result that appears in the response of a search request. Each result
-  captures details of one entry that matches the search.
-
-  Enums:
-    EntryTypeValueValuesEnum: Type of the entry.
-    TableSourceTypeValueValuesEnum: Table source type.
-
-  Fields:
-    entryType: Type of the entry.
-    fullResourceName: The full name of the cloud resource the entry belongs
-      to. See:
-      https://cloud.google.com/apis/design/resource_names#full_resource_name
-      Example: "//bigquery.googleapis.com/projects/projectId/datasets/datasetI
-      d/tables/tableId".
-    tableSourceType: Table source type.
-  """
-
-  class EntryTypeValueValuesEnum(_messages.Enum):
-    r"""Type of the entry.
-
-    Values:
-      ENTRY_TYPE_UNSPECIFIED: Default unknown type
-      TABLE: The type of entry that has a GoogleSQL schema, including logical
-        views.
-    """
-    ENTRY_TYPE_UNSPECIFIED = 0
-    TABLE = 1
 
   class TableSourceTypeValueValuesEnum(_messages.Enum):
-    r"""Table source type.
+    r"""The table source type.
 
     Values:
       TABLE_SOURCE_TYPE_UNSPECIFIED: Default unknown type.
@@ -181,9 +96,126 @@ class GoogleCloudDatacatalogV1beta1SearchCatalogResult(_messages.Message):
     BIGQUERY_VIEW = 1
     BIGQUERY_TABLE = 2
 
-  entryType = _messages.EnumField('EntryTypeValueValuesEnum', 1)
-  fullResourceName = _messages.StringField(2)
-  tableSourceType = _messages.EnumField('TableSourceTypeValueValuesEnum', 3)
+  tableSourceType = _messages.EnumField('TableSourceTypeValueValuesEnum', 1)
+  viewSpec = _messages.MessageField('GoogleCloudDatacatalogV1beta1ViewSpec', 2)
+
+
+class GoogleCloudDatacatalogV1beta1ColumnSchema(_messages.Message):
+  r"""Representation of a column within a schema. Columns could be nested
+  inside other columns.
+
+  Fields:
+    column: Required. Name of the column.
+    description: Description of the column.
+    mode: A column's mode indicates whether the values in this column are
+      required, nullable, etc. Only 'NULLABLE', 'REQUIRED' and 'REPEATED' are
+      supported, default mode is 'NULLABLE'.
+    subcolumns: Schema of sub-columns.
+    type: Required. Type of the column.
+  """
+
+  column = _messages.StringField(1)
+  description = _messages.StringField(2)
+  mode = _messages.StringField(3)
+  subcolumns = _messages.MessageField('GoogleCloudDatacatalogV1beta1ColumnSchema', 4, repeated=True)
+  type = _messages.StringField(5)
+
+
+class GoogleCloudDatacatalogV1beta1Entry(_messages.Message):
+  r"""Entry Metadata.  A Data Catalog Entry resource represents another
+  resource in Google Cloud Platform, such as a BigQuery Dataset or a Pub/Sub
+  Topic. Clients can use the `linked_resource` field in the Entry resource to
+  refer to the original resource id of the source system.  An Entry resource
+  contains resource details, such as its schema. An Entry can also be used to
+  attach flexible metadata, such as a Tag.
+
+  Enums:
+    TypeValueValuesEnum: Type of entry.
+
+  Fields:
+    bigqueryTableSpec: Specification that applies to a BigQuery table. This is
+      only valid on entries of type TABLE.
+    description: Entry description, which can consist of several sentences or
+      paragraphs that describe entry contents.
+    displayName: Display information such as title and description. A short
+      name to identify the entry, for example, "Analytics Data - Jan 2011".
+    linkedResource: Output only. The full name of the cloud resource the entry
+      belongs to. See:
+      https://cloud.google.com/apis/design/resource_names#full_resource_name
+      Data Catalog supports resources from select Google Cloud Platform
+      systems. `linked_resource` is the full name of the Google Cloud Platform
+      resource. For example, the `linked_resource` for a table resource from
+      BigQuery is:  "//bigquery.googleapis.com/projects/projectId/datasets/dat
+      asetId/tables/tableId".
+    name: The Data Catalog resource name of the entry in URL format. For
+      example, "projects/{project_id}/locations/{location}/entryGroups/{entry_
+      group_id}/entries/{entry_id}".
+    schema: Schema of the entry.
+    sourceSystemTimestamps: Output only. Timestamps about the underlying
+      Google Cloud Platform resource -- not about this Data Catalog Entry.
+    type: Type of entry.
+  """
+
+  class TypeValueValuesEnum(_messages.Enum):
+    r"""Type of entry.
+
+    Values:
+      ENTRY_TYPE_UNSPECIFIED: Default unknown type
+      TABLE: The type of entry that has a GoogleSQL schema, including logical
+        views.
+      DATA_STREAM: An entry type which is used for streaming entries. Example
+        - Pub/Sub.
+    """
+    ENTRY_TYPE_UNSPECIFIED = 0
+    TABLE = 1
+    DATA_STREAM = 2
+
+  bigqueryTableSpec = _messages.MessageField('GoogleCloudDatacatalogV1beta1BigQueryTableSpec', 1)
+  description = _messages.StringField(2)
+  displayName = _messages.StringField(3)
+  linkedResource = _messages.StringField(4)
+  name = _messages.StringField(5)
+  schema = _messages.MessageField('GoogleCloudDatacatalogV1beta1Schema', 6)
+  sourceSystemTimestamps = _messages.MessageField('GoogleCloudDatacatalogV1beta1SystemTimestamps', 7)
+  type = _messages.EnumField('TypeValueValuesEnum', 8)
+
+
+class GoogleCloudDatacatalogV1beta1Schema(_messages.Message):
+  r"""Represents a schema (e.g. BigQuery, GoogleSQL, Avro schema).
+
+  Fields:
+    columns: Schema of columns. A maximum of 10,000 columns and sub-columns
+      can be specified.
+  """
+
+  columns = _messages.MessageField('GoogleCloudDatacatalogV1beta1ColumnSchema', 1, repeated=True)
+
+
+class GoogleCloudDatacatalogV1beta1SystemTimestamps(_messages.Message):
+  r"""Timestamps about this resource according to a particular system.
+
+  Fields:
+    createTime: Output only. The creation time of the resource within the
+      given system.
+    expireTime: Output only. The expiration time of the resource within the
+      given system.
+    updateTime: Output only. The last-modified time of the resource within the
+      given system.
+  """
+
+  createTime = _messages.StringField(1)
+  expireTime = _messages.StringField(2)
+  updateTime = _messages.StringField(3)
+
+
+class GoogleCloudDatacatalogV1beta1ViewSpec(_messages.Message):
+  r"""Table view specification.
+
+  Fields:
+    viewQuery: The query that defines the table view.
+  """
+
+  viewQuery = _messages.StringField(1)
 
 
 class StandardQueryParameters(_messages.Message):

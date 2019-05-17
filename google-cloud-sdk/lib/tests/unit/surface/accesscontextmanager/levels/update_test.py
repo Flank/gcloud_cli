@@ -26,10 +26,10 @@ from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
 
 
-class LevelsUpdateTestBeta(accesscontextmanager.Base):
+class LevelsUpdateTestGA(accesscontextmanager.Base):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)
@@ -100,7 +100,7 @@ class LevelsUpdateTestBeta(accesscontextmanager.Base):
 
     self.assertEqual(results, level)
 
-  def testCreate_PolicyFromProperty(self):
+  def testUpdate_PolicyFromProperty(self):
     self.SetUpForTrack(self.track)
     policy = 'my_acm_policy'
     properties.VALUES.access_context_manager.policy.Set(policy)
@@ -113,11 +113,17 @@ class LevelsUpdateTestBeta(accesscontextmanager.Base):
     self.assertEqual(results, level)
 
 
-class LevelsUpdateTestAlpha(LevelsUpdateTestBeta):
+class LevelsUpdateTestBeta(LevelsUpdateTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class LevelsUpdateTestAlpha(LevelsUpdateTestGA):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
 
+
 if __name__ == '__main__':
   test_case.main()
-

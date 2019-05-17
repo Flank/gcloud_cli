@@ -20,9 +20,9 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import functools
-import enum  # pylint: disable=unused-import, for pytype
 
 from googlecloudsdk.api_lib.compute import filter_rewrite
+from googlecloudsdk.api_lib.compute import kms_utils
 from googlecloudsdk.api_lib.compute.regions import service as regions_service
 from googlecloudsdk.api_lib.compute.zones import service as zones_service
 from googlecloudsdk.calliope import actions
@@ -237,7 +237,6 @@ class ResourceArgScopes(object):
     self.scopes = {}
 
   def AddScope(self, scope, collection):
-    # type: (enum.Enum, str) -> None
     self.scopes[scope] = ResourceArgScope(scope, self.flag_prefix, collection)
 
   def SpecifiedByArgs(self, args):
@@ -510,7 +509,7 @@ class ResourceResolver(object):
         api_resource_registry)
 
     # Now unpack each element.
-    refs = [ref[0] for ref in refs]  # type: list[resources.Resource]
+    refs = [ref[0] for ref in refs]
 
     # Make sure correct collection was given for each resource, for example
     # URLs have implicit collections.
@@ -795,6 +794,51 @@ def AddStorageLocationFlag(parser, resource):
       """.format(resource))
 
 
+def AddGuestFlushFlag(parser, resource):
+  parser.add_argument(
+      '--guest-flush',
+      action='store_true',
+      default=False,
+      help=('Create an application-consistent {} by informing the OS '
+            'to prepare for the snapshot process. Currently only supported '
+            'on Windows instances using the Volume Shadow Copy Service '
+            '(VSS).'.format(resource)))
+
+
+def AddShieldedInstanceInitialStateKeyArg(parser):
+  """Add the initial state for shielded instance arg."""
+  parser.add_argument(
+      '--platform-key-file',
+      help="""\
+      Single Platform Key file path used when booting up
+      shielded instance from this image.
+        """)
+  parser.add_argument(
+      '--key-exchange-key-file',
+      type=arg_parsers.ArgList(),
+      metavar='KEK_VALUE',
+      help="""\
+      List of key exchange key file paths used when booting up
+      shieled instance from this image.
+        """)
+  parser.add_argument(
+      '--signature-database-file',
+      type=arg_parsers.ArgList(),
+      metavar='DB_VALUE',
+      help="""\
+      List of valid public certificates file paths used when booting up
+      shieled instance from this image.
+        """)
+  parser.add_argument(
+      '--forbidden-database-file',
+      type=arg_parsers.ArgList(),
+      metavar='DBX_VALUE',
+      help="""\
+      List of revoked certificates file paths used when
+      booting up shieled instance from this image.
+        """)
+
+
 def RewriteFilter(args, message=None, frontend_fields=None):
   """Rewrites args.filter into client and server filter expression strings.
 
@@ -824,3 +868,82 @@ def RewriteFilter(args, message=None, frontend_fields=None):
           args.filter, defaults=defaults)
   log.info('client_filter=%r server_filter=%r', client_filter, server_filter)
   return client_filter, server_filter
+
+
+def AddSourceDiskKmsKeyArg(parser):
+  spec = {
+      'disk': str,
+      'kms-key': str,
+      'kms-project': str,
+      'kms-location': str,
+      'kms-keyring': str,
+  }
+
+  parser.add_argument(
+      '--source-disk-kms-key',
+      type=arg_parsers.ArgDict(spec=spec),
+      action='append',
+      metavar='PROPERTY=VALUE',
+      help="""
+              KMS encryption key of the disk attached to the
+              source instance. Required if the source disk is protected by
+              a KMS encryption key. This flag may be repeated to specify
+              multiple attached disks.
+
+              *disk*::: URL of the disk attached to the source instance.
+              This can be a full or valid partial URL
+
+              *kms-key*::: Fully qualified Cloud KMS cryptokey name that
+              protects the {resource}.
+              This can either be the fully qualified path or the name.
+              The fully qualified Cloud KMS cryptokey name format is:
+              ``projects/<kms-project>/locations/<kms-location>/keyRings/<kms-keyring>/
+              cryptoKeys/<key-name>''.
+              If the value is not fully qualified then kms-location, kms-keyring, and
+              optionally kms-project are required.
+              See {kms_help} for more details.
+
+              *kms-project*::: Project that contains the Cloud KMS cryptokey that
+              protects the {resource}.
+               If the project is not specified then the project where the
+               {resource} is being created will be used.
+               If this flag is set then key-location, kms-keyring, and kms-key
+               are required.
+               See {kms_help} for more details.
+
+              *kms-location*::: Location of the Cloud KMS cryptokey to be used for
+               protecting the {resource}.
+               All Cloud KMS cryptokeys are reside in a 'location'.
+              To get a list of possible locations run 'gcloud kms locations list'.
+              If this flag is set then kms-keyring and kms-key are required.
+              See {kms_help} for more details.
+
+              *kms-keyring*::: The keyring which contains the Cloud KMS cryptokey that
+              will protect the {resource}.
+                If this flag is set then kms-location and kms-key are required.
+                See {kms_help} for more details.
+              """.format(resource='disk', kms_help=kms_utils.KMS_HELP_URL))
+
+
+def AddSourceDiskCsekKeyArg(parser):
+  spec = {
+      'disk': str,
+      'csek-key-file': str
+  }
+  parser.add_argument(
+      '--source-disk-csek-key',
+      type=arg_parsers.ArgDict(spec=spec),
+      action='append',
+      metavar='PROPERTY=VALUE',
+      help="""
+              Customer-supplied encryption key of the disk attached to the
+              source instance. Required if the source disk is protected by
+              a customer-supplied encryption key. This flag may be repeated to
+              specify multiple attached disks.
+
+              *disk*::: URL of the disk attached to the source instance.
+              This can be a full or   valid partial URL
+
+              *csek-key-file*::: path to customer-supplied encryption key.
+            """
+  )

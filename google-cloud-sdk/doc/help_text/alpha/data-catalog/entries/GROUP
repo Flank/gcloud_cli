@@ -1,0 +1,37 @@
+NAME
+    gcloud alpha data-catalog entries - manage entries in Cloud Data Catalog
+
+SYNOPSIS
+    gcloud alpha data-catalog entries COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage entries in Cloud Data Catalog.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     describe
+        (ALPHA) Describe a Cloud Data Catalog entry.
+
+     lookup
+        (ALPHA) Lookup a Cloud Data Catalog entry by its target name.
+
+     update
+        (ALPHA) Update a Cloud Data Catalog entry.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. This variant is also available:
+
+        $ gcloud beta data-catalog entries
+

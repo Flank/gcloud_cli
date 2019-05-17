@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
+from googlecloudsdk.core import resources
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
@@ -39,6 +40,8 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest,
   def SetUp(self):
     SetUp(self, 'beta')
     self.track = calliope_base.ReleaseTrack.BETA
+    self.resources = resources.REGISTRY.Clone()
+    self.resources.RegisterApiByName('compute', 'beta')
 
   def testScopeWarning(self):
     messages = self.messages
@@ -524,6 +527,49 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest,
             --global
           """)
 
+  def testWithFailover(self):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [messages.BackendService(
+            name='my-backend-service',
+            port=80,
+            fingerprint=b'my-fingerprint',
+            timeoutSec=120)],
+        [],
+    ])
+
+    self.Run("""
+        compute backend-services add-backend my-backend-service
+          --instance-group my-group
+          --instance-group-zone us-central1-a
+          --failover
+          --global
+        """)
+
+    self.CheckRequests(
+        [(self.compute.backendServices, 'Get',
+          messages.ComputeBackendServicesGetRequest(
+              backendService='my-backend-service', project='my-project'))],
+        [(self.compute.backendServices, 'Update',
+          messages.ComputeBackendServicesUpdateRequest(
+              backendService='my-backend-service',
+              backendServiceResource=messages.BackendService(
+                  name='my-backend-service',
+                  port=80,
+                  fingerprint=b'my-fingerprint',
+                  backends=[
+                      messages.Backend(
+                          failover=True,
+                          group=self.resources.Create(
+                              'compute.instanceGroups',
+                              instanceGroup='my-group',
+                              project='my-project',
+                              zone='us-central1-a').SelfLink()),
+                  ],
+                  timeoutSec=120),
+              project='my-project'))],
+    )
+
   def testInstanceGroupAndNetworkEndpointGroupMutualExclusion(self):
     messages = self.messages
     self.make_requests.side_effect = iter([
@@ -554,7 +600,7 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest,
       ('--instance-group', 'CONNECTION', '--max-connections-per-endpoint'),
       ('--instance-group', 'RATE', '--max-rate-per-endpoint'),)
   def testGroupResourceMatchesFlags(self, group_flag, balancing_mode,
-                                    incomptaible_flag):
+                                    incompatible_flag):
     messages = self.messages
     self.make_requests.side_effect = iter([
         [messages.BackendService(
@@ -565,7 +611,7 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest,
     with self.AssertRaisesExceptionMatches(
         exceptions.InvalidArgumentException,
         'Invalid value for [{0}]: cannot be set with {1}'.format(
-            incomptaible_flag, group_flag)):
+            incompatible_flag, group_flag)):
       self.Run("""
           compute backend-services add-backend my-backend-service
             {0} my-group
@@ -573,7 +619,7 @@ class BackendServiceAddBackendBetaTest(test_base.BaseTest,
             --balancing-mode {1}
             {2} 100
             --global
-          """.format(group_flag, balancing_mode, incomptaible_flag))
+          """.format(group_flag, balancing_mode, incompatible_flag))
 
 
 class BackendServiceAddBackendRegionalInstanceGroupTest(test_base.BaseTest):

@@ -26,7 +26,7 @@ from tests.lib.surface.filestore import base
 class CloudFilestoreLocationsListTest(base.CloudFilestoreUnitTestBase):
 
   def SetUp(self):
-    self.SetUpTrack(calliope_base.ReleaseTrack.BETA)
+    self.SetUpTrack(calliope_base.ReleaseTrack.GA)
 
   def RunList(self, *args):
     return self.Run(['filestore', 'locations', 'list'] + list(args))
@@ -74,6 +74,12 @@ class CloudFilestoreLocationsListTest(base.CloudFilestoreUnitTestBase):
         https://file.googleapis.com/{0}/projects/{1}/locations/Location2
         """.format(self.api_version, self.Project()),
         normalize_space=True)
+
+
+class CloudFilestoreLocationsListBetaTest(CloudFilestoreLocationsListTest):
+
+  def SetUp(self):
+    self.SetUpTrack(calliope_base.ReleaseTrack.BETA)
 
 
 class CloudFilestoreLocationsListAlphaTest(

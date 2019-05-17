@@ -25,42 +25,26 @@ from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.compute import completers
 from googlecloudsdk.core.resource import resource_projector
 from tests.lib import completer_test_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
 import mock
 
 
-class DisksListTest(test_base.BaseTest, completer_test_base.CompleterBase):
+class DisksListCompleterTestGA(
+    test_base.BaseTest, completer_test_base.CompleterBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     lister_patcher = mock.patch(
-        'googlecloudsdk.api_lib.compute.lister.GetZonalResourcesDicts',
+        'googlecloudsdk.api_lib.compute.lister.MultiScopeLister',
         autospec=True)
     self.addCleanup(lister_patcher.stop)
-    self.mock_get_zonal_resources = lister_patcher.start()
-    self.mock_get_zonal_resources.return_value = (
+    self.mock_multi_scope_lister = lister_patcher.start()
+    self.mock_multi_scope_lister.return_value.return_value = (
         resource_projector.MakeSerializable(test_resources.DISKS))
-
-  def testTableOutput(self):
-    self.Run(
-        'compute disks list')
-    self.mock_get_zonal_resources.assert_called_once_with(
-        service=self.compute_v1.disks,
-        project='my-project',
-        requested_zones=[],
-        filter_expr=None,
-        http=self.mock_http(),
-        batch_url=self.batch_url,
-        errors=[])
-    self.AssertOutputEquals(
-        textwrap.dedent("""\
-            NAME   ZONE   SIZE_GB TYPE        STATUS
-            disk-1 zone-1 10      pd-ssd      READY
-            disk-2 zone-1 10      pd-ssd      READY
-            disk-3 zone-1 10      pd-standard READY
-            """), normalize_space=True)
 
   def testDisksCompleter(self):
     self.RunCompleter(
@@ -78,22 +62,33 @@ class DisksListTest(test_base.BaseTest, completer_test_base.CompleterBase):
     )
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'),
-                          (calliope_base.ReleaseTrack.BETA, 'beta'))
-class RegionalDisksListTest(test_base.BaseTest, parameterized.TestCase):
+class DisksListCompleterTestBeta(DisksListCompleterTestGA):
 
-  def _SetUp(self, track, api_version):
-    self.SelectApi(api_version)
-    self.track = track
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class DisksListCompleterTestAlpha(DisksListCompleterTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class RegionalDisksListTestGA(test_base.BaseTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+    self.api_version = 'v1'
+
+  def SetUp(self):
+    self.SelectApi(self.api_version)
 
     list_json_patcher = mock.patch(
         'googlecloudsdk.api_lib.compute.request_helper.ListJson', autospec=True)
     self.addCleanup(list_json_patcher.stop)
     self.list_json = list_json_patcher.start()
 
-  def testOutputFormat(self, track, api_version):
-    self._SetUp(track, api_version)
+  def testOutputFormat(self):
     self.list_json.side_effect = [
         resource_projector.MakeSerializable(test_resources.DISKS + [
             self.messages.Disk(
@@ -130,8 +125,7 @@ class RegionalDisksListTest(test_base.BaseTest, parameterized.TestCase):
               disk-3 region-1 region 10 pd-standard READY
               """), normalize_space=True)
 
-  def testOnlyRegional(self, track, api_version):
-    self._SetUp(track, api_version)
+  def testOnlyRegional(self):
     self.list_json.side_effect = [
         [encoding.MessageToDict(self.messages.Disk(
             name='disk-3',
@@ -161,6 +155,20 @@ class RegionalDisksListTest(test_base.BaseTest, parameterized.TestCase):
               NAME LOCATION LOCATION_SCOPE SIZE_GB TYPE STATUS
               disk-3 region-1 region 10 pd-standard READY
               """), normalize_space=True)
+
+
+class RegionalDisksListTestBeta(RegionalDisksListTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
+
+
+class RegionalDisksListTestAlpha(RegionalDisksListTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
 
 
 if __name__ == '__main__':

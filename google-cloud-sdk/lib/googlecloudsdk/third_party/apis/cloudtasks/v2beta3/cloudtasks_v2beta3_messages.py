@@ -173,6 +173,8 @@ class AppEngineHttpRequest(_messages.Message):
       HEAD: HTTP HEAD
       PUT: HTTP PUT
       DELETE: HTTP DELETE
+      PATCH: HTTP PATCH
+      OPTIONS: HTTP OPTIONS
     """
     HTTP_METHOD_UNSPECIFIED = 0
     POST = 1
@@ -180,6 +182,8 @@ class AppEngineHttpRequest(_messages.Message):
     HEAD = 3
     PUT = 4
     DELETE = 5
+    PATCH = 6
+    OPTIONS = 7
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class HeadersValue(_messages.Message):
@@ -295,7 +299,7 @@ class Attempt(_messages.Message):
   Fields:
     dispatchTime: Output only. The time that this attempt was dispatched.
       `dispatch_time` will be truncated to the nearest microsecond.
-    responseStatus: Output only. The response from the target for this
+    responseStatus: Output only. The response from the worker for this
       attempt.  If `response_time` is unset, then the task has not been
       attempted or is currently running and the `response_status` field is
       meaningless.
@@ -315,10 +319,10 @@ class Binding(_messages.Message):
   r"""Associates `members` with a `role`.
 
   Fields:
-    condition: Unimplemented. The condition that is associated with this
-      binding. NOTE: an unsatisfied condition will not allow user access via
-      current binding. Different bindings, including their conditions, are
-      examined independently.
+    condition: The condition that is associated with this binding. NOTE: An
+      unsatisfied condition will not allow user access via current binding.
+      Different bindings, including their conditions, are examined
+      independently.
     members: Specifies the identities requesting access for a Cloud Platform
       resource. `members` can have the following values:  * `allUsers`: A
       special identifier that represents anyone who is    on the internet;
@@ -330,8 +334,8 @@ class Binding(_messages.Message):
       service    account. For example, `my-other-
       app@appspot.gserviceaccount.com`.  * `group:{emailid}`: An email address
       that represents a Google group.    For example, `admins@example.com`.
-      * `domain:{domain}`: A Google Apps domain name that represents all the
-      users of that domain. For example, `google.com` or `example.com`.
+      * `domain:{domain}`: The G Suite domain (primary) that represents all
+      the    users of that domain. For example, `google.com` or `example.com`.
     role: Role that is assigned to `members`. For example, `roles/viewer`,
       `roles/editor`, or `roles/owner`.
   """
@@ -458,7 +462,7 @@ class CloudtasksProjectsLocationsQueuesPatchRequest(_messages.Message):
       format: `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`  *
       `PROJECT_ID` can contain letters ([A-Za-z]), numbers ([0-9]),    hyphens
       (-), colons (:), or periods (.).    For more information, see
-      [Identifying projects](https://cloud.google.com/resource-manager/docs
+      [Identifying    projects](https://cloud.google.com/resource-manager/docs
       /creating-managing-projects#identifying_projects) * `LOCATION_ID` is the
       canonical ID for the queue's location.    The list of available
       locations can be obtained by calling    ListLocations.    For more
@@ -619,11 +623,10 @@ class CloudtasksProjectsLocationsQueuesTasksListRequest(_messages.Message):
       IAM](https://cloud.google.com/iam/) permission on the Task resource.
 
   Fields:
-    pageSize: Requested page size. Fewer tasks than requested might be
-      returned.  The maximum page size is 1000. If unspecified, the page size
-      will be the maximum. Fewer tasks than requested might be returned, even
-      if more tasks exist; use next_page_token in the response to determine if
-      more tasks exist.
+    pageSize: Maximum page size.  Fewer tasks than requested might be
+      returned, even if more tasks exist; use next_page_token in the response
+      to determine if more tasks exist.  The maximum page size is 1000. If
+      unspecified, the page size will be the maximum.
     pageToken: A token identifying the page of results to return.  To request
       the first page results, page_token must be empty. To request the next
       page of results, page_token must be the value of next_page_token
@@ -804,6 +807,156 @@ class GetIamPolicyRequest(_messages.Message):
   r"""Request message for `GetIamPolicy` method."""
 
 
+class HttpRequest(_messages.Message):
+  r"""HTTP request.  Warning: This is an
+  [alpha](https://cloud.google.com/terms/launch-stages) feature. If you
+  haven't already joined, you can [use this form to sign
+  up](https://docs.google.com/forms/d/e
+  /1FAIpQLSfc4uEy9CBHKYUSdnY1hdhKDCX7julVZHy3imOiR-XrU7bUNQ/viewform).  The
+  task will be pushed to the worker as an HTTP request. If the worker or the
+  redirected worker acknowledges the task by returning a successful HTTP
+  response code ([`200` - `299`]), the task will removed from the queue. If
+  any other HTTP response code is returned or no response is received, the
+  task will be retried according to the following:  * User-specified
+  throttling: retry configuration,   rate limits, and the queue's state.  *
+  System throttling: To prevent the worker from overloading, Cloud Tasks may
+  temporarily reduce the queue's effective rate. User-specified settings
+  will not be changed.   System throttling happens because:    * Cloud Tasks
+  backoffs on all errors. Normally the backoff specified in     rate limits
+  will be used. But if the worker returns     `429` (Too Many Requests), `503`
+  (Service Unavailable), or the rate of     errors is high, Cloud Tasks will
+  use a higher backoff rate. The retry     specified in the `Retry-After` HTTP
+  response header is considered.    * To prevent traffic spikes and to smooth
+  sudden large traffic spikes,     dispatches ramp up slowly when the queue is
+  newly created or idle and     if large numbers of tasks suddenly become
+  available to dispatch (due to     spikes in create task rates, the queue
+  being unpaused, or many tasks     that are scheduled at the same time).
+
+  Enums:
+    HttpMethodValueValuesEnum: The HTTP method to use for the request. The
+      default is POST.
+
+  Messages:
+    HeadersValue: HTTP request headers.  This map contains the header field
+      names and values. Headers can be set when the task is created.  These
+      headers represent a subset of the headers that will accompany the task's
+      HTTP request. Some HTTP request headers will be ignored or replaced.  A
+      partial list of headers that will be ignored or replaced is:  * Host:
+      This will be computed by Cloud Tasks and derived from   HttpRequest.url.
+      * Content-Length: This will be computed by Cloud Tasks. * User-Agent:
+      This will be set to `"Google-Cloud-Tasks"`. * X-Google-*: Google use
+      only. * X-AppEngine-*: Google use only.  `Content-Type` won't be set by
+      Cloud Tasks. You can explicitly set `Content-Type` to a media type when
+      the  task is created.  For example, `Content-Type` can be set to
+      `"application/octet-stream"` or  `"application/json"`.  Headers which
+      can have multiple values (according to RFC2616) can be specified using
+      comma-separated values.  The size of the headers must be less than 80KB.
+
+  Fields:
+    body: HTTP request body.  A request body is allowed only if the HTTP
+      method is POST, PUT, or PATCH. It is an error to set body on a task with
+      an incompatible HttpMethod.
+    headers: HTTP request headers.  This map contains the header field names
+      and values. Headers can be set when the task is created.  These headers
+      represent a subset of the headers that will accompany the task's HTTP
+      request. Some HTTP request headers will be ignored or replaced.  A
+      partial list of headers that will be ignored or replaced is:  * Host:
+      This will be computed by Cloud Tasks and derived from   HttpRequest.url.
+      * Content-Length: This will be computed by Cloud Tasks. * User-Agent:
+      This will be set to `"Google-Cloud-Tasks"`. * X-Google-*: Google use
+      only. * X-AppEngine-*: Google use only.  `Content-Type` won't be set by
+      Cloud Tasks. You can explicitly set `Content-Type` to a media type when
+      the  task is created.  For example, `Content-Type` can be set to
+      `"application/octet-stream"` or  `"application/json"`.  Headers which
+      can have multiple values (according to RFC2616) can be specified using
+      comma-separated values.  The size of the headers must be less than 80KB.
+    httpMethod: The HTTP method to use for the request. The default is POST.
+    oauthToken: If specified, an [OAuth
+      token](https://developers.google.com/identity/protocols/OAuth2) will be
+      generated and attached as an `Authorization` header in the HTTP request.
+      This type of authorization should be used when sending requests to a GCP
+      endpoint.
+    oidcToken: If specified, an
+      [OIDC](https://developers.google.com/identity/protocols/OpenIDConnect)
+      token will be generated and attached as an `Authorization` header in the
+      HTTP request.  This type of authorization should be used when sending
+      requests to third party endpoints or Cloud Run. .
+    url: Required. The full url path that the request will be sent to.  This
+      string must begin with either "http://" or "https://". Some examples
+      are: `http://acme.com` and `https://acme.com/sales:8080`. Cloud Tasks
+      will encode some characters for safety and compatibility. The maximum
+      allowed URL length is 2083 characters after encoding.  The `Location`
+      header response from a redirect response [`300` - `399`] may be
+      followed. The redirect is not counted as a separate attempt.
+  """
+
+  class HttpMethodValueValuesEnum(_messages.Enum):
+    r"""The HTTP method to use for the request. The default is POST.
+
+    Values:
+      HTTP_METHOD_UNSPECIFIED: HTTP method unspecified
+      POST: HTTP POST
+      GET: HTTP GET
+      HEAD: HTTP HEAD
+      PUT: HTTP PUT
+      DELETE: HTTP DELETE
+      PATCH: HTTP PATCH
+      OPTIONS: HTTP OPTIONS
+    """
+    HTTP_METHOD_UNSPECIFIED = 0
+    POST = 1
+    GET = 2
+    HEAD = 3
+    PUT = 4
+    DELETE = 5
+    PATCH = 6
+    OPTIONS = 7
+
+  @encoding.MapUnrecognizedFields('additionalProperties')
+  class HeadersValue(_messages.Message):
+    r"""HTTP request headers.  This map contains the header field names and
+    values. Headers can be set when the task is created.  These headers
+    represent a subset of the headers that will accompany the task's HTTP
+    request. Some HTTP request headers will be ignored or replaced.  A partial
+    list of headers that will be ignored or replaced is:  * Host: This will be
+    computed by Cloud Tasks and derived from   HttpRequest.url. * Content-
+    Length: This will be computed by Cloud Tasks. * User-Agent: This will be
+    set to `"Google-Cloud-Tasks"`. * X-Google-*: Google use only. *
+    X-AppEngine-*: Google use only.  `Content-Type` won't be set by Cloud
+    Tasks. You can explicitly set `Content-Type` to a media type when the
+    task is created.  For example, `Content-Type` can be set to `"application
+    /octet-stream"` or  `"application/json"`.  Headers which can have multiple
+    values (according to RFC2616) can be specified using comma-separated
+    values.  The size of the headers must be less than 80KB.
+
+    Messages:
+      AdditionalProperty: An additional property for a HeadersValue object.
+
+    Fields:
+      additionalProperties: Additional properties of type HeadersValue
+    """
+
+    class AdditionalProperty(_messages.Message):
+      r"""An additional property for a HeadersValue object.
+
+      Fields:
+        key: Name of the additional property.
+        value: A string attribute.
+      """
+
+      key = _messages.StringField(1)
+      value = _messages.StringField(2)
+
+    additionalProperties = _messages.MessageField('AdditionalProperty', 1, repeated=True)
+
+  body = _messages.BytesField(1)
+  headers = _messages.MessageField('HeadersValue', 2)
+  httpMethod = _messages.EnumField('HttpMethodValueValuesEnum', 3)
+  oauthToken = _messages.MessageField('OAuthToken', 4)
+  oidcToken = _messages.MessageField('OidcToken', 5)
+  url = _messages.StringField(6)
+
+
 class ListLocationsResponse(_messages.Message):
   r"""The response message for Locations.ListLocations.
 
@@ -926,6 +1079,46 @@ class Location(_messages.Message):
   name = _messages.StringField(5)
 
 
+class OAuthToken(_messages.Message):
+  r"""Contains information needed for generating an [OAuth
+  token](https://developers.google.com/identity/protocols/OAuth2). This type
+  of authorization should be used when sending requests to a GCP endpoint.
+
+  Fields:
+    scope: OAuth scope to be used for generating OAuth access token. If not
+      specified, "https://www.googleapis.com/auth/cloud-platform" will be
+      used.
+    serviceAccountEmail: [Service account
+      email](https://cloud.google.com/iam/docs/service-accounts) to be used
+      for generating OAuth token. The service account must be within the same
+      project as the queue. The caller must have iam.serviceAccounts.actAs
+      permission for the service account.
+  """
+
+  scope = _messages.StringField(1)
+  serviceAccountEmail = _messages.StringField(2)
+
+
+class OidcToken(_messages.Message):
+  r"""Contains information needed for generating an [OpenID Connect
+  token](https://developers.google.com/identity/protocols/OpenIDConnect). This
+  type of authorization should be used when sending requests to third party
+  endpoints or Cloud Run. .
+
+  Fields:
+    audience: Audience to be used when generating OIDC token. If not
+      specified, the URI specified in target will be used.
+    serviceAccountEmail: [Service account
+      email](https://cloud.google.com/iam/docs/service-accounts) to be used
+      for generating OIDC token. The service account must be within the same
+      project as the queue. The caller must have iam.serviceAccounts.actAs
+      permission for the service account.
+  """
+
+  audience = _messages.StringField(1)
+  serviceAccountEmail = _messages.StringField(2)
+
+
 class PauseQueueRequest(_messages.Message):
   r"""Request message for PauseQueue."""
 
@@ -986,14 +1179,14 @@ class Queue(_messages.Message):
       . UpdateQueue cannot be used to change `state`.
 
   Fields:
-    appEngineHttpQueue: App Engine HTTP queue.  An App Engine queue is a queue
-      that has an AppEngineHttpQueue type.
+    appEngineHttpQueue: AppEngineHttpQueue settings apply only to App Engine
+      tasks in this queue.
     name: Caller-specified and required in CreateQueue, after which it becomes
       output only.  The queue name.  The queue name must have the following
       format: `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`  *
       `PROJECT_ID` can contain letters ([A-Za-z]), numbers ([0-9]),    hyphens
       (-), colons (:), or periods (.).    For more information, see
-      [Identifying projects](https://cloud.google.com/resource-manager/docs
+      [Identifying    projects](https://cloud.google.com/resource-manager/docs
       /creating-managing-projects#identifying_projects) * `LOCATION_ID` is the
       canonical ID for the queue's location.    The list of available
       locations can be obtained by calling    ListLocations.    For more
@@ -1008,22 +1201,30 @@ class Queue(_messages.Message):
       will be truncated to the nearest microsecond. Purge time will be unset
       if the queue has never been purged.
     rateLimits: Rate limits for task dispatches.  rate_limits and retry_config
-      are related because they both control task attempts however they control
-      how tasks are attempted in different ways:  * rate_limits controls the
+      are related because they both control task attempts. However they
+      control task attempts in different ways:  * rate_limits controls the
       total rate of   dispatches from a queue (i.e. all traffic dispatched
       from the   queue, regardless of whether the dispatch is from a first
       attempt or a retry). * retry_config controls what happens to
       particular a task after its first attempt fails. That is,   retry_config
-      controls task retries (the   second attempt, third attempt, etc).
+      controls task retries (the   second attempt, third attempt, etc).  The
+      queue's actual dispatch rate is the result of:  * Number of tasks in the
+      queue * User-specified throttling: rate_limits,   retry_config, and the
+      queue's state. * System throttling due to `429` (Too Many Requests) or
+      `503` (Service   Unavailable) responses from the worker, high error
+      rates, or to smooth   sudden large traffic spikes.
     retryConfig: Settings that determine the retry behavior.  * For tasks
       created using Cloud Tasks: the queue-level retry settings   apply to all
       tasks in the queue that were created using Cloud Tasks.   Retry settings
       cannot be set on individual tasks. * For tasks created using the App
       Engine SDK: the queue-level retry   settings apply to all tasks in the
       queue which do not have retry settings   explicitly set on the task and
-      were created by the App Engine SDK. See   [App Engine documentation](htt
-      ps://cloud.google.com/appengine/docs/standard/python/taskqueue/push
+      were created by the App Engine SDK. See   [App Engine   documentation](h
+      ttps://cloud.google.com/appengine/docs/standard/python/taskqueue/push
       /retrying-tasks).
+    stackdriverLoggingConfig: Configuration options for writing logs to
+      [Stackdriver Logging](https://cloud.google.com/logging/docs/). If this
+      field is unset, then no logs are written.
     state: Output only. The state of the queue.  `state` can only be changed
       by called PauseQueue, ResumeQueue, or uploading [queue.yaml/xml](https:/
       /cloud.google.com/appengine/docs/python/config/queueref). UpdateQueue
@@ -1065,7 +1266,8 @@ class Queue(_messages.Message):
   purgeTime = _messages.StringField(3)
   rateLimits = _messages.MessageField('RateLimits', 4)
   retryConfig = _messages.MessageField('RetryConfig', 5)
-  state = _messages.EnumField('StateValueValuesEnum', 6)
+  stackdriverLoggingConfig = _messages.MessageField('StackdriverLoggingConfig', 6)
+  state = _messages.EnumField('StateValueValuesEnum', 7)
 
 
 class RateLimits(_messages.Message):
@@ -1241,6 +1443,20 @@ class SetIamPolicyRequest(_messages.Message):
   policy = _messages.MessageField('Policy', 1)
 
 
+class StackdriverLoggingConfig(_messages.Message):
+  r"""Configuration options for writing logs to [Stackdriver
+  Logging](https://cloud.google.com/logging/docs/).
+
+  Fields:
+    samplingRatio: Specifies the fraction of operations to write to
+      [Stackdriver Logging](https://cloud.google.com/logging/docs/). This
+      field may contain any value between 0.0 and 1.0, inclusive. 0.0 is the
+      default and means that no operations are logged.
+  """
+
+  samplingRatio = _messages.FloatField(1)
+
+
 class StandardQueryParameters(_messages.Message):
   r"""Query parameters accepted by all methods.
 
@@ -1390,17 +1606,45 @@ class Task(_messages.Message):
       Task has been returned.
 
   Fields:
-    appEngineHttpRequest: App Engine HTTP request that is sent to the task's
-      target. Can be set only if app_engine_http_queue is set on the queue.
-      An App Engine task is a task that has AppEngineHttpRequest set.
+    appEngineHttpRequest: HTTP request that is sent to the App Engine app
+      handler.  An App Engine task is a task that has AppEngineHttpRequest
+      set.
     createTime: Output only. The time that the task was created.
       `create_time` will be truncated to the nearest second.
     dispatchCount: Output only. The number of attempts dispatched.  This count
-      includes tasks which have been dispatched but haven't received a
+      includes attempts which have been dispatched but haven't received a
       response.
+    dispatchDeadline: The deadline for requests sent to the worker. If the
+      worker does not respond by this deadline then the request is cancelled
+      and the attempt is marked as a `DEADLINE_EXCEEDED` failure. Cloud Tasks
+      will retry the task according to the RetryConfig.  Note that when the
+      request is cancelled, Cloud Tasks will stop listing for the response,
+      but whether the worker stops processing depends on the worker. For
+      example, if the worker is stuck, it may not react to cancelled requests.
+      The default and maximum values depend on the type of request:   * For
+      App Engine tasks, 0 indicates that the   request has the default
+      deadline. The default deadline depends on the   [scaling
+      type](https://cloud.google.com/appengine/docs/standard/go/how-instances-
+      are-managed#instance_scaling)   of the service: 10 minutes for standard
+      apps with automatic scaling, 24   hours for standard apps with manual
+      and basic scaling, and 60 minutes for   flex apps. If the request
+      deadline is set, it must be in the interval [15   seconds, 24 hours 15
+      seconds]. Regardless of the task's   `dispatch_deadline`, the app
+      handler will not run for longer than than   the service's timeout. We
+      recommend setting the `dispatch_deadline` to   at most a few seconds
+      more than the app handler's timeout. For more   information see
+      [Timeouts](https://cloud.google.com/tasks/docs/creating-appengine-
+      handlers#timeouts).  `dispatch_deadline` will be truncated to the
+      nearest millisecond. The deadline is an approximate deadline.
     firstAttempt: Output only. The status of the task's first attempt.  Only
       dispatch_time will be set. The other Attempt information is not retained
       by Cloud Tasks.
+    httpRequest: HTTP request that is sent to the task's target.  Warning:
+      This is an [alpha](https://cloud.google.com/terms/launch-stages)
+      feature. If you haven't already joined, you can [use this form to sign
+      up](https://docs.google.com/forms/d/e
+      /1FAIpQLSfc4uEy9CBHKYUSdnY1hdhKDCX7julVZHy3imOiR-XrU7bUNQ/viewform).  An
+      HTTP task is a task that has HttpRequest set.
     lastAttempt: Output only. The status of the task's last attempt.
     name: Optionally caller-specified in CreateTask.  The task name.  The task
       name must have the following format: `projects/PROJECT_ID/locations/LOCA
@@ -1447,12 +1691,14 @@ class Task(_messages.Message):
   appEngineHttpRequest = _messages.MessageField('AppEngineHttpRequest', 1)
   createTime = _messages.StringField(2)
   dispatchCount = _messages.IntegerField(3, variant=_messages.Variant.INT32)
-  firstAttempt = _messages.MessageField('Attempt', 4)
-  lastAttempt = _messages.MessageField('Attempt', 5)
-  name = _messages.StringField(6)
-  responseCount = _messages.IntegerField(7, variant=_messages.Variant.INT32)
-  scheduleTime = _messages.StringField(8)
-  view = _messages.EnumField('ViewValueValuesEnum', 9)
+  dispatchDeadline = _messages.StringField(4)
+  firstAttempt = _messages.MessageField('Attempt', 5)
+  httpRequest = _messages.MessageField('HttpRequest', 6)
+  lastAttempt = _messages.MessageField('Attempt', 7)
+  name = _messages.StringField(8)
+  responseCount = _messages.IntegerField(9, variant=_messages.Variant.INT32)
+  scheduleTime = _messages.StringField(10)
+  view = _messages.EnumField('ViewValueValuesEnum', 11)
 
 
 class TestIamPermissionsRequest(_messages.Message):

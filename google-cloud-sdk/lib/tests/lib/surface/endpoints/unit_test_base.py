@@ -45,8 +45,6 @@ class EV1UnitTestBase(sdk_test_base.WithFakeAuth,
     EV1UnitTestBase.PROJECT_NAME = self.Project()
     self.services_messages = core_apis.GetMessagesModule(
         'servicemanagement', 'v1')
-    self.apikeys_messages = core_apis.GetMessagesModule(
-        'apikeys', 'v1')
 
   def SetUp(self):
     properties.VALUES.core.project.Set(self.PROJECT_NAME)
@@ -60,13 +58,6 @@ class EV1UnitTestBase(sdk_test_base.WithFakeAuth,
             'servicemanagement', 'v1', no_http=True))
     self.mocked_client.Mock()
     self.addCleanup(self.mocked_client.Unmock)
-
-    # Mock out the Apikeys API
-    self.mocked_apikeys_client = mock.Client(
-        core_apis.GetClientClass('apikeys', 'v1'),
-        real_client=core_apis.GetClientInstance('apikeys', 'v1', no_http=True))
-    self.mocked_apikeys_client.Mock()
-    self.addCleanup(self.mocked_apikeys_client.Unmock)
 
     # Mock out time.sleep calls in operation polling
     self.time_mock = self.StartObjectPatch(time, 'time')

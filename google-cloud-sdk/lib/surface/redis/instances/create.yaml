@@ -1,18 +1,19 @@
 - help_text:
     brief: |
       Create a Memorystore Redis instance.
-    DESCRIPTION: |
+    description: |
       Create a new Redis instance.
 
       This command can fail for the following reasons:
         * An instance with the same name already exists.
         * The active account does not have permission to create instances.
-    EXAMPLES: |
+    examples: |
       To create a basic tier instance with the name `my-redis-instance` in region `us-central-1`
       with memory size of 5 GiB, run:
 
         $ {command} my-redis-instance --region=us-central1 --size=5
 
+  release_tracks: [ALPHA, BETA, GA]
   arguments:
     resource:
       spec: !REF googlecloudsdk.command_lib.redis.resources:instance
@@ -85,13 +86,17 @@
           - api_field: value
     - arg_name: redis-version
       api_field: instance.redisVersion
-      hidden: true
+      GA:
+        hidden: true
       metavar: VERSION
       help_text: The version of Redis software.
       choices:
       - enum_value: REDIS_3_2
         arg_value: redis_3_2
-        help_text: Deploy Redis 3.2
+        help_text: Redis 3.2 compatibility
+      - enum_value: REDIS_4_0
+        arg_value: redis_4_0
+        help_text: Redis 4.0 compatibility
     - arg_name: reserved-ip-range
       api_field: instance.reservedIpRange
       help_text: |

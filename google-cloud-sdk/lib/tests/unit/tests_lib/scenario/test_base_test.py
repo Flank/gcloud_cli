@@ -19,8 +19,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import unittest
-
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions as calliope_exceptions
 from googlecloudsdk.core import exceptions
@@ -210,21 +208,27 @@ actions:
     self.assertEquals('otherproj', properties.VALUES.core.project.Get())
 
 
-class TestBaseSkipTests(test_base.ScenarioTestBase):
+class TestBaseSkipTests(test_base.ScenarioTestBase, parameterized.TestCase):
 
-  def testSkip(self):
-    data = """\
-title: my scenario
-release_tracks: [ALPHA, BETA]
-skip:
-  reason: skip this
-  bug: b/12345
-actions: []
-"""
-    spec_path = self.Touch(self.temp_path, contents=data)
-    with self.assertRaisesRegex(unittest.SkipTest, r'skip this \(b/12345\)'):
-      self.RunScenario(spec_path, calliope_base.ReleaseTrack.GA,
-                       session.ExecutionMode.LOCAL, [])
+  def SetUp(self):
+    # Test skip behavior can be changed by env vars, so prevent that here.
+    self.StartEnvPatch({}, clear=True)
+
+  @parameterized.named_parameters(
+      ('SkippedRemote', True, session.ExecutionMode.REMOTE,
+       {'reason': 'Failing', 'bug': 'b/123456789'}),
+      ('SkippedLocal', True, session.ExecutionMode.LOCAL,
+       {'reason': 'Failing', 'bug': 'b/123456789', 'locally': True}),
+      ('NotSkippedRemote', False, session.ExecutionMode.REMOTE, None),
+      ('NotSkippedLocal', False, session.ExecutionMode.LOCAL,
+       {'reason': 'Failing', 'bug': 'b/123456789'}),
+  )
+  def testSkipper(self, expected_is_skipped, execution_mode, skip_data):
+    def Test():
+      pass
+    skipped_test = test_base.SkipIfSkipped(skip_data, execution_mode)(Test)
+    is_skipped = Test != skipped_test
+    self.assertEqual(expected_is_skipped, is_skipped)
 
 
 if __name__ == '__main__':

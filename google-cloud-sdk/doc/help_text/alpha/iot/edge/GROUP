@@ -1,0 +1,43 @@
+NAME
+    gcloud alpha iot edge - manage Cloud IoT Edge resources
+
+SYNOPSIS
+    gcloud alpha iot edge GROUP [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage Cloud IoT Edge resources, including the Edge device itself,
+    Edge functions, containers, and ML models.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+GROUPS
+    GROUP is one of the following:
+
+     containers
+        (ALPHA) Manage Edge Containers.
+
+     devices
+        (ALPHA) Manage Cloud IoT Edge Devices.
+
+     functions
+        (ALPHA) Manage Edge Functions.
+
+     ml
+        (ALPHA) Manage Edge ML Models.
+
+     topic-bridge
+        (ALPHA) Manage topic bridging table for the Edge device.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you will have to apply for early access and
+    have your projects registered on the API whitelist to use it. To do so,
+    contact Support at https://cloud.google.com/support/.
+

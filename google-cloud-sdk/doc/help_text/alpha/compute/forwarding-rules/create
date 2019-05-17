@@ -221,8 +221,8 @@ OPTIONAL FLAGS
           forwarding rule. Assigned IP addresses can be reserved or unreserved.
 
           IP addresses are restricted based on the forwarding rule's load
-          balancing scheme (EXTERNAL, INTERNAL, INTERNAL_MANAGED or
-          INTERNAL_SELF_MANAGED) and scope (global or regional).
+          balancing scheme ((EXTERNAL, INTERNAL, INTERNAL_MANAGED,
+          INTERNAL_SELF_MANAGED)) and scope (global or regional).
 
           When the --load-balancing-scheme is EXTERNAL, if the address is
           reserved, it must either (1) reside in the global scope if the
@@ -398,8 +398,9 @@ OPTIONAL FLAGS
           can be all or a set of at most 5 ports.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

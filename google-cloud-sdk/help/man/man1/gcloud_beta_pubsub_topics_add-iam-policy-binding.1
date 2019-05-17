@@ -58,11 +58,11 @@ Examples: \f5user:test\-user@gmail.com\fR, \f5group:admins@example.com\fR,
 Can also be one of the following special values:
 .RS 2m
 .IP "\(em" 2m
-\f5allUsers\fR \- anyone who is on the internet, with or without a Google
-account.
+\f5allUsers\fR \- Special identifier that represents anyone who is on the
+internet, with or without a Google account.
 .IP "\(em" 2m
-\f5allAuthenticatedUsers\fR \- anyone who is authenticated with a Google account
-or a service account.
+\f5allAuthenticatedUsers\fR \- Special identifier that represents anyone who is
+authenticated with a Google account or a service account.
 .RE
 .RE
 .sp
@@ -78,10 +78,11 @@ Define the role of the member.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -107,8 +108,7 @@ add an IAM policy binding for the role of 'roles/editor' to the given service
 account:
 
 .RS 2m
-$ gcloud beta pubsub topics add\-iam\-policy\-binding \e
-    test\-proj1@example.domain.com \e
+$ gcloud beta pubsub topics add\-iam\-policy\-binding my\-topic \e
     \-\-member='serviceAccount:test\-proj1@example.domain.com' \e
     \-\-role='roles/editor'
 .RE

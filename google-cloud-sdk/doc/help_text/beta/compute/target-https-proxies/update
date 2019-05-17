@@ -16,7 +16,7 @@ DESCRIPTION
     target HTTPS proxy in turn points to a URL map that defines the rules for
     routing the requests. The URL map's job is to map URLs to backend services
     which handle the actual requests. The target HTTPS proxy also points to at
-    most 10 SSL certificates used for server-side authentication. The target
+    most 15 SSL certificates used for server-side authentication. The target
     HTTPS proxy can be associated with at most one SSL policy.
 
 POSITIONAL ARGUMENTS
@@ -38,7 +38,7 @@ FLAGS
             Allows Google to control when QUIC is rolled out.
 
      --ssl-certificates=SSL_CERTIFICATE,[...]
-        References to at most 10 SSL certificate resources that are used for
+        References to at most 15 SSL certificate resources that are used for
         server-side authentication. The first SSL certificate in this list is
         considered the primary SSL certificate associated with the load
         balancer. The SSL certificate must exist and cannot be deleted while
@@ -61,8 +61,9 @@ FLAGS
           cannot be deleted while referenced by a target HTTPS proxy.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

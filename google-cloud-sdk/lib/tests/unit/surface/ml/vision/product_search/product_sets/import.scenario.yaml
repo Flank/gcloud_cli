@@ -1,0 +1,111 @@
+title: test product sets import
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: ml vision product-search product-sets import --location=us-east1 gs://my-bucket/my-object.csv
+      --async
+  - stderr: |
+      Request issued for: [us-east1]
+      Check operation [41b80896f39592e9] for status.
+  - stdout: |
+      name: projects/fake-project/locations/us-east1/operations/41b80896f39592e9
+- execute:
+  - command: ml vision product-search product-sets import --location=us-east1 gs://my-bucket/my-object.csv
+  - stderr: |
+      Request issued for: [us-east1]
+  - progress_tracker:
+    - message: Waiting for operation [41b80896f39592e9] to complete
+    - status: SUCCESS
+  - stdout: |
+      done: true
+      metadata:
+        '@type': type.googleapis.com/google.cloud.vision.v1.BatchOperationMetadata
+        endTime: '2019-04-26T18:05:08.229636482Z'
+        state: SUCCESSFUL
+        submitTime: '2019-04-26T18:05:05.707813761Z'
+      name: projects/fake-project/locations/us-east1/operations/41b80896f39592e9
+actions:
+- execute_command:
+    command: ml vision product-search product-sets import --location=us-east1 gs://my-bucket/my-object.csv
+      --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://vision.googleapis.com/v1/projects/fake-project/locations/us-east1/productSets:import?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              inputConfig:
+                gcsSource:
+                  csvFileUri: gs://my-bucket/my-object.csv
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-east1/operations/41b80896f39592e9"
+            }
+    - expect_stderr: |
+        Request issued for: [us-east1]
+        Check operation [41b80896f39592e9] for status.
+    - expect_stdout: |
+        name: projects/fake-project/locations/us-east1/operations/41b80896f39592e9
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: ml vision product-search product-sets import --location=us-east1 gs://my-bucket/my-object.csv
+    events:
+    - api_call:
+        expect_request:
+          uri: https://vision.googleapis.com/v1/projects/fake-project/locations/us-east1/productSets:import?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              inputConfig:
+                gcsSource:
+                  csvFileUri: gs://my-bucket/my-object.csv
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-east1/operations/41b80896f39592e9"
+            }
+    - expect_stderr: |
+        Request issued for: [us-east1]
+    - api_call:
+        expect_request:
+          uri: https://vision.googleapis.com/v1/projects/fake-project/locations/us-east1/operations/41b80896f39592e9?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-east1/operations/41b80896f39592e9",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.vision.v1.BatchOperationMetadata",
+                "state": "SUCCESSFUL",
+                "submitTime": "2019-04-26T18:05:05.707813761Z",
+                "endTime": "2019-04-26T18:05:08.229636482Z"
+              },
+              "done": true
+            }
+    - expect_progress_tracker:
+        message: Waiting for operation [41b80896f39592e9] to complete
+        status: SUCCESS
+    - expect_stdout: |
+        done: true
+        metadata:
+          '@type': type.googleapis.com/google.cloud.vision.v1.BatchOperationMetadata
+          endTime: '2019-04-26T18:05:08.229636482Z'
+          state: SUCCESSFUL
+          submitTime: '2019-04-26T18:05:05.707813761Z'
+        name: projects/fake-project/locations/us-east1/operations/41b80896f39592e9
+    - expect_exit:
+        code: 0

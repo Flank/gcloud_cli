@@ -29,7 +29,7 @@ from tests.lib.surface.filestore import base
 class CloudFilestoreOperationsDescribeTest(base.CloudFilestoreUnitTestBase):
 
   def SetUp(self):
-    self.SetUpTrack(calliope_base.ReleaseTrack.BETA)
+    self.SetUpTrack(calliope_base.ReleaseTrack.GA)
 
   def RunDescribe(self, *args):
     return self.Run(['filestore', 'operations', 'describe'] + list(args))
@@ -41,8 +41,18 @@ class CloudFilestoreOperationsDescribeTest(base.CloudFilestoreUnitTestBase):
     self.mock_client.projects_locations_operations.Get.Expect(
         self.messages.FileProjectsLocationsOperationsGetRequest(name=name),
         test_operation)
-    result = self.RunDescribe('operation_name', '--location=us-central1-c')
+    result = self.RunDescribe('operation_name', '--zone=us-central1-c')
     self.assertEquals(result, test_operation)
+
+  def testDescribeValidFilestoreOperationWithDeprecatedLocation(self):
+    test_operation = self.GetTestCloudFilestoreOperation()
+    name = ('projects/{}/locations/us-central1-c/operations/'
+            'operation_name'.format(self.Project()))
+    self.mock_client.projects_locations_operations.Get.Expect(
+        self.messages.FileProjectsLocationsOperationsGetRequest(name=name),
+        test_operation)
+    result = self.RunDescribe('operation_name', '--location=us-central1-c')
+    self.assertEqual(result, test_operation)
 
   def testDescribeWithDefaultLocation(self):
     properties.VALUES.filestore.location.Set('us-central1-c')
@@ -62,6 +72,13 @@ class CloudFilestoreOperationsDescribeTest(base.CloudFilestoreUnitTestBase):
   def testMissingOperationName(self):
     with self.assertRaises(cli_test_base.MockArgumentError):
       self.RunDescribe()
+
+
+class CloudFilestoreOperationsDescribeBetaTest(
+    CloudFilestoreOperationsDescribeTest):
+
+  def SetUp(self):
+    self.SetUpTrack(calliope_base.ReleaseTrack.BETA)
 
 
 class CloudFilestoreOperationsDescribeAlphaTest(

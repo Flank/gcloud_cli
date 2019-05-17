@@ -19,8 +19,9 @@ DESCRIPTION
     here: https://cloud.google.com/appengine/docs/
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -98,7 +99,7 @@ EXAMPLES
 
     For an in-depth look into using the local development server, follow this
     guide :
-    https://cloud.google.com/appengine/docs/standard/python/tools/using-local-server.
+    https://cloud.google.com/appengine/docs/standard/python/tools/using-local-server
 
     To deploy the code and configuration of your app to the App Engine server,
     run:

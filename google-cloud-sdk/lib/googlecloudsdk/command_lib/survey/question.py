@@ -83,8 +83,12 @@ class Question(six.with_metaclass(abc.ABCMeta, object)):
   def instruction_on_rejection(self):
     return self._instruction_on_rejection
 
-  @abc.abstractmethod
   def PrintQuestion(self):
+    self._PrintQuestion()
+    log.out.flush()
+
+  @abc.abstractmethod
+  def _PrintQuestion(self):
     pass
 
   def PrintInstruction(self):
@@ -162,7 +166,7 @@ class MultiChoiceQuestion(Question):
       raise QuestionCreationError('Question cannot be created because some '
                                   'required field is missing.')
 
-  def PrintQuestion(self):
+  def _PrintQuestion(self):
     """Prints question and lists all choices."""
     choices_repr = [
         '[{}] {}'.format(index, msg)
@@ -182,6 +186,10 @@ class MultiChoiceQuestion(Question):
     else:
       return 1 <= answer_int <= len(self._choices)
 
+  def Choice(self, index):
+    """Gets one choice of the multi-choice question."""
+    return self._choices[index]
+
   def __eq__(self, other):
     if isinstance(other, self.__class__):
       # pylint: disable=protected-access
@@ -196,11 +204,14 @@ class MultiChoiceQuestion(Question):
     return hash((self._question, self._instruction,
                  self._instruction_on_rejection, tuple(self._choices)))
 
+  def __len__(self):
+    return len(self._choices)
+
 
 class FreeTextQuestion(Question):
   """Free text question."""
 
-  def PrintQuestion(self):
+  def _PrintQuestion(self):
     question = survey_util.Indent(self._question, 1)
     log.Print(question)
 

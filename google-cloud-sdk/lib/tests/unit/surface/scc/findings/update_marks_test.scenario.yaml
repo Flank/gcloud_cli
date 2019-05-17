@@ -1,0 +1,168 @@
+title: scc findings update-marks scenario test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      scc findings update-marks gcloudcsccfinding2 --organization 345840165995 --source 2948230327750090626 --security-marks "mark_key1=mark_val1,mark_key2=mark_val2" --update-mask ""
+  - stdout: |
+      marks:
+        mark_key1: mark_val1
+        mark_key2: mark_val2
+      name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks
+- execute:
+  - command: |
+      scc findings update-marks gcloudcsccfinding2 --organization 345840165995 --source 2948230327750090626 --security-marks "mark_key1=mark_val1,mark_key2=mark_val2"
+  - stdout: |
+      marks:
+        mark_key1: mark_val1
+        mark_key2: mark_val2
+      name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks
+- execute:
+  - command: |
+      scc findings update-marks gcloudcsccfinding2 --organization 345840165995 --source 2948230327750090626 --security-marks "mark_key1=mark_val1" --update-mask "marks.mark_key1"
+  - stdout: |
+      marks:
+        mark_key1: mark_val1
+        mark_key2: mark_val2
+      name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks
+actions:
+- execute_command:
+    # Update all marks (empty update-mask)
+    command: |
+      scc findings update-marks gcloudcsccfinding2 --organization 345840165995 --source 2948230327750090626 --security-marks "mark_key1=mark_val1,mark_key2=mark_val2" --update-mask ""
+    events:
+    - api_call:
+        expect_request:
+          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks?alt=json
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              marks:
+                mark_key1: mark_val1
+                mark_key2: mark_val2
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks",
+              "marks": {
+                "mark_key1": "mark_val1",
+                "mark_key2": "mark_val2"
+              }
+            }
+
+    - expect_stdout: |
+        marks:
+          mark_key1: mark_val1
+          mark_key2: mark_val2
+        name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks
+    - expect_exit:
+        code: 0
+- execute_command:
+    # Update all marks (skip update-mask)
+    command: |
+      scc findings update-marks gcloudcsccfinding2 --organization 345840165995 --source 2948230327750090626 --security-marks "mark_key1=mark_val1,mark_key2=mark_val2"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks?alt=json
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              marks:
+                mark_key1: mark_val1
+                mark_key2: mark_val2
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks",
+              "marks": {
+                "mark_key1": "mark_val1",
+                "mark_key2": "mark_val2"
+              }
+            }
+    - expect_stdout: |
+        marks:
+          mark_key1: mark_val1
+          mark_key2: mark_val2
+        name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks
+    - expect_exit:
+        code: 0
+- execute_command:
+    # Update single mark using update-mask
+    command: |
+      scc findings update-marks gcloudcsccfinding2 --organization 345840165995 --source 2948230327750090626 --security-marks "mark_key1=mark_val1" --update-mask "marks.mark_key1"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks?alt=json&updateMask=marks.mark_key1
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              marks:
+                mark_key1: mark_val1
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks",
+              "marks": {
+                "mark_key1": "mark_val1",
+                "mark_key2": "mark_val2"
+              }
+            }
+    - expect_stdout: |
+        marks:
+          mark_key1: mark_val1
+          mark_key2: mark_val2
+        name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks
+    - expect_exit:
+        code: 0
+- execute_command:
+    # Update using full resource name.
+    command: |
+      scc findings update-marks organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2 --security-marks "mark_key1=mark_val1" --update-mask "marks.mark_key1"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks?alt=json&updateMask=marks.mark_key1
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              marks:
+                mark_key1: mark_val1
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks",
+              "marks": {
+                "mark_key1": "mark_val1",
+                "mark_key2": "mark_val2"
+              }
+            }
+    - expect_stdout: |
+        marks:
+          mark_key1: mark_val1
+          mark_key2: mark_val2
+        name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2/securityMarks
+    - expect_exit:
+        code: 0
+- execute_command:
+    # Update using full resource name and organization flag.
+    command: |
+      scc findings update-marks organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding2 --organization 345840165995 --security-marks "mark_key1=mark_val1" --update-mask "marks.mark_key1"
+    events:
+    - expect_exit:
+        code: 1
+        message: Only provide a full resouce name (organizations/123/sources/456/findings/789) or an --organization flag and --sources flag, not both.

@@ -1,13 +1,13 @@
 NAME
-    gcloud beta ml-engine models - cloud ML Engine Models commands
+    gcloud beta ml-engine models - AI Platform Models commands
 
 SYNOPSIS
     gcloud beta ml-engine models COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) A Cloud ML Engine model is a container representing an ML
-    application or service. A model may contain multiple versions which act as
-    the implementation of the service. See also:
+    (BETA) An AI Platform model is a container representing an ML application
+    or service. A model may contain multiple versions which act as the
+    implementation of the service. See also:
 
         $ gcloud beta ml-engine versions --help.
 
@@ -15,8 +15,9 @@ DESCRIPTION
     https://cloud.google.com/ml/docs/concepts/technical-overview#model
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -27,19 +28,19 @@ COMMANDS
         (BETA) Add IAM policy binding to a model.
 
      create
-        (BETA) Create a new Cloud ML Engine model.
+        (BETA) Create a new AI Platform model.
 
      delete
-        (BETA) Delete an existing Cloud ML Engine model.
+        (BETA) Delete an existing AI Platform model.
 
      describe
-        (BETA) Describe an existing Cloud ML Engine model.
+        (BETA) Describe an existing AI Platform model.
 
      get-iam-policy
         (BETA) Get the IAM policy for a model.
 
      list
-        (BETA) List existing Cloud ML Engine models.
+        (BETA) List existing AI Platform models.
 
      remove-iam-policy-binding
         (BETA) Remove IAM policy binding from a ML model.
@@ -48,7 +49,7 @@ COMMANDS
         (BETA) Set the IAM policy for a model.
 
      update
-        (BETA) Update an existing Cloud ML Engine model.
+        (BETA) Update an existing AI Platform model.
 
 NOTES
     This command is currently in BETA and may change without notice. These

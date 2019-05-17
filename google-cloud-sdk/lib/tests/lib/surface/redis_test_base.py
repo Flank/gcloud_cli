@@ -30,9 +30,8 @@ from tests.lib import sdk_test_base
 class UnitTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
   """Base class for `gcloud redis` unit tests."""
 
-  def SetUpForTrack(self, track):
-    self.track = track
-    self.api_version = redis.API_VERSION_FOR_TRACK[track]
+  def SetUp(self):
+    self.api_version = redis.API_VERSION_FOR_TRACK[self.track]
     self.mock_client = mock.Client(
         client_class=apis.GetClientClass('redis', self.api_version))
     self.mock_client.Mock()
@@ -40,8 +39,8 @@ class UnitTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 
     self.messages = self.mock_client.MESSAGES_MODULE
 
-    self.project_ref = resources.REGISTRY.Create('redis.projects',
-                                                 projectsId=self.Project())
+    self.project_ref = resources.REGISTRY.Create(
+        'redis.projects', projectsId=self.Project())
 
     self.locations_service = self.mock_client.projects_locations
     self.instances_service = self.mock_client.projects_locations_instances
@@ -49,8 +48,12 @@ class UnitTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 
     self.region_id = 'us-central1'
     self.region_ref = resources.REGISTRY.Parse(
-        self.region_id, collection='redis.projects.locations',
-        params={'locationsId': self.region_id, 'projectsId': self.Project()},
+        self.region_id,
+        collection='redis.projects.locations',
+        params={
+            'locationsId': self.region_id,
+            'projectsId': self.Project()
+        },
         api_version=self.api_version)
     self.region_relative_name = self.region_ref.RelativeName()
 
@@ -58,11 +61,18 @@ class UnitTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 class InstancesUnitTestBase(UnitTestBase):
   """Base class for `gcloud redis instances` unit tests."""
 
+  def SetUp(self):
+    self.SetUpInstancesForTrack()
+
   def SetUpInstancesForTrack(self):
     self.instance_id = 'my-redis-instance'
     self.instance_ref = resources.REGISTRY.Parse(
-        self.instance_id, collection='redis.projects.locations.instances',
-        params={'locationsId': self.region_id, 'projectsId': self.Project()},
+        self.instance_id,
+        collection='redis.projects.locations.instances',
+        params={
+            'locationsId': self.region_id,
+            'projectsId': self.Project()
+        },
         api_version=self.api_version)
     self.instance_relative_name = self.instance_ref.RelativeName()
 
@@ -70,7 +80,10 @@ class InstancesUnitTestBase(UnitTestBase):
     self.wait_operation_ref = resources.REGISTRY.Parse(
         self.wait_operation_id,
         collection='redis.projects.locations.operations',
-        params={'locationsId': self.region_id, 'projectsId': self.Project()},
+        params={
+            'locationsId': self.region_id,
+            'projectsId': self.Project()
+        },
         api_version=self.api_version)
     self.wait_operation_relative_name = self.wait_operation_ref.RelativeName()
 
@@ -78,26 +91,43 @@ class InstancesUnitTestBase(UnitTestBase):
     network_ref = resources.REGISTRY.Create(
         'compute.networks', project=self.Project(), network='default')
     return self.messages.Instance(
-        name=name, authorizedNetwork=network_ref.RelativeName(), memorySizeGb=1,
+        name=name,
+        authorizedNetwork=network_ref.RelativeName(),
+        memorySizeGb=1,
         tier=self.messages.Instance.TierValueValuesEnum('BASIC'))
 
-  def MakeAllOptionsInstance(self, name=None):
+  def MakeAllOptionsInstance(self, name=None, redis_version='REDIS_3_2'):
     network_ref = resources.REGISTRY.Create(
         'compute.networks', project=self.Project(), network='my-network')
+    redis_configs = {
+        'maxmemory-policy': 'noeviction',
+        'notify-keyspace-events': 'El'
+    }
+    if redis_version == 'REDIS_4_0':
+      redis_configs['maxmemory-policy'] = 'allkeys-lfu'
+      redis_configs['activedefrag'] = 'yes'
+      redis_configs['lfu-log-factor'] = '2'
+      redis_configs['lfu-decay-time'] = '10'
+
     return self.messages.Instance(
         name=name,
         alternativeLocationId='zone2',
         authorizedNetwork=network_ref.RelativeName(),
         displayName='my-display-name',
         labels=encoding.DictToAdditionalPropertyMessage(
-            {'a': '1', 'b': '2'}, self.messages.Instance.LabelsValue,
+            {
+                'a': '1',
+                'b': '2'
+            },
+            self.messages.Instance.LabelsValue,
             sort_items=True),
         locationId='zone1',
         memorySizeGb=4,
         redisConfigs=encoding.DictToAdditionalPropertyMessage(
-            {'maxmemory-policy': 'noeviction', 'notify-keyspace-events': 'El'},
-            self.messages.Instance.RedisConfigsValue, sort_items=True),
-        redisVersion='REDIS_3_2',
+            redis_configs,
+            self.messages.Instance.RedisConfigsValue,
+            sort_items=True),
+        redisVersion=redis_version,
         reservedIpRange='10.0.0.0/29',
         tier=self.messages.Instance.TierValueValuesEnum('STANDARD_HA'))
 
@@ -105,11 +135,17 @@ class InstancesUnitTestBase(UnitTestBase):
 class OperationsUnitTestBase(UnitTestBase):
   """Base class for `gcloud redis operations` unit tests."""
 
+  def SetUp(self):
+    self.SetUpOperationsForTrack()
+
   def SetUpOperationsForTrack(self):
     self.operation_id = 'my-redis-operation'
     self.operation_ref = resources.REGISTRY.Parse(
         self.operation_id,
         collection='redis.projects.locations.operations',
-        params={'locationsId': self.region_id, 'projectsId': self.Project()},
+        params={
+            'locationsId': self.region_id,
+            'projectsId': self.Project()
+        },
         api_version=self.api_version)
     self.operation_relative_name = self.operation_ref.RelativeName()

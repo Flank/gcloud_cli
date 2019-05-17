@@ -1,0 +1,65 @@
+
+.TH "GCLOUD_SERVICES_VPC\-PEERINGS_OPERATIONS_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud services vpc\-peerings operations describe \- describes an operation resource for a given operation name
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud services vpc\-peerings operations describe\fR \fB\-\-name\fR=\fIOPERATION_NAME\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+This command will return information about an operation given the name of that
+operation.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-name\fR=\fIOPERATION_NAME\fR
+The name of operation to describe
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To describe an operation resource named \f5operations/abc\fR, run:
+
+.RS 2m
+$ gcloud services vpc\-peerings operations describe \e
+    \-\-name=operations/abc
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha services vpc\-peerings operations describe
+$ gcloud beta services vpc\-peerings operations describe
+.RE
+

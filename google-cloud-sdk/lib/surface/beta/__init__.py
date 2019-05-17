@@ -27,4 +27,4 @@ from googlecloudsdk.calliope import base
 class Beta(base.Group):
   """Beta versions of gcloud commands."""
 
-  category = 'SDK Tools'
+  category = base.SDK_TOOLS_CATEGORY

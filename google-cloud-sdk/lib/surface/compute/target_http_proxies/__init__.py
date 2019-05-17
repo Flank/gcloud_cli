@@ -25,7 +25,7 @@ class TargetHTTPProxies(base.Group):
   """List, create, and delete target HTTP proxies."""
 
 
-TargetHTTPProxies.category = 'Networking'
+TargetHTTPProxies.category = base.NETWORKING_CATEGORY
 
 TargetHTTPProxies.detailed_help = {
     'brief': 'List, create, and delete target HTTP proxies',

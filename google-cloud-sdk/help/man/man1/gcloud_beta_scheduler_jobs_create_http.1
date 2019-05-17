@@ -11,7 +11,7 @@ gcloud beta scheduler jobs create http \- create a Cloud Scheduler job that trig
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta scheduler jobs create http\fR \fIJOB\fR \fB\-\-schedule\fR=\fISCHEDULE\fR \fB\-\-uri\fR=\fIURI\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-headers\fR=\fIHEADERS\fR] [\fB\-\-http\-method\fR=\fIHTTP_METHOD\fR;\ default="post"] [\fB\-\-max\-backoff\fR=\fIMAX_BACKOFF\fR;\ default="1h"] [\fB\-\-max\-doublings\fR=\fIMAX_DOUBLINGS\fR;\ default=16] [\fB\-\-max\-retry\-attempts\fR=\fIMAX_RETRY_ATTEMPTS\fR] [\fB\-\-max\-retry\-duration\fR=\fIMAX_RETRY_DURATION\fR] [\fB\-\-min\-backoff\fR=\fIMIN_BACKOFF\fR;\ default="5s"] [\fB\-\-time\-zone\fR=\fITIME_ZONE\fR;\ default="Etc/UTC"] [\fB\-\-message\-body\fR=\fIMESSAGE_BODY\fR\ |\ \fB\-\-message\-body\-from\-file\fR=\fIMESSAGE_BODY_FROM_FILE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta scheduler jobs create http\fR \fIJOB\fR \fB\-\-schedule\fR=\fISCHEDULE\fR \fB\-\-uri\fR=\fIURI\fR [\fB\-\-attempt\-deadline\fR=\fIATTEMPT_DEADLINE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-headers\fR=\fIHEADERS\fR] [\fB\-\-http\-method\fR=\fIHTTP_METHOD\fR;\ default="post"] [\fB\-\-max\-backoff\fR=\fIMAX_BACKOFF\fR;\ default="1h"] [\fB\-\-max\-doublings\fR=\fIMAX_DOUBLINGS\fR;\ default=16] [\fB\-\-max\-retry\-attempts\fR=\fIMAX_RETRY_ATTEMPTS\fR] [\fB\-\-max\-retry\-duration\fR=\fIMAX_RETRY_DURATION\fR] [\fB\-\-min\-backoff\fR=\fIMIN_BACKOFF\fR;\ default="5s"] [\fB\-\-time\-zone\fR=\fITIME_ZONE\fR;\ default="Etc/UTC"] [\fB\-\-message\-body\fR=\fIMESSAGE_BODY\fR\ |\ \fB\-\-message\-body\-from\-file\fR=\fIMESSAGE_BODY_FROM_FILE\fR] [[\fB\-\-oauth\-service\-account\-email\fR=\fIOAUTH_SERVICE_ACCOUNT_EMAIL\fR\ :\ \fB\-\-oauth\-token\-scope\fR=\fIOAUTH_TOKEN_SCOPE\fR]\ |\ [\fB\-\-oidc\-service\-account\-email\fR=\fIOIDC_SERVICE_ACCOUNT_EMAIL\fR\ :\ \fB\-\-oidc\-token\-audience\fR=\fIOIDC_TOKEN_AUDIENCE\fR]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -91,6 +91,12 @@ after encoding.
 
 .RS 2m
 .TP 2m
+\fB\-\-attempt\-deadline\fR=\fIATTEMPT_DEADLINE\fR
+The deadline for job attempts. If the request handler doesn't respond by this
+dealine, the request is cancelled and the attempt is marked as failed. For
+example, 20s.
+
+.TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
 Human\-readable description of the job.
 
@@ -158,17 +164,68 @@ with compatible HTTP methods (PUT or POST).
 Path to file containing the data payload to be included as the body of the HTTP
 request. May only be given with compatible HTTP methods (PUT or POST).
 
+.RE
+.sp
+.TP 2m
 
+How the request sent to the target when executing the job should be
+authenticated. At most one of these may be specified:
+
+
+.RS 2m
+.TP 2m
+
+OAuth2
+
+.RS 2m
+.TP 2m
+\fB\-\-oauth\-service\-account\-email\fR=\fIOAUTH_SERVICE_ACCOUNT_EMAIL\fR
+The service account email to be used for generating an OAuth2 access token to be
+included in the request sent to the target when executing the job. The service
+account must be within the same project as the job. The caller must have
+iam.serviceAccounts.actAs permission for the service account. This flag must be
+specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-oauth\-token\-scope\fR=\fIOAUTH_TOKEN_SCOPE\fR
+The scope to be used when generating an OAuth2 access token to be included in
+the request sent to the target when executing the job. If not specified,
+"https://www.googleapis.com/auth/cloud\-platform" will be used.
+
+.RE
+.sp
+.TP 2m
+
+OpenId Connect
+
+.RS 2m
+.TP 2m
+\fB\-\-oidc\-service\-account\-email\fR=\fIOIDC_SERVICE_ACCOUNT_EMAIL\fR
+The service account email to be used for generating an OpenId Connect token to
+be included in the request sent to the target when executing the job. The
+service account must be within the same project as the job. The caller must have
+iam.serviceAccounts.actAs permission for the service account. This flag must be
+specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-oidc\-token\-audience\fR=\fIOIDC_TOKEN_AUDIENCE\fR
+The audience to be used when generating an OpenId Connect token to be included
+in the request sent to the target when executing the job. If not specified, the
+URI specified in target will be used.
+
+
+.RE
 .RE
 .RE
 .sp
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

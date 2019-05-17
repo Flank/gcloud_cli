@@ -1,0 +1,43 @@
+NAME
+    gcloud beta compute networks peerings update - update a Google Compute
+        Engine network peering
+
+SYNOPSIS
+    gcloud beta compute networks peerings update NAME --network=NETWORK
+        [--export-custom-routes] [--import-custom-routes]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) Update a Google Compute Engine network peering.
+
+POSITIONAL ARGUMENTS
+     NAME
+        The name of the peering.
+
+REQUIRED FLAGS
+     --network=NETWORK
+        The name of the network in the current project to be peered with the
+        peer network.
+
+OPTIONAL FLAGS
+     --export-custom-routes
+        If set, the network will export custom routes to peer network. Use
+        --no-export-custom-routes to disable it.
+
+     --import-custom-routes
+        If set, the network will import custom routes from peer network. Use
+        --no-import-custom-routes to disable it.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha compute networks peerings update
+

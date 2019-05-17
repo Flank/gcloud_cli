@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.tasks import app
 from googlecloudsdk.command_lib.tasks import constants
 from googlecloudsdk.command_lib.tasks import parsers
@@ -137,6 +138,78 @@ class CreateAppEngineQueueTest(test_base.CloudTasksTestBase):
 
   def testCreate_NoOptions(self):
     expected_queue = self.messages.Queue(
+        name=self.queue_name)
+    self.queues_service.Create.Expect(
+        self.messages.CloudtasksProjectsLocationsQueuesCreateRequest(
+            parent=self.location_ref.RelativeName(), queue=expected_queue),
+        response=expected_queue)
+
+    actual_queue = self.Run('tasks queues create my-queue')
+
+    self.assertEqual(actual_queue, expected_queue)
+    self.AssertErrContains(constants.QUEUE_MANAGEMENT_WARNING)
+
+  def testCreate_AllOptions(self):
+    expected_queue = self.messages.Queue(
+        name=self.queue_name,
+        appEngineRoutingOverride=self.messages.AppEngineRouting(service='abc'),
+        retryConfig=self.messages.RetryConfig(maxAttempts=10,
+                                              maxRetryDuration='5s',
+                                              maxDoublings=4, minBackoff='1s',
+                                              maxBackoff='10s'),
+        rateLimits=self.messages.RateLimits(
+            maxDispatchesPerSecond=100, maxConcurrentDispatches=10))
+    self.queues_service.Create.Expect(
+        self.messages.CloudtasksProjectsLocationsQueuesCreateRequest(
+            parent=self.location_ref.RelativeName(), queue=expected_queue),
+        response=expected_queue)
+
+    actual_queue = self.Run('tasks queues create my-queue '
+                            '--max-attempts=10 --max-retry-duration=5s '
+                            '--max-doublings=4 --min-backoff=1s '
+                            '--max-backoff=10s '
+                            '--max-dispatches-per-second=100 '
+                            '--max-concurrent-dispatches=10 '
+                            '--routing-override=service:abc')
+
+    self.assertEqual(actual_queue, expected_queue)
+    self.AssertErrContains(constants.QUEUE_MANAGEMENT_WARNING)
+
+  def testCreate_AllOptions_MaxAttemptsUnlimited(self):
+    expected_queue = self.messages.Queue(
+        name=self.queue_name,
+        appEngineRoutingOverride=self.messages.AppEngineRouting(service='abc'),
+        retryConfig=self.messages.RetryConfig(maxAttempts=-1,
+                                              maxRetryDuration='5s',
+                                              maxDoublings=4,
+                                              minBackoff='1s',
+                                              maxBackoff='10s'),
+        rateLimits=self.messages.RateLimits(
+            maxDispatchesPerSecond=100, maxConcurrentDispatches=10))
+    self.queues_service.Create.Expect(
+        self.messages.CloudtasksProjectsLocationsQueuesCreateRequest(
+            parent=self.location_ref.RelativeName(), queue=expected_queue),
+        response=expected_queue)
+
+    actual_queue = self.Run('tasks queues create my-queue '
+                            '--max-attempts=unlimited --max-retry-duration=5s '
+                            '--max-doublings=4 --min-backoff=1s '
+                            '--max-backoff=10s '
+                            '--max-dispatches-per-second=100 '
+                            '--max-concurrent-dispatches=10 '
+                            '--routing-override=service:abc')
+
+    self.assertEqual(actual_queue, expected_queue)
+    self.AssertErrContains(constants.QUEUE_MANAGEMENT_WARNING)
+
+
+class CreateAppEngineQueueTestBeta(CreateAppEngineQueueTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def testCreate_NoOptions(self):
+    expected_queue = self.messages.Queue(
         name=self.queue_name,
         appEngineHttpQueue=self.messages.AppEngineHttpQueue())
     self.queues_service.Create.Expect(
@@ -144,7 +217,7 @@ class CreateAppEngineQueueTest(test_base.CloudTasksTestBase):
             parent=self.location_ref.RelativeName(), queue=expected_queue),
         response=expected_queue)
 
-    actual_queue = self.Run('tasks queues create-app-engine-queue my-queue')
+    actual_queue = self.Run('tasks queues create my-queue')
 
     self.assertEqual(actual_queue, expected_queue)
     self.AssertErrContains(constants.QUEUE_MANAGEMENT_WARNING)
@@ -166,7 +239,7 @@ class CreateAppEngineQueueTest(test_base.CloudTasksTestBase):
             parent=self.location_ref.RelativeName(), queue=expected_queue),
         response=expected_queue)
 
-    actual_queue = self.Run('tasks queues create-app-engine-queue my-queue '
+    actual_queue = self.Run('tasks queues create my-queue '
                             '--max-attempts=10 --max-retry-duration=5s '
                             '--max-doublings=4 --min-backoff=1s '
                             '--max-backoff=10s '
@@ -195,7 +268,7 @@ class CreateAppEngineQueueTest(test_base.CloudTasksTestBase):
             parent=self.location_ref.RelativeName(), queue=expected_queue),
         response=expected_queue)
 
-    actual_queue = self.Run('tasks queues create-app-engine-queue my-queue '
+    actual_queue = self.Run('tasks queues create my-queue '
                             '--max-attempts=unlimited --max-retry-duration=5s '
                             '--max-doublings=4 --min-backoff=1s '
                             '--max-backoff=10s '

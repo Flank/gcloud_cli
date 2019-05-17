@@ -68,7 +68,6 @@ class PolicyTest(base.DnsTest):
             self.Run, [('compute networks delete {} --quiet'.format(name))],
             {'track': calliope_base.ReleaseTrack.GA})
 
-  @test_case.Filters.skip('Failing', 'b/121028329')
   def testScenario(self):
     """CRUD Lifecycle Test for Cloud DNS Policies."""
     with self._CreatePolicy() as test_policy:
@@ -77,15 +76,18 @@ class PolicyTest(base.DnsTest):
       self.AssertOutputContains(test_policy)
       before_policy = self.Run('dns policies describe {}'.format(test_policy))
       self.assertFalse(before_policy.enableInboundForwarding)
+      self.assertFalse(before_policy.enableLogging)
       self.assertEqual('Test Policy', before_policy.description)
       self.assertFalse(before_policy.networks)
       with self._CreateTestNetwork(test_policy) as test_network:
         updated_policy = self.Run('dns policies update {} --description "{}" '
                                   '--enable-inbound-forwarding '
+                                  '--enable-logging '
                                   '--networks {}'.format(
                                       test_policy, 'New Test Description',
                                       test_network))
         self.assertTrue(updated_policy.enableInboundForwarding)
+        self.assertTrue(updated_policy.enableLogging)
         self.assertEqual('New Test Description', updated_policy.description)
         self.assertTrue(updated_policy.networks)
         self.assertIn(test_network, updated_policy.networks[0].networkUrl)

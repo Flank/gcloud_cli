@@ -19,6 +19,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import re
+
 from googlecloudsdk.calliope import cli as calliope
 from googlecloudsdk.calliope import usage_text
 from googlecloudsdk.command_lib.util.apis import yaml_command_translator
@@ -269,7 +271,7 @@ Available commands for test sdk2:
       bool-mutex              A command with a Boolean flag in a mutex group.
 """)
 
-  def testCategoricalUsageNoCategories(self):
+  def testUncategorizedUsage(self):
     with self.assertRaises(SystemExit):
       self.cli.Execute('sdk3'.split())
     self.AssertErrEquals("""\
@@ -869,177 +871,58 @@ class GcloudUsageTextTest(util.WithTestTool):
   def testGcloudUsage(self):
     with self.assertRaises(SystemExit):
       self.cli.Execute([])
-    self.AssertErrContains("""\
-ERROR: (gcloud) Command name argument expected.
+    expected = r"""ERROR: \(gcloud\) Command name argument expected\.
 
 Available commands for gcloud:
 
   AI and Machine Learning
-      ml                      Use Google Cloud machine learning capabilities.
-      ml-engine               Manage Cloud ML Engine jobs and models.
-
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+
   API Platform and Ecosystems
-      endpoints               Create, enable and manage API services.
-      service-management      Create, enable and manage API services.
-      services                List, enable and disable APIs and services.
-
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+
   Compute
-      app                     Manage your App Engine deployments.
-      container               Deploy and manage clusters of machines for running
-                              containers.
-      functions               Manage Google Cloud Functions.
-
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+
   Data Analytics
-      composer                Create and manage Cloud Composer Environments.
-      dataflow                Manage Google Cloud Dataflow jobs.
-      dataproc                Create and manage Google Cloud Dataproc clusters
-                              and jobs.
-      pubsub                  Manage Cloud Pub/Sub topics and subscriptions.
-
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+
   Databases
-      datastore               Manage your Cloud Datastore indexes.
-      spanner                 Command groups for Cloud Spanner.
-      sql                     Create and manage Google Cloud SQL databases.
-
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+
   Identity and Security
-      auth                    Manage oauth2 credentials for the Google Cloud
-                              SDK.
-      iam                     Manage IAM service accounts and keys.
-      kms                     Manage cryptographic keys in the cloud.
-
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+
   Internet of Things
-      iot                     Manage Cloud IoT resources.
-
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+
   Management Tools
-      builds                  Create and manage builds for Google Cloud Build.
-      debug                   Commands for interacting with the Cloud Debugger.
-      deployment-manager      Manage deployments of cloud resources.
-      logging                 Manage Stackdriver Logging.
-      organizations           Create and manage Google Cloud Platform
-                              Organizations.
-      projects                Create and manage project access policies.
-
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+
   Mobile
-      firebase                Work with Google Firebase.
-
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+
   Networking
-      dns                     Manage your Cloud DNS managed-zones and
-                              record-sets.
-      domains                 Manage domains for your Google Cloud projects.
-
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+
   SDK Tools
-      components              List, install, update, or remove Google Cloud SDK
-                              components.
-      config                  View and edit Cloud SDK properties.
-      feedback                Provide feedback to the Google Cloud SDK team.
-      help                    Search gcloud help text.
-      info                    Display information about the current gcloud
-                              environment.
-      init                    Initialize or reinitialize gcloud.
-      meta                    Cloud meta introspection commands.
-      source                  Cloud git repository commands.
-      topic                   gcloud supplementary help.
-      version                 Print version information for Cloud SDK
-                              components.
-""")
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+
+  Storage
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+\n\Z"""
+
+    self.assertIsNotNone(re.match(expected, self.GetErr()))
 
   def testGcloudComputeUsage(self):
     with self.assertRaises(SystemExit):
       self.cli.Execute('compute'.split())
-    self.AssertErrContains("""\
-ERROR: (gcloud.compute) Command name argument expected.
+    expected = r"""ERROR: \(gcloud\.compute\) Command name argument expected\.
 
 Available commands for gcloud compute:
 
   Disks
-      disk-types              Read Google Compute Engine virtual disk types.
-      disks                   Read and manipulate Google Compute Engine disks.
-
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+
   Info
-      accelerator-types       Read Google Compute Engine accelerator types.
-      machine-types           Read Google Compute Engine virtual machine types.
-      operations              Read and manipulate Google Compute Engine
-                              operations.
-      regions                 List Google Compute Engine regions.
-      zones                   List Google Compute Engine zones.
-
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+
   Instances
-      commitments             Manage Google Compute Engine commitments.
-      diagnose                Debugging tools for Google Compute Engine virtual
-                              machine instances.
-      images                  List, create, and delete Google Compute Engine
-                              images.
-      instance-groups         Read and manipulate Google Compute Engine instance
-                              groups.
-      instance-templates      Read and manipulate Google Compute Engine
-                              instances templates.
-      instances               Read and manipulate Google Compute Engine virtual
-                              machine instances.
-      snapshots               List, describe, and delete Google Compute Engine
-                              snapshots.
-      sole-tenancy            Read and manage Google Compute Engine sole-tenancy
-                              resources.
-      target-instances        Read and manipulate Google Compute Engine virtual
-                              target instances.
-      tpus                    List, create, and delete Cloud TPUs.
-
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+
   Load Balancing
-      backend-buckets         Read and manipulate backend buckets.
-      backend-services        List, create, and delete backend services.
-      forwarding-rules        Read and manipulate traffic forwarding rules to
-                              network load balancers.
-      health-checks           Read and manipulate health checks for load
-                              balanced instances.
-      http-health-checks      Read and manipulate HTTP health checks for load
-                              balanced instances.
-      https-health-checks     Read and manipulate HTTPS health checks for load
-                              balanced instances.
-      ssl-certificates        List, create, and delete Google Compute Engine SSL
-                              certificates.
-      ssl-policies            List, create, delete and update Google Compute
-                              Engine SSL policies.
-      target-pools            Control Compute Engine target pools for network
-                              load balancing.
-
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+
   Networking
-      addresses               Read and manipulate Google Compute Engine
-                              addresses.
-      firewall-rules          List, create, update, and delete Google Compute
-                              Engine firewall rules.
-      interconnects           Read and manipulate  Google Compute Engine
-                              interconnects.
-      networks                List, create, and delete Google Compute Engine
-                              networks.
-      routers                 List, create, and delete Google Compute Engine
-                              routers.
-      routes                  Read and manipulate routes.
-      shared-vpc              Configure shared VPC.
-      target-http-proxies     List, create, and delete target HTTP proxies.
-      target-https-proxies    List, create, and delete target HTTPS proxies.
-      target-ssl-proxies      List, create, and delete target SSL proxies.
-      target-tcp-proxies      List, create, and delete target TCP proxies.
-      target-vpn-gateways     Read and manipulate Google Compute Engine VPN
-                              Gateways.
-      url-maps                List, create, and delete URL maps.
-      vpn-tunnels             Read and manipulate Google Compute Engine VPN
-                              Tunnels.
-
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+
   Tools
-      config-ssh              Populate SSH config files with Host entries from
-                              each instance.
-      connect-to-serial-port  Connect to the serial port of an instance.
-      os-login                Create and manipulate Google Compute Engine OS
-                              Login resources.
-      project-info            Read and manipulate project-level data like quotas
-                              and metadata.
-      reset-windows-password  Reset and return a password for a Windows machine
-                              instance.
-      scp                     Copy files to and from Google Compute Engine
-                              virtual machines via scp.
-      sign-url                Sign specified URL for use with Cloud CDN Signed
-                              URLs.
-      ssh                     SSH into a virtual machine instance.
-""")
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+\n\Z"""
+
+    self.assertIsNotNone(re.match(expected, self.GetErr()))
 
   def testGcloudComputeUsagePager(self):
     self.StartObjectPatch(console_io, 'IsInteractive', return_value=True)
@@ -1048,171 +931,61 @@ Available commands for gcloud compute:
       self.cli.Execute('compute'.split())
     self.AssertErrEquals(
         'ERROR: (gcloud.compute) Command name argument expected.\n')
-    contents = """\
-Command name argument expected.
+    contents = r"""Command name argument expected\.
 
 Available commands for gcloud compute:
 
   Disks
-      disk-types              Read Google Compute Engine virtual disk types.
-      disks                   Read and manipulate Google Compute Engine disks.
-
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+
   Info
-      accelerator-types       Read Google Compute Engine accelerator types.
-      machine-types           Read Google Compute Engine virtual machine types.
-      operations              Read and manipulate Google Compute Engine
-                              operations.
-      regions                 List Google Compute Engine regions.
-      zones                   List Google Compute Engine zones.
-
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+
   Instances
-      commitments             Manage Google Compute Engine commitments.
-      diagnose                Debugging tools for Google Compute Engine virtual
-                              machine instances.
-      images                  List, create, and delete Google Compute Engine
-                              images.
-      instance-groups         Read and manipulate Google Compute Engine instance
-                              groups.
-      instance-templates      Read and manipulate Google Compute Engine
-                              instances templates.
-      instances               Read and manipulate Google Compute Engine virtual
-                              machine instances.
-      snapshots               List, describe, and delete Google Compute Engine
-                              snapshots.
-      sole-tenancy            Read and manage Google Compute Engine sole-tenancy
-                              resources.
-      target-instances        Read and manipulate Google Compute Engine virtual
-                              target instances.
-      tpus                    List, create, and delete Cloud TPUs.
-
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+
   Load Balancing
-      backend-buckets         Read and manipulate backend buckets.
-      backend-services        List, create, and delete backend services.
-      forwarding-rules        Read and manipulate traffic forwarding rules to
-                              network load balancers.
-      health-checks           Read and manipulate health checks for load
-                              balanced instances.
-      http-health-checks      Read and manipulate HTTP health checks for load
-                              balanced instances.
-      https-health-checks     Read and manipulate HTTPS health checks for load
-                              balanced instances.
-      ssl-certificates        List, create, and delete Google Compute Engine SSL
-                              certificates.
-      ssl-policies            List, create, delete and update Google Compute
-                              Engine SSL policies.
-      target-pools            Control Compute Engine target pools for network
-                              load balancing.
-
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+
   Networking
-      addresses               Read and manipulate Google Compute Engine
-                              addresses.
-      firewall-rules          List, create, update, and delete Google Compute
-                              Engine firewall rules.
-      interconnects           Read and manipulate  Google Compute Engine
-                              interconnects.
-      networks                List, create, and delete Google Compute Engine
-                              networks.
-      routers                 List, create, and delete Google Compute Engine
-                              routers.
-      routes                  Read and manipulate routes.
-      shared-vpc              Configure shared VPC.
-      target-http-proxies     List, create, and delete target HTTP proxies.
-      target-https-proxies    List, create, and delete target HTTPS proxies.
-      target-ssl-proxies      List, create, and delete target SSL proxies.
-      target-tcp-proxies      List, create, and delete target TCP proxies.
-      target-vpn-gateways     Read and manipulate Google Compute Engine VPN
-                              Gateways.
-      url-maps                List, create, and delete URL maps.
-      vpn-tunnels             Read and manipulate Google Compute Engine VPN
-                              Tunnels.
-
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+
   Tools
-      config-ssh              Populate SSH config files with Host entries from
-                              each instance.
-      connect-to-serial-port  Connect to the serial port of an instance.
-      os-login                Create and manipulate Google Compute Engine OS
-                              Login resources.
-      project-info            Read and manipulate project-level data like quotas
-                              and metadata.
-      reset-windows-password  Reset and return a password for a Windows machine
-                              instance.
-      scp                     Copy files to and from Google Compute Engine
-                              virtual machines via scp.
-      sign-url                Sign specified URL for use with Cloud CDN Signed
-                              URLs.
-      ssh                     SSH into a virtual machine instance.
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+\n\Z"""
 
-"""
-    mock_more.assert_called_with(contents, out=mock.ANY)
+    self.assertEquals(1, mock_more.call_count)
+    self.assertEquals(1, len(mock_more.call_args[0]))
+    self.assertIsNotNone(re.match(contents, mock_more.call_args[0][0]))
+    self.assertEquals({'out': mock.ANY}, mock_more.call_args[1])
 
   def testGcloudComputeInstancesUsage(self):
-    # Expect to see regular usage text since no categories are defined.
+    # Expect to see uncategorized usage text since no categories are defined.
     with self.assertRaises(SystemExit):
       self.cli.Execute('compute instances'.split())
-    self.AssertErrEquals("""\
-ERROR: (gcloud.compute.instances) Command name argument expected.
+    expected = r"""ERROR: \(gcloud\.compute\.instances\) Command name argument expected\.
 
 Available groups for gcloud compute instances:
 
-      network-interfaces      Read and manipulate Google Compute Engine instance
-                              network interfaces.
-
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+
 Available commands for gcloud compute instances:
 
-      add-access-config           Create a Google Compute Engine virtual machine
-                                  access configuration.
-      add-labels                  Add labels to Google Compute Engine virtual
-                                  machine instances.
-      add-metadata                Add or update instance metadata.
-      add-tags                    Add tags to Google Compute Engine virtual
-                                  machine instances.
-      attach-disk                 Attach a disk to an instance.
-      create                      Create Google Compute Engine virtual machine
-                                  instances.
-      create-with-container       Creates Google Compute engine virtual machine
-                                  instances running     container images.
-      delete                      Delete Google Compute Engine virtual machine
-                                  instances.
-      delete-access-config        Delete an access configuration from a virtual
-                                  machine network interface.
-      describe                    Describe a virtual machine instance.
-      detach-disk                 Detach disks from Compute Engine virtual
-                                  machine instances.
-      get-serial-port-output      Read output from a virtual machine instance's
-                                  serial port.
-      list                        List Google Compute Engine instances.
-      move                        Move an instance and its attached persistent
-                                  disks between zones.
-      remove-labels               Remove labels from Google Compute Engine
-                                  virtual machine instances.
-      remove-metadata             Remove instance metadata.
-      remove-tags                 Remove tags from Google Compute Engine virtual
-                                  machine instances.
-      reset                       Reset a virtual machine instance.
-      set-disk-auto-delete        Set auto-delete behavior for disks.
-      set-machine-type            Set machine type for Google Compute Engine
-                                  virtual machines.
-      set-scheduling              Set scheduling options for Google Compute
-                                  Engine virtual machines.
-      set-service-account         Set service account and scopes for a Google
-                                  Compute Engine instance.
-      simulate-maintenance-event  Simulate maintenance of virtual machine
-                                  instances.
-      start                       Start a stopped virtual machine instance.
-      stop                        Stop a virtual machine instance.
-      tail-serial-port-output     Periodically fetch new output from a virtual
-                                  machine instance's serial port and display it
-                                  as it becomes available.
-      update                      Update a Google Compute Engine virtual
-                                  machine.
-      update-access-config        Update a Google Compute Engine virtual machine
-                                  access configuration.
-      update-container            Updates Google Compute engine virtual machine
-                                  instances running container     images.
-
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+
 For detailed information on this command and its flags, run:
-  gcloud compute instances --help
-""")
+  gcloud compute instances --help\n\Z"""
+
+    self.assertIsNotNone(re.match(expected, self.GetErr()))
+
+  def testGcloudConfigUsage(self):
+    # Expect to see uncategorized usage text since no categories are defined.
+    with self.assertRaises(SystemExit):
+      self.cli.Execute('config'.split())
+    expected = r"""ERROR: \(gcloud\.config\) Command name argument expected\.
+
+Available groups for gcloud config:
+
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+
+Available commands for gcloud config:
+
+(      [-\w]+\s+[-./,'\w\s]+?\.\n)+
+For detailed information on this command and its flags, run:
+  gcloud config --help\n\Z"""
+
+    self.assertIsNotNone(re.match(expected, self.GetErr()))
 
 if __name__ == '__main__':
   test_case.main()

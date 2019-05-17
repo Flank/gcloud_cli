@@ -26,10 +26,11 @@ To create new deployments, use \f5gcloud alpha run deploy\fR.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -39,6 +40,10 @@ gcloud help\fR for details.
 
 .RS 2m
 .TP 2m
+\fBadd\-iam\-policy\-binding\fR
+\fB(ALPHA)\fR Add IAM policy binding to a Cloud Run service.
+
+.TP 2m
 \fBdelete\fR
 \fB(ALPHA)\fR Delete a service.
 
@@ -47,8 +52,25 @@ gcloud help\fR for details.
 \fB(ALPHA)\fR Obtain details about a given service.
 
 .TP 2m
+\fBget\-iam\-policy\fR
+\fB(ALPHA)\fR Get the IAM policy for a Cloud Run service.
+
+.TP 2m
 \fBlist\fR
 \fB(ALPHA)\fR List available services.
+
+.TP 2m
+\fBremove\-iam\-policy\-binding\fR
+\fB(ALPHA)\fR Remove IAM policy binding of a Cloud Run service.
+
+.TP 2m
+\fBset\-iam\-policy\fR
+\fB(ALPHA)\fR Set the IAM policy for a service.
+
+.TP 2m
+\fBupdate\fR
+\fB(ALPHA)\fR Update Cloud Run environment variables and other configuration
+settings.
 
 
 .RE
@@ -70,5 +92,9 @@ This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you will have to apply for early access and have your projects registered on the
 API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+https://cloud.google.com/support/. This variant is also available:
+
+.RS 2m
+$ gcloud beta run services
+.RE
 

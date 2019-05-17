@@ -35,6 +35,7 @@ from tests.lib.surface.firebase.test.android import unit_base
 TOOLRESULTS_MESSAGES = apis.GetMessagesModule('toolresults', 'v1beta3')
 
 TEST_OUTCOME_FORMAT = util.OUTCOMES_FORMAT
+FLAKY_ATTEMPTS_OUTCOME_FORMAT = util.FLAKY_ATTEMPTS_OUTCOMES_FORMAT
 
 HISTORY_ID = 'bh.1'
 EXECUTION_ID = '5'
@@ -50,8 +51,17 @@ DIMENSIONS = [
         key='Orientation', value='up'),
     ]
 
+MULTI_STEP_0 = TOOLRESULTS_MESSAGES.MultiStep(
+    multistepNumber=0,
+    primaryStep=TOOLRESULTS_MESSAGES.PrimaryStep(
+        rollUp=TOOLRESULTS_MESSAGES.PrimaryStep.RollUpValueValuesEnum.flaky
+    )
+)
+MULTI_STEP_1 = TOOLRESULTS_MESSAGES.MultiStep(multistepNumber=1)
+
 SUMMARY_ENUM = TOOLRESULTS_MESSAGES.Outcome.SummaryValueValuesEnum
 SUCCESS = SUMMARY_ENUM.success
+FLAKY = SUMMARY_ENUM.flaky
 FAILURE = SUMMARY_ENUM.failure
 INCONCLUSIVE = SUMMARY_ENUM.inconclusive
 SKIPPED = SUMMARY_ENUM.skipped
@@ -61,6 +71,7 @@ SUCCESS_OUTCOME = TOOLRESULTS_MESSAGES.Outcome(
 SUCCESS_NATIVE_CRASH_OUTCOME = TOOLRESULTS_MESSAGES.Outcome(
     summary=SUCCESS,
     successDetail=TOOLRESULTS_MESSAGES.SuccessDetail(otherNativeCrash=True))
+FLAKY_OUTCOME = TOOLRESULTS_MESSAGES.Outcome(summary=FLAKY)
 FAILURE_OUTCOME = TOOLRESULTS_MESSAGES.Outcome(
     summary=FAILURE,
     failureDetail=TOOLRESULTS_MESSAGES.FailureDetail())
@@ -169,6 +180,43 @@ WARNING: No results found, something went wrong. Try re-running the tests.
     self.AssertOutputContains('| OUTCOME | TEST_AXIS_VALUE | TEST_DETAILS |',
                               normalize_space=True)
     self.AssertOutputContains('| Failed | Nexus-v1-en-up | Test timed out |',
+                              normalize_space=True)
+    self.AssertErrEquals('')
+
+  def testResultsForFlakyAttempts(self):
+    summary_fetcher = self._createResultsSummaryFetcher()
+
+    step1 = self._createPrimaryStep(FAILURE_OUTCOME, [FAIL_OVERVIEW1])
+    step2 = self._createRerunStep(SUCCESS_OUTCOME, [PASS_OVERVIEW1])
+    self.tr_client.projects_histories_executions_steps.List.Expect(
+        request=self._createStepsListRequest(None),
+        response=self.toolresults_msgs.ListStepsResponse(steps=[step1, step2]))
+
+    outcomes = summary_fetcher.CreateFlakyAttemptsMatrixOutcomeSummary()
+    resource_printer.Print(outcomes, FLAKY_ATTEMPTS_OUTCOME_FORMAT)
+
+    self.AssertOutputContains(
+        '| OUTCOME | TEST_AXIS_VALUE | PASSED_EXECUTIONS |',
+        normalize_space=True)
+    self.AssertOutputContains('| Flaky | Nexus-v1-en-up | 50% (1 of 2) |',
+                              normalize_space=True)
+    self.AssertErrEquals('')
+
+  def testResultsForPassedFlakyAttempts(self):
+    summary_fetcher = self._createResultsSummaryFetcher()
+
+    step = self._createStep(SUCCESS_OUTCOME, [PASS_OVERVIEW1])
+    self.tr_client.projects_histories_executions_steps.List.Expect(
+        request=self._createStepsListRequest(None),
+        response=self.toolresults_msgs.ListStepsResponse(steps=[step]))
+
+    outcomes = summary_fetcher.CreateFlakyAttemptsMatrixOutcomeSummary()
+    resource_printer.Print(outcomes, FLAKY_ATTEMPTS_OUTCOME_FORMAT)
+
+    self.AssertOutputContains(
+        '| OUTCOME | TEST_AXIS_VALUE | PASSED_EXECUTIONS |',
+        normalize_space=True)
+    self.AssertOutputContains('| Passed | Nexus-v1-en-up | 100% (1 of 1) |',
                               normalize_space=True)
     self.AssertErrEquals('')
 
@@ -357,6 +405,15 @@ WARNING: No results found, something went wrong. Try re-running the tests.
 
     self.assertEqual(exc, exit_code.ROLLUP_SUCCESS)
 
+  def testFetchTestRollupOutcome_Flaky_VerifyExitCode(self):
+    summary_fetcher = self._createResultsSummaryFetcher()
+    self._expectHistoriesExecutionsGet(FLAKY_OUTCOME)
+
+    exc = exit_code.ExitCodeFromRollupOutcome(
+        summary_fetcher.FetchMatrixRollupOutcome(), SUMMARY_ENUM)
+
+    self.assertEqual(exc, exit_code.ROLLUP_SUCCESS)
+
   def testFetchTestRollupOutcome_SuccessWithNativeCrash_VerifyExitCode(self):
     summary_fetcher = self._createResultsSummaryFetcher()
     self._expectHistoriesExecutionsGet(SUCCESS_NATIVE_CRASH_OUTCOME)
@@ -412,6 +469,24 @@ WARNING: No results found, something went wrong. Try re-running the tests.
                                       dimensionValue=DIMENSIONS,
                                       outcome=outcome,
                                       testExecutionStep=execution_step)
+
+  def _createPrimaryStep(self, outcome, overviews):
+    execution_step = self.toolresults_msgs.TestExecutionStep(
+        testSuiteOverviews=overviews)
+    return self.toolresults_msgs.Step(name='Bonobo test',
+                                      dimensionValue=DIMENSIONS,
+                                      outcome=outcome,
+                                      testExecutionStep=execution_step,
+                                      multiStep=MULTI_STEP_0)
+
+  def _createRerunStep(self, outcome, overviews):
+    execution_step = self.toolresults_msgs.TestExecutionStep(
+        testSuiteOverviews=overviews)
+    return self.toolresults_msgs.Step(name='Bonobo test',
+                                      dimensionValue=DIMENSIONS,
+                                      outcome=outcome,
+                                      testExecutionStep=execution_step,
+                                      multiStep=MULTI_STEP_1)
 
   def _createStepsListRequest(self, token):
     return (self.toolresults_msgs

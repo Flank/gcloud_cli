@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -207,8 +207,8 @@ class TokenRenderer(renderer.Renderer):
     elif self._tokens[-1][self.TOKEN_TYPE_INDEX] == Token.Markdown.Section:
       # A section header with no content.
       prv_text = self._tokens[-1][self.TOKEN_TEXT_INDEX]
-      prv_indent = re.match('( *)', prv_text).group(1)  # pytype: disable=attribute-error
-      new_indent = re.match('( *)', text).group(1)  # pytype: disable=attribute-error
+      prv_indent = re.match('( *)', prv_text).group(1)
+      new_indent = re.match('( *)', text).group(1)
       if prv_indent == new_indent:
         # Same indentation => discard the previous empty section.
         self._tokens[-1] = (token_type, text)

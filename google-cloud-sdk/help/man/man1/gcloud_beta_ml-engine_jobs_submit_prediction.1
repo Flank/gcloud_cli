@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta ml\-engine jobs submit prediction \- start a Cloud ML Engine batch prediction job
+gcloud beta ml\-engine jobs submit prediction \- start an AI Platform batch prediction job
 
 
 
@@ -17,7 +17,7 @@ gcloud beta ml\-engine jobs submit prediction \- start a Cloud ML Engine batch p
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Start a Cloud ML Engine batch prediction job.
+\fB(BETA)\fR Start an AI Platform batch prediction job.
 
 
 
@@ -126,9 +126,8 @@ if not specified.
 
 .TP 2m
 \fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR
-Google Cloud ML Engine runtime version for this job. Defaults to a stable
-version, which is defined in documentation along with the list of supported
-versions:
+AI Platform runtime version for this job. Defaults to a stable version, which is
+defined in documentation along with the list of supported versions:
 https://cloud.google.com/ml\-engine/docs/tensorflow/runtime\-version\-list
 
 .TP 2m
@@ -146,7 +145,7 @@ This flag may only be given if \-\-model is specified. If unspecified, the
 default version of the model will be used. To list versions for a model, run
 
 .RS 2m
-$ gcloud ml\-engine versions list
+$ gcloud ai\-platform versions list
 .RE
 
 
@@ -155,10 +154,11 @@ $ gcloud ml\-engine versions list
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

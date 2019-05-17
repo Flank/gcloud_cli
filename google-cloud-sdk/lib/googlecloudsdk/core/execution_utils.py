@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2013 Google Inc. All Rights Reserved.
+# Copyright 2013 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -57,6 +57,7 @@ class InvalidCommandError(exceptions.Error):
         '{cmd}: command not found'.format(cmd=cmd))
 
 
+# Doesn't work in par or stub files.
 def GetPythonExecutable():
   """Gets the path to the Python interpreter that should be used."""
   cloudsdk_python = encoding.GetEncodedValue(os.environ, 'CLOUDSDK_PYTHON')
@@ -137,6 +138,7 @@ def _GetToolEnv(env=None):
   """
   if env is None:
     env = dict(os.environ)
+  env = encoding.EncodeEnv(env)
   encoding.SetEncodedValue(env, 'CLOUDSDK_WRAPPER', '1')
 
   # Flags can set properties which override the properties file and the existing
@@ -156,6 +158,7 @@ def _GetToolEnv(env=None):
   return env
 
 
+# Doesn't work in par or stub files.
 def ArgsForPythonTool(executable_path, *args, **kwargs):
   """Constructs an argument list for calling the Python interpreter.
 
@@ -209,6 +212,17 @@ def ArgsForExecutableTool(executable_path, *args):
     An argument list to execute the native binary
   """
   return _GetToolArgs(None, None, executable_path, *args)
+
+
+# Works in regular installs as well as hermetic par and stub files. Doesn't work
+# in classic par and stub files.
+def ArgsForGcloud():
+  """Constructs an argument list to run gcloud."""
+  if not sys.executable:
+    # In hermetic par/stub files sys.executable is None. In regular installs,
+    # and in classic par/stub files it is a non-empty string.
+    return _GetToolArgs(None, None, sys.argv[0])
+  return ArgsForPythonTool(config.GcloudPath())
 
 
 class _ProcessHolder(object):
@@ -287,7 +301,7 @@ def Exec(args,
   # started and the original is killed.  When running in a shell, the prompt
   # returns as soon as the parent is killed even though the child is still
   # running.  subprocess waits for the new process to finish before returning.
-  env = encoding.EncodeEnv(_GetToolEnv(env=env))
+  env = _GetToolEnv(env=env)
 
   process_holder = _ProcessHolder()
   with _ReplaceSignal(signal.SIGTERM, process_holder.Handler):
@@ -420,7 +434,7 @@ def KillSubprocess(p):
     # subprocesses from the main process down
 
     # set env LANG for subprocess.Popen to be 'en_US.UTF-8'
-    new_env = dict(os.environ)
+    new_env = encoding.EncodeEnv(dict(os.environ))
     new_env['LANG'] = 'en_US.UTF-8'
     get_pids_process = subprocess.Popen(['ps', '-e',
                                          '-o', 'ppid=', '-o', 'pid='],
@@ -436,7 +450,7 @@ def KillSubprocess(p):
     # Create the process map
     pid_map = {}
     for line in stdout.strip().split('\n'):
-      (ppid, pid) = re.match(r'\s*(\d+)\s+(\d+)', line).groups()  # pytype: disable=attribute-error
+      (ppid, pid) = re.match(r'\s*(\d+)\s+(\d+)', line).groups()
       ppid = int(ppid)
       pid = int(pid)
       children = pid_map.get(ppid)

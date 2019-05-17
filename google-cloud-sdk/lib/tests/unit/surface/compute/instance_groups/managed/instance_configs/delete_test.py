@@ -62,6 +62,7 @@ class InstanceGroupManagerInstanceConfigsDeleteTest(
                         self.project_uri + '/zones/us-central2-a/instances/foo',
                         self.project_uri + '/zones/us-central2-a/instances/bas',
                     ],
+                    names=['foo', 'bas']
                 ),
             project='fake-project',
             zone='us-central2-a',
@@ -185,11 +186,10 @@ class RegionInstanceGroupManagerInstanceConfigsDeleteTest(
                 self.messages.RegionInstanceGroupManagerDeleteInstanceConfigReq
             )(instances=[
                 self.project_uri + '/zones/us-central2-a/instances/foo',
-                self.project_uri + '/zones/us-central2-a/instances/bas',
-            ],),
+                self.project_uri + '/zones/us-central2-a/instances/bas',],
+              names=['foo', 'bas']),
             project='fake-project',
-            region='us-central2',
-        )
+            region='us-central2')
     response = self.messages.Operation(
         selfLink=(self.project_uri + '/regions/us-central2/operations/delete'),)
     self.client.regionInstanceGroupManagers.DeletePerInstanceConfigs.Expect(

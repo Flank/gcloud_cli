@@ -1,0 +1,70 @@
+
+.TH "GCLOUD_ALPHA_DOMAINS_REGISTRATIONS_SEARCH\-DOMAINS" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha domains registrations search\-domains \- search for available domains
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha domains registrations search\-domains\fR \fIDOMAIN_QUERY\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR This command searches for available domains relevant to a
+specified query.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIDOMAIN_QUERY\fR
+Domains search query.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To search for domains for my\-new\-project, run:
+
+.RS 2m
+$ gcloud alpha domains registrations search\-domains my\-new\-project
+.RE
+
+To search for a specific domain, and get suggestions for other domain endings,
+run:
+
+.RS 2m
+$ gcloud alpha domains registrations search\-domains example.com
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/.
+

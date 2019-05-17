@@ -153,7 +153,7 @@ class AuditLogConfig(_messages.Message):
 
 
 class AuthProvider(_messages.Message):
-  r"""Configuration for an anthentication provider, including support for
+  r"""Configuration for an authentication provider, including support for
   [JSON Web Token (JWT)](https://tools.ietf.org/html/draft-ietf-oauth-json-
   web-token-32).
 
@@ -181,10 +181,11 @@ class AuthProvider(_messages.Message):
     jwksUri: URL of the provider's public key set to validate signature of the
       JWT. See [OpenID Discovery](https://openid.net/specs/openid-connect-
       discovery-1_0.html#ProviderMetadata). Optional if the key set document:
-      - can be retrieved from    [OpenID Discovery](https://openid.net/specs
-      /openid-connect-discovery-1_0.html    of the issuer.  - can be inferred
-      from the email domain of the issuer (e.g. a Google service account).
-      Example: https://www.googleapis.com/oauth2/v1/certs
+      - can be retrieved from    [OpenID
+      Discovery](https://openid.net/specs/openid-connect-discovery-1_0.html of
+      the issuer.  - can be inferred from the email domain of the issuer (e.g.
+      a Google  service account).  Example:
+      https://www.googleapis.com/oauth2/v1/certs
   """
 
   audiences = _messages.StringField(1)
@@ -291,24 +292,66 @@ class Backend(_messages.Message):
 class BackendRule(_messages.Message):
   r"""A backend rule provides configuration for an individual API element.
 
+  Enums:
+    PathTranslationValueValuesEnum:
+
   Fields:
     address: The address of the API backend.
     deadline: The number of seconds to wait for a response from a request.
       The default deadline for gRPC is infinite (no deadline) and HTTP
       requests is 5 seconds.
+    jwtAudience: The JWT audience is used when generating a JWT id token for
+      the backend.
     minDeadline: Minimum deadline in seconds needed for this method. Calls
       having deadline value lower than this will be rejected.
     operationDeadline: The number of seconds to wait for the completion of a
       long running operation. The default is no deadline.
+    pathTranslation: A PathTranslationValueValuesEnum attribute.
     selector: Selects the methods to which this rule applies.  Refer to
       selector for syntax details.
   """
 
+  class PathTranslationValueValuesEnum(_messages.Enum):
+    r"""PathTranslationValueValuesEnum enum type.
+
+    Values:
+      PATH_TRANSLATION_UNSPECIFIED: <no description>
+      CONSTANT_ADDRESS: Use the backend address as-is, with no modification to
+        the path. If the URL pattern contains variables, the variable names
+        and values will be appended to the query string. If a query string
+        parameter and a URL pattern variable have the same name, this may
+        result in duplicate keys in the query string.  # Examples  Given the
+        following operation config:      Method path:
+        /api/company/{cid}/user/{uid}     Backend address:
+        https://example.cloudfunctions.net/getUser  Requests to the following
+        request paths will call the backend at the translated path:
+        Request path: /api/company/widgetworks/user/johndoe     Translated:
+        https://example.cloudfunctions.net/getUser?cid=widgetworks&uid=johndoe
+        Request path: /api/company/widgetworks/user/johndoe?timezone=EST
+        Translated:     https://example.cloudfunctions.net/getUser?timezone=ES
+        T&cid=widgetworks&uid=johndoe
+      APPEND_PATH_TO_ADDRESS: The request path will be appended to the backend
+        address.  # Examples  Given the following operation config:
+        Method path:        /api/company/{cid}/user/{uid}     Backend address:
+        https://example.appspot.com  Requests to the following request paths
+        will call the backend at the translated path:      Request path:
+        /api/company/widgetworks/user/johndoe     Translated:
+        https://example.appspot.com/api/company/widgetworks/user/johndoe
+        Request path: /api/company/widgetworks/user/johndoe?timezone=EST
+        Translated:     https://example.appspot.com/api/company/widgetworks/us
+        er/johndoe?timezone=EST
+    """
+    PATH_TRANSLATION_UNSPECIFIED = 0
+    CONSTANT_ADDRESS = 1
+    APPEND_PATH_TO_ADDRESS = 2
+
   address = _messages.StringField(1)
   deadline = _messages.FloatField(2)
-  minDeadline = _messages.FloatField(3)
-  operationDeadline = _messages.FloatField(4)
-  selector = _messages.StringField(5)
+  jwtAudience = _messages.StringField(3)
+  minDeadline = _messages.FloatField(4)
+  operationDeadline = _messages.FloatField(5)
+  pathTranslation = _messages.EnumField('PathTranslationValueValuesEnum', 6)
+  selector = _messages.StringField(7)
 
 
 class Billing(_messages.Message):
@@ -352,10 +395,10 @@ class Binding(_messages.Message):
   r"""Associates `members` with a `role`.
 
   Fields:
-    condition: Unimplemented. The condition that is associated with this
-      binding. NOTE: an unsatisfied condition will not allow user access via
-      current binding. Different bindings, including their conditions, are
-      examined independently.
+    condition: The condition that is associated with this binding. NOTE: An
+      unsatisfied condition will not allow user access via current binding.
+      Different bindings, including their conditions, are examined
+      independently.
     members: Specifies the identities requesting access for a Cloud Platform
       resource. `members` can have the following values:  * `allUsers`: A
       special identifier that represents anyone who is    on the internet;
@@ -367,8 +410,8 @@ class Binding(_messages.Message):
       service    account. For example, `my-other-
       app@appspot.gserviceaccount.com`.  * `group:{emailid}`: An email address
       that represents a Google group.    For example, `admins@example.com`.
-      * `domain:{domain}`: A Google Apps domain name that represents all the
-      users of that domain. For example, `google.com` or `example.com`.
+      * `domain:{domain}`: The G Suite domain (primary) that represents all
+      the    users of that domain. For example, `google.com` or `example.com`.
     role: Role that is assigned to `members`. For example, `roles/viewer`,
       `roles/editor`, or `roles/owner`.
   """
@@ -502,7 +545,7 @@ class ConfigChange(_messages.Message):
       field is used for the index (usually selector, name, or id). For maps,
       the term 'key' is used. If the field has no unique identifier, the
       numeric index is used. Examples: - visibility.rules[selector=="google.Li
-      braryService.CreateBook"].restriction -
+      braryService.ListBooks"].restriction -
       quota.metric_rules[selector=="google"].metric_costs[key=="reads"].value
       - logging.producer_destinations[0]
     newValue: Value of the changed object in the new Service configuration, in
@@ -847,8 +890,8 @@ class DocumentationRule(_messages.Message):
       is a qualified name of the element which may end in "*", indicating a
       wildcard. Wildcards are only allowed at the end and for a whole
       component of the qualified name, i.e. "foo.*" is ok, but not "foo.b*" or
-      "foo.*.bar". To specify a default for all applicable elements, the whole
-      pattern "*" is used.
+      "foo.*.bar". A wildcard will match one or more components. To specify a
+      default for all applicable elements, the whole pattern "*" is used.
   """
 
   deprecationDescription = _messages.StringField(1)
@@ -1213,6 +1256,19 @@ class Field(_messages.Message):
   typeUrl = _messages.StringField(10)
 
 
+class FlowErrorDetails(_messages.Message):
+  r"""Encapsulation of flow-specific error details for debugging. Used as a
+  details field on an error Status, not intended for external use.
+
+  Fields:
+    exceptionType: The type of exception (as a class name).
+    flowStepId: The step that failed.
+  """
+
+  exceptionType = _messages.StringField(1)
+  flowStepId = _messages.StringField(2)
+
+
 class GenerateConfigReportRequest(_messages.Message):
   r"""Request message for GenerateConfigReport method.
 
@@ -1325,10 +1381,11 @@ class Http(_messages.Message):
   REST API methods.
 
   Fields:
-    fullyDecodeReservedExpansion: When set to true, URL path parmeters will be
-      fully URI-decoded except in cases of single segment matches in reserved
-      expansion, where "%2F" will be left encoded.  The default behavior is to
-      not decode RFC 6570 reserved characters in multi segment matches.
+    fullyDecodeReservedExpansion: When set to true, URL path parameters will
+      be fully URI-decoded except in cases of single segment matches in
+      reserved expansion, where "%2F" will be left encoded.  The default
+      behavior is to not decode RFC 6570 reserved characters in multi segment
+      matches.
     rules: A list of HTTP configuration rules that apply to individual API
       methods.  **NOTE:** All service configuration rules follow "last one
       wins" order.
@@ -2047,6 +2104,10 @@ class MonitoredResourceDescriptor(_messages.Message):
   different monitored resource types. APIs generally provide a `list` method
   that returns the monitored resource descriptors used by the API.
 
+  Enums:
+    LaunchStageValueValuesEnum: Optional. The launch stage of the monitored
+      resource definition.
+
   Fields:
     description: Optional. A detailed description of the monitored resource
       type that might be used in documentation.
@@ -2058,6 +2119,8 @@ class MonitoredResourceDescriptor(_messages.Message):
       monitored resource type. For example, an individual Google Cloud SQL
       database is identified by values for the labels `"database_id"` and
       `"zone"`.
+    launchStage: Optional. The launch stage of the monitored resource
+      definition.
     name: Optional. The resource name of the monitored resource descriptor:
       `"projects/{project_id}/monitoredResourceDescriptors/{type}"` where
       {type} is the value of the `type` field in this object and {project_id}
@@ -2069,11 +2132,51 @@ class MonitoredResourceDescriptor(_messages.Message):
       maximum length of this value is 256 characters.
   """
 
+  class LaunchStageValueValuesEnum(_messages.Enum):
+    r"""Optional. The launch stage of the monitored resource definition.
+
+    Values:
+      LAUNCH_STAGE_UNSPECIFIED: Do not use this default value.
+      EARLY_ACCESS: Early Access features are limited to a closed group of
+        testers. To use these features, you must sign up in advance and sign a
+        Trusted Tester agreement (which includes confidentiality provisions).
+        These features may be unstable, changed in backward-incompatible ways,
+        and are not guaranteed to be released.
+      ALPHA: Alpha is a limited availability test for releases before they are
+        cleared for widespread use. By Alpha, all significant design issues
+        are resolved and we are in the process of verifying functionality.
+        Alpha customers need to apply for access, agree to applicable terms,
+        and have their projects whitelisted. Alpha releases don't have to be
+        feature complete, no SLAs are provided, and there are no technical
+        support obligations, but they will be far enough along that customers
+        can actually use them in test environments or for limited-use tests --
+        just like they would in normal production cases.
+      BETA: Beta is the point at which we are ready to open a release for any
+        customer to use. There are no SLA or technical support obligations in
+        a Beta release. Products will be complete from a feature perspective,
+        but may have some open outstanding issues. Beta releases are suitable
+        for limited production use cases.
+      GA: GA features are open to all developers and are considered stable and
+        fully qualified for production use.
+      DEPRECATED: Deprecated features are scheduled to be shut down and
+        removed. For more information, see the "Deprecation Policy" section of
+        our [Terms of Service](https://cloud.google.com/terms/) and the
+        [Google Cloud Platform Subject to the Deprecation
+        Policy](https://cloud.google.com/terms/deprecation) documentation.
+    """
+    LAUNCH_STAGE_UNSPECIFIED = 0
+    EARLY_ACCESS = 1
+    ALPHA = 2
+    BETA = 3
+    GA = 4
+    DEPRECATED = 5
+
   description = _messages.StringField(1)
   displayName = _messages.StringField(2)
   labels = _messages.MessageField('LabelDescriptor', 3, repeated=True)
-  name = _messages.StringField(4)
-  type = _messages.StringField(5)
+  launchStage = _messages.EnumField('LaunchStageValueValuesEnum', 4)
+  name = _messages.StringField(5)
+  type = _messages.StringField(6)
 
 
 class Monitoring(_messages.Message):
@@ -2100,13 +2203,17 @@ class Monitoring(_messages.Message):
 
   Fields:
     consumerDestinations: Monitoring configurations for sending metrics to the
-      consumer project. There can be multiple consumer destinations, each one
-      must have a different monitored resource type. A metric can be used in
-      at most one consumer destination.
+      consumer project. There can be multiple consumer destinations. A
+      monitored resouce type may appear in multiple monitoring destinations if
+      different aggregations are needed for different sets of metrics
+      associated with that monitored resource type. A monitored resource and
+      metric pair may only be used once in the Monitoring configuration.
     producerDestinations: Monitoring configurations for sending metrics to the
-      producer project. There can be multiple producer destinations, each one
-      must have a different monitored resource type. A metric can be used in
-      at most one producer destination.
+      producer project. There can be multiple producer destinations. A
+      monitored resouce type may appear in multiple monitoring destinations if
+      different aggregations are needed for different sets of metrics
+      associated with that monitored resource type. A monitored resource and
+      metric pair may only be used once in the Monitoring configuration.
   """
 
   consumerDestinations = _messages.MessageField('MonitoringDestination', 1, repeated=True)
@@ -2118,8 +2225,8 @@ class MonitoringDestination(_messages.Message):
   or the consumer project).
 
   Fields:
-    metrics: Names of the metrics to report to this monitoring destination.
-      Each name must be defined in Service.metrics section.
+    metrics: Types of the metrics to report to this monitoring destination.
+      Each type must be defined in Service.metrics section.
     monitoredResource: The monitored resource type. The type must be defined
       in Service.monitored_resources section.
   """
@@ -2186,7 +2293,8 @@ class Operation(_messages.Message):
       if any.
     name: The server-assigned name, which is only unique within the same
       service that originally returns it. If you use the default HTTP mapping,
-      the `name` should have the format of `operations/some/unique/name`.
+      the `name` should be a resource name ending with
+      `operations/{unique_id}`.
     response: The normal response of the operation in case of success.  If the
       original method returns no data on success, such as `Delete`, the
       response is `google.protobuf.Empty`.  If the original method is standard
@@ -2481,12 +2589,12 @@ class QueryUserAccessResponse(_messages.Message):
 
 class Quota(_messages.Message):
   r"""Quota configuration helps to achieve fairness and budgeting in service
-  usage.  The quota configuration works this way: - The service configuration
-  defines a set of metrics. - For API calls, the quota.metric_rules maps
-  methods to metrics with   corresponding costs. - The quota.limits defines
-  limits on the metrics, which will be used for   quota checks at runtime.  An
-  example quota configuration in yaml format:     quota:      limits:       -
-  name: apiWriteQpsPerProject        metric:
+  usage.  The metric based quota configuration works this way: - The service
+  configuration defines a set of metrics. - For API calls, the
+  quota.metric_rules maps methods to metrics with   corresponding costs. - The
+  quota.limits defines limits on the metrics, which will be used for   quota
+  checks at runtime.  An example quota configuration in yaml format:
+  quota:      limits:       - name: apiWriteQpsPerProject        metric:
   library.googleapis.com/write_calls        unit: "1/min/{project}"  # rate
   limit for consumer projects        values:          STANDARD: 10000        #
   The metric rules bind all methods to the read_calls metric,      # except
@@ -3104,8 +3212,10 @@ class Service(_messages.Message):
       This is required by the Service.monitoring and Service.logging
       configurations.
     monitoring: Monitoring configuration.
-    name: The DNS address at which this service is available, e.g.
-      `calendar.googleapis.com`.
+    name: The service name, which is a DNS-like logical identifier for the
+      service, such as `calendar.googleapis.com`. The service name typically
+      goes through DNS verification to make sure the owner of the service also
+      owns the DNS name.
     producerProjectId: The Google project that owns this service.
     quota: Quota configuration.
     sourceInfo: Output only. The source information for this configuration if
@@ -3258,7 +3368,8 @@ class ServicemanagementServicesConfigsListRequest(_messages.Message):
   r"""A ServicemanagementServicesConfigsListRequest object.
 
   Fields:
-    pageSize: The max number of items to include in the response list.
+    pageSize: The max number of items to include in the response list. Page
+      size is 50 if not specified. Maximum value is 100.
     pageToken: The token of the page to retrieve.
     serviceName: The name of the service.  See the [overview](/service-
       management/overview) for naming requirements.  For example:
@@ -3567,7 +3678,8 @@ class ServicemanagementServicesListRequest(_messages.Message):
     consumerProjectId: Include services consumed by the specified project.  If
       project_settings is expanded, then this field controls which project
       project_settings is populated for.
-    pageSize: Requested size of the next page of data.
+    pageSize: The max number of items to include in the response list. Page
+      size is 50 if not specified. Maximum value is 100.
     pageToken: Token identifying which result to start with; returned by a
       previous list call.
     producerProjectId: Include services produced by the specified project.
@@ -3714,7 +3826,8 @@ class ServicemanagementServicesRolloutsListRequest(_messages.Message):
       use filter='status=SUCCESS'   -- To limit the results to those in
       [status](google.api.servicemanagement.v1.RolloutStatus) 'CANCELLED'
       or 'FAILED', use filter='status=CANCELLED OR status=FAILED'
-    pageSize: The max number of items to include in the response list.
+    pageSize: The max number of items to include in the response list. Page
+      size is 50 if not specified. Maximum value is 100.
     pageToken: The token of the page to retrieve.
     serviceName: The name of the service.  See the [overview](/service-
       management/overview) for naming requirements.  For example:

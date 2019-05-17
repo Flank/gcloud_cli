@@ -78,7 +78,6 @@ class ComputeXpnTest(e2e_test_base.BaseTest):
   # don't have the ability to create projects on demand. Therefore, we're
   # subject to race conditions. This decorator minimizes (but does not
   # eliminate) the risk of race conditions.
-  @test_case.Filters.skip('Failing', 'b/121155171')
   @test_case.Filters.RunOnlyOnLinux('Artificially limit run frequency.')
   def testXpn(self):
     with self._EnableXpnProject(self.host_project):

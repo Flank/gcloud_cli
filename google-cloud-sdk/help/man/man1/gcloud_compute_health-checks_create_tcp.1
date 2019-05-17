@@ -11,7 +11,7 @@ gcloud compute health\-checks create tcp \- create a TCP health check to monitor
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute health\-checks create tcp\fR \fINAME\fR [\fB\-\-check\-interval\fR=\fICHECK_INTERVAL\fR;\ default="5s"] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-healthy\-threshold\fR=\fIHEALTHY_THRESHOLD\fR;\ default=2] [\fB\-\-proxy\-header\fR=\fIPROXY_HEADER\fR;\ default="NONE"] [\fB\-\-request\fR=\fIREQUEST\fR] [\fB\-\-response\fR=\fIRESPONSE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="5s"] [\fB\-\-unhealthy\-threshold\fR=\fIUNHEALTHY_THRESHOLD\fR;\ default=2] [\fB\-\-port\fR=\fIPORT\fR;\ default=80\ \fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute health\-checks create tcp\fR \fINAME\fR [\fB\-\-check\-interval\fR=\fICHECK_INTERVAL\fR;\ default="5s"] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-healthy\-threshold\fR=\fIHEALTHY_THRESHOLD\fR;\ default=2] [\fB\-\-proxy\-header\fR=\fIPROXY_HEADER\fR;\ default="NONE"] [\fB\-\-request\fR=\fIREQUEST\fR] [\fB\-\-response\fR=\fIRESPONSE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="5s"] [\fB\-\-unhealthy\-threshold\fR=\fIUNHEALTHY_THRESHOLD\fR;\ default=2] [\fB\-\-port\fR=\fIPORT\fR;\ default=80\ \fB\-\-port\-name\fR=\fIPORT_NAME\fR\ \fB\-\-use\-serving\-port\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -120,17 +120,31 @@ The TCP port number that this health check monitors.
 \fB\-\-port\-name\fR=\fIPORT_NAME\fR
 The port name that this health check monitors. By default, this is empty.
 
+.TP 2m
+\fB\-\-use\-serving\-port\fR
+If given, use the "serving port" for health checks:
 
+.RS 2m
+.IP "\(bu" 2m
+When health checking network endpoints in a Network Endpoint Group, use the port
+specified with each endpoint.
+.IP "\(bu" 2m
+When health checking other backends, use the port or named port of the backend
+service.
+.RE
 .RE
 .RE
 .sp
 
+
+
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

@@ -4,8 +4,7 @@ NAME
 
 SYNOPSIS
     gcloud dataproc workflow-templates get-iam-policy
-        (TEMPLATE : --region=REGION) [--filter=EXPRESSION] [--limit=LIMIT]
-        [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [GCLOUD_WIDE_FLAG ...]
+        (TEMPLATE : --region=REGION) [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Gets the IAM policy for a workflow template, given a template ID.
@@ -25,8 +24,8 @@ POSITIONAL ARGUMENTS
           this group are specified.
 
        --region=REGION
-          The Cloud DataProc region for the template. Each Cloud Dataproc
-          region constitutes an independent resource namespace constrained to
+          Cloud Dataproc region for the template. Each Cloud Dataproc region
+          constitutes an independent resource namespace constrained to
           deploying instances into Google Compute Engine zones inside the
           region. The default value of global is a special multi-region
           namespace which is capable of deploying instances into all Google
@@ -34,35 +33,10 @@ POSITIONAL ARGUMENTS
           Dataproc regions. Overrides the default dataproc/region property
           value for this command invocation.
 
-LIST COMMAND FLAGS
-     --filter=EXPRESSION
-        Apply a Boolean filter EXPRESSION to each resource item to be listed.
-        If the expression evaluates True, then that item is listed. For more
-        details and examples of filter expressions, run $ gcloud topic filters.
-        This flag interacts with other flags that are applied in this order:
-        --flatten, --sort-by, --filter, --limit.
-
-     --limit=LIMIT
-        Maximum number of resources to list. The default is unlimited. This
-        flag interacts with other flags that are applied in this order:
-        --flatten, --sort-by, --filter, --limit.
-
-     --page-size=PAGE_SIZE
-        Some services group resource list output into pages. This flag
-        specifies the maximum number of resources per page. The default is
-        determined by the service if it supports paging, otherwise it is
-        unlimited (no paging). Paging may be applied before or after --filter
-        and --limit depending on the service.
-
-     --sort-by=[FIELD,...]
-        Comma-separated list of resource field key names to sort by. The
-        default order is ascending. Prefix a field with ``~'' for descending
-        order on that field. This flag interacts with other flags that are
-        applied in this order: --flatten, --sort-by, --filter, --limit.
-
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -73,7 +47,8 @@ EXAMPLES
         $ gcloud dataproc workflow-templates get-iam-policy example-workflow
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha dataproc workflow-templates get-iam-policy
         $ gcloud beta dataproc workflow-templates get-iam-policy
 

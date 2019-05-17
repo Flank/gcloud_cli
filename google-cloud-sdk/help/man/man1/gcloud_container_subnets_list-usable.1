@@ -1,0 +1,124 @@
+
+.TH "GCLOUD_CONTAINER_SUBNETS_LIST\-USABLE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud container subnets list\-usable \- list subnets usable for cluster creation in a specific project
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud container subnets list\-usable\fR [\fB\-\-network\-project\fR=\fINETWORK_PROJECT\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Usability of subnetworks for cluster creation is dependent on the IAM policy of
+the project's Google Kubernetes Engine Service Account. Use the
+\f5\-\-project\fR flag to evaluate subnet usability in different projects. This
+list may differ from the list returned by Google Compute Engine's
+\f5list\-usable\fR command, which returns subnets only usable by the caller.
+
+To show subnetworks shared from a Shared\-VPC host project, use
+\f5\-\-network\-project\fR to specify the project that owns the subnetworks.
+
+
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-network\-project\fR=\fINETWORK_PROJECT\fR
+The project owning the subnetworks returned. This field is translated into the
+expression \f5networkProjectId=[PROJECT_ID]\fR and ANDed to the \f5\-\-filter\fR
+flag value.
+
+Defaults to the \fB\-\-project\fR value.
+
+
+.RE
+.sp
+
+.SH "LIST COMMAND FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-filter\fR=\fIEXPRESSION\fR
+Apply a Boolean filter \fIEXPRESSION\fR to each resource item to be listed. If
+the expression evaluates \f5True\fR, then that item is listed. For more details
+and examples of filter expressions, run $ gcloud topic filters. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-limit\fR=\fILIMIT\fR
+Maximum number of resources to list. The default is \fBunlimited\fR. This flag
+interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
+\fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR
+Some services group resource list output into pages. This flag specifies the
+maximum number of resources per page. The default is determined by the service
+if it supports paging, otherwise it is \fBunlimited\fR (no paging). Paging may
+be applied before or after \fB\-\-filter\fR and \fB\-\-limit\fR depending on the
+service.
+
+.TP 2m
+\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]
+Comma\-separated list of resource field key names to sort by. The default order
+is ascending. Prefix a field with ``~'' for descending order on that field. This
+flag interacts with other flags that are applied in this order:
+\fB\-\-flatten\fR, \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
+
+.TP 2m
+\fB\-\-uri\fR
+Print a list of resource URIs instead of the default output.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+List all subnetworks usable for cluster creation in project \f5my\-project\fR.
+
+.RS 2m
+$ gcloud container subnets list\-usable \e
+  \-\-project=my\-project
+.RE
+
+List all subnetworks existing in project \f5my\-shared\-host\-project\fR usable
+for cluster creation in project \f5my\-service\-project\fR.
+
+.RS 2m
+$ gcloud container subnets list\-usable \e
+   \-\-project=my\-service\-project \e
+   \-\-network\-project=my\-shared\-host\-project
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha container subnets list\-usable
+$ gcloud beta container subnets list\-usable
+.RE
+

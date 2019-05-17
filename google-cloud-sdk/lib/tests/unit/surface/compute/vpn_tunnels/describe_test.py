@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2019 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,63 +18,82 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import textwrap
-
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
-from tests.lib.surface.compute import test_base
-from tests.lib.surface.compute import test_resources
+from tests.lib.surface.compute import vpn_tunnels_test_base
 
 
-def SetUp(test_obj, api_version):
-  test_obj.SelectApi(api_version)
+class VpnTunnelsDescribeGATest(vpn_tunnels_test_base.VpnTunnelsTestBase):
 
-  if api_version == 'v1':
-    test_obj.vpn_tunnels = test_resources.VPN_TUNNELS_V1
-  elif api_version == 'beta':
-    test_obj.vpn_tunnels = test_resources.VPN_TUNNELS_BETA
-  else:
-    raise ValueError('api_version must be \'v1\' or \'beta\'.'
-                     'Got [{0}].'.format(api_version))
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def testDescribeClassicVpnTunnel(self):
+    name = 'my-tunnel'
+    description = 'My tunnel description.'
+    ike_version = 2
+    peer_ip_address = '71.72.73.74'
+    shared_secret = 'secret-xyz'
+    local_traffic_selector = ['192.168.100.14/24', '10.0.0.0/16']
+    remote_traffic_selector = ['192.168.100.15/24', '10.1.0.0/16']
+    target_vpn_gateway = 'my-gateway'
+
+    vpn_tunnel_ref = self.GetVpnTunnelRef(name)
+    result_vpn_tunnel = self.messages.VpnTunnel(
+        name=name,
+        description=description,
+        ikeVersion=ike_version,
+        peerIp=peer_ip_address,
+        sharedSecret=shared_secret,
+        localTrafficSelector=local_traffic_selector,
+        remoteTrafficSelector=remote_traffic_selector,
+        targetVpnGateway=self.GetTargetVpnGatewayRef(
+            target_vpn_gateway).SelfLink(),
+        selfLink=vpn_tunnel_ref.SelfLink())
+
+    self.ExpectGetRequest(vpn_tunnel_ref, result_vpn_tunnel)
+
+    response = self.Run('compute vpn-tunnels describe {} --region {}'.format(
+        name, self.REGION))
+    self.assertEqual(response, result_vpn_tunnel)
 
 
-class VpnTunnelsDescribeTest(test_base.BaseTest, test_case.WithOutputCapture):
+class VpnTunnelsDescribeBetaTest(VpnTunnelsDescribeGATest):
 
-  def SetUp(self):
-    SetUp(self, 'v1')
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
-  def testSimpleInvocationMakesRightRequest(self):
-    messages = self.messages
-    self.make_requests.side_effect = iter([
-        [self.vpn_tunnels[0]],
-    ])
 
-    self.Run("""
-        compute vpn-tunnels describe tunnel-1
-            --region region-1
-        """)
+class VpnTunnelsDescribeAlphaTest(VpnTunnelsDescribeBetaTest):
 
-    self.CheckRequests(
-        [(self.compute.vpnTunnels,
-          'Get',
-          messages.ComputeVpnTunnelsGetRequest(
-              project='my-project',
-              region='region-1',
-              vpnTunnel='tunnel-1'))],
-    )
-    self.assertMultiLineEqual(
-        self.GetOutput(),
-        textwrap.dedent("""\
-            creationTimestamp: '2011-11-11T17:54:10.636-07:00'
-            description: the first tunnel
-            ikeVersion: 1
-            name: tunnel-1
-            peerIp: 1.1.1.1
-            region: {uri}/projects/my-project/regions/region-1
-            selfLink: {uri}/projects/my-project/regions/region-1/vpnTunnels/tunnel-1
-            sharedSecretHash: ff33f3a693905de7e85178529e3a13feb85a3964
-            status: ESTABLISHED
-            targetVpnGateway: {uri}/projects/my-project/regions/region-1/targetVpnGateways/gateway-1
-            """.format(uri=self.compute_uri)))
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testDescribeHighAvailabilityVpnTunnel(self):
+    name = 'my-tunnel'
+    description = 'My tunnel description.'
+    ike_version = 2
+    peer_ip_address = '71.72.73.74'
+    shared_secret = 'secret-xyz'
+    vpn_gateway = 'my-gateway'
+    interface = 1
+
+    vpn_tunnel_ref = self.GetVpnTunnelRef(name)
+    result_vpn_tunnel = self.messages.VpnTunnel(
+        name=name,
+        description=description,
+        ikeVersion=ike_version,
+        peerIp=peer_ip_address,
+        sharedSecret=shared_secret,
+        vpnGateway=self.GetVpnGatewayRef(vpn_gateway).SelfLink(),
+        vpnGatewayInterface=interface,
+        selfLink=vpn_tunnel_ref.SelfLink())
+
+    self.ExpectGetRequest(vpn_tunnel_ref, result_vpn_tunnel)
+
+    response = self.Run('compute vpn-tunnels describe {} --region {}'.format(
+        name, self.REGION))
+    self.assertEqual(response, result_vpn_tunnel)
 
 
 if __name__ == '__main__':

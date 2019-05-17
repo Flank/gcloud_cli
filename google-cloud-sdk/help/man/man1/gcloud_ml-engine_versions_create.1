@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud ml\-engine versions create \- create a new Cloud ML Engine version
+gcloud ml\-engine versions create \- create a new AI Platform version
 
 
 
@@ -17,9 +17,9 @@ gcloud ml\-engine versions create \- create a new Cloud ML Engine version
 
 .SH "DESCRIPTION"
 
-Creates a new version of a Cloud ML Engine model.
+Creates a new version of an AI Platform model.
 
-For more details on managing ML Engine models and versions see
+For more details on managing AI Platform models and versions see
 https://cloud.google.com/ml\-engine/docs/how\-tos/managing\-models\-jobs
 
 
@@ -124,9 +124,8 @@ and above. Python 2.7 works with all supported runtime versions.
 
 .TP 2m
 \fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR
-Google Cloud ML Engine runtime version for this job. Defaults to a stable
-version, which is defined in documentation along with the list of supported
-versions:
+AI Platform runtime version for this job. Defaults to a stable version, which is
+defined in documentation along with the list of supported versions:
 https://cloud.google.com/ml\-engine/docs/tensorflow/runtime\-version\-list
 
 .TP 2m
@@ -142,10 +141,11 @@ paths) and no other flags implicitly specify an upload path.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

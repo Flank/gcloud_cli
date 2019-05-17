@@ -21,15 +21,14 @@ from __future__ import unicode_literals
 import re
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.source import util
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.source import base
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA)
-class ProjectConfigUpdatePushblockTest(base.SourceTestBase):
+class ProjectConfigUpdatePushblockTestGA(base.SourceTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def _ExpectUpdateProjectConfigWithPushblockConfigured(self,
                                                         enable_pushblock,
@@ -40,30 +39,40 @@ class ProjectConfigUpdatePushblockTest(base.SourceTestBase):
 
     self._ExpectUpdateProjectConfig(project_config, 'enablePrivateKeyCheck')
 
-  def testUpdate_EnablePushblock(self, track):
-    self.track = track
+  def testUpdate_EnablePushblock(self):
     self._ExpectUpdateProjectConfigWithPushblockConfigured(
         enable_pushblock=True)
     self.Run('source project-configs update --enable-pushblock')
 
-  def testUpdate_EnablePushblockWithAnotherProject(self, track):
-    self.track = track
+  def testUpdate_EnablePushblockWithAnotherProject(self):
     self._ExpectUpdateProjectConfigWithPushblockConfigured(
         enable_pushblock=True, project_name='another-project')
     self.Run('source project-configs update --project=another-project '
              '--enable-pushblock')
 
-  def testUpdate_DisablePushblock(self, track):
-    self.track = track
+  def testUpdate_DisablePushblock(self):
     self._ExpectUpdateProjectConfigWithPushblockConfigured(
         enable_pushblock=False)
     self.Run('source project-configs update --disable-pushblock')
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA)
-class ProjectConfigUpdateAddTopicTest(base.SourceTestBase):
+class ProjectConfigUpdatePushblockTestBeta(ProjectConfigUpdatePushblockTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class ProjectConfigUpdatePushblockTestAlpha(
+    ProjectConfigUpdatePushblockTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class ProjectConfigUpdateAddTopicTestGA(base.SourceTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def _InitialProjectConfig(self, topic_name, project_name):
     pubsub_config = self._CreatePubsubConfig(topic_name, 'json', 'a@gmail.com')
@@ -71,8 +80,8 @@ class ProjectConfigUpdateAddTopicTest(base.SourceTestBase):
         name=project_name,
         pubsubConfigs=self.messages.ProjectConfig.PubsubConfigsValue(
             additionalProperties=[
-                self.messages.ProjectConfig.PubsubConfigsValue.
-                AdditionalProperty(key=topic_name, value=pubsub_config)
+                self.messages.ProjectConfig.PubsubConfigsValue
+                .AdditionalProperty(key=topic_name, value=pubsub_config)
             ]))
 
   def _UpdatedProjectConfig(self, topic_name, new_topic_name, project_name):
@@ -81,13 +90,13 @@ class ProjectConfigUpdateAddTopicTest(base.SourceTestBase):
                                                  'b@gmail.com')
     return self.messages.ProjectConfig(
         name=project_name,
-        pubsubConfigs=self.messages.ProjectConfig.
-        PubsubConfigsValue(additionalProperties=[
-            self.messages.ProjectConfig.PubsubConfigsValue.AdditionalProperty(
-                key=topic_name, value=pubsub_config),
-            self.messages.ProjectConfig.PubsubConfigsValue.AdditionalProperty(
-                key=new_topic_name, value=new_pubsub_config)
-        ]))
+        pubsubConfigs=self.messages.ProjectConfig.PubsubConfigsValue(
+            additionalProperties=[
+                self.messages.ProjectConfig.PubsubConfigsValue
+                .AdditionalProperty(key=topic_name, value=pubsub_config),
+                self.messages.ProjectConfig.PubsubConfigsValue.
+                AdditionalProperty(key=new_topic_name, value=new_pubsub_config)
+            ]))
 
   def _ExpectUpdateProjectConfigWithAddedTopic(self,
                                                project_config,
@@ -97,8 +106,7 @@ class ProjectConfigUpdateAddTopicTest(base.SourceTestBase):
     self._ExpectGetProjectConfig(project_ref, project_config)
     self._ExpectUpdateProjectConfig(update_project_config, 'pubsubConfigs')
 
-  def testAdd(self, track):
-    self.track = track
+  def testAdd(self):
     project_name = self._GetProjectRef().RelativeName()
     topic_name_1 = 'projects/{}/topics/foo'.format(self.Project())
     topic_name_2 = 'projects/{}/topics/foo2'.format(self.Project())
@@ -112,8 +120,7 @@ class ProjectConfigUpdateAddTopicTest(base.SourceTestBase):
     self.Run('source project-configs update --add-topic foo2 '
              '--message-format=protobuf --service-account=b@gmail.com')
 
-  def testAdd_TopicProject(self, track):
-    self.track = track
+  def testAdd_TopicProject(self):
     project_name = self._GetProjectRef().RelativeName()
     topic_name_1 = 'projects/{}/topics/foo'.format(self.Project())
     topic_name_2 = 'projects/another-project/topics/foo2'
@@ -129,10 +136,22 @@ class ProjectConfigUpdateAddTopicTest(base.SourceTestBase):
              '--message-format=protobuf --service-account=b@gmail.com')
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA)
-class ProjectConfigUpdateRemoveTest(base.SourceTestBase):
+class ProjectConfigUpdateAddTopicTestBeta(ProjectConfigUpdateAddTopicTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class ProjectConfigUpdateAddTopicTestAlpha(ProjectConfigUpdateAddTopicTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class ProjectConfigUpdateRemoveTestGA(base.SourceTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def _InitialProjectConfig(self, topic_name, another_topic_name, project_name):
     pubsub_config = self._CreatePubsubConfig(topic_name, 'json', 'a@gmail.com')
@@ -140,8 +159,8 @@ class ProjectConfigUpdateRemoveTest(base.SourceTestBase):
                                                  'b@gmail.com')
     return self.messages.ProjectConfig(
         name=project_name,
-        pubsubConfigs=self.messages.ProjectConfig.
-        PubsubConfigsValue(additionalProperties=[
+        pubsubConfigs=self.messages.ProjectConfig
+        .PubsubConfigsValue(additionalProperties=[
             self.messages.ProjectConfig.PubsubConfigsValue.AdditionalProperty(
                 key=topic_name, value=pubsub_config),
             self.messages.ProjectConfig.PubsubConfigsValue.AdditionalProperty(
@@ -154,8 +173,8 @@ class ProjectConfigUpdateRemoveTest(base.SourceTestBase):
         name=project_name,
         pubsubConfigs=self.messages.ProjectConfig.PubsubConfigsValue(
             additionalProperties=[
-                self.messages.ProjectConfig.PubsubConfigsValue.
-                AdditionalProperty(key=topic_name, value=pubsub_config)
+                self.messages.ProjectConfig.PubsubConfigsValue
+                .AdditionalProperty(key=topic_name, value=pubsub_config)
             ]))
 
   def _ExpectUpdateProjectConfigWithRemovedTopic(self,
@@ -166,8 +185,7 @@ class ProjectConfigUpdateRemoveTest(base.SourceTestBase):
     self._ExpectGetProjectConfig(project_ref, project_config)
     self._ExpectUpdateProjectConfig(removed_project_config, 'pubsubConfigs')
 
-  def testRemove(self, track):
-    self.track = track
+  def testRemove(self):
     project_name = self._GetProjectRef().RelativeName()
     topic_name_1 = 'projects/{}/topics/foo'.format(self.Project())
     topic_name_2 = 'projects/{}/topics/foo2'.format(self.Project())
@@ -180,8 +198,7 @@ class ProjectConfigUpdateRemoveTest(base.SourceTestBase):
 
     self.Run('source project-configs update --remove-topic=foo2')
 
-  def testRemove_TopicProject(self, track):
-    self.track = track
+  def testRemove_TopicProject(self):
     project_name = self._GetProjectRef().RelativeName()
     topic_name_1 = 'projects/{}/topics/foo'.format(self.Project())
     topic_name_2 = 'projects/another-project/topics/foo2'
@@ -195,8 +212,7 @@ class ProjectConfigUpdateRemoveTest(base.SourceTestBase):
     self.Run('source project-configs update '
              '--remove-topic=foo2 --topic-project=another-project')
 
-  def testRemove_InvalidTopic(self, track):
-    self.track = track
+  def testRemove_InvalidTopic(self):
     project_name = self._GetProjectRef().RelativeName()
     topic_name_1 = 'projects/{}/topics/foo'.format(self.Project())
     topic_name_2 = 'projects/another-project/topics/foo2'
@@ -210,8 +226,7 @@ class ProjectConfigUpdateRemoveTest(base.SourceTestBase):
     with self.assertRaisesRegex(util.InvalidTopicError, error_message):
       self.Run('source project-configs update --remove-topic=foo3')
 
-  def testRemove_Empty(self, track):
-    self.track = track
+  def testRemove_Empty(self):
     initial_project_config = self.messages.ProjectConfig(
         name=self._GetProjectRef().RelativeName())
     self._ExpectGetProjectConfig(self._GetProjectRef(), initial_project_config)
@@ -223,10 +238,22 @@ class ProjectConfigUpdateRemoveTest(base.SourceTestBase):
       self.Run('source project-configs update --remove-topic=foo')
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA)
-class ProjectConfigUpdateUpdateTopicTest(base.SourceTestBase):
+class ProjectConfigUpdateRemoveTestBeta(ProjectConfigUpdateRemoveTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class ProjectConfigUpdateRemoveTestAlpha(ProjectConfigUpdateRemoveTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class ProjectConfigUpdateUpdateTopicTestGA(base.SourceTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def _InitialProjectConfig(self, topic_name, message_format='json'):
     project_name = self._GetProjectRef().RelativeName()
@@ -236,8 +263,8 @@ class ProjectConfigUpdateUpdateTopicTest(base.SourceTestBase):
         name=project_name,
         pubsubConfigs=self.messages.ProjectConfig.PubsubConfigsValue(
             additionalProperties=[
-                self.messages.ProjectConfig.PubsubConfigsValue.
-                AdditionalProperty(key=topic_name, value=pubsub_config),
+                self.messages.ProjectConfig.PubsubConfigsValue
+                .AdditionalProperty(key=topic_name, value=pubsub_config),
             ]))
 
   def _UpdatedProjectConfig(self, topic_name, message_format='json'):
@@ -248,8 +275,8 @@ class ProjectConfigUpdateUpdateTopicTest(base.SourceTestBase):
         name=project_name,
         pubsubConfigs=self.messages.ProjectConfig.PubsubConfigsValue(
             additionalProperties=[
-                self.messages.ProjectConfig.PubsubConfigsValue.
-                AdditionalProperty(key=topic_name, value=pubsub_config)
+                self.messages.ProjectConfig.PubsubConfigsValue
+                .AdditionalProperty(key=topic_name, value=pubsub_config)
             ]))
 
   def _ExpectUpdateProjectConfigWithUpdatedTopic(self, project_config,
@@ -258,8 +285,7 @@ class ProjectConfigUpdateUpdateTopicTest(base.SourceTestBase):
     self._ExpectGetProjectConfig(project_ref, project_config)
     self._ExpectUpdateProjectConfig(updated_project_config, 'pubsubConfigs')
 
-  def testUpdate(self, track):
-    self.track = track
+  def testUpdate(self):
     topic_name = 'projects/{}/topics/foo'.format(self.Project())
     initial_project_config = self._InitialProjectConfig(topic_name)
     updated_project_config = self._UpdatedProjectConfig(topic_name, 'protobuf')
@@ -270,8 +296,7 @@ class ProjectConfigUpdateUpdateTopicTest(base.SourceTestBase):
              '--update-topic=foo '
              '--message-format=protobuf --service-account=b@gmail.com')
 
-  def testUpdate_TopicProject(self, track):
-    self.track = track
+  def testUpdate_TopicProject(self):
     topic_name = 'projects/another-project/topics/foo'
     initial_project_config = self._InitialProjectConfig(topic_name)
     updated_project_config = self._UpdatedProjectConfig(topic_name, 'protobuf')
@@ -283,8 +308,7 @@ class ProjectConfigUpdateUpdateTopicTest(base.SourceTestBase):
              '--topic-project=another-project '
              '--message-format=protobuf --service-account=b@gmail.com')
 
-  def testUpdate_InvalidTopic(self, track):
-    self.track = track
+  def testUpdate_InvalidTopic(self):
     topic_name = 'projects/another-project/topics/foo'
     initial_project_config = self._InitialProjectConfig(topic_name)
     self._ExpectGetProjectConfig(self._GetProjectRef(), initial_project_config)
@@ -295,8 +319,7 @@ class ProjectConfigUpdateUpdateTopicTest(base.SourceTestBase):
     with self.assertRaisesRegex(util.InvalidTopicError, error_message):
       self.Run('source project-configs update --update-topic=foo3')
 
-  def testUpdate_Empty(self, track):
-    self.track = track
+  def testUpdate_Empty(self):
     initial_project_config = self.messages.ProjectConfig()
     self._ExpectGetProjectConfig(self._GetProjectRef(), initial_project_config)
     error_message = re.escape(
@@ -306,8 +329,7 @@ class ProjectConfigUpdateUpdateTopicTest(base.SourceTestBase):
     with self.assertRaisesRegex(util.InvalidTopicError, error_message):
       self.Run('source project-configs update --update-topic=foo')
 
-  def testUpdate_WithUnchangedMessageFormat(self, track):
-    self.track = track
+  def testUpdate_WithUnchangedMessageFormat(self):
     topic_name = 'projects/{}/topics/foo'.format(self.Project())
     initial_project_config = self._InitialProjectConfig(topic_name, 'protobuf')
     updated_project_config = self._UpdatedProjectConfig(topic_name, 'protobuf')
@@ -317,14 +339,27 @@ class ProjectConfigUpdateUpdateTopicTest(base.SourceTestBase):
     self.Run('source project-configs update --update-topic=foo '
              '--service-account=b@gmail.com')
 
-  def testUpdate_WithUnchangedData(self, track):
-    self.track = track
+  def testUpdate_WithUnchangedData(self):
     topic_name = 'projects/{}/topics/foo'.format(self.Project())
     initial_project_config = self._InitialProjectConfig(topic_name, 'protobuf')
     self._ExpectUpdateProjectConfigWithUpdatedTopic(initial_project_config,
                                                     initial_project_config)
 
     self.Run('source project-configs update --update-topic=foo ')
+
+
+class ProjectConfigUpdateUpdateTopicTestBeta(
+    ProjectConfigUpdateUpdateTopicTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class ProjectConfigUpdateUpdateTopicTestAlpha(
+    ProjectConfigUpdateUpdateTopicTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

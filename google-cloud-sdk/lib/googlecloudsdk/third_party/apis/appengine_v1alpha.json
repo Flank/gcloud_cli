@@ -136,7 +136,7 @@
       "type": "object",
       "properties": {
         "name": {
-          "description": "The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the name should have the format of operations\/some\/unique\/name.",
+          "description": "The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the name should be a resource name ending with operations\/{unique_id}.",
           "type": "string"
         },
         "metadata": {
@@ -489,68 +489,6 @@
             "type": "any",
             "description": "Properties of the object. Contains field @type with type URL."
           }
-        }
-      }
-    },
-    "OperationMetadata": {
-      "id": "OperationMetadata",
-      "description": "Metadata for the given google.longrunning.Operation.",
-      "type": "object",
-      "properties": {
-        "operationType": {
-          "description": "Type of this operation. Deprecated, use method field instead. Example: \"create_version\".@OutputOnly",
-          "type": "string"
-        },
-        "insertTime": {
-          "description": "Timestamp that this operation was created.@OutputOnly",
-          "type": "string",
-          "format": "google-datetime"
-        },
-        "endTime": {
-          "description": "Timestamp that this operation completed.@OutputOnly",
-          "type": "string",
-          "format": "google-datetime"
-        },
-        "user": {
-          "description": "User who requested this operation.@OutputOnly",
-          "type": "string"
-        },
-        "target": {
-          "description": "Name of the resource that this operation is acting on. Example: apps\/myapp\/modules\/default.@OutputOnly",
-          "type": "string"
-        },
-        "method": {
-          "description": "API method that initiated this operation. Example: google.appengine.v1beta4.Version.CreateVersion.@OutputOnly",
-          "type": "string"
-        }
-      }
-    },
-    "OperationMetadataV1Beta5": {
-      "id": "OperationMetadataV1Beta5",
-      "description": "Metadata for the given google.longrunning.Operation.",
-      "type": "object",
-      "properties": {
-        "method": {
-          "description": "API method name that initiated this operation. Example: google.appengine.v1beta5.Version.CreateVersion.@OutputOnly",
-          "type": "string"
-        },
-        "insertTime": {
-          "description": "Timestamp that this operation was created.@OutputOnly",
-          "type": "string",
-          "format": "google-datetime"
-        },
-        "endTime": {
-          "description": "Timestamp that this operation completed.@OutputOnly",
-          "type": "string",
-          "format": "google-datetime"
-        },
-        "user": {
-          "description": "User who requested this operation.@OutputOnly",
-          "type": "string"
-        },
-        "target": {
-          "description": "Name of the resource that this operation is acting on. Example: apps\/myapp\/services\/default.@OutputOnly",
-          "type": "string"
         }
       }
     },

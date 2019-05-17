@@ -101,6 +101,36 @@ class UpdateTestAlpha(UpdateTestBeta):
     self.mock_client.Mock()
     self.addCleanup(self.mock_client.Unmock)
 
+  def testUpdateDisabledMulticast(self):
+    expected = self.messages.Network()
+
+    expected.multicastMode = (
+        self.messages.Network.MulticastModeValueValuesEnum.DISABLED)
+    self.mock_client.networks.Patch.Expect(
+        self.messages.ComputeNetworksPatchRequest(
+            project='fake-project',
+            network='my-network',
+            networkResource=expected), self.messages.Operation(name='myop'))
+
+    self.Run("""
+        compute networks update my-network --multicast-mode disabled
+        """)
+
+  def testUpdateZonalMulticast(self):
+    expected = self.messages.Network()
+
+    expected.multicastMode = (
+        self.messages.Network.MulticastModeValueValuesEnum.ZONAL)
+    self.mock_client.networks.Patch.Expect(
+        self.messages.ComputeNetworksPatchRequest(
+            project='fake-project',
+            network='my-network',
+            networkResource=expected), self.messages.Operation(name='myop'))
+
+    self.Run("""
+        compute networks update my-network --multicast-mode zonal
+        """)
+
 
 if __name__ == '__main__':
   test_case.main()

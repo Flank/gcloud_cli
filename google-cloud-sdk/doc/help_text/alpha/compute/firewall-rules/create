@@ -8,6 +8,7 @@ SYNOPSIS
         [--description=DESCRIPTION]
         [--destination-ranges=CIDR_RANGE,[CIDR_RANGE,...]]
         [--direction=DIRECTION] [--disabled] [--enable-logging]
+        [--logging-metadata=LOGGING_METADATA]
         [--network=NETWORK; default="default"] [--priority=PRIORITY]
         [--rules=PROTOCOL[:PORT[-PORT]],[...]]
         [--source-ranges=CIDR_RANGE,[CIDR_RANGE,...]]
@@ -101,6 +102,11 @@ OPTIONAL FLAGS
         Enable logging for the firewall rule. Logs will be exported to
         StackDriver. Firewall logging is disabled by default.
 
+     --logging-metadata=LOGGING_METADATA
+        Can only be specified if --enable-logging is true. Configures whether
+        metadata fields should be added to the reported firewall logs.
+        LOGGING_METADATA must be one of: exclude-all, include-all.
+
      --network=NETWORK; default="default"
         The network to which this rule is attached. If omitted, the rule is
         attached to the default network.
@@ -183,19 +189,20 @@ OPTIONAL FLAGS
         target tags can also be specified.
 
      --target-tags=TAG,[TAG,...]
-        A list of instance tags indicating the set of instances on the network
-        which may accept inbound connections that match the firewall rule. If
-        both target tags and target service account are omitted, all instances
-        on the network can receive inbound connections that match the rule.
+        List of instance tags indicating the set of instances on the network
+        which may accept connections that match the firewall rule. Note that
+        tags can be assigned to instances during instance creation.
 
-        Tags can be assigned to instances during instance creation.
-
-        If target tags are specified then neither a source nor target service
+        If target tags are specified, then neither a source nor target service
         account can also be specified.
 
+        If both target tags and target service account are omitted, all
+        instances on the network can receive connections that match the rule.
+
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

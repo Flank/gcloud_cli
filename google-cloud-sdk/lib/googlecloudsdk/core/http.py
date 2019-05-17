@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2013 Google Inc. All Rights Reserved.
+# Copyright 2013 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,8 +14,6 @@
 # limitations under the License.
 
 """A module to get an unauthenticated http object."""
-# TODO(b/71388306): Unskip pytype on this file.
-# pytype: skip-file
 
 from __future__ import absolute_import
 from __future__ import division
@@ -32,6 +30,7 @@ from googlecloudsdk.core import http_proxy
 from googlecloudsdk.core import log
 from googlecloudsdk.core import metrics
 from googlecloudsdk.core import properties
+from googlecloudsdk.core.console import console_attr
 from googlecloudsdk.core.console import console_io
 from googlecloudsdk.core.util import encoding
 from googlecloudsdk.core.util import platforms
@@ -84,6 +83,37 @@ def Http(timeout='unset', response_encoding=None, ca_certs=None):
   return http_client
 
 
+# TODO(b/120951866) Can this be the same as Http?
+def HttpClient(
+    timeout=None,
+    proxy_info=httplib2.proxy_info_from_environment,
+    ca_certs=httplib2.CA_CERTS,
+    disable_ssl_certificate_validation=False):
+  """Returns a httplib2.Http subclass.
+
+  Args:
+    timeout: float, Request timeout, in seconds.
+    proxy_info: httplib2.ProxyInfo object or callable
+    ca_certs: str, absolute filename of a ca_certs file
+    disable_ssl_certificate_validation: bool, If true, disable ssl certificate
+        validation.
+
+  Returns: A httplib2.Http subclass
+
+  """
+  if properties.VALUES.proxy.use_urllib3_via_shim.GetBool():
+    import httplib2shim  # pylint:disable=g-import-not-at-top
+    http_class = httplib2shim.Http
+  else:
+    http_class = httplib2.Http
+
+  return http_class(
+      timeout=timeout,
+      proxy_info=proxy_info,
+      ca_certs=ca_certs,
+      disable_ssl_certificate_validation=disable_ssl_certificate_validation)
+
+
 def _CreateRawHttpClient(timeout='unset', ca_certs=None):
   """Create an HTTP client matching the appropriate gcloud properties."""
   # Compared with setting the default timeout in the function signature (i.e.
@@ -97,10 +127,10 @@ def _CreateRawHttpClient(timeout='unset', ca_certs=None):
     ca_certs = ca_certs_property
   if no_validate:
     ca_certs = None
-  return httplib2.Http(timeout=effective_timeout,
-                       proxy_info=http_proxy.GetHttpProxyInfo(),
-                       ca_certs=ca_certs,
-                       disable_ssl_certificate_validation=no_validate)
+  return HttpClient(timeout=effective_timeout,
+                    proxy_info=http_proxy.GetHttpProxyInfo(),
+                    ca_certs=ca_certs,
+                    disable_ssl_certificate_validation=no_validate)
 
 
 def MakeUserAgentString(cmd_path=None):
@@ -123,6 +153,7 @@ def MakeUserAgentString(cmd_path=None):
           ' interactive/{is_interactive}'
           ' from-script/{from_script}'
           ' python/{py_version}'
+          ' term/{term}'
           ' {ua_fragment}').format(
               version=config.CLOUD_SDK_VERSION.replace(' ', '_'),
               cmd=(cmd_path or properties.VALUES.metrics.command_name.Get()),
@@ -133,7 +164,8 @@ def MakeUserAgentString(cmd_path=None):
                                                       heuristic=True),
               py_version=platform.python_version(),
               ua_fragment=platforms.Platform.Current().UserAgentFragment(),
-              from_script=console_io.IsRunFromShellScript())
+              from_script=console_io.IsRunFromShellScript(),
+              term=console_attr.GetConsoleAttr().GetTermIdentifier())
 
 
 def GetDefaultTimeout():

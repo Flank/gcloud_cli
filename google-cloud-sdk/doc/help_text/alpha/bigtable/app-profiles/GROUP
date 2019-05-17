@@ -1,15 +1,16 @@
 NAME
-    gcloud alpha bigtable app-profiles - manage Cloud Bigtable app_profiles
+    gcloud alpha bigtable app-profiles - manage Cloud Bigtable app profiles
 
 SYNOPSIS
     gcloud alpha bigtable app-profiles COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Manage Cloud Bigtable app_profiles.
+    (ALPHA) Manage Cloud Bigtable app profiles.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -17,26 +18,27 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        (ALPHA) Create a new Bigtable app_profile.
+        (ALPHA) Create a new Bigtable app profile.
 
      delete
-        (ALPHA) Delete a Bigtable app-profile.
+        (ALPHA) Delete a Bigtable app profile.
 
      describe
-        (ALPHA) Describe an existing Bigtable app-profile.
+        (ALPHA) Describe an existing Bigtable app profile.
 
      list
-        (ALPHA) List Bigtable app-profiles.
+        (ALPHA) List Bigtable app profiles.
 
      update
-        (ALPHA) Update a Bigtable app_profile.
+        (ALPHA) Update a Bigtable app profile.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you will have to apply for early access and have your projects
     registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    https://cloud.google.com/support/. These variants are also available:
 
+        $ gcloud bigtable app-profiles
         $ gcloud beta bigtable app-profiles
 

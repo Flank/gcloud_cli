@@ -1,0 +1,41 @@
+NAME
+    gcloud alpha ai-platform operations - manage AI Platform operations
+
+SYNOPSIS
+    gcloud alpha ai-platform operations COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage AI Platform operations.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     cancel
+        (ALPHA) Cancel an AI Platform operation.
+
+     describe
+        (ALPHA) Describe an AI Platform operation.
+
+     list
+        (ALPHA) List existing AI Platform jobs.
+
+     wait
+        (ALPHA) Wait for an AI Platform operation to complete.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
+
+        $ gcloud ai-platform operations
+        $ gcloud beta ai-platform operations
+

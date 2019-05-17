@@ -51,8 +51,16 @@ class Base(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
         'cloudresourcemanager', 'v1')
 
   def SetUpForTrack(self, track):
-    api_version = {calliope_base.ReleaseTrack.ALPHA: 'v1beta',
-                   calliope_base.ReleaseTrack.BETA: 'v1beta'}[track]
+    api_version = {
+        calliope_base.ReleaseTrack.ALPHA: 'v1beta',
+        calliope_base.ReleaseTrack.BETA: 'v1beta',
+        calliope_base.ReleaseTrack.GA: 'v1'
+    }[track]
+    self.include_unrestricted_services = {
+        calliope_base.ReleaseTrack.ALPHA: True,
+        calliope_base.ReleaseTrack.BETA: True,
+        calliope_base.ReleaseTrack.GA: False
+    }[track]
     self.client = mock.Client(
         client_class=apis.GetClientClass(self._API_NAME, api_version))
     self.client.Mock()
@@ -96,11 +104,11 @@ class Base(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
 
   def _MakePerimeter(
       self,
-      id_='MY_PERIMTER',
+      id_='MY_PERIMETER',
       title='My Perimeter',
       description='Very long description of my service perimeter',
       restricted_services=('storage.googleapis.com',),
-      unrestricted_services=('compute.googleapis.com',),
+      unrestricted_services=('*',),
       access_levels=('MY_LEVEL', 'MY_LEVEL_2'),
       resources=('projects/12345', 'projects/67890'),
       type_=None,
@@ -113,8 +121,10 @@ class Base(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase,
         )),
         resources=resources,
         restrictedServices=restricted_services,
-        unrestrictedServices=unrestricted_services,
         )
+    if self.include_unrestricted_services:
+      status.unrestrictedServices = unrestricted_services
+
     return self.messages.ServicePerimeter(
         description=description,
         name='accessPolicies/MY_POLICY/servicePerimeters/' + id_,

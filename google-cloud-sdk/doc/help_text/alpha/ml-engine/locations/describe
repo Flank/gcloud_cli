@@ -1,12 +1,12 @@
 NAME
-    gcloud alpha ml-engine locations describe - display CMLE capabilities in a
-        location
+    gcloud alpha ml-engine locations describe - display AI Platform
+        capabilities in a location
 
 SYNOPSIS
     gcloud alpha ml-engine locations describe LOCATION [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Display CMLE capabilities in a location.
+    (ALPHA) Display AI Platform capabilities in a location.
 
 POSITIONAL ARGUMENTS
      Location resource - The location you want to show details for. This
@@ -20,8 +20,9 @@ POSITIONAL ARGUMENTS
           ID of the location or fully qualified identifier for the location.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

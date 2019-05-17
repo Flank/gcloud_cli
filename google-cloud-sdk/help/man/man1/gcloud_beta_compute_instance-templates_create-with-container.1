@@ -359,7 +359,7 @@ be used.
 \fBauto\-delete\fR
 If \f5\fIyes\fR\fR, this persistent disk will be automatically deleted when the
 instance is deleted. However, if the disk is later detached from the instance,
-this option won't apply. The default value for this is \f5\fIno\fR\fR.
+this option won't apply. The default value for this is \f5\fIyes\fR\fR.
 
 .RE
 .sp
@@ -382,8 +382,8 @@ This flag is currently in BETA and may change without notice.
 .TP 2m
 \fBdevice\-name\fR
 Optional. A name that indicates the disk name the guest operating system will
-see. If omitted, a device name of the form \f5\fIlocal\-ssd\-N\fR\fR will be
-used.
+see. Can only be specified if \f5interface\fR is \f5SCSI\fR. If omitted, a
+device name of the form \f5\fIlocal\-ssd\-N\fR\fR will be used.
 
 .TP 2m
 \fBinterface\fR
@@ -484,7 +484,8 @@ neither is specified, this defaults to the "default" network.
 \fB\-\-network\-interface\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]
 Adds a network interface to the instance. Mutually exclusive with any of these
 flags: \fB\-\-address\fR, \fB\-\-network\fR, \fB\-\-network\-tier\fR,
-\fB\-\-subnet\fR, \fB\-\-private\-network\-ip\fR.
+\fB\-\-subnet\fR, \fB\-\-private\-network\-ip\fR. This flag can be repeated to
+specify multiple network interfaces.
 
 The following keys are allowed:
 .RS 2m
@@ -788,10 +789,11 @@ Create instance without service account
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

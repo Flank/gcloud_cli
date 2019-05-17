@@ -348,6 +348,8 @@ def JsonResumableChunkSizeDefined():
 def MonkeyPatchBoto():
   """Apply gsutil-specific patches to Boto.
 
+  Here be dragons. Sorry.
+
   Note that this method should not be used as a replacement for contributing
   fixes to the upstream Boto library. However, the Boto library has historically
   not been consistent about release cadence, so upstream fixes may not be
@@ -358,13 +360,16 @@ def MonkeyPatchBoto():
   method should be invoked after all other Boto-related initialization has been
   completed.
   """
-  # pylint: disable=g-import-not-at-top
+  # We have to do all sorts of gross things here (dynamic imports, invalid names
+  # to resolve symbols in copy/pasted methods, invalid spacing from copy/pasted
+  # methods, etc.), so we just disable pylint warnings for this whole method.
+  # pylint: disable=all
+
   # This should have already been imported if this method was called in the
   # correct place, but we need to perform the import within this method for
   # this module to recognize it.  We don't import this at module level because
   # its import timing is important and is managed elsewhere.
   import gcs_oauth2_boto_plugin
-  # pylint: enable=g-import-not-at-top
 
   # TODO(https://github.com/boto/boto/issues/3831): Remove this if the GitHub
   # issue is ever addressed.

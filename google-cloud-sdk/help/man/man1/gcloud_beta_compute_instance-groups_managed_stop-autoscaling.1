@@ -18,9 +18,13 @@ gcloud beta compute instance\-groups managed stop\-autoscaling \- stop autoscali
 .SH "DESCRIPTION"
 
 \fB(BETA)\fR \fBgcloud beta compute instance\-groups managed
-stop\-autoscaling\fR stops autoscaling a managed instance group. If autoscaling
-is not enabled for the managed instance group, this command does nothing and
-will report an error.
+stop\-autoscaling\fR stops autoscaling a managed instance group and deletes the
+autoscaler configuration. If autoscaling is not enabled for the managed instance
+group, this command does nothing and will report an error.
+
+If you need to keep the autoscaler configuration, you can temporarily disable an
+autoscaler by setting its \f5mode\fR to \f5off\fR using the
+\f5\fIupdate\-autoscaling\fR\fR command instead.
 
 
 
@@ -78,10 +82,11 @@ invocation.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

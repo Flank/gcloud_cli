@@ -45,7 +45,8 @@ class ModelsClientTest(base.MlGaPlatformTestBase):
 
   def testCreate(self):
     model = self.short_msgs.Model(
-        name='myModel', onlinePredictionLogging=False)
+        name='myModel', onlinePredictionLogging=False,
+        onlinePredictionConsoleLogging=False)
     self.client.projects_models.Create.Expect(
         self._MakeCreateRequest(
             parent='projects/{}'.format(self.Project()),
@@ -55,17 +56,20 @@ class ModelsClientTest(base.MlGaPlatformTestBase):
 
   def testCreateEnableLogging(self):
     model = self.short_msgs.Model(
-        name='myModel', onlinePredictionLogging=True)
+        name='myModel', onlinePredictionLogging=True,
+        onlinePredictionConsoleLogging=True)
     self.client.projects_models.Create.Expect(
         self._MakeCreateRequest(
             parent='projects/{}'.format(self.Project()),
             model=model),
         model)
-    self.assertEqual(model, self.models_client.Create('myModel', None, True))
+    self.assertEqual(
+        model, self.models_client.Create('myModel', None, True, True))
 
   def testCreateDescription(self):
     model = self.short_msgs.Model(
-        name='myModel', description='My Model', onlinePredictionLogging=False)
+        name='myModel', description='My Model', onlinePredictionLogging=False,
+        onlinePredictionConsoleLogging=False)
     self.client.projects_models.Create.Expect(
         self._MakeCreateRequest(
             parent='projects/{}'.format(self.Project()),
@@ -76,7 +80,8 @@ class ModelsClientTest(base.MlGaPlatformTestBase):
 
   def testCreateWithSingleRegion(self):
     model = self.short_msgs.Model(
-        name='myModel', regions=['us-central1'], onlinePredictionLogging=False)
+        name='myModel', regions=['us-central1'], onlinePredictionLogging=False,
+        onlinePredictionConsoleLogging=False)
     self.client.projects_models.Create.Expect(
         self._MakeCreateRequest(
             parent='projects/{}'.format(self.Project()),
@@ -89,7 +94,8 @@ class ModelsClientTest(base.MlGaPlatformTestBase):
     model = self.short_msgs.Model(
         name='myModel',
         regions=['us-central1', 'us-east1'],
-        onlinePredictionLogging=False)
+        onlinePredictionLogging=False,
+        onlinePredictionConsoleLogging=False)
     self.client.projects_models.Create.Expect(
         self._MakeCreateRequest(
             parent='projects/{}'.format(self.Project()),

@@ -82,6 +82,7 @@ class WithMockHttp(cli_test_base.CliTestBase):
     self.strict = True
     self._responses = {}
     self._requests = []
+    self._next_exception = None
 
   def TearDown(self):
     if sys.exc_info()[0]:
@@ -105,6 +106,11 @@ class WithMockHttp(cli_test_base.CliTestBase):
 
   def _request(self, uri, method='GET', body=None, headers=None, *args,
                **kwargs):
+    if self._next_exception:
+      e = self._next_exception
+      self._next_exception = None
+      # pylint: disable=raising-bad-type, This will be an actual exception.
+      raise e
     if '?' in uri:
       parts = uri.split('?', 1)
       base_uri = parts[0]
@@ -148,6 +154,9 @@ class WithMockHttp(cli_test_base.CliTestBase):
     headers = {'status': status}
     headers.update(response_headers or {})
     return (httplib2.Response(headers), response_body)
+
+  def SetNextException(self, e):
+    self._next_exception = e
 
   def AddHTTPResponse(self, url, request_headers=None,
                       expected_params=None, expected_body=None,

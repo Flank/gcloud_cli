@@ -22,16 +22,20 @@ from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.resource import resource_projector
-from tests.lib import completer_test_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
 
-messages = core_apis.GetMessagesModule('compute', 'v1')
 
+class DisksDeleteTestGA(test_base.BaseTest):
 
-class DisksDeleteTest(test_base.BaseTest, completer_test_base.CompleterBase):
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+    self.api_version = 'v1'
+
+  def SetUp(self):
+    self.SelectApi(self.api_version)
+    self.messages = core_apis.GetMessagesModule('compute', self.api_version)
 
   def testWithSingleDisk(self):
     properties.VALUES.core.disable_prompts.Set(True)
@@ -40,9 +44,9 @@ class DisksDeleteTest(test_base.BaseTest, completer_test_base.CompleterBase):
         """)
 
     self.CheckRequests(
-        [(self.compute_v1.disks,
+        [(self.compute.disks,
           'Delete',
-          messages.ComputeDisksDeleteRequest(
+          self.messages.ComputeDisksDeleteRequest(
               disk='disk-1',
               project='my-project',
               zone='central2-a'))],
@@ -55,23 +59,23 @@ class DisksDeleteTest(test_base.BaseTest, completer_test_base.CompleterBase):
         """)
 
     self.CheckRequests(
-        [(self.compute_v1.disks,
+        [(self.compute.disks,
           'Delete',
-          messages.ComputeDisksDeleteRequest(
+          self.messages.ComputeDisksDeleteRequest(
               disk='disk-1',
               project='my-project',
               zone='central2-a')),
 
-         (self.compute_v1.disks,
+         (self.compute.disks,
           'Delete',
-          messages.ComputeDisksDeleteRequest(
+          self.messages.ComputeDisksDeleteRequest(
               disk='disk-2',
               project='my-project',
               zone='central2-a')),
 
-         (self.compute_v1.disks,
+         (self.compute.disks,
           'Delete',
-          messages.ComputeDisksDeleteRequest(
+          self.messages.ComputeDisksDeleteRequest(
               disk='disk-3',
               project='my-project',
               zone='central2-a'))],
@@ -83,23 +87,23 @@ class DisksDeleteTest(test_base.BaseTest, completer_test_base.CompleterBase):
         compute disks delete disk-1 disk-2 disk-3 --zone central2-a
         """)
     self.CheckRequests(
-        [(self.compute_v1.disks,
+        [(self.compute.disks,
           'Delete',
-          messages.ComputeDisksDeleteRequest(
+          self.messages.ComputeDisksDeleteRequest(
               disk='disk-1',
               project='my-project',
               zone='central2-a')),
 
-         (self.compute_v1.disks,
+         (self.compute.disks,
           'Delete',
-          messages.ComputeDisksDeleteRequest(
+          self.messages.ComputeDisksDeleteRequest(
               disk='disk-2',
               project='my-project',
               zone='central2-a')),
 
-         (self.compute_v1.disks,
+         (self.compute.disks,
           'Delete',
-          messages.ComputeDisksDeleteRequest(
+          self.messages.ComputeDisksDeleteRequest(
               disk='disk-3',
               project='my-project',
               zone='central2-a'))],
@@ -123,23 +127,14 @@ class DisksDeleteTest(test_base.BaseTest, completer_test_base.CompleterBase):
 
   def testDeleteCompletion(self):
     lister_mock = self.StartPatch(
-        'googlecloudsdk.api_lib.compute.lister.GetZonalResourcesDicts',
+        'googlecloudsdk.api_lib.compute.lister.MultiScopeLister',
         autospec=True)
-    lister_mock.return_value = resource_projector.MakeSerializable(
+    lister_mock.return_value.return_value = resource_projector.MakeSerializable(
         test_resources.DISKS)
     self.RunCompletion('compute disks delete --zone zone-1 d',
                        ['disk-1', 'disk-2', 'disk-3'])
 
-
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'),
-                          (calliope_base.ReleaseTrack.BETA, 'beta'))
-class RegionalDisksDeleteTest(test_base.BaseTest, parameterized.TestCase):
-
-  def testDefaultOptionsWithSingleDisk(self, track, api_version):
-    self.SelectApi(api_version)
-    self.track = track
-
+  def testDefaultOptionsWithSingleDisk(self):
     self.Run("""
         compute disks delete disk-1 --region central2
         """)
@@ -152,6 +147,20 @@ class RegionalDisksDeleteTest(test_base.BaseTest, parameterized.TestCase):
               project='my-project',
               region='central2'))],
     )
+
+
+class DisksDeleteTestBeta(DisksDeleteTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
+
+
+class DisksDeleteTestAlpha(DisksDeleteTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
 
 
 if __name__ == '__main__':

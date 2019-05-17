@@ -1,14 +1,34 @@
 title: compute sole-tenancy node-templates remove-iam-policy-binding scenario test
-release_tracks: [BETA]
-
+release_tracks: [GA, BETA, ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute sole-tenancy node-templates remove-iam-policy-binding my-node-template
+      --region us-central1 --member=user:owner@gmail.com --role=roles/owner
+  - stderr: |
+      Updated IAM policy for node_template [my-node-template].
+  - stdout: |
+      bindings:
+      - members:
+        - user:newowner@gmail.com
+        role: roles/owner
+      etag: etag
+      version: 1
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1
+      BETA: beta
+      ALPHA: alpha
 # remove binding without condition to a policy without condition
 - execute_command:
-    command: compute sole-tenancy node-templates remove-iam-policy-binding my-node-template --region us-central1 --member=user:owner@gmail.com --role=roles/owner
+    command: compute sole-tenancy node-templates remove-iam-policy-binding my-node-template
+      --region us-central1 --member=user:owner@gmail.com --role=roles/owner
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/beta/projects/fake-project/regions/us-central1/nodeTemplates/projects%2Ffake-project%2Fregions%2Fus-central1%2FnodeTemplates%2Fmy-node-template/getIamPolicy?alt=json
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/nodeTemplates/my-node-template/getIamPolicy?alt=json
           method: GET
           body: null
         return_response:
@@ -30,15 +50,15 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/beta/projects/fake-project/regions/us-central1/nodeTemplates/projects%2Ffake-project%2Fregions%2Fus-central1%2FnodeTemplates%2Fmy-node-template/setIamPolicy?alt=json
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/nodeTemplates/my-node-template/setIamPolicy?alt=json
           method: POST
           body:
             json:
               policy:
                 bindings:
-                - role: 'roles/owner'
-                  members: ['user:newowner@gmail.com']
-                etag: 'etag'
+                - role: roles/owner
+                  members: ["user:newowner@gmail.com"]
+                etag: etag
                 version: 1
         return_response:
           headers:

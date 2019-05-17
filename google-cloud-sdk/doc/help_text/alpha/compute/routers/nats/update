@@ -4,11 +4,11 @@ NAME
 
 SYNOPSIS
     gcloud alpha compute routers nats update NAME --router=ROUTER [--async]
-        [--enable-logging] [--region=REGION]
+        [--enable-logging] [--log-filter=LOG_FILTER] [--region=REGION]
         [--auto-allocate-nat-external-ips
           | --nat-external-ip-pool=IP_ADDRESS,[IP_ADDRESS,...]]
+        [--clear-drain-nat-ips | --drain-nat-ips=DRAIN_NAT_IPS,[...]]
         [--clear-icmp-idle-timeout | --icmp-idle-timeout=ICMP_IDLE_TIMEOUT]
-        [--clear-log-filter | --log-filter=LOG_FILTER]
         [--clear-min-ports-per-vm | --min-ports-per-vm=MIN_PORTS_PER_VM]
         [--clear-tcp-established-idle-timeout
           | --tcp-established-idle-timeout=TCP_ESTABLISHED_IDLE_TIMEOUT]
@@ -42,6 +42,25 @@ OPTIONAL FLAGS
         gcloud alpha compute routers nats update MY-NAT \ --no-enable-logging
         --router ROUTER --region REGION
 
+     --log-filter=LOG_FILTER
+        Filter for logs exported to stackdriver.
+
+        The default is ALL.
+
+        If logging is not enabled, filter settings will be persisted but will
+        have no effect.
+
+        Use --[no-]enable-logging to enable and disable logging.
+
+        LOG_FILTER must be one of:
+
+         ALL
+            Export logs for all connections handled by this NAT.
+         ERRORS_ONLY
+            Export logs for connection failures only.
+         TRANSLATIONS_ONLY
+            Export logs for successful connections only.
+
      --region=REGION
         Region of the NAT to create. If not specified, you may be prompted to
         select a region.
@@ -72,40 +91,22 @@ OPTIONAL FLAGS
 
      At most one of these may be specified:
 
+       --clear-drain-nat-ips
+          Clear the drained NAT IPs
+
+       --drain-nat-ips=DRAIN_NAT_IPS,[...]
+          External IP Addresses to be drained
+
+          These IPs must be valid external IPs that have been used as NAT IPs
+
+     At most one of these may be specified:
+
        --clear-icmp-idle-timeout
           Clear timeout for ICMP connections
 
        --icmp-idle-timeout=ICMP_IDLE_TIMEOUT
           Timeout for ICMP connections. See $ gcloud topic datetimes for
           information on duration formats.
-
-     At most one of these may be specified:
-
-       --clear-log-filter
-          Clear the filter for logs exported to stackdriver. Without a filter,
-          logs (if enabled) will be exported for all connections handled by
-          this NAT.
-
-       --log-filter=LOG_FILTER
-          Specify a filter for logs exported to stackdriver. This can be one of
-          the following: ERRORS_ONLY - export logs for connection failures
-          only. TRANSLATIONS_ONLY - export logs for successful connections
-          only. Without a filter, logs (if enabled) will be exported for all
-          connections handled by this NAT.
-
-          If logging is not enabled, filter settings will be persisted but will
-          have no effect. Use --[no-]enable-logging to enable and disable
-          logging.
-
-          To clear the filter, use $ gcloud alpha compute routers nats update
-          MY-NAT \ --clear-log-filter --router ROUTER --region REGION
-
-          LOG_FILTER must be one of:
-
-           ERRORS_ONLY
-              Export logs for connection failures only.
-           TRANSLATIONS_ONLY
-              Export logs for successful connections only.
 
      At most one of these may be specified:
 
@@ -160,8 +161,9 @@ OPTIONAL FLAGS
           NAT.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

@@ -25,13 +25,10 @@ SYNOPSIS
         [--private-network-ip=PRIVATE_NETWORK_IP]
         [--no-require-csek-key-create]
         [--resource-policies=[RESOURCE_POLICY,...]] [--no-restart-on-failure]
-        [--shielded-vm-integrity-monitoring] [--shielded-vm-secure-boot]
-        [--shielded-vm-vtpm]
-        [--source-instance-template=SOURCE_INSTANCE_TEMPLATE]
+        [--shielded-integrity-monitoring] [--shielded-secure-boot]
+        [--shielded-vtpm] [--source-instance-template=SOURCE_INSTANCE_TEMPLATE]
         [--source-machine-image=SOURCE_MACHINE_IMAGE] [--subnet=SUBNET]
         [--tags=TAG,[TAG,...]] [--zone=ZONE] [--address=ADDRESS | --no-address]
-        [--allocation-affinity=ALLOCATION_AFFINITY;
-          default="any" --allocation-label=[key=KEY],[value=VALUE]]
         [--boot-disk-kms-key=BOOT_DISK_KMS_KEY
           : --boot-disk-kms-keyring=BOOT_DISK_KMS_KEYRING
           --boot-disk-kms-location=BOOT_DISK_KMS_LOCATION
@@ -46,6 +43,8 @@ SYNOPSIS
           | --node-group=NODE_GROUP] [--public-dns | --no-public-dns]
         [--public-ptr | --no-public-ptr]
         [--public-ptr-domain=PUBLIC_PTR_DOMAIN | --no-public-ptr-domain]
+        [--reservation=RESERVATION
+          --reservation-affinity=RESERVATION_AFFINITY; default="any"]
         [--scopes=[SCOPE,...] | --no-scopes]
         [--service-account=SERVICE_ACCOUNT | --no-service-account]
         [GCLOUD_WIDE_FLAG ...]
@@ -83,8 +82,8 @@ FLAGS
             types.
 
          count
-            The number of pieces of the accelerator to attach to the instances.
-            The default value is 1.
+            Number of accelerators to attach to each instance. The default
+            value is 1.
 
      --async
         Display information about the operation in progress, without waiting
@@ -224,6 +223,13 @@ FLAGS
                 o https://www.googleapis.com/compute/v1/projects/myproject/global/snapshots/snapshot
                 o snapshot
 
+         disk-resource-policy
+            Resource policy that will be applied to created disk. You can
+            provide full or partial URL. See
+                    + https://cloud.google.com/sdk/gcloud/reference/beta/compute/resource-policies/
+                    + https://cloud.google.com/compute/docs/disks/scheduled-snapshots
+    for more details about resource-policies.
+
      --csek-key-file=FILE
         Path to a Customer-Supplied Encryption Key (CSEK) key file, mapping
         Google Compute Engine resources to user managed keys to be used when
@@ -270,7 +276,7 @@ FLAGS
             If yes, this persistent disk will be automatically deleted when the
             instance is deleted. However, if the disk is later detached from
             the instance, this option won't apply. The default value for this
-            is no.
+            is yes.
 
          scope
             Can be zonal or regional. If zonal, the disk is interpreted as a
@@ -314,8 +320,8 @@ FLAGS
 
          device-name
             Optional. A name that indicates the disk name the guest operating
-            system will see. If omitted, a device name of the form local-ssd-N
-            will be used.
+            system will see. Can only be specified if interface is SCSI. If
+            omitted, a device name of the form local-ssd-N will be used.
 
          interface
             Optional. The kind of disk interface exposed to the VM for this
@@ -385,7 +391,8 @@ FLAGS
      --network-interface=[PROPERTY=VALUE,...]
         Adds a network interface to the instance. Mutually exclusive with any
         of these flags: --address, --network, --network-tier, --subnet,
-        --private-network-ip.
+        --private-network-ip. This flag can be repeated to specify multiple
+        network interfaces.
 
         The following keys are allowed:
          address
@@ -473,17 +480,17 @@ FLAGS
         Engine. This does not affect terminations performed by the user.
         Enabled by default, use --no-restart-on-failure to disable.
 
-     --shielded-vm-integrity-monitoring
+     --shielded-integrity-monitoring
         Enables monitoring and attestation of the boot integrity of the
         instance. The attestation is performed against the integrity policy
         baseline. This baseline is initially derived from the implicitly
         trusted boot image when the instance is created. This baseline can be
         updated by using --shielded-vm-learn-integrity-policy.
 
-     --shielded-vm-secure-boot
+     --shielded-secure-boot
         The instance will boot with secure boot enabled.
 
-     --shielded-vm-vtpm
+     --shielded-vtpm
         The instance will boot with the TPM (Trusted Platform Module) enabled.
         A TPM is a hardware module that can be used for different security
         operations such as remote attestation, encryption and sealing of keys.
@@ -553,25 +560,6 @@ FLAGS
           If provided, the instances will not be assigned external IP
           addresses.
 
-    Manage the configuration of desired allocation which this instance could
-    take capacity from.
-
-         --allocation-affinity=ALLOCATION_AFFINITY; default="any"
-            Specifies the configuration of desired allocation which this
-            instance could take capacity from. Choices are 'any', 'none' and
-            'specific', default is 'any'. ALLOCATION_AFFINITY must be one of:
-            any, none, specific.
-
-         --allocation-label=[key=KEY],[value=VALUE]
-            The key and values of the label of the allocation resource.
-            Required if the value of --allocation-affinity is specific.
-
-         key
-            The label key of allocation resource.
-
-         value
-            The label value of allocation resource.
-
      Key resource - The Cloud KMS (Key Management Service) cryptokey that will
      be used to protect the disk. The arguments in this group can be used to
      specify the attributes of this resource.
@@ -609,13 +597,13 @@ FLAGS
      --image-project=IMAGE_PROJECT
         The project against which all image and image family references will be
         resolved. It is best practice to define image-project.
-     o If specifying one of our public images, image-project must be
-       provided.
-     o If there are several of the same image-family value in multiple
-       projects, image-project must be specified to clarify the image to be
-       used.
-     o If not specified and either image or image-family is provided, the
-       current default project is used.
+        * If specifying one of our public images, image-project must be
+          provided.
+        * If there are several of the same image-family value in multiple
+          projects, image-project must be specified to clarify the image to be
+          used.
+        * If not specified and either image or image-family is provided, the
+          current default project is used.
 
      At most one of these may be specified:
 
@@ -644,8 +632,8 @@ FLAGS
           be created from. You can provide this as a full URL to the snapshot
           or just the snapshot name. For example, the following are valid
           values:
-       * https://www.googleapis.com/compute/v1/projects/myproject/global/snapshots/snapshot
-       * snapshot
+          + https://www.googleapis.com/compute/v1/projects/myproject/global/snapshots/snapshot
+          + snapshot
 
      Maintenance Behavior. At most one of these may be specified:
 
@@ -730,6 +718,16 @@ FLAGS
           record for the external IP of the instance with the PTR domain name
           being the DNS name of the instance.
 
+     Specifies the reservation for the instance.
+
+       --reservation=RESERVATION
+          The name of the reservation, required when
+          --reservation-affinity=specific.
+
+       --reservation-affinity=RESERVATION_AFFINITY; default="any"
+          The type of reservation for the instance. RESERVATION_AFFINITY must
+          be one of: any, none, specific.
+
      At most one of these may be specified:
 
        --scopes=[SCOPE,...]
@@ -803,8 +801,9 @@ FLAGS
           Create instance without service account
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

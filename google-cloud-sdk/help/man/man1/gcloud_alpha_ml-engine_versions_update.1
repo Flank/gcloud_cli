@@ -5,19 +5,19 @@
 
 .SH "NAME"
 .HP
-gcloud alpha ml\-engine versions update \- update a Cloud ML Engine version
+gcloud alpha ml\-engine versions update \- update an AI Platform version
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha ml\-engine versions update\fR (\fIVERSION\fR\ :\ \fB\-\-model\fR=\fIMODEL\fR) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-add\-package\-uris\fR=[\fIPACKAGE\-URIS\fR,...]\ |\ \fB\-\-clear\-package\-uris\fR\ |\ \fB\-\-remove\-package\-uris\fR=[\fIPACKAGE\-URIS\fR,...]\ |\ \fB\-\-set\-package\-uris\fR=[\fIPACKAGE\-URIS\fR,...]\ \fB\-\-clear\-model\-class\fR\ |\ \fB\-\-model\-class\fR=\fIMODEL_CLASS\fR] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha ml\-engine versions update\fR (\fIVERSION\fR\ :\ \fB\-\-model\fR=\fIMODEL\fR) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Update a Cloud ML Engine version.
+\fB(ALPHA)\fR Update an AI Platform version.
 
 
 
@@ -26,12 +26,12 @@ gcloud alpha ml\-engine versions update \- update a Cloud ML Engine version
 .RS 2m
 .TP 2m
 
-Version resource \- The Cloud ML Engine model to update. The arguments in this
-group can be used to specify the attributes of this resource. (NOTE) Some
-attributes are not given arguments in this group but can be set in other ways.
-To set the [project] attribute: provide the argument [version] on the command
-line with a fully specified name; provide the argument [\-\-project] on the
-command line; set the property [core/project]. This must be specified.
+Version resource \- The AI Platform model to update. The arguments in this group
+can be used to specify the attributes of this resource. (NOTE) Some attributes
+are not given arguments in this group but can be set in other ways. To set the
+[project] attribute: provide the argument [version] on the command line with a
+fully specified name; provide the argument [\-\-project] on the command line;
+set the property [core/project]. This must be specified.
 
 .RS 2m
 .TP 2m
@@ -67,61 +67,6 @@ numbers.
 
 .TP 2m
 
-Configure user code in prediction. Cloud ML Engine allows a model to have
-user\-provided prediction code; these options configure that code.
-
-
-
-.RS 2m
-.TP 2m
-
-These flags modify the member user\-supplied packages to use for prediction of
-this version. The values should be given as a comma\-separated list of Google
-Cloud Storage URIs (\f5gs://...\fR). At most one of these may be specified:
-
-.RS 2m
-.TP 2m
-\fB\-\-add\-package\-uris\fR=[\fIPACKAGE\-URIS\fR,...]
-Append the given values to the current user\-supplied packages to use for
-prediction.
-
-.TP 2m
-\fB\-\-clear\-package\-uris\fR
-Empty the current user\-supplied packages to use for prediction.
-
-.TP 2m
-\fB\-\-remove\-package\-uris\fR=[\fIPACKAGE\-URIS\fR,...]
-Remove the given values from the current user\-supplied packages to use for
-prediction.
-
-.TP 2m
-\fB\-\-set\-package\-uris\fR=[\fIPACKAGE\-URIS\fR,...]
-Completely replace the current user\-supplied packages to use for prediction
-with the given values.
-
-.RE
-.sp
-.TP 2m
-
-The fully\-qualified name of the custom Model class in the package provided for
-custom prediction. For example, \f5my_package.SequenceModel\fR. At most one of
-these may be specified:
-
-
-.RS 2m
-.TP 2m
-\fB\-\-clear\-model\-class\fR
-Clear the custom Model class from the version.
-
-.TP 2m
-\fB\-\-model\-class\fR=\fIMODEL_CLASS\fR
-Set the custom Model class for the version.
-
-.RE
-.RE
-.sp
-.TP 2m
-
 At most one of these may be specified:
 
 .RS 2m
@@ -154,10 +99,11 @@ List of label keys to remove. If a label does not exist it is silently ignored.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

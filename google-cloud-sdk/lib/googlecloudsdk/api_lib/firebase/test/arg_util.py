@@ -55,6 +55,17 @@ def AddCommonTestRunArgs(parser):
       default=None,
       help='Invoke a test asynchronously without waiting for test results.')
   parser.add_argument(
+      '--num-flaky-test-attempts',
+      metavar='int',
+      type=arg_validate.NONNEGATIVE_INT_PARSER,
+      help="""\
+      Specifies the number of times a test execution should be reattempted if
+      one or more of its test cases fail for any reason. An execution that
+      initially fails but succeeds on any reattempt is reported as FLAKY.\n
+      The maximum number of reruns allowed is 10. (Default: 0, which implies
+      no reruns.) All additional attempts are executed in parallel.
+      """)
+  parser.add_argument(
       '--record-video',
       action='store_true',
       default=None,
@@ -104,6 +115,11 @@ def AddAndroidTestArgs(parser):
       'to be APKs.')
   parser.add_argument(
       '--app-package',
+      action=actions.DeprecationAction(
+          '--app-package',
+          warn=('The `--app-package` flag is deprecated and should no longer '
+                'be used. By default, the correct application package name is '
+                'parsed from the APK manifest.')),
       help='The Java package of the application under test (default: extracted '
       'from the APK manifest).')
   parser.add_argument(
@@ -143,11 +159,11 @@ def AddAndroidTestArgs(parser):
       --environment-variables numShards=4,shardIndex=0
       ```
 
-      Enable code coverage and provide a file path to store the coverage
+      Enable code coverage and provide a directory to store the coverage
       results when using Android Test Orchestrator (`--use-orchestrator`):
 
       ```
-      --environment-variables clearPackageData,coverage=true,coverageFile=/sdcard/coverage.ec
+      --environment-variables clearPackageData=true,coverage=true,coverageFilePath=/sdcard/
       ```
 
       Enable code coverage and provide a file path to store the coverage
@@ -199,6 +215,11 @@ def AddAndroidTestArgs(parser):
       'using a URL beginning with `gs://`.')
   parser.add_argument(
       '--test-package',
+      action=actions.DeprecationAction(
+          '--test-package',
+          warn=('The `--test-package` flag is deprecated and should no longer '
+                'be used. By default, the correct test package name is '
+                'parsed from the APK manifest.')),
       category=ANDROID_INSTRUMENTATION_TEST,
       help='The Java package name of the instrumentation test (default: '
       'extracted from the APK manifest).')
@@ -243,40 +264,6 @@ def AddAndroidTestArgs(parser):
   # The following args are specific to Android Robo tests.
 
   parser.add_argument(
-      '--max-steps',
-      action=actions.DeprecationAction(
-          '--max-steps',
-          warn=('The `--max-steps` flag is deprecated and no longer has any '
-                'effect on the Robo crawler. The `--timeout` flag may be '
-                'optionally used to limit the maximum length of a Robo test.')),
-      metavar='int',
-      category=ANDROID_ROBO_TEST,
-      type=arg_validate.NONNEGATIVE_INT_PARSER,
-      help='The maximum number of steps/actions a Robo test can execute '
-      '(default: no limit).')
-  parser.add_argument(
-      '--max-depth',
-      action=actions.DeprecationAction(
-          '--max-depth',
-          warn=('The `--max-depth` flag is deprecated and no longer has any '
-                'effect on the actions of the Robo crawler.')),
-      metavar='int',
-      category=ANDROID_ROBO_TEST,
-      type=arg_validate.POSITIVE_INT_PARSER,
-      help='The maximum depth of the traversal stack a Robo test can explore. '
-      'Needs to be at least 2 to make Robo explore the app beyond the first '
-      'activity (default: 50).')
-  parser.add_argument(
-      '--app-initial-activity',
-      action=actions.DeprecationAction(
-          '--app-initial-activity',
-          warn=('The `--app-initial-activity` flag is deprecated and no longer '
-                'has any effect on the Robo crawler. Alternatively, the '
-                '`--robo-script` flag (in beta) can be used to guide Robo to a '
-                'specific part of your app before the Robo test begins.')),
-      category=ANDROID_ROBO_TEST,
-      help='The initial activity used to start the app during a Robo test.')
-  parser.add_argument(
       '--robo-directives',
       metavar='TYPE:RESOURCE_NAME=INPUT',
       category=ANDROID_ROBO_TEST,
@@ -284,23 +271,28 @@ def AddAndroidTestArgs(parser):
       help='A comma-separated (`<type>:<key>=<value>`) map of '
       '`robo_directives` that you can use to customize the behavior of Robo '
       'test. The `type` specifies the action type of the directive, which may '
-      'take on values `click` or `text`. If no `type` is provided, `text` will '
-      'be used by default. Each key should be the Android resource name of a '
-      'target UI element and each value should be the text input for that '
-      'element. Values are only permitted for `text` type elements, so no '
-      'value should be specified for `click` type elements. For example, use'
+      'take on values `click`, `text` or `ignore`. If no `type` is provided, '
+      '`text` will be used by default. Each key should be the Android resource '
+      'name of a target UI element and each value should be the text input for '
+      'that element. Values are only permitted for `text` type elements, so no '
+      'value should be specified for `click` and `ignore` type elements.'
+      '\n\n'
+      'To provide custom login credentials for your app, use'
       '\n\n'
       '    --robo-directives text:username_resource=username,'
       'text:password_resource=password'
       '\n\n'
-      'to provide custom login credentials for your app, or'
+      'To instruct Robo to click on the sign-in button, use'
       '\n\n'
       '    --robo-directives click:sign_in_button='
       '\n\n'
-      'to instruct Robo to click on the sign in button. To learn more about '
-      'Robo test and robo_directives, see '
-      'https://firebase.google.com/docs/test-lab/android/command-line'
-      '#custom_login_and_text_input_with_robo_test.'
+      'To instruct Robo to ignore any UI elements with resource names which '
+      'equal or start with the user-defined value, use'
+      '\n\n'
+      '  --robo-directives ignore:ignored_ui_element_resource_name='
+      '\n\n'
+      'To learn more about Robo test and robo_directives, see '
+      'https://firebase.google.com/docs/test-lab/android/command-line#custom_login_and_text_input_with_robo_test.'
       '\n\n'
       'Caution: You should only use credentials for test accounts that are not '
       'associated with real users.')
@@ -413,7 +405,7 @@ def AddGaArgs(parser):
   del parser  # Unused by AddGaArgs
 
 
-def AddBetaArgs(parser):
+def AddAndroidBetaArgs(parser):
   """Register args which are only available in the beta run command.
 
   Args:

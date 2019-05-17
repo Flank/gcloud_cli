@@ -281,6 +281,26 @@
           "items": {
             "$ref": "PackageIssue"
           }
+        },
+        "effectiveSeverity": {
+          "description": "The distro assigned severity for this vulnerability when that is\navailable and note provider assigned severity when distro has not yet\nassigned a severity for this vulnerability.",
+          "enumDescriptions": [
+            "Unknown Impact",
+            "Minimal Impact",
+            "Low Impact",
+            "Medium Impact",
+            "High Impact",
+            "Critical Impact"
+          ],
+          "type": "string",
+          "enum": [
+            "SEVERITY_UNSPECIFIED",
+            "MINIMAL",
+            "LOW",
+            "MEDIUM",
+            "HIGH",
+            "CRITICAL"
+          ]
         }
       }
     },
@@ -298,7 +318,6 @@
           "$ref": "VulnerabilityLocation"
         },
         "severityName": {
-          "description": "The severity (eg: distro assigned severity) for this vulnerability.",
           "type": "string"
         }
       }
@@ -804,23 +823,23 @@
           "description": "The recovered Dockerfile directive used to construct this layer.",
           "enumDescriptions": [
             "Default value for unsupported\/missing directive",
-            "https:\/\/docs.docker.com\/reference\/builder\/#maintainer",
-            "https:\/\/docs.docker.com\/reference\/builder\/#run",
-            "https:\/\/docs.docker.com\/reference\/builder\/#cmd",
-            "https:\/\/docs.docker.com\/reference\/builder\/#label",
-            "https:\/\/docs.docker.com\/reference\/builder\/#expose",
-            "https:\/\/docs.docker.com\/reference\/builder\/#env",
-            "https:\/\/docs.docker.com\/reference\/builder\/#add",
+            "https:\/\/docs.docker.com\/engine\/reference\/builder\/",
+            "https:\/\/docs.docker.com\/engine\/reference\/builder\/",
+            "https:\/\/docs.docker.com\/engine\/reference\/builder\/",
+            "https:\/\/docs.docker.com\/engine\/reference\/builder\/",
+            "https:\/\/docs.docker.com\/engine\/reference\/builder\/",
+            "https:\/\/docs.docker.com\/engine\/reference\/builder\/",
+            "https:\/\/docs.docker.com\/engine\/reference\/builder\/",
             "https:\/\/docs.docker.com\/reference\/builder\/#copy",
-            "https:\/\/docs.docker.com\/reference\/builder\/#entrypoint",
-            "https:\/\/docs.docker.com\/reference\/builder\/#volume",
-            "https:\/\/docs.docker.com\/reference\/builder\/#user",
-            "https:\/\/docs.docker.com\/reference\/builder\/#workdir",
-            "https:\/\/docs.docker.com\/reference\/builder\/#arg",
-            "https:\/\/docs.docker.com\/reference\/builder\/#onbuild",
-            "https:\/\/docs.docker.com\/reference\/builder\/#stopsignal",
-            "https:\/\/docs.docker.com\/reference\/builder\/#healthcheck",
-            "https:\/\/docs.docker.com\/reference\/builder\/#shell"
+            "https:\/\/docs.docker.com\/engine\/reference\/builder\/",
+            "https:\/\/docs.docker.com\/engine\/reference\/builder\/",
+            "https:\/\/docs.docker.com\/engine\/reference\/builder\/",
+            "https:\/\/docs.docker.com\/engine\/reference\/builder\/",
+            "https:\/\/docs.docker.com\/engine\/reference\/builder\/",
+            "https:\/\/docs.docker.com\/engine\/reference\/builder\/",
+            "https:\/\/docs.docker.com\/engine\/reference\/builder\/",
+            "https:\/\/docs.docker.com\/engine\/reference\/builder\/",
+            "https:\/\/docs.docker.com\/engine\/reference\/builder\/"
           ],
           "type": "string",
           "enum": [
@@ -994,7 +1013,7 @@
       "type": "object",
       "properties": {
         "name": {
-          "description": "The server-assigned name, which is only unique within the same service that\noriginally returns it. If you use the default HTTP mapping, the\n`name` should have the format of `operations\/some\/unique\/name`.",
+          "description": "The server-assigned name, which is only unique within the same service that\noriginally returns it. If you use the default HTTP mapping, the\n`name` should be a resource name ending with `operations\/{unique_id}`.",
           "type": "string"
         },
         "metadata": {
@@ -1025,7 +1044,7 @@
     },
     "Status": {
       "id": "Status",
-      "description": "The `Status` type defines a logical error model that is suitable for different\nprogramming environments, including REST APIs and RPC APIs. It is used by\n[gRPC](https:\/\/github.com\/grpc). The error model is designed to be:\n\n- Simple to use and understand for most users\n- Flexible enough to meet unexpected needs\n\n# Overview\n\nThe `Status` message contains three pieces of data: error code, error message,\nand error details. The error code should be an enum value of\ngoogle.rpc.Code, but it may accept additional error codes if needed.  The\nerror message should be a developer-facing English message that helps\ndevelopers *understand* and *resolve* the error. If a localized user-facing\nerror message is needed, put the localized message in the error details or\nlocalize it in the client. The optional error details may contain arbitrary\ninformation about the error. There is a predefined set of error detail types\nin the package `google.rpc` that can be used for common error conditions.\n\n# Language mapping\n\nThe `Status` message is the logical representation of the error model, but it\nis not necessarily the actual wire format. When the `Status` message is\nexposed in different client libraries and different wire protocols, it can be\nmapped differently. For example, it will likely be mapped to some exceptions\nin Java, but more likely mapped to some error codes in C.\n\n# Other uses\n\nThe error model and the `Status` message can be used in a variety of\nenvironments, either with or without APIs, to provide a\nconsistent developer experience across different environments.\n\nExample uses of this error model include:\n\n- Partial errors. If a service needs to return partial errors to the client,\n    it may embed the `Status` in the normal response to indicate the partial\n    errors.\n\n- Workflow errors. A typical workflow has multiple steps. Each step may\n    have a `Status` message for error reporting.\n\n- Batch operations. If a client uses batch request and batch response, the\n    `Status` message should be used directly inside batch response, one for\n    each error sub-response.\n\n- Asynchronous operations. If an API call embeds asynchronous operation\n    results in its response, the status of those operations should be\n    represented directly using the `Status` message.\n\n- Logging. If some API errors are stored in logs, the message `Status` could\n    be used directly after any stripping needed for security\/privacy reasons.",
+      "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https:\/\/github.com\/grpc). The error model is designed to be:\n\n- Simple to use and understand for most users\n- Flexible enough to meet unexpected needs\n\n# Overview\n\nThe `Status` message contains three pieces of data: error code, error\nmessage, and error details. The error code should be an enum value of\ngoogle.rpc.Code, but it may accept additional error codes if needed.  The\nerror message should be a developer-facing English message that helps\ndevelopers *understand* and *resolve* the error. If a localized user-facing\nerror message is needed, put the localized message in the error details or\nlocalize it in the client. The optional error details may contain arbitrary\ninformation about the error. There is a predefined set of error detail types\nin the package `google.rpc` that can be used for common error conditions.\n\n# Language mapping\n\nThe `Status` message is the logical representation of the error model, but it\nis not necessarily the actual wire format. When the `Status` message is\nexposed in different client libraries and different wire protocols, it can be\nmapped differently. For example, it will likely be mapped to some exceptions\nin Java, but more likely mapped to some error codes in C.\n\n# Other uses\n\nThe error model and the `Status` message can be used in a variety of\nenvironments, either with or without APIs, to provide a\nconsistent developer experience across different environments.\n\nExample uses of this error model include:\n\n- Partial errors. If a service needs to return partial errors to the client,\n    it may embed the `Status` in the normal response to indicate the partial\n    errors.\n\n- Workflow errors. A typical workflow has multiple steps. Each step may\n    have a `Status` message for error reporting.\n\n- Batch operations. If a client uses batch request and batch response, the\n    `Status` message should be used directly inside batch response, one for\n    each error sub-response.\n\n- Asynchronous operations. If an API call embeds asynchronous operation\n    results in its response, the status of those operations should be\n    represented directly using the `Status` message.\n\n- Logging. If some API errors are stored in logs, the message `Status` could\n    be used directly after any stripping needed for security\/privacy reasons.",
       "type": "object",
       "properties": {
         "code": {
@@ -1629,14 +1648,14 @@
           "type": "string"
         },
         "members": {
-          "description": "Specifies the identities requesting access for a Cloud Platform resource.\n`members` can have the following values:\n\n* `allUsers`: A special identifier that represents anyone who is\n   on the internet; with or without a Google account.\n\n* `allAuthenticatedUsers`: A special identifier that represents anyone\n   who is authenticated with a Google account or a service account.\n\n* `user:{emailid}`: An email address that represents a specific Google\n   account. For example, `alice@gmail.com` .\n\n\n* `serviceAccount:{emailid}`: An email address that represents a service\n   account. For example, `my-other-app@appspot.gserviceaccount.com`.\n\n* `group:{emailid}`: An email address that represents a Google group.\n   For example, `admins@example.com`.\n\n\n* `domain:{domain}`: A Google Apps domain name that represents all the\n   users of that domain. For example, `google.com` or `example.com`.\n\n",
+          "description": "Specifies the identities requesting access for a Cloud Platform resource.\n`members` can have the following values:\n\n* `allUsers`: A special identifier that represents anyone who is\n   on the internet; with or without a Google account.\n\n* `allAuthenticatedUsers`: A special identifier that represents anyone\n   who is authenticated with a Google account or a service account.\n\n* `user:{emailid}`: An email address that represents a specific Google\n   account. For example, `alice@gmail.com` .\n\n\n* `serviceAccount:{emailid}`: An email address that represents a service\n   account. For example, `my-other-app@appspot.gserviceaccount.com`.\n\n* `group:{emailid}`: An email address that represents a Google group.\n   For example, `admins@example.com`.\n\n\n* `domain:{domain}`: The G Suite domain (primary) that represents all the\n   users of that domain. For example, `google.com` or `example.com`.\n\n",
           "type": "array",
           "items": {
             "type": "string"
           }
         },
         "condition": {
-          "description": "Unimplemented. The condition that is associated with this binding.\nNOTE: an unsatisfied condition will not allow user access via current\nbinding. Different bindings, including their conditions, are examined\nindependently.",
+          "description": "The condition that is associated with this binding.\nNOTE: An unsatisfied condition will not allow user access via current\nbinding. Different bindings, including their conditions, are examined\nindependently.",
           "$ref": "Expr"
         }
       }

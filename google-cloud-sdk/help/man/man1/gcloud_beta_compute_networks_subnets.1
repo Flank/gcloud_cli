@@ -23,10 +23,11 @@ gcloud beta compute networks subnets \- list, describe, and delete Google Comput
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -35,6 +36,10 @@ gcloud help\fR for details.
 \f5\fICOMMAND\fR\fR is one of the following:
 
 .RS 2m
+.TP 2m
+\fBadd\-iam\-policy\-binding\fR
+\fB(BETA)\fR Add an IAM policy binding to a Google Compute Engine subnetwork.
+
 .TP 2m
 \fBcreate\fR
 \fB(BETA)\fR Define a subnet for a network in custom subnet mode.
@@ -53,7 +58,7 @@ gcloud help\fR for details.
 
 .TP 2m
 \fBget\-iam\-policy\fR
-\fB(BETA)\fR Get the IAM Policy for a Google Compute Engine subnetwork.
+\fB(BETA)\fR Get the IAM policy for a Google Compute Engine subnetwork.
 
 .TP 2m
 \fBlist\fR
@@ -64,8 +69,13 @@ gcloud help\fR for details.
 \fB(BETA)\fR List Google Compute Engine subnetworks permitted for use.
 
 .TP 2m
+\fBremove\-iam\-policy\-binding\fR
+\fB(BETA)\fR Remove an IAM policy binding from a Google Compute Engine
+subnetwork.
+
+.TP 2m
 \fBset\-iam\-policy\fR
-\fB(BETA)\fR Set the IAM Policy for a Google Compute Engine subnetwork.
+\fB(BETA)\fR Set the IAM policy for a Google Compute Engine subnetwork.
 
 .TP 2m
 \fBupdate\fR

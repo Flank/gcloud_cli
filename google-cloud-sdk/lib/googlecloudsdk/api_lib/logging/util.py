@@ -108,6 +108,64 @@ def AddNonProjectArgs(parser, help_string):
       help='{0} associated with this billing account.'.format(help_string))
 
 
+def AddBucketLocationArg(parser, required, help_string):
+  """Adds a location argument.
+
+  Args:
+    parser: parser to which to add args.
+    required: whether the arguments is required.
+    help_string: the help string.
+  """
+  parser.add_argument(
+      '--location', required=required, metavar='LOCATION', help=help_string)
+
+
+def GetProjectResource():
+  """Returns the resource for the current project."""
+  return resources.REGISTRY.Parse(
+      properties.VALUES.core.project.Get(required=True),
+      collection='cloudresourcemanager.projects')
+
+
+def GetOrganizationResource(organization):
+  """Returns the resource for the organization.
+
+  Args:
+    organization: organization.
+
+  Returns:
+    The resource.
+  """
+  return resources.REGISTRY.Parse(
+      organization, collection='cloudresourcemanager.organizations')
+
+
+def GetFolderResource(folder):
+  """Returns the resource for the folder.
+
+  Args:
+    folder: folder.
+
+  Returns:
+    The resource.
+  """
+  return folders.FoldersRegistry().Parse(
+      folder, collection='cloudresourcemanager.folders')
+
+
+def GetBillingAccountResource(billing_account):
+  """Returns the resource for the billing_account.
+
+  Args:
+    billing_account: billing account.
+
+  Returns:
+    The resource.
+  """
+  return resources.REGISTRY.Parse(
+      billing_account, collection='cloudbilling.billingAccounts')
+
+
 def GetParentResourceFromArgs(args):
   """Returns the parent resource derived from the given args.
 
@@ -118,21 +176,13 @@ def GetParentResourceFromArgs(args):
     The parent resource.
   """
   if args.organization:
-    return resources.REGISTRY.Parse(
-        args.organization,
-        collection='cloudresourcemanager.organizations')
+    return GetOrganizationResource(args.organization)
   elif args.folder:
-    return folders.FoldersRegistry().Parse(
-        args.folder,
-        collection='cloudresourcemanager.folders')
+    return GetFolderResource(args.folder)
   elif args.billing_account:
-    return resources.REGISTRY.Parse(
-        args.billing_account,
-        collection='cloudbilling.billingAccounts')
+    return GetBillingAccountResource(args.billing_account)
   else:
-    return resources.REGISTRY.Parse(
-        properties.VALUES.core.project.Get(required=True),
-        collection='cloudresourcemanager.projects')
+    return GetProjectResource()
 
 
 def GetParentFromArgs(args):
@@ -145,6 +195,23 @@ def GetParentFromArgs(args):
     The relative path. e.g. 'projects/foo', 'folders/1234'.
   """
   return GetParentResourceFromArgs(args).RelativeName()
+
+
+def GetBucketLocationFromArgs(args):
+  """Returns the relative path to the bucket location from args.
+
+  Args:
+    args: command line args.
+
+  Returns:
+    The relative path. e.g. 'projects/foo/locations/bar'.
+  """
+  if args.location:
+    location = args.location
+  else:
+    location = '-'
+
+  return CreateResourceName(GetParentFromArgs(args), 'locations', location)
 
 
 def GetIdFromArgs(args):
@@ -313,4 +380,3 @@ def UpdateLogMetric(metric, description=None, log_filter=None, data=None):
     for field_name in update_data:
       setattr(metric, field_name, getattr(metric_diff, field_name))
   return metric
-

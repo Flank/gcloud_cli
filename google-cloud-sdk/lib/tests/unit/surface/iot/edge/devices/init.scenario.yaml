@@ -1,0 +1,29 @@
+title: Edge device initialization test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - label: Base Case
+  - command: iot edge devices init my-device --registry my-registry --region us-central1
+  - stdout: |
+      {}
+actions:
+- execute_command:
+    label: Base Case
+    command: iot edge devices init my-device --registry my-registry --region us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://edge.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/registries/my-registry/devices/my-device:init?alt=json
+          method: POST
+          headers: {}
+          body: None
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {}
+    - expect_stdout: |
+        {}
+    - expect_exit:
+        code: 0

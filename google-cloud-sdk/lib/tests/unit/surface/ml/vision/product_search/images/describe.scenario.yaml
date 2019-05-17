@@ -1,0 +1,34 @@
+title: test reference image describe
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: ml vision product-search images describe my-image --location=us-east1
+      --product=my-product
+  - stdout: |
+      name: projects/cloudsdktest/locations/us-east1/products/my-product/referenceImages/my-image
+      uri: gs://chaoren-bucket/face-input.png
+actions:
+- execute_command:
+    command: ml vision product-search images describe my-image --location=us-east1
+      --product=my-product
+    events:
+    - api_call:
+        expect_request:
+          uri: https://vision.googleapis.com/v1/projects/fake-project/locations/us-east1/products/my-product/referenceImages/my-image?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/cloudsdktest/locations/us-east1/products/my-product/referenceImages/my-image",
+              "uri": "gs://chaoren-bucket/face-input.png"
+            }
+    - expect_stdout: |
+        name: projects/cloudsdktest/locations/us-east1/products/my-product/referenceImages/my-image
+        uri: gs://chaoren-bucket/face-input.png
+    - expect_exit:
+        code: 0

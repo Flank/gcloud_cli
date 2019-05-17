@@ -8,8 +8,9 @@ DESCRIPTION
     (BETA) Cloud ML Video-Intelligence command groups.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -29,8 +30,17 @@ COMMANDS
      detect-labels
         (BETA) Detect general labels for videos.
 
+     detect-object
+        (BETA) Detect and track objects in a video.
+
      detect-shot-changes
         (BETA) Detect shot changes in videos.
+
+     detect-text
+        (BETA) Detect text in videos.
+
+     transcribe-speech
+        (BETA) Transcribe speech in a video.
 
 NOTES
     This command is currently in BETA and may change without notice. These

@@ -276,6 +276,33 @@ class InterconnectsCreateBetaTest(test_base.BaseTest):
     self.AssertErrContains('WARNING: IT_PRIVATE will be deprecated for '
                            'interconnect-type. Please use DEDICATED instead.\n')
 
+  def testCreateInterconnect_100G(self):
+    self.ExpectInterconnectRequest(
+        interconnectType=self.messages.Interconnect
+        .InterconnectTypeValueValuesEnum.DEDICATED,
+        linkType=self.messages.Interconnect.LinkTypeValueValuesEnum
+        .LINK_TYPE_ETHERNET_100G_LR,
+        requestedLinkCount=1)
+
+    self.Run('compute interconnects create my-interconnect '
+             '--interconnect-type DEDICATED '
+             '--location my-location --link-type LINK_TYPE_ETHERNET_100G_LR '
+             '--requested-link-count 1 --admin-enabled '
+             '--customer-name customer-name')
+
+    self.CheckInterconnectRequest(
+        interconnectType=self.messages.Interconnect
+        .InterconnectTypeValueValuesEnum.DEDICATED,
+        linkType=self.messages.Interconnect.LinkTypeValueValuesEnum
+        .LINK_TYPE_ETHERNET_100G_LR,
+        requestedLinkCount=1)
+    self.AssertOutputEquals('')
+    self.AssertErrContains(
+        'Please check the provided contact email for further instructions on '
+        'how to activate your Interconnect. See also https://cloud.google.com/'
+        'interconnect/docs/how-to/dedicated/retrieving-loas for more detailed '
+        'help.')
+
 
 class InterconnectsCreateAlphaTest(InterconnectsCreateBetaTest):
 

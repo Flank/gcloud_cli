@@ -24,6 +24,7 @@ import textwrap
 from apitools.base.py import encoding
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import exceptions
+from googlecloudsdk.core import http
 from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
 from tests.lib import parameterized
@@ -201,9 +202,10 @@ class QuotaHeaderTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth,
 
   def SetUp(self):
     properties.VALUES.core.project.Set('foo')
-    self.request_mock = self.StartObjectPatch(
-        httplib2.Http, 'request',
-        return_value=(httplib2.Response({'status': 200}), b''))
+    mock_http_client = self.StartObjectPatch(http, 'Http')
+    mock_http_client.return_value.request.return_value = \
+        (httplib2.Response({'status': 200}), b'')
+    self.request_mock = mock_http_client.return_value.request
 
   @parameterized.parameters(
       (None, 'alpha', b'foo'),

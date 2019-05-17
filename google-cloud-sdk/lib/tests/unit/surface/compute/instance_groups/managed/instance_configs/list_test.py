@@ -33,26 +33,73 @@ class InstanceGroupsManagedInstancesConfigsListTestBase(test_base.BaseTest):
     self.track = calliope_base.ReleaseTrack.ALPHA
     self.SelectApi(self._API_VERSION)
 
+  def _MakePreservedStateDiskMapEntry(self, device_name, source, mode):
+    mode_map = {
+        'READ_ONLY': self.messages.PreservedStatePreservedDisk
+                     .ModeValueValuesEnum.READ_ONLY,
+        'READ_WRITE': self.messages.PreservedStatePreservedDisk
+                      .ModeValueValuesEnum.READ_WRITE
+    }
+    return self.messages.PreservedState.DisksValue.AdditionalProperty(
+        key=device_name,
+        value=self.messages.PreservedStatePreservedDisk(
+            autoDelete=self.messages.PreservedStatePreservedDisk \
+              .AutoDeleteValueValuesEnum.NEVER,
+            source=source,
+            mode=mode_map[mode]
+        )
+    )
+
+  def _MakePreservedStateMetadataMapEntry(self, key, value):
+    return self.messages.PreservedState.MetadataValue.AdditionalProperty(
+        key=key, value=value)
+
   def MakePerInstanceConfig(self, instance, override_disks, override_metadata,
                             override_origin):
+    disk_overrides = []
+    preserved_state_disks = []
+    for override_disk in override_disks:
+      disk_overrides.append(
+          self.messages.ManagedInstanceOverrideDiskOverride(
+              deviceName=override_disk['device_name'],
+              source=override_disk['source'],
+              mode=self.messages.ManagedInstanceOverrideDiskOverride\
+              .ModeValueValuesEnum(override_disk['mode']),
+          )
+      )
+      preserved_state_disks.append(
+          self._MakePreservedStateDiskMapEntry(
+              device_name=override_disk['device_name'],
+              source=override_disk['source'],
+              mode=override_disk['mode']
+          )
+      )
+    metadata_overrides = [
+        self.messages.ManagedInstanceOverride.MetadataValueListEntry(
+            key=metadata['key'], value=metadata['value'])
+        for metadata in override_metadata
+    ]
+    preserved_state_metadata = [
+        self._MakePreservedStateMetadataMapEntry(
+            key=metadata['key'], value=metadata['value'])
+        for metadata in override_metadata
+    ]
     return self.messages.PerInstanceConfig(
         instance=instance,
+        name=instance.rsplit('/', 1)[-1],
         override=self.messages.ManagedInstanceOverride(
-            disks=[
-                self.messages.ManagedInstanceOverrideDiskOverride(
-                    deviceName=override_disk['device_name'],
-                    source=override_disk['source'],
-                    mode=self.messages.ManagedInstanceOverrideDiskOverride.
-                    ModeValueValuesEnum(override_disk['mode']),
-                ) for override_disk in override_disks
-            ],
-            metadata=[
-                self.messages.ManagedInstanceOverride.MetadataValueListEntry(
-                    key=metadata['key'], value=metadata['value'])
-                for metadata in override_metadata
-            ],
+            disks=disk_overrides,
+            metadata=metadata_overrides,
             origin=self.messages.ManagedInstanceOverride.OriginValueValuesEnum(
                 override_origin),
+        ),
+        preservedState=self.messages.PreservedState(
+            disks=self.messages.PreservedState.DisksValue(
+                additionalProperties=preserved_state_disks
+            ),
+            metadata=self.messages.PreservedState.MetadataValue(
+                additionalProperties=preserved_state_metadata
+            )
         ),
     )
 
@@ -133,9 +180,11 @@ class InstanceGroupsManagedInstancesConfigsListZonalTest(
     self.CheckRequests([(self.compute.instanceGroupManagers,
                          'ListPerInstanceConfigs', request)])
 
-    self.AssertOutputMatches("""\
+    self.AssertOutputMatches(
+        """\
         ---
         instance: {compute_uri}/projects/my-project/zones/us-central1-a/instances/inst-0001
+        name: inst-0001
         override:
           disks:
           - deviceName: my-disk-1
@@ -150,12 +199,26 @@ class InstanceGroupsManagedInstancesConfigsListZonalTest(
           - key: key-foo
             value: value foo
           origin: AUTO_GENERATED
+        preservedState:
+          disks:
+            my-disk-1:
+              autoDelete: NEVER
+              mode: READ_WRITE
+              source: https://www.googleapis.com/compute/alpha/projects/my-project/zones/us-central1-a/disks/inst-0001-1
+            my-disk-2:
+              autoDelete: NEVER
+              mode: READ_ONLY
+              source: https://www.googleapis.com/compute/alpha/projects/my-project/zones/us-central1-a/disks/inst-0001-2
+          metadata:
+            key-BAR: value BAR
+            key-foo: value foo
         .*
         instance: {compute_uri}/projects/my-project/zones/us-central1-a/instances/inst-0002
         .*
         instance: {compute_uri}/projects/my-project/zones/us-central1-a/instances/custom-inst-0003
         .*
-        """.format(compute_uri=self.compute_uri), normalize_space=True)
+        """.format(compute_uri=self.compute_uri),
+        normalize_space=True)
 
   def testListInstanceConfigsWithLimit(self):
     self.Run("""
@@ -335,6 +398,7 @@ class InstanceGroupsManagedInstancesConfigsListRegionalTest(
     self.AssertOutputMatches("""\
         ---
         instance: {compute_uri}/projects/my-project/zones/us-central1-a/instances/inst-0001
+        name: inst-0001
         override:
           disks:
           - deviceName: my-disk-1
@@ -349,6 +413,19 @@ class InstanceGroupsManagedInstancesConfigsListRegionalTest(
           - key: key-foo
             value: value foo
           origin: AUTO_GENERATED
+        preservedState:
+          disks:
+            my-disk-1:
+              autoDelete: NEVER
+              mode: READ_WRITE
+              source: https://www.googleapis.com/compute/alpha/projects/my-project/zones/us-central1-a/disks/inst-0001-1
+            my-disk-2:
+              autoDelete: NEVER
+              mode: READ_ONLY
+              source: https://www.googleapis.com/compute/alpha/projects/my-project/zones/us-central1-a/disks/inst-0001-2
+          metadata:
+            key-BAR: value BAR
+            key-foo: value foo
         .*
         instance: {compute_uri}/projects/my-project/zones/us-central1-b/instances/inst-0002
         .*
@@ -372,6 +449,7 @@ class InstanceGroupsManagedInstancesConfigsListRegionalTest(
 
     self.AssertOutputContains("""\
         instance: {compute_uri}/projects/my-project/zones/us-central1-a/instances/inst-0001
+        name: inst-0001
         """.format(compute_uri=self.compute_uri), normalize_space=True)
     self.AssertOutputNotContains("""\
         instance: {compute_uri}/projects/my-project/zones/us-central1-b/instances/inst-0002

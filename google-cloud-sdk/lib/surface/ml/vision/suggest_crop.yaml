@@ -2,9 +2,14 @@
 
   help_text:
     brief: Suggest a bounding box in an image.
-    DESCRIPTION: |
+    description: |
       Returns the coordinates of a bounding box that surrounds the dominant
       object or face in an image.
+    examples: |
+      To get the coordinates of a bounding box that surrounds the dominant
+      object or face in an image `gs://my_bucket/input_file`:
+
+        $ {command} gs://my_bucket/input_file
 
   request:
     _COMMON_: request
@@ -31,9 +36,14 @@
 
   help_text:
     brief: Suggest a bounding box in an image.
-    DESCRIPTION: |
+    description: |
       Returns the coordinates of a bounding box that surrounds the dominant
       object or face in an image.
+    examples: |
+      To get the coordinates of a bounding box that surrounds the dominant
+      object or face in an image `gs://my_bucket/input_file`:
+
+        $ {command} gs://my_bucket/input_file
 
   request:
     _COMMON_: request

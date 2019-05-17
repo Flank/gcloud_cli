@@ -11,7 +11,7 @@ gcloud beta pubsub subscriptions modify\-push\-config \- modifies the push confi
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta pubsub subscriptions modify\-push\-config\fR \fISUBSCRIPTION\fR \fB\-\-push\-endpoint\fR=\fIPUSH_ENDPOINT\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta pubsub subscriptions modify\-push\-config\fR \fISUBSCRIPTION\fR \fB\-\-push\-endpoint\fR=\fIPUSH_ENDPOINT\fR [\fB\-\-push\-auth\-service\-account\fR=\fISERVICE_ACCOUNT_EMAIL\fR] [\fB\-\-push\-auth\-token\-audience\fR=\fIOPTIONAL_AUDIENCE_OVERRIDE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -55,12 +55,30 @@ set the subscription type to PUSH.
 .RE
 .sp
 
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-push\-auth\-service\-account\fR=\fISERVICE_ACCOUNT_EMAIL\fR
+Service account email used as the identity for the generated Open ID Connect
+token for authenticated push.
+
+.TP 2m
+\fB\-\-push\-auth\-token\-audience\fR=\fIOPTIONAL_AUDIENCE_OVERRIDE\fR
+Audience used in the generated Open ID Connect token for authenticated push. If
+not specified, it will be set to the push\-endpoint.
+
+
+.RE
+.sp
+
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

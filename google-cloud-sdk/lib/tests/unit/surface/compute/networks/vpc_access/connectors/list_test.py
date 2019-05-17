@@ -23,34 +23,35 @@ from tests.lib import test_case
 from tests.lib.surface.compute.networks.vpc_access import base
 
 
-class ConnectorsListTest(base.VpcAccessUnitTestBase):
+class ConnectorsListTestBeta(base.VpcAccessUnitTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'v1beta1'
 
   def testConnectorsList(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    expected_connectors = self._MakeConnectors()
-    self._ExpectList(expected_connectors)
-    self.Run(
-        'compute networks vpc-access connectors list --region={}'.format(
-            self.region_id))
+    connectors = self._MakeConnectors()
+    self._ExpectList(connectors)
+    self.Run('compute networks vpc-access connectors list --region={}'.format(
+        self.region_id))
 
     # pylint: disable=line-too-long
     self.AssertOutputEquals(
         """\
-        CONNECTOR_ID    REGION       TYPE      NETWORK       IP_CIDR_RANGE  STATUS
-        my-connector-0  us-central1  EXTENDED  my-network-0  10.132.0.0/28  READY
-        my-connector-1  us-central1  BASIC     my-network-2                 CREATING
-        my-connector-2  us-central1  EXTENDED  my-network-1  10.128.0.0/28  CREATING
-        my-connector-3  us-central1  EXTENDED  my-network-2  10.142.0.0/28  DELETING
-        my-connector-4  us-central1  BASIC     my-network-1                 READY
-        my-connector-5  us-central1  BASIC     my-network-2                 DELETING
+        CONNECTOR_ID    REGION       NETWORK       IP_CIDR_RANGE  MIN_THROUGHPUT MAX_THROUGHPUT STATE
+        my-connector-0  us-central1  my-network-0  10.132.0.0/28  200            1000           READY
+        my-connector-1  us-central1  my-network-2  10.10.0.0/28   200            300            CREATING
+        my-connector-2  us-central1  my-network-1  10.128.0.0/28  300            1000           CREATING
+        my-connector-3  us-central1  my-network-2  10.142.0.0/28  200            500            DELETING
+        my-connector-4  us-central1  my-network-1  10.100.0.0/28  200            1000           READY
+        my-connector-5  us-central1  my-network-2  10.200.0.0/28  200            1000           UPDATING
         """,
         normalize_space=True)
     # pylint: enable=line-too-long
 
   def testConnectorsListUri(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    expected_connectors = self._MakeConnectors()
-    self._ExpectList(expected_connectors)
+    connectors = self._MakeConnectors()
+    self._ExpectList(connectors)
     self.Run(
         'compute networks vpc-access connectors list --region={} --uri'.format(
             self.region_id))
@@ -68,6 +69,81 @@ class ConnectorsListTest(base.VpcAccessUnitTestBase):
             api_version=self.api_version,
             project=self.project_id,
             location=self.region_id),
+        normalize_space=True)
+    # pylint: enable=line-too-long
+
+  def _MakeConnectors(self):
+    connectors = []
+    connectors.append(
+        self._MakeConnector(
+            'my-connector-0', 'my-network-0', '10.132.0.0/28',
+            self.messages.Connector.StateValueValuesEnum('READY'), 200, 1000))
+    connectors.append(
+        self._MakeConnector(
+            'my-connector-1', 'my-network-2', '10.10.0.0/28',
+            self.messages.Connector.StateValueValuesEnum('CREATING'), 200, 300))
+    connectors.append(
+        self._MakeConnector(
+            'my-connector-2', 'my-network-1', '10.128.0.0/28',
+            self.messages.Connector.StateValueValuesEnum('CREATING'), 300,
+            1000))
+    connectors.append(
+        self._MakeConnector(
+            'my-connector-3', 'my-network-2', '10.142.0.0/28',
+            self.messages.Connector.StateValueValuesEnum('DELETING'), 200, 500))
+    connectors.append(
+        self._MakeConnector(
+            'my-connector-4', 'my-network-1', '10.100.0.0/28',
+            self.messages.Connector.StateValueValuesEnum('READY'), 200, 1000))
+    connectors.append(
+        self._MakeConnector(
+            'my-connector-5', 'my-network-2', '10.200.0.0/28',
+            self.messages.Connector.StateValueValuesEnum('UPDATING'), 200,
+            1000))
+    return connectors
+
+  def _MakeConnector(self, connector_id, network, ip_cidr_range, state,
+                     min_throughput, max_throughput):
+    connector_prefix = 'projects/{}/locations/{}/connectors/'.format(
+        self.project_id, self.region_id)
+    return self.messages.Connector(
+        name=connector_prefix + connector_id,
+        network=network,
+        ipCidrRange=ip_cidr_range,
+        state=state,
+        minThroughput=min_throughput,
+        maxThroughput=max_throughput)
+
+  def _ExpectList(self, connectors):
+    self.connectors_client.List.Expect(
+        request=self.messages.VpcaccessProjectsLocationsConnectorsListRequest(
+            parent=self.region_relative_name),
+        response=self.messages.ListConnectorsResponse(connectors=connectors))
+
+
+class ConnectorsListTestAlpha(ConnectorsListTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'v1alpha1'
+
+  def testConnectorsList(self):
+    expected_connectors = self._MakeConnectors()
+    self._ExpectList(expected_connectors)
+    self.Run('compute networks vpc-access connectors list --region={}'.format(
+        self.region_id))
+
+    # pylint: disable=line-too-long
+    self.AssertOutputEquals(
+        """\
+        CONNECTOR_ID    REGION       TYPE      NETWORK       IP_CIDR_RANGE  STATUS
+        my-connector-0  us-central1  EXTENDED  my-network-0  10.132.0.0/28  READY
+        my-connector-1  us-central1  BASIC     my-network-2                 CREATING
+        my-connector-2  us-central1  EXTENDED  my-network-1  10.128.0.0/28  CREATING
+        my-connector-3  us-central1  EXTENDED  my-network-2  10.142.0.0/28  DELETING
+        my-connector-4  us-central1  BASIC     my-network-1                 READY
+        my-connector-5  us-central1  BASIC     my-network-2                 DELETING
+        """,
         normalize_space=True)
     # pylint: enable=line-too-long
 
@@ -120,13 +196,6 @@ class ConnectorsListTest(base.VpcAccessUnitTestBase):
         type=self.type_basic,
         network=network,
         status=status)
-
-  def _ExpectList(self, expected_connectors):
-    self.connectors_client.List.Expect(
-        request=self.messages.VpcaccessProjectsLocationsConnectorsListRequest(
-            parent=self.region_relative_name),
-        response=self.messages.ListConnectorsResponse(
-            connectors=expected_connectors))
 
 
 if __name__ == '__main__':

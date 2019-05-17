@@ -1,0 +1,205 @@
+title: Test enable backend_services IAP
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: iap web enable --resource-type=backend-services --service=backend-service
+      --oauth2-client-id=1234 --oauth2-client-secret=SECRET
+  - stderr: |
+      WARNING: IAP only protects requests that go through the Cloud Load Balancer. See the IAP documentation for important security best practices: https://cloud.google.com/iap/.
+  - stderr: |
+      Updated [https://www.googleapis.com/compute/v1/projects/cloudsdktest/global/backendServices/backend-service].
+  - stdout: |
+      ---
+      affinityCookieTtlSec: 0
+      connectionDraining:
+        drainingTimeoutSec: 0
+      creationTimestamp: '2015-04-28T13:44:18.498-07:00'
+      description: ''
+      enableCDN: false
+      fingerprint: j_iHLvmHLuw=
+      healthChecks:
+      - https://www.googleapis.com/compute/v1/projects/cloudsdktest/global/httpsHealthChecks/https-health-check
+      iap:
+        enabled: true
+        oauth2ClientId: '1234'
+        oauth2ClientSecretSha256: 0917b13a9091915d54b6336f45909539cce452b3661b21f386418a257883b30a
+      id: '16352997042619467402'
+      kind: compute#backendService
+      loadBalancingScheme: EXTERNAL
+      name: backend-service
+      port: 443
+      portName: https
+      protocol: HTTPS
+      selfLink: https://www.googleapis.com/compute/v1/projects/cloudsdktest/global/backendServices/backend-service
+      sessionAffinity: NONE
+      timeoutSec: 30
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1
+      BETA: v1beta1
+      ALPHA: v1beta1
+
+- execute_command:
+    command: iap web enable --resource-type=backend-services --service=backend-service
+      --oauth2-client-id=1234 --oauth2-client-secret=SECRET
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/v1/projects/fake-project/global/backendServices/backend-service?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            kind: compute#backendService
+            id: '16352997042619467402'
+            creationTimestamp: '2015-04-28T13:44:18.498-07:00'
+            name: backend-service
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloudsdktest/global/backendServices/backend-service
+            healthChecks:
+            - https://www.googleapis.com/compute/v1/projects/cloudsdktest/global/httpsHealthChecks/https-health-check
+            timeoutSec: 30
+            port: 443
+            protocol: HTTPS
+            fingerprint: LV0VUnaedd8=
+            portName: https
+            enableCDN: false
+            sessionAffinity: NONE
+            affinityCookieTtlSec: 0
+            loadBalancingScheme: EXTERNAL
+            connectionDraining:
+              drainingTimeoutSec: 0
+    - expect_stderr: |
+        WARNING: IAP only protects requests that go through the Cloud Load Balancer. See the IAP documentation for important security best practices: https://cloud.google.com/iap/.
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/v1/projects/fake-project/global/backendServices/backend-service?alt=json
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              affinityCookieTtlSec: 0
+              connectionDraining:
+                drainingTimeoutSec: 0
+              creationTimestamp: '2015-04-28T13:44:18.498-07:00'
+              enableCDN: false
+              fingerprint: LV0VUnaedd8=
+              healthChecks:
+              - https://www.googleapis.com/compute/v1/projects/cloudsdktest/global/httpsHealthChecks/https-health-check
+              iap:
+                enabled: true
+                oauth2ClientId: '1234'
+                oauth2ClientSecret: SECRET
+              id: '16352997042619467402'
+              kind: compute#backendService
+              loadBalancingScheme: EXTERNAL
+              name: backend-service
+              port: 443
+              portName: https
+              protocol: HTTPS
+              selfLink: https://www.googleapis.com/compute/v1/projects/cloudsdktest/global/backendServices/backend-service
+              sessionAffinity: NONE
+              timeoutSec: 30
+        return_response:
+          headers:
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '977674377132585541'
+            name: operation-1548782761704-5809c16587c30-13a6a243-53ea7212
+            operationType: patch
+            targetLink: https://www.googleapis.com/compute/v1/projects/cloudsdktest/global/backendServices/backend-service
+            targetId: '16352997042619467402'
+            status: PENDING
+            progress: 0
+            insertTime: '2019-01-29T09:26:02.373-08:00'
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloudsdktest/global/operations/operation-1548782761704-5809c16587c30-13a6a243-53ea7212
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/v1/projects/fake-project/global/operations/operation-1548782761704-5809c16587c30-13a6a243-53ea7212?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '977674377132585541'
+            name: operation-1548782761704-5809c16587c30-13a6a243-53ea7212
+            operationType: patch
+            targetLink: https://www.googleapis.com/compute/v1/projects/cloudsdktest/global/backendServices/backend-service
+            targetId: '16352997042619467402'
+            status: DONE
+            progress: 100
+            insertTime: '2019-01-29T09:26:02.373-08:00'
+            startTime: '2019-01-29T09:26:03.024-08:00'
+            endTime: '2019-01-29T09:26:07.574-08:00'
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloudsdktest/global/operations/operation-1548782761704-5809c16587c30-13a6a243-53ea7212
+    - expect_stderr: |
+        Updated [https://www.googleapis.com/compute/v1/projects/cloudsdktest/global/backendServices/backend-service].
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/v1/projects/fake-project/global/backendServices/backend-service?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            kind: compute#backendService
+            id: '16352997042619467402'
+            creationTimestamp: '2015-04-28T13:44:18.498-07:00'
+            name: backend-service
+            description: ''
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloudsdktest/global/backendServices/backend-service
+            healthChecks:
+            - https://www.googleapis.com/compute/v1/projects/cloudsdktest/global/httpsHealthChecks/https-health-check
+            timeoutSec: 30
+            port: 443
+            protocol: HTTPS
+            fingerprint: j_iHLvmHLuw=
+            portName: https
+            enableCDN: false
+            sessionAffinity: NONE
+            affinityCookieTtlSec: 0
+            loadBalancingScheme: EXTERNAL
+            connectionDraining:
+              drainingTimeoutSec: 0
+            iap:
+              enabled: true
+              oauth2ClientId: '1234'
+              oauth2ClientSecretSha256: 0917b13a9091915d54b6336f45909539cce452b3661b21f386418a257883b30a
+    - expect_stdout: |
+        ---
+        affinityCookieTtlSec: 0
+        connectionDraining:
+          drainingTimeoutSec: 0
+        creationTimestamp: '2015-04-28T13:44:18.498-07:00'
+        description: ''
+        enableCDN: false
+        fingerprint: j_iHLvmHLuw=
+        healthChecks:
+        - https://www.googleapis.com/compute/v1/projects/cloudsdktest/global/httpsHealthChecks/https-health-check
+        iap:
+          enabled: true
+          oauth2ClientId: '1234'
+          oauth2ClientSecretSha256: 0917b13a9091915d54b6336f45909539cce452b3661b21f386418a257883b30a
+        id: '16352997042619467402'
+        kind: compute#backendService
+        loadBalancingScheme: EXTERNAL
+        name: backend-service
+        port: 443
+        portName: https
+        protocol: HTTPS
+        selfLink: https://www.googleapis.com/compute/v1/projects/cloudsdktest/global/backendServices/backend-service
+        sessionAffinity: NONE
+        timeoutSec: 30
+    - expect_exit:
+        code: 0

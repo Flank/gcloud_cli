@@ -1,0 +1,142 @@
+
+.TH "GCLOUD_BETA_ML_VISION_DETECT\-PRODUCT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta ml vision detect\-product \- detect products within an image
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta ml vision detect\-product\fR \fIIMAGE_PATH\fR \fB\-\-category\fR=[\fICATEGORY\fR,...] (\fB\-\-product\-set\fR=\fIPRODUCT_SET\fR\ :\ \fB\-\-product\-set\-location\fR=\fIPRODUCT_SET_LOCATION\fR) [\fB\-\-bounding\-polygon\fR=\fIBOUNDING_POLYGON\fR] [\fB\-\-filter\fR=\fIFILTER\fR] [\fB\-\-max\-results\fR=\fIMAX_RESULTS\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR detect products within an image
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIIMAGE_PATH\fR
+Path to the image to be analyzed. This can be either a local path or a URL. If
+you provide a local file, the contents will be sent directly to Google Cloud
+Vision. If you provide a URL, it must be in Google Cloud Storage format
+(gs://bucket/object) or an HTTP URL (http://... or https://...)
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-category\fR=[\fICATEGORY\fR,...]
+Product category to search in. \fICATEGORY\fR must be one of: \fBapparel\fR,
+\fBhomegoods\fR, \fBtoys\fR.
+
+.TP 2m
+
+Product set resource \- The product set to be searched for similar images. The
+arguments in this group can be used to specify the attributes of this resource.
+(NOTE) Some attributes are not given arguments in this group but can be set in
+other ways. To set the [project] attribute: provide the argument
+[\-\-product\-set] on the command line with a fully specified name; provide the
+argument [\-\-project] on the command line; set the property [core/project].
+This must be specified.
+
+.RS 2m
+.TP 2m
+\fB\-\-product\-set\fR=\fIPRODUCT_SET\fR
+ID of the product set or fully qualified identifier for the product set. This
+flag must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-product\-set\-location\fR=\fIPRODUCT_SET_LOCATION\fR
+The location of the product set.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-bounding\-polygon\fR=\fIBOUNDING_POLYGON\fR
+Bounding polygon around the areas of interest in the image. If it is not
+specified, system discretion will be applied. A bounding polygon can be
+specified by a list of vertices or normalized vertices. A vertex (x, y)
+represents a 2D point in the image. x, y are integers and are in the same scale
+as the original image. The normalized vertex coordinates are relative to orginal
+image and range from 0 to 1. For example,
+\-\-bounding\-polygon=0.,0.,0.,0.3,0.3,0.,0.3,0.3 specifies a polygon with 4
+normalized vertices \- (0., 0.), (0., 0.3), (0.3, 0.), (0.3, 0.3). Notice that
+the decimal point is needed for normalized vertex coordindates.
+
+.TP 2m
+\fB\-\-filter\fR=\fIFILTER\fR
+Filter expression to restrict search results based on product labels. ANDs of
+ORs of key\-value expressions are supported, where expressions within an OR must
+have the same key. Expressions separated by AND must have different keys. An '='
+should be used to connect the key and value. For example, '(color = red OR color
+= blue) AND brand = Google' is acceptable, but not '(color = red OR brand =
+Google)' or 'color: red'.
+
+.TP 2m
+\fB\-\-max\-results\fR=\fIMAX_RESULTS\fR
+Maximum number of results to be provided.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBvision/v1\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/vision/
+
+
+
+.SH "EXAMPLES"
+
+To detect product in image 'gs://my\-bucket/my\-image.jpg' by searching in
+product set 'my\-product\-set', in category 'toys', run:
+
+.RS 2m
+$ gcloud beta ml vision detect\-product gs://my\-bucket/my\-image.jpg \e
+    \-\-product\-set='my\-product\-set' \-\-product\-set\-location=us\-east1 \e
+    \-\-category='toys'
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha ml vision detect\-product
+.RE
+

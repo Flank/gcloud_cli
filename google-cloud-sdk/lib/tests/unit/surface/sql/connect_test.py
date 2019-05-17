@@ -171,39 +171,10 @@ class _BaseConnectTest(object):
             region='us-central1',
             replicaConfiguration=None,
             replicaNames=[],
-            selfLink=
-            'https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/{1}'
+            selfLink='https://www.googleapis.com/sql/v1beta4/projects/{0}/instances/{1}'
             .format(self.Project(), self.instance['id']),
-            serverCaCert=self.messages.SslCert(
-                cert=
-                '-----BEGIN CERTIFICATE-----\nMIIDITCCAgmgAwIBAgIBADANBgkqhkiG9w0BAQUFADBIMSMwIQYDVQQDExpHb29n\nbGUgQ2x',
-                certSerialNumber='0',
-                commonName='C=US,O=Google\\, Inc,CN=Google Cloud SQL Server CA',
-                createTime=datetime.datetime(
-                    2017,
-                    5,
-                    12,
-                    21,
-                    33,
-                    4,
-                    844000,
-                    tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
-                expirationTime=datetime.datetime(
-                    2019,
-                    5,
-                    12,
-                    21,
-                    34,
-                    4,
-                    844000,
-                    tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
-                instance=self.instance['id'],
-                kind='sql#sslCert',
-                selfLink=None,
-                sha1Fingerprint='fcddb49c4a00ff8796ba099933dbeb208b8599bd',
-            ),
-            serviceAccountEmailAddress=
-            'vxmlqos47zbmzgjppv2ued6e74@speckle-umbrella-5.iam.gserviceaccount.com',
+            serverCaCert=None,
+            serviceAccountEmailAddress='vxmlqos47zbmzgjppv2ued6e74@speckle-umbrella-5.iam.gserviceaccount.com',
             settings=self.messages.Settings(
                 activationPolicy='ALWAYS',
                 authorizedGaeApplications=[],
@@ -222,8 +193,9 @@ class _BaseConnectTest(object):
                 ipConfiguration=self.messages.IpConfiguration(
                     authorizedNetworks=[
                         self.messages.AclEntry(
-                            expirationTime=self.time_of_connection +
-                            datetime.timedelta(minutes=5),
+                            expirationTime=(
+                                self.time_of_connection + datetime.timedelta(
+                                    minutes=5)).replace(microsecond=10000),
                             kind='sql#aclEntry',
                             name='sql connect at time {0}'.format(
                                 str(self.time_of_connection)),

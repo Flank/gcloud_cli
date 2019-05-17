@@ -63,7 +63,7 @@ def CheckArgs(args):
 
 
 def MakeResource(collection='foo.projects.instances', attributes=None,
-                 is_positional=True, removed_flags=None, arg_name=None):
+                 is_positional=None, removed_flags=None, arg_name=None):
   attributes = attributes if attributes is not None else ['instance']
   return resource_arg_schema.YAMLResourceArgument(
       {'name': attributes[-1] if attributes else 'UNKNOWN',
@@ -199,6 +199,16 @@ class DeclarativeTests(base.Base, parameterized.TestCase):
   def testGenerateList(self, is_atomic):
     self.MockCRUDMethods(('foo.locations.instances', is_atomic))
     method = registry.GetMethod('foo.locations.instances', 'list')
+    # Make sure positional override works.
+    gen = arg_marshalling.DeclarativeArgumentGenerator(
+        method, [], MakeResource(collection='foo.locations',
+                                 attributes=['location'],
+                                 is_positional=True))
+    (_, args) = CheckArgs(gen.GenerateArgs())
+    self.assertEqual(['location'], sorted(args.keys()))
+    self.assertEqual(args['location'].name, 'location')
+
+    # Make sure list commands are non-positional by default.
     gen = arg_marshalling.DeclarativeArgumentGenerator(
         method, [], MakeResource(collection='foo.locations',
                                  attributes=['location']))
@@ -298,6 +308,8 @@ class DeclarativeTests(base.Base, parameterized.TestCase):
     mock_field.name = 'foo'
     mock_field.repeated = False
     method.GetRequestType().all_fields.return_value = [mock_field]
+    message = method.GetRequestType()()
+    message.field_by_name = mock.Mock(return_value=mock_field)
 
     gen = arg_marshalling.DeclarativeArgumentGenerator(
         method, [], MakeResource(collection='foo.instances'))

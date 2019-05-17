@@ -100,6 +100,10 @@ state: RUNNABLE
 """.format(self.Project()),
         normalize_space=True)
 
+    # This is a V1 instance, so check that the deprecation message is shown.
+    self.AssertErrContains(
+        'Upgrade your First Generation instance to Second Generation')
+
   def testDescribeLabels(self):
     self.mocked_client.instances.Get.Expect(
         self.messages.SqlInstancesGetRequest(
@@ -185,6 +189,19 @@ settings:
 
     with self.assertRaises(exceptions.ResourceNotFoundError):
       self.Run('sql instances describe nosuchinstance')
+
+  # TODO(b/122660263): Remove when V1 instances are no longer supported.
+  def testNoV2DeprecationWarning(self):
+    diff = {
+        'name': 'v2-instance',
+    }
+    self.ExpectInstanceGet(self.GetV2Instance(), diff)
+
+    self.Run('sql instances describe v2-instance')
+
+    # This is a V2 instance, so check that the deprecation message is not shown.
+    self.AssertErrNotContains(
+        'Upgrade your First Generation instance to Second Generation')
 
 
 class InstancesDescribeGATest(_BaseInstancesDescribeTest, base.SqlMockTestGA):

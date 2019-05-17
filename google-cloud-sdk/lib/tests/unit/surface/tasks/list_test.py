@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.tasks import app
 from googlecloudsdk.command_lib.tasks import parsers
 from googlecloudsdk.command_lib.util import time_util
@@ -77,9 +78,9 @@ class TasksListTest(test_base.CloudTasksTestBase):
     self.Run('tasks list --queue my-queue --uri')
 
     self.AssertOutputEquals("""\
-        https://cloudtasks.googleapis.com/v2beta2/{0}/tasks/t0
-        https://cloudtasks.googleapis.com/v2beta2/{0}/tasks/t1
-        https://cloudtasks.googleapis.com/v2beta2/{0}/tasks/t2
+        https://cloudtasks.googleapis.com/v2/{0}/tasks/t0
+        https://cloudtasks.googleapis.com/v2/{0}/tasks/t1
+        https://cloudtasks.googleapis.com/v2/{0}/tasks/t2
         """.format(self.queue_name), normalize_space=True)
 
   def testList_TwoPages(self):
@@ -163,6 +164,12 @@ t31 app-engine {createTime} {scheduleTime} 32 32 Unknown
         t2         app-engine  {0}              {1}                3                  3                  Unknown
         """.format(self.task_create_time,
                    self.task_schedule_time), normalize_space=True)
+
+
+class TasksListTestBeta(TasksListTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 if __name__ == '__main__':

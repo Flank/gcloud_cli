@@ -8,17 +8,21 @@ DESCRIPTION
     with projections can be used to format and change the default output to a
     more meaningful result.
 
-    To change the default output format of a command, use the --format flag.
-    For details run $ gcloud topic formats.
+    Use the --format flag to change the default output format of a command. For
+    details run $ gcloud topic formats.
 
-    To select resources to be listed, use the --filter flag. For details run $
+    Use the --filter flag to select resources to be listed. For details run $
     gcloud topic filters.
 
-    To reach resource items through a unique path of names from the root, use
-    resource-keys. For details run $ gcloud topic resource-keys.
+    Use resource-keys to reach resource items through a unique path of names
+    from the root. For details run $ gcloud topic resource-keys.
 
-    To list a subset of resource keys in a resource, use projections. Resource
+    Use projections to list a subset of resource keys in a resource. Resource
     projections are described in detail below.
+
+    Note: To refer to a list of fields you can sort, filter, and format by for
+    each resource, you can run a list command with the format set to text or
+    json. For example, $ gcloud compute instances list --limit=1 --format=text.
 
     To work through an interactive tutorial about using the filter and format
     flags instead, see:
@@ -741,6 +745,17 @@ DESCRIPTION
 
      type_suffix(uri, undefined="")
         Get the type and the name of the object the uri refers to.
+
+     vpn_tunnel_gateway(vpn_tunnel, undefined="")
+        Returns the gateway for the specified VPN tunnel resource if
+        applicable.
+
+        The arguments are:
+
+         vpn_tunnel
+            JSON-serializable object of a VPN tunnel.
+         undefined
+            Returns this value if the resource cannot be formatted.
 
      zone(undefined="")
         Returns a zone name from a selfLink.

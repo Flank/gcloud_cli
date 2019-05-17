@@ -100,13 +100,13 @@ class PeeringsCreateTest(test_base.BaseTest):
                'network-1')
 
 
-class PeeringsCreateAlphaTest(test_base.BaseTest):
+class PeeringsCreateBetaTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.BETA
     self.SelectApi(self.track.prefix)
     self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', 'alpha')
+    self.resources.RegisterApiByName('compute', 'beta')
 
   def testCreatePeeringWithCustomRoutesFlags(self):
     self.Run('compute networks peerings create peering-1 --network '
@@ -114,7 +114,7 @@ class PeeringsCreateAlphaTest(test_base.BaseTest):
              '--export-custom-routes --import-custom-routes')
 
     self.CheckRequests(
-        [(self.compute_alpha.networks, 'AddPeering',
+        [(self.compute_beta.networks, 'AddPeering',
           self.messages.ComputeNetworksAddPeeringRequest(
               network='network-1',
               networksAddPeeringRequest=self.messages.NetworksAddPeeringRequest(
@@ -132,7 +132,7 @@ class PeeringsCreateAlphaTest(test_base.BaseTest):
              '--export-custom-routes --import-custom-routes')
 
     self.CheckRequests(
-        [(self.compute_alpha.networks, 'AddPeering',
+        [(self.compute_beta.networks, 'AddPeering',
           self.messages.ComputeNetworksAddPeeringRequest(
               network='network-1',
               networksAddPeeringRequest=self.messages.NetworksAddPeeringRequest(

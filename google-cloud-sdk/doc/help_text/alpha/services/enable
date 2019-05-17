@@ -26,8 +26,9 @@ FLAGS
         for the operation to complete.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -39,6 +40,11 @@ EXAMPLES
     To run the same command asynchronously (non-blocking), run:
 
         $ gcloud alpha services enable my-consumed-service --async
+
+    To enable services called service1, service2, and service3 on the current
+    project, run:
+
+        $ gcloud alpha services enable service1 service2 service3
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

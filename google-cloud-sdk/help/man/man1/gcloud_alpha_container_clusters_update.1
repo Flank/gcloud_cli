@@ -11,7 +11,7 @@ gcloud alpha container clusters update \- update cluster settings for an existin
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha container clusters update\fR \fINAME\fR (\fB\-\-complete\-credential\-rotation\fR\ |\ \fB\-\-complete\-ip\-rotation\fR\ |\ \fB\-\-enable\-autoscaling\fR\ |\ \fB\-\-enable\-binauthz\fR\ |\ \fB\-\-enable\-legacy\-authorization\fR\ |\ \fB\-\-enable\-master\-authorized\-networks\fR\ |\ \fB\-\-enable\-network\-policy\fR\ |\ \fB\-\-enable\-pod\-security\-policy\fR\ |\ \fB\-\-enable\-vertical\-pod\-autoscaling\fR\ |\ \fB\-\-generate\-password\fR\ |\ \fB\-\-maintenance\-window\fR=\fIMAINTENANCE_WINDOW\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ |\ \fB\-\-security\-profile\fR=\fISECURITY_PROFILE\fR\ |\ \fB\-\-set\-password\fR\ |\ \fB\-\-start\-credential\-rotation\fR\ |\ \fB\-\-start\-ip\-rotation\fR\ |\ \fB\-\-update\-addons\fR=[\fIADDON\fR=\fIENABLED\fR|\fIDISABLED\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-additional\-zones\fR=[\fIZONE\fR,...]\ |\ \fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]\ |\ \fB\-\-clear\-resource\-usage\-bigquery\-dataset\fR\ |\ \fB\-\-enable\-network\-egress\-metering\fR\ \fB\-\-resource\-usage\-bigquery\-dataset\fR=\fIRESOURCE_USAGE_BIGQUERY_DATASET\fR\ |\ [\fB\-\-enable\-autoprovisioning\fR\ :\ \fB\-\-autoprovisioning\-config\-file\fR=\fIAUTOPROVISIONING_CONFIG_FILE\fR\ |\ [\fB\-\-max\-cpu\fR=\fIMAX_CPU\fR\ \fB\-\-max\-memory\fR=\fIMAX_MEMORY\fR\ :\ \fB\-\-min\-cpu\fR=\fIMIN_CPU\fR\ \fB\-\-min\-memory\fR=\fIMIN_MEMORY\fR\ [\fB\-\-max\-accelerator\fR=[\fItype\fR=\fITYPE\fR,\fIcount\fR=\fICOUNT\fR,...]\ :\ \fB\-\-min\-accelerator\fR=[\fItype\fR=\fITYPE\fR,\fIcount\fR=\fICOUNT\fR,...]]]]\ |\ \fB\-\-logging\-service\fR=\fILOGGING_SERVICE\fR\ \fB\-\-monitoring\-service\fR=\fIMONITORING_SERVICE\fR\ |\ \fB\-\-password\fR=\fIPASSWORD\fR\ \fB\-\-enable\-basic\-auth\fR\ |\ \fB\-\-username\fR=\fIUSERNAME\fR,\ \fB\-u\fR\ \fIUSERNAME\fR) [\fB\-\-async\fR] [\fB\-\-istio\-config\fR=[\fIauth\fR=\fIMTLS_PERMISSIVE\fR,...]] [\fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-node\-pool\fR=\fINODE_POOL\fR] [\fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha container clusters update\fR \fINAME\fR (\fB\-\-complete\-credential\-rotation\fR\ |\ \fB\-\-complete\-ip\-rotation\fR\ |\ \fB\-\-enable\-autoscaling\fR\ |\ \fB\-\-enable\-binauthz\fR\ |\ \fB\-\-enable\-intra\-node\-visibility\fR\ |\ \fB\-\-enable\-legacy\-authorization\fR\ |\ \fB\-\-enable\-master\-authorized\-networks\fR\ |\ \fB\-\-enable\-network\-policy\fR\ |\ \fB\-\-enable\-peering\-route\-sharing\fR\ |\ \fB\-\-enable\-pod\-security\-policy\fR\ |\ \fB\-\-enable\-vertical\-pod\-autoscaling\fR\ |\ \fB\-\-generate\-password\fR\ |\ \fB\-\-maintenance\-window\fR=\fIMAINTENANCE_WINDOW\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]\ |\ \fB\-\-security\-profile\fR=\fISECURITY_PROFILE\fR\ |\ \fB\-\-set\-password\fR\ |\ \fB\-\-start\-credential\-rotation\fR\ |\ \fB\-\-start\-ip\-rotation\fR\ |\ \fB\-\-update\-addons\fR=[\fIADDON\fR=\fIENABLED\fR|\fIDISABLED\fR,...]\ |\ \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-additional\-zones\fR=[\fIZONE\fR,...]\ |\ \fB\-\-node\-locations\fR=\fIZONE\fR,[\fIZONE\fR,...]\ |\ \fB\-\-clear\-resource\-usage\-bigquery\-dataset\fR\ |\ \fB\-\-enable\-network\-egress\-metering\fR\ \fB\-\-resource\-usage\-bigquery\-dataset\fR=\fIRESOURCE_USAGE_BIGQUERY_DATASET\fR\ |\ [\fB\-\-enable\-autoprovisioning\fR\ :\ \fB\-\-autoprovisioning\-config\-file\fR=\fIAUTOPROVISIONING_CONFIG_FILE\fR\ |\ [\fB\-\-max\-cpu\fR=\fIMAX_CPU\fR\ \fB\-\-max\-memory\fR=\fIMAX_MEMORY\fR\ :\ \fB\-\-min\-cpu\fR=\fIMIN_CPU\fR\ \fB\-\-min\-memory\fR=\fIMIN_MEMORY\fR\ [\fB\-\-max\-accelerator\fR=[\fItype\fR=\fITYPE\fR,\fIcount\fR=\fICOUNT\fR,...]\ :\ \fB\-\-min\-accelerator\fR=[\fItype\fR=\fITYPE\fR,\fIcount\fR=\fICOUNT\fR,...]]]]\ |\ \fB\-\-logging\-service\fR=\fILOGGING_SERVICE\fR\ \fB\-\-monitoring\-service\fR=\fIMONITORING_SERVICE\fR\ |\ \fB\-\-password\fR=\fIPASSWORD\fR\ \fB\-\-enable\-basic\-auth\fR\ |\ \fB\-\-username\fR=\fIUSERNAME\fR,\ \fB\-u\fR\ \fIUSERNAME\fR) [\fB\-\-async\fR] [\fB\-\-istio\-config\fR=[\fIauth\fR=\fIMTLS_PERMISSIVE\fR,...]] [\fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-node\-pool\fR=\fINODE_POOL\fR] [\fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -76,6 +76,17 @@ node pool if \-\-node\-pool is not provided.
 Enable Binary Authorization for this cluster.
 
 .TP 2m
+\fB\-\-enable\-intra\-node\-visibility\fR
+Enable Intra\-node visibility for this cluster.
+
+Enabling intra\-node visibility makes your intra\-node pod to pod traffic
+visible to the networking fabric. With this feature, you can use VPC flow
+logging or other VPC features for intra\-node traffic.
+
+This is a beta feature, enabling it on existing cluster causes the cluster
+master and the cluster nodes to restart, which might cause disruption.
+
+.TP 2m
 \fB\-\-enable\-legacy\-authorization\fR
 Enables the legacy ABAC authentication for the cluster. User rights are granted
 through the use of policies which combine attributes together. For a detailed
@@ -106,6 +117,12 @@ through HTTPS.
 Enable network policy enforcement for this cluster. If you are enabling network
 policy on an existing cluster the network policy addon must first be enabled on
 the master by using \-\-update\-addons=NetworkPolicy=ENABLED flag.
+
+.TP 2m
+\fB\-\-enable\-peering\-route\-sharing\fR
+Enable custom route sharing between the master and node VPCs, which ensures
+clients running in networks connected via a Cloud Router, VPN, or Interconnect
+can reach the API server.
 
 .TP 2m
 \fB\-\-enable\-pod\-security\-policy\fR
@@ -194,7 +211,7 @@ point to the new IP.
 Cluster addons to enable or disable. Options are
 HorizontalPodAutoscaling=ENABLED|DISABLED HttpLoadBalancing=ENABLED|DISABLED
 KubernetesDashboard=ENABLED|DISABLED Istio=ENABLED|DISABLED
-NetworkPolicy=ENABLED|DISABLED
+NetworkPolicy=ENABLED|DISABLED CloudRun=ENABLED|DISABLED
 
 .TP 2m
 \fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
@@ -321,20 +338,29 @@ At most one of these may be specified:
 .RS 2m
 .TP 2m
 \fB\-\-autoprovisioning\-config\-file\fR=\fIAUTOPROVISIONING_CONFIG_FILE\fR
-Path of the JSON/YAML file which contains information about the cluster's
-autoscaling configuration. Currently it only contains a list of resource limits
-of the cluster.
+Path of the JSON/YAML file which contains information about the cluster's node
+autoprovisioning configuration. Currently it contains a list of resource limits
+and identity defaults for autoprovisioning.
 
-Each resource limits definition contains three fields: resourceType, maximum and
-minimum. Resource type can be "cpu", "memory" or an accelerator (e.g.
+Resource limits are specified in the field 'resourceLimits'. Each resource
+limits definition contains three fields: resourceType, maximum and minimum.
+Resource type can be "cpu", "memory" or an accelerator (e.g.
 "nvidia\-tesla\-k80" for nVidia Tesla K80). Use gcloud compute
 accelerator\-types list to learn about available accelerator types. Maximum is
 the maximum allowed amount with the unit of the resource. Minimum is the minimum
 allowed amount with the unit of the resource.
 
+Identity default contains at most one of the below fields: serviceAccount: The
+Google Cloud Platform Service Account to be used by node VMs in autoprovisioined
+node pools. If not specified, the project default service account is used.
+scopes: A list of scopes be used by node instances in autoprovisioined node
+pools. Multiple scopes can be specified, separated by commas. For information on
+defaults, look at:
+https://cloud.google.com/sdk/gcloud/reference/container/clusters/create#\-\-scopes
+
 .TP 2m
 
-Flags to configure resource limits:
+Flags to configure autoprovisioned nodes
 
 .RS 2m
 .TP 2m
@@ -488,7 +514,7 @@ $ gcloud alpha container clusters update example\-cluster \e
 .sp
 .TP 2m
 \fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]
-The list of CIDR blocks (up to 20) that are allowed to connect to Kubernetes
+The list of CIDR blocks (up to 50) that are allowed to connect to Kubernetes
 master through HTTPS. Specified in CIDR notation (e.g. 1.2.3.4/30). Can not be
 specified unless \f5\-\-enable\-master\-authorized\-networks\fR is also
 specified.
@@ -541,10 +567,11 @@ Compute zone (e.g. us\-central1\-a) for the cluster. Overrides the default
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

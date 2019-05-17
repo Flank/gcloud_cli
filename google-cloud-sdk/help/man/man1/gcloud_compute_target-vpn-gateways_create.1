@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud compute target\-vpn\-gateways create \- create a target VPN Gateway
+gcloud compute target\-vpn\-gateways create \- create a Cloud VPN Classic Target VPN Gateway
 
 
 
@@ -17,11 +17,11 @@ gcloud compute target\-vpn\-gateways create \- create a target VPN Gateway
 
 .SH "DESCRIPTION"
 
-\fBgcloud compute target\-vpn\-gateways create\fR is used to create a target VPN
-Gateway. A target VPN Gateway can reference one or more VPN tunnels that connect
-it to external VPN gateways. A VPN Gateway may also be referenced by one or more
-forwarding rules that define which packets the gateway is responsible for
-routing.
+\fBgcloud compute target\-vpn\-gateways create\fR is used to create a Cloud VPN
+Classic Target VPN Gateway. A Target VPN Gateway can reference one or more VPN
+tunnels that connect it to the remote tunnel endpoint. A Target VPN Gateway may
+also be referenced by one or more forwarding rules that define which packets the
+gateway is responsible for routing.
 
 
 
@@ -87,10 +87,11 @@ Alternatively, the region can be stored in the environment variable
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

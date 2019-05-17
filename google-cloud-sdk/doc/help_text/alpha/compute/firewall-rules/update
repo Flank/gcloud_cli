@@ -5,7 +5,8 @@ SYNOPSIS
     gcloud alpha compute firewall-rules update NAME
         [--allow=[PROTOCOL[:PORT[-PORT]],...]] [--description=DESCRIPTION]
         [--destination-ranges=[CIDR_RANGE,...]] [--disabled] [--enable-logging]
-        [--priority=PRIORITY] [--rules=[PROTOCOL[:PORT[-PORT]],...]]
+        [--logging-metadata=LOGGING_METADATA] [--priority=PRIORITY]
+        [--rules=[PROTOCOL[:PORT[-PORT]],...]]
         [--source-ranges=[CIDR_RANGE,...]]
         [--source-service-accounts=[EMAIL,...]] [--source-tags=[TAG,...]]
         [--target-service-accounts=[EMAIL,...]] [--target-tags=[TAG,...]]
@@ -83,6 +84,11 @@ FLAGS
      --enable-logging
         Enable logging for the firewall rule. Logs will be exported to
         StackDriver. Firewall logging is disabled by default.
+
+     --logging-metadata=LOGGING_METADATA
+        Can only be specified if --enable-logging is true. Configures whether
+        metadata fields should be added to the reported firewall logs.
+        LOGGING_METADATA must be one of: exclude-all, include-all.
 
      --priority=PRIORITY
         This is an integer between 0 and 65535, both inclusive. When NOT
@@ -176,15 +182,15 @@ FLAGS
                 --target-service-accounts
 
      --target-tags=[TAG,...]
-        A list of instance tags indicating the set of instances on the network
-        which may accept inbound connections that match the firewall rule. If
-        both target tags and target service account are omitted, all instances
-        on the network can receive inbound connections that match the rule.
+        List of instance tags indicating the set of instances on the network
+        which may accept connections that match the firewall rule. Note that
+        tags can be assigned to instances during instance creation.
 
-        Tags can be assigned to instances during instance creation.
-
-        If target tags are specified then neither a source nor target service
+        If target tags are specified, then neither a source nor target service
         account can also be specified.
+
+        If both target tags and target service account are omitted, all
+        instances on the network can receive connections that match the rule.
 
         Setting this will override the existing target tags for the firewall.
         The following will clear the existing target tags:
@@ -192,10 +198,16 @@ FLAGS
             $ gcloud alpha compute firewall-rules update MY-RULE --target-tags
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
+
+EXAMPLES
+    To update the firewall rule RULE to enable logging, run:
+
+        $ gcloud alpha compute firewall-rules update RULE --enable-logging
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

@@ -264,7 +264,7 @@ address is directed to the target pointed to by the forwarding rule. Assigned IP
 addresses can be reserved or unreserved.
 
 IP addresses are restricted based on the forwarding rule's load balancing scheme
-(EXTERNAL, INTERNAL, INTERNAL_MANAGED or INTERNAL_SELF_MANAGED) and scope
+((EXTERNAL, INTERNAL, INTERNAL_MANAGED, INTERNAL_SELF_MANAGED)) and scope
 (global or regional).
 
 When the \-\-load\-balancing\-scheme is EXTERNAL, if the address is reserved, it
@@ -521,10 +521,11 @@ set of at most 5 ports.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

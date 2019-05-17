@@ -83,7 +83,8 @@ class MatrixCreatorOrchestratorTests(unit_base.AndroidMockClientTest):
                     googleAuto=self.testing_msgs.GoogleAuto())),
             disableVideoRecording=False,
             disablePerformanceMetrics=False,
-            testTimeout='900s'))
+            testTimeout='900s'),
+        flakyTestAttempts=0)
 
   def ExpectMatrixOrchestratorOption(self, orchestrator_option):
     test_matrix_id = 'test-matrix-id'

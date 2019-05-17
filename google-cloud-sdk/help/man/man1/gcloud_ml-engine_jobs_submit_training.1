@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud ml\-engine jobs submit training \- submit a Cloud Machine Learning training job
+gcloud ml\-engine jobs submit training \- submit an AI Platform training job
 
 
 
@@ -17,7 +17,7 @@ gcloud ml\-engine jobs submit training \- submit a Cloud Machine Learning traini
 
 .SH "DESCRIPTION"
 
-Submit a Cloud Machine Learning training job.
+Submit an AI Platform training job.
 
 This creates temporary files and executes Python code staged by a user on Google
 Cloud Storage. Model code can either be specified with a path, e.g.:
@@ -50,7 +50,7 @@ successfully submitted.
 
 To follow the progress of your job, pass the \f5\-\-stream\-logs\fR flag (note
 that even with the \f5\-\-stream\-logs\fR flag, the job will continue to run
-after this command exits and must be cancelled with \f5gcloud ml\-engine jobs
+after this command exits and must be cancelled with \f5gcloud ai\-platform jobs
 cancel JOB_ID\fR).
 
 For more information, see:
@@ -145,8 +145,8 @@ Google Cloud Storage path in which to store training outputs and other data
 needed for training.
 
 This path will be passed to your TensorFlow program as the \f5\-\-job_dir\fR
-command\-line arg. The benefit of specifying this field is that Cloud ML Engine
-will validate the path for use in training.
+command\-line arg. The benefit of specifying this field is that AI Platform will
+validate the path for use in training.
 
 If packages must be uploaded and \f5\-\-staging\-bucket\fR is not provided, this
 path will be used instead.
@@ -210,9 +210,8 @@ Alternatively, the region can be stored in the environment variable
 
 .TP 2m
 \fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR
-Google Cloud ML Engine runtime version for this job. Defaults to a stable
-version, which is defined in documentation along with the list of supported
-versions:
+AI Platform runtime version for this job. Defaults to a stable version, which is
+defined in documentation along with the list of supported versions:
 https://cloud.google.com/ml\-engine/docs/tensorflow/runtime\-version\-list
 
 .TP 2m
@@ -223,8 +222,8 @@ servers. \fISCALE_TIER\fR must be one of:
 .RS 2m
 .TP 2m
 \fBbasic\fR
-Single worker instance. This tier is suitable for learning how to use Cloud ML
-Engine, and for experimenting with new models using small datasets.
+Single worker instance. This tier is suitable for learning how to use AI
+Platform, and for experimenting with new models using small datasets.
 .TP 2m
 \fBbasic\-gpu\fR
 Single worker instance with a GPU.
@@ -295,7 +294,7 @@ Note that even if command execution is halted, the job will still run until
 cancelled with
 
 .RS 2m
-$ gcloud ml\-engine jobs cancel JOB_ID
+$ gcloud ai\-platform jobs cancel JOB_ID
 .RE
 
 
@@ -305,10 +304,11 @@ $ gcloud ml\-engine jobs cancel JOB_ID
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

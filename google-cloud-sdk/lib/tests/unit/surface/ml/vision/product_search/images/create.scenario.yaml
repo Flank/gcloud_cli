@@ -1,0 +1,223 @@
+title: test reference image creation
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: ml vision product-search images create my-image --location=us-east1 --product=my-product
+      --storage-location=gs://my-bucket/image.png
+  - stderr: |
+      Created reference image [my-image].
+- execute:
+  - command: ml vision product-search images create my-image --location=us-east1 --product=my-product
+      --storage-location=gs://my-bucket/image.png --flags-file=polygon-args-vertices.yaml
+  - stderr: |
+      Created reference image [my-image].
+- execute:
+  - command: ml vision product-search images create my-image --location=us-east1 --product=my-product
+      --storage-location=gs://my-bucket/image.png --flags-file=polygon-args-normalized-vertices.yaml
+  - stderr: |
+      Created reference image [my-image].
+- execute:
+  - command: ml vision product-search images create my-image --location=us-east1 --product=my-product
+      --storage-location=gs://my-bucket/image.png --flags-file=polygon-args-both.yaml
+  - stderr: |
+      Created reference image [my-image].
+actions:
+- write_file:
+    path: polygon-args-vertices.yaml
+    contents: |
+      - --bounding-polygon:
+          vertices:
+            - {x: 0, y: 0}
+            - {x: 0, y: 10}
+- write_file:
+    path: polygon-args-normalized-vertices.yaml
+    contents: |
+      - --bounding-polygon:
+          normalized-vertices:
+            - {x: 0.8, y: 0.8}
+            - {x: 0.8, y: 1}
+- write_file:
+    path: polygon-args-both.yaml
+    contents: |
+      - --bounding-polygon:
+          vertices:
+            - {x: 0, y: 0}
+            - {x: 0, y: 10}
+      - --bounding-polygon:
+          normalized-vertices:
+            - {x: 0.8, y: 0.8}
+            - {x: 0.8, y: 1}
+- execute_command:
+    command: ml vision product-search images create my-image --location=us-east1 --product=my-product
+      --storage-location=gs://my-bucket/image.png
+    events:
+    - api_call:
+        expect_request:
+          uri: https://vision.googleapis.com/v1/projects/fake-project/locations/us-east1/products/my-product/referenceImages?alt=json&referenceImageId=my-image
+          method: POST
+          headers: {}
+          body:
+            json:
+              uri: gs://my-bucket/image.png
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-east1/products/my-product/referenceImages/my-image",
+              "uri": "gs://my-bucket/image.png"
+            }
+    - expect_stderr: |
+        Created reference image [my-image].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: ml vision product-search images create my-image --location=us-east1 --product=my-product
+      --storage-location=gs://my-bucket/image.png --flags-file=polygon-args-vertices.yaml
+    events:
+    - api_call:
+        expect_request:
+          uri: https://vision.googleapis.com/v1/projects/fake-project/locations/us-east1/products/my-product/referenceImages?alt=json&referenceImageId=my-image
+          method: POST
+          headers: {}
+          body:
+            json:
+              boundingPolys:
+              - vertices:
+                - x: 0
+                  y: 0
+                - x: 0
+                  y: 10
+              uri: gs://my-bucket/image.png
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-east1/products/my-product/referenceImages/my-image",
+              "uri": "gs://my-bucket/image.png",
+              "boundingPolys": [
+                {
+                  "vertices": [
+                    {
+                      "x": 0,
+                      "y": 0
+                    },
+                    {
+                      "x": 0,
+                      "y": 10
+                    }
+                  ]
+                }
+              ]
+            }
+    - expect_stderr: |
+        Created reference image [my-image].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: ml vision product-search images create my-image --location=us-east1 --product=my-product
+      --storage-location=gs://my-bucket/image.png --flags-file=polygon-args-normalized-vertices.yaml
+    events:
+    - api_call:
+        expect_request:
+          uri: https://vision.googleapis.com/v1/projects/fake-project/locations/us-east1/products/my-product/referenceImages?alt=json&referenceImageId=my-image
+          method: POST
+          headers: {}
+          body:
+            json:
+              boundingPolys:
+              - normalizedVertices:
+                - x: 0.8
+                  y: 0.8
+                - x: 0.8
+                  y: 1.0
+              uri: gs://my-bucket/image.png
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-east1/products/my-product/referenceImages/my-image",
+              "uri": "gs://my-bucket/image.png",
+              "boundingPolys": [
+              {
+                "normalizedVertices": [
+                {
+                  "x": 0.8,
+                  "y": 0.8
+                },
+                {
+                  "x": 0.8,
+                  "y": 1.0
+                }
+                ]
+              }
+              ]
+            }
+    - expect_stderr: |
+        Created reference image [my-image].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: ml vision product-search images create my-image --location=us-east1 --product=my-product
+      --storage-location=gs://my-bucket/image.png --flags-file=polygon-args-both.yaml
+    events:
+    - api_call:
+        expect_request:
+          uri: https://vision.googleapis.com/v1/projects/fake-project/locations/us-east1/products/my-product/referenceImages?alt=json&referenceImageId=my-image
+          method: POST
+          headers: {}
+          body:
+            json:
+              boundingPolys:
+              - vertices:
+                - x: 0
+                  y: 0
+                - x: 0
+                  y: 10
+              - normalizedVertices:
+                - x: 0.8
+                  y: 0.8
+                - x: 0.8
+                  y: 1.0
+              uri: gs://my-bucket/image.png
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/cloudsdktest/locations/us-east1/products/my-product/referenceImages/my-image",
+              "uri": "gs://chaoren-bucket/face-input.png",
+              "boundingPolys": [
+                {
+                  "vertices": [
+                    {
+                      "x": 0,
+                      "y": 0
+                    },
+                    {
+                      "x": 0,
+                      "y": 10
+                    }
+                  ]
+                },
+                {
+                  "normalizedVertices": [
+                    {
+                      "x": 0.8,
+                      "y": 0.8
+                    },
+                    {
+                      "x": 0.8,
+                      "y": 1.0
+                    }
+                  ]
+                }
+              ]
+            }
+    - expect_stderr: |
+        Created reference image [my-image].
+    - expect_exit:
+        code: 0

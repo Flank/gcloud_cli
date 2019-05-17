@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -50,6 +50,8 @@ STYLE_MAPPINGS_BASIC = StyleMapping({
     text.TextTypes.URL: text.TextAttributes('{}'),
     text.TextTypes.COMMAND: text.TextAttributes('{}'),
     text.TextTypes.INFO: text.TextAttributes('{}'),
+    text.TextTypes.PT_SUCCESS: text.TextAttributes('{}'),
+    text.TextTypes.PT_FAILURE: text.TextAttributes('{}'),
 })
 
 
@@ -82,6 +84,10 @@ STYLE_MAPPINGS_ANSI = StyleMapping({
         '{}',
         color=ansi.Colors.YELLOW,
         attrs=[]),
+    text.TextTypes.PT_SUCCESS: text.TextAttributes(
+        '{}', color=ansi.Colors.GREEN),
+    text.TextTypes.PT_FAILURE: text.TextAttributes(
+        '{}', color=ansi.Colors.RED),
 })
 
 
@@ -114,6 +120,10 @@ STYLE_MAPPINGS_ANSI_256 = StyleMapping({
         '{}',
         color=ansi.Colors.COLOR_167,
         attrs=[]),
+    text.TextTypes.PT_SUCCESS: text.TextAttributes(
+        '{}', color=ansi.Colors.GREEN),
+    text.TextTypes.PT_FAILURE: text.TextAttributes(
+        '{}', color=ansi.Colors.RED),
 })
 
 
@@ -126,15 +136,19 @@ STYLE_MAPPINGS_TESTING = StyleMapping(dict([
         text.TextTypes.URI,
         text.TextTypes.URL,
         text.TextTypes.COMMAND,
-        text.TextTypes.INFO]]))
+        text.TextTypes.INFO,
+        text.TextTypes.PT_SUCCESS,
+        text.TextTypes.PT_FAILURE]]))
 
 
 def GetStyleMappings(console_attributes=None):
   """Gets the style mappings based on the console and user properties."""
   console_attributes = console_attributes or console_attr.GetConsoleAttr()
+  is_screen_reader = properties.VALUES.accessibility.screen_reader.GetBool()
   if properties.VALUES.core.color_theme.Get() == 'testing':
     return STYLE_MAPPINGS_TESTING
-  elif (console_attributes.SupportsAnsi() and
+  elif (not is_screen_reader and
+        console_attributes.SupportsAnsi() and
         properties.VALUES.core.color_theme.Get() != 'off'):
     if console_attributes._term == 'xterm-256color':  # pylint: disable=protected-access
       return STYLE_MAPPINGS_ANSI_256

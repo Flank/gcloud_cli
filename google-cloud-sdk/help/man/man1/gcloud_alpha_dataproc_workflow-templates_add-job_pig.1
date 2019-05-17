@@ -1,0 +1,127 @@
+
+.TH "GCLOUD_ALPHA_DATAPROC_WORKFLOW\-TEMPLATES_ADD\-JOB_PIG" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha dataproc workflow\-templates add\-job pig \- add a Pig job to the workflow template
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha dataproc workflow\-templates add\-job pig\fR \fB\-\-step\-id\fR=\fISTEP_ID\fR \fB\-\-workflow\-template\fR=\fIWORKFLOW_TEMPLATE\fR (\fB\-\-execute\fR=\fIQUERY\fR,\ \fB\-e\fR\ \fIQUERY\fR\ |\ \fB\-\-file\fR=\fIFILE\fR,\ \fB\-f\fR\ \fIFILE\fR) [\fB\-\-continue\-on\-failure\fR] [\fB\-\-driver\-log\-levels\fR=[\fIPACKAGE\fR=\fILEVEL\fR,...]] [\fB\-\-jars\fR=[\fIJAR\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-params\fR=[\fIPARAM\fR=\fIVALUE\fR,...]] [\fB\-\-properties\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-start\-after\fR=\fISTEP_ID\fR,[\fISTEP_ID\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Add a Pig job to the workflow template.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-step\-id\fR=\fISTEP_ID\fR
+The step ID of the job in the workflow template.
+
+.TP 2m
+\fB\-\-workflow\-template\fR=\fIWORKFLOW_TEMPLATE\fR
+The dataproc workflow template ID.
+
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-execute\fR=\fIQUERY\fR, \fB\-e\fR \fIQUERY\fR
+A Pig query to execute as part of the job.
+
+.TP 2m
+\fB\-\-file\fR=\fIFILE\fR, \fB\-f\fR \fIFILE\fR
+HCFS URI of file containing Pig script to execute as the job.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-continue\-on\-failure\fR
+Whether to continue if a single query fails.
+
+.TP 2m
+\fB\-\-driver\-log\-levels\fR=[\fIPACKAGE\fR=\fILEVEL\fR,...]
+A list of package to log4j log level pairs to configure driver logging. For
+example: root=FATAL,com.example=INFO
+
+.TP 2m
+\fB\-\-jars\fR=[\fIJAR\fR,...]
+Comma separated list of jar files to be provided to Pig and MR. May contain
+UDFs.
+
+.TP 2m
+\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of label KEY=VALUE pairs to add.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
+.TP 2m
+\fB\-\-params\fR=[\fIPARAM\fR=\fIVALUE\fR,...]
+A list of key value pairs to set variables in the Pig queries.
+
+.TP 2m
+\fB\-\-properties\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]
+A list of key value pairs to configure Pig.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
+independent resource namespace constrained to deploying instances into Compute
+Engine zones inside the region. The default value of \f5global\fR is a special
+multi\-region namespace which is capable of deploying instances into all Compute
+Engine zones globally, and is disjoint from other Cloud Dataproc regions.
+Overrides the default \fBdataproc/region\fR property value for this command
+invocation.
+
+.TP 2m
+\fB\-\-start\-after\fR=\fISTEP_ID\fR,[\fISTEP_ID\fR,...]
+(Optional) List of step IDs to start this job after.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
+
+.RS 2m
+$ gcloud dataproc workflow\-templates add\-job pig
+$ gcloud beta dataproc workflow\-templates add\-job pig
+.RE
+

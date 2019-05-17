@@ -1,0 +1,142 @@
+
+.TH "GCLOUD_ALPHA_DIALOGFLOW_AGENT_QUERY" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha dialogflow agent query \- send a text or audio conversational query to the agent of the current project
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha dialogflow agent query\fR (\fB\-\-query\-text\fR=\fIQUERY_TEXT\fR\ |\ \fB\-\-audio\-encoding\fR=\fIAUDIO_ENCODING\fR\ \fB\-\-query\-audio\-file\fR=\fIQUERY_AUDIO_FILE\fR\ \fB\-\-sample\-rate\fR=\fISAMPLE_RATE\fR) [\fB\-\-language\fR=\fILANGUAGE\fR;\ default="en"] [\fB\-\-session\fR=\fISESSION\fR;\ default="DEFAULT_SESSION"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Send a text or audio conversational query to the agent of the
+current project.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Exactly one of these must be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-query\-text\fR=\fIQUERY_TEXT\fR
+Conversational query in the form of text.
+
+.TP 2m
+
+Audio file and config:
+
+
+.RS 2m
+.TP 2m
+\fB\-\-audio\-encoding\fR=\fIAUDIO_ENCODING\fR
+Encoding of the audio file.
+
+See here for more information:
+https://cloud.google.com/dialogflow\-enterprise/docs/reference/rest/v2/projects.agent.sessions/detectIntent#AudioEncoding.
+
+\fIAUDIO_ENCODING\fR must be one of: \fBaudio\-encoding\-amr\fR,
+\fBaudio\-encoding\-amr\-wb\fR, \fBaudio\-encoding\-flac\fR,
+\fBaudio\-encoding\-linear\-16\fR, \fBaudio\-encoding\-mulaw\fR,
+\fBaudio\-encoding\-ogg\-opus\fR,
+\fBaudio\-encoding\-speex\-with\-header\-byte\fR,
+\fBaudio\-encoding\-unspecified\fR. This flag must be specified if any of the
+other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-query\-audio\-file\fR=\fIQUERY_AUDIO_FILE\fR
+Path to an audio file to use as a conversational query. This flag must be
+specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-sample\-rate\fR=\fISAMPLE_RATE\fR
+Sample rate of the audio file in Hertz. This flag must be specified if any of
+the other arguments in this group are specified.
+
+
+.RE
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-language\fR=\fILANGUAGE\fR; default="en"
+The language code of the query. For information on supported languages, see:
+https://dialogflow.com/docs/languages.
+
+.TP 2m
+\fB\-\-session\fR=\fISESSION\fR; default="DEFAULT_SESSION"
+ID of the session to send the query to. This can be any number or string up to
+36 bytes. By default, a different random ID will be used for every request.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBdialogflow/v2\fR API. The full documentation for this
+API can be found at: https://cloud.google.com/dialogflow\-enterprise/
+
+
+
+.SH "EXAMPLES"
+
+To query the agent of the current project with text:
+
+.RS 2m
+$ gcloud alpha dialogflow agent query \-\-query\-text="hi"
+.RE
+
+To query the agent of the current project with text in session
+\f5my\-session\fR:
+
+.RS 2m
+$ gcloud alpha dialogflow agent query \-\-session="my\-session" \e
+    \-\-query\-text="hi"
+.RE
+
+To query the agent of the current project with audio:
+
+.RS 2m
+$ gcloud alpha dialogflow agent query \e
+    \-\-query\-audio\-file="path/to/audio_file.wav" \e
+    \-\-sample\-rate="16000" \e
+    \-\-audio\-encoding="AUDIO_ENCODING_LINEAR_16"
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/.
+

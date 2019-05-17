@@ -1,0 +1,72 @@
+project:
+  name: project
+  collection: datacatalog.projects
+  attributes:
+  - &project
+    parameter_name: projectsId
+    attribute_name: project
+    help: |
+      Project of the {resource}.
+    property: core/project
+
+location:
+  name: location
+  collection: datacatalog.projects.locations
+  attributes:
+  - *project
+  - &location
+    parameter_name: locationsId
+    attribute_name: location
+    help: |
+      Location of the {resource}.
+
+entry_group:
+  name: entry group
+  collection: datacatalog.projects.locations.entryGroups
+  request_id_field: entryGroupId
+  attributes:
+  - *project
+  - *location
+  - &entry_group
+    parameter_name: entryGroupsId
+    attribute_name: entry-group
+    help: |
+      Entry group of the {resource}.
+
+entry:
+  name: entry
+  collection: datacatalog.projects.locations.entryGroups.entries
+  request_id_field: googleCloudDatacatalogV1beta1CreateEntryRequest.entryId
+  disable_auto_completers: true
+  attributes:
+  - *project
+  - *location
+  - *entry_group
+  - parameter_name: entriesId
+    attribute_name: entry
+    help: |
+      Entry of the {resource}.
+
+crawler:
+  name: crawler
+  collection: datacatalog.projects.crawlers
+  request_id_field: crawlerId
+  attributes:
+  - *project
+  - &crawler
+    parameter_name: crawlersId
+    attribute_name: crawler
+    help: |
+      The Cloud Data Catalog crawler for the {resource}.
+
+crawler_run:
+  name: crawler run
+  collection: datacatalog.projects.crawlers.crawlerRuns
+  attributes:
+  - *project
+  - *crawler
+  - &crawler_run
+    parameter_name: crawlerRunsId
+    attribute_name: crawler_run
+    help: |
+      The Cloud Data Catalog crawler run for the {resource}.

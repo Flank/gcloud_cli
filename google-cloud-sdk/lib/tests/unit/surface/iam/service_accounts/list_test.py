@@ -37,13 +37,13 @@ class ListTest(unit_test_base.BaseTest):
   def testPopulatedResponse(self):
     self.client.projects_serviceAccounts.List.Expect(
         request=self.msgs.IamProjectsServiceAccountsListRequest(
-            name='projects/test-project',
-            pageSize=100),
+            name='projects/test-project', pageSize=100),
         response=self.msgs.ListServiceAccountsResponse(accounts=[
             self.msgs.ServiceAccount(
                 displayName='Test Account',
                 email='test@test-project.iam.gserviceaccount.com',
                 uniqueId='000000001',
+                disabled=True,
                 projectId=self.Project()),
             self.msgs.ServiceAccount(
                 displayName='Example Account',
@@ -56,9 +56,12 @@ class ListTest(unit_test_base.BaseTest):
 
     self.AssertOutputContains('Test Account')
     self.AssertOutputContains('test@test-project.iam.gserviceaccount.com')
+    self.AssertOutputContains('DISABLED')
+    self.AssertOutputContains('True')
 
     self.AssertOutputContains('Example Account')
     self.AssertOutputContains('example@test-project.iam.gserviceaccount.com')
+    self.AssertOutputContains('False')
 
   def testLimitedResponse(self):
     self.client.projects_serviceAccounts.List.Expect(
@@ -81,6 +84,7 @@ class ListTest(unit_test_base.BaseTest):
 
     self.AssertOutputNotContains('Example Account')
     self.AssertOutputNotContains('example@test-project.iam.gserviceaccount.com')
+    self.AssertOutputContains('False')
 
   def testFilteredResponse(self):
     self.client.projects_serviceAccounts.List.Expect(
@@ -103,6 +107,57 @@ class ListTest(unit_test_base.BaseTest):
 
     self.AssertOutputContains('Example Account')
     self.AssertOutputContains('example@test-project.iam.gserviceaccount.com')
+    self.AssertOutputContains('False')
+
+  def testFilteredDisabledResponse(self):
+    self.client.projects_serviceAccounts.List.Expect(
+        request=self.msgs.IamProjectsServiceAccountsListRequest(
+            name='projects/test-project', pageSize=100),
+        response=self.msgs.ListServiceAccountsResponse(accounts=[
+            self.msgs.ServiceAccount(
+                displayName='Test Account',
+                email='test@test-project.iam.gserviceaccount.com',
+                disabled=True),
+            self.msgs.ServiceAccount(
+                displayName='Example Account',
+                email='example@test-project.iam.gserviceaccount.com'),
+        ]))
+
+    self.Run('beta iam service-accounts list --filter=disabled:True')
+
+    self.AssertOutputContains('Test Account')
+    self.AssertOutputContains('test@test-project.iam.gserviceaccount.com')
+    self.AssertOutputContains('DISABLED')
+    self.AssertOutputContains('True')
+
+    self.AssertOutputNotContains('Example Account')
+    self.AssertOutputNotContains('example@test-project.iam.gserviceaccount.com')
+    self.AssertOutputNotContains('False')
+
+  def testFilteredEnabledResponse(self):
+    self.client.projects_serviceAccounts.List.Expect(
+        request=self.msgs.IamProjectsServiceAccountsListRequest(
+            name='projects/test-project', pageSize=100),
+        response=self.msgs.ListServiceAccountsResponse(accounts=[
+            self.msgs.ServiceAccount(
+                displayName='Test Account',
+                email='test@test-project.iam.gserviceaccount.com',
+                disabled=True),
+            self.msgs.ServiceAccount(
+                displayName='Example Account',
+                email='example@test-project.iam.gserviceaccount.com'),
+        ]))
+
+    self.Run('beta iam service-accounts list --filter=disabled:False')
+
+    self.AssertOutputNotContains('Test Account')
+    self.AssertOutputNotContains('test@test-project.iam.gserviceaccount.com')
+    self.AssertOutputNotContains('True')
+
+    self.AssertOutputContains('Example Account')
+    self.AssertOutputContains('example@test-project.iam.gserviceaccount.com')
+    self.AssertOutputContains('DISABLED')
+    self.AssertOutputContains('False')
 
   def testBadLength(self):
     with self.AssertRaisesArgumentError():

@@ -49,10 +49,11 @@ invocation.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -72,6 +73,10 @@ gcloud help\fR for details.
 .TP 2m
 \fBpig\fR
 \fB(BETA)\fR Submit a Pig job to a cluster.
+
+.TP 2m
+\fBpresto\fR
+\fB(BETA)\fR Submit a Presto job to a cluster.
 
 .TP 2m
 \fBpyspark\fR
@@ -141,10 +146,11 @@ $ gcloud beta dataproc jobs submit hive \-\-cluster my_cluster \e
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
 $ gcloud dataproc jobs submit
+$ gcloud alpha dataproc jobs submit
 .RE
 

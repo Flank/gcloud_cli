@@ -17,8 +17,8 @@ gcloud alpha services vpc\-peerings connect \- connect to a service via VPC peer
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR This command connects a network to a service via VPC peering for a
-project.
+\fB(ALPHA)\fR This command connects a private service connection to a service
+via a VPC network.
 
 
 
@@ -31,7 +31,7 @@ The network in the current project to be peered with the service
 
 .TP 2m
 \fB\-\-ranges\fR=\fIRANGES\fR
-IP CIDR ranges for service to use.
+The names of IP CIDR ranges for service to use.
 
 
 .RE
@@ -55,10 +55,11 @@ The service to connect to
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -66,12 +67,12 @@ gcloud help\fR for details.
 
 To connect a network called \f5my\-network\fR on the current project to a
 service called \f5your\-service\fR with IP CIDR ranges
-\f510.197.0.0/20,10.198.0.0/20\fR for the service to use, run:
+\f5google\-range\-1,google\-range\-2\fR for the service to use, run:
 
 .RS 2m
 $ gcloud alpha services vpc\-peerings connect \-\-network my\-network \e
     \-\-service your\-service \e
-    \-\-ranges 10.197.0.0/20,10.198.0.0/20
+    \-\-ranges google\-range\-1,google\-range\-2
 .RE
 
 To run the same command asynchronously (non\-blocking), run:
@@ -79,7 +80,7 @@ To run the same command asynchronously (non\-blocking), run:
 .RS 2m
 $ gcloud alpha services vpc\-peerings connect \-\-network my\-network \e
     \-\-service your\-service \e
-    \-\-ranges 10.197.0.0/20,10.198.0.0/20 \-\-async
+    \-\-ranges google\-range\-1,google\-range\-2 \-\-async
 .RE
 
 
@@ -90,9 +91,10 @@ This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you will have to apply for early access and have your projects registered on the
 API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. This variant is also available:
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
+$ gcloud services vpc\-peerings connect
 $ gcloud beta services vpc\-peerings connect
 .RE
 

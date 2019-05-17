@@ -21,19 +21,16 @@ from __future__ import unicode_literals
 from apitools.base.py import encoding
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface import redis_test_base
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,
-                           calliope_base.ReleaseTrack.BETA,
-                           calliope_base.ReleaseTrack.GA])
-class ListTest(redis_test_base.UnitTestBase, parameterized.TestCase):
+class ListTestGA(redis_test_base.UnitTestBase):
 
-  def testList(self, track):
-    self.SetUpForTrack(track)
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def testList(self):
     expected_zones = ['zone1', 'zone2', 'zone3']
     expected_region_id = self.region_id
     expect_region = self._MakeRegion(expected_region_id, expected_zones)
@@ -49,8 +46,7 @@ class ListTest(redis_test_base.UnitTestBase, parameterized.TestCase):
         zone3  {region_id}
         """.format(region_id=expected_region_id), normalize_space=True)
 
-  def testList_MultipleRegions(self, track):
-    self.SetUpForTrack(track)
+  def testList_MultipleRegions(self):
     region1 = self._MakeRegion('region1', ['zone1a', 'zone1b', 'zone1c'])
     region2 = self._MakeRegion('region2', ['zone2a', 'zone2b'])
     region_no_zones = self._MakeRegion('region_no_zones')
@@ -68,8 +64,7 @@ class ListTest(redis_test_base.UnitTestBase, parameterized.TestCase):
         zone2b  region2
         """, normalize_space=True)
 
-  def testList_MultipleRegions_RegionFlag(self, track):
-    self.SetUpForTrack(track)
+  def testList_MultipleRegions_RegionFlag(self):
     region1 = self._MakeRegion('region1', ['zone1a', 'zone1b', 'zone1c'])
     region2 = self._MakeRegion('region2', ['zone2a', 'zone2b'])
     region_no_zones = self._MakeRegion('region_no_zones')
@@ -84,8 +79,7 @@ class ListTest(redis_test_base.UnitTestBase, parameterized.TestCase):
         zone2b  region2
         """, normalize_space=True)
 
-  def testList_NoRegionsHaveZones(self, track):
-    self.SetUpForTrack(track)
+  def testList_NoRegionsHaveZones(self):
     region1_nozones = self._MakeRegion('region1_nozones', [])
     region2_nozones = self._MakeRegion('region2_nozones', [])
     self._ExpectRegionsList([region1_nozones, region2_nozones])
@@ -94,8 +88,7 @@ class ListTest(redis_test_base.UnitTestBase, parameterized.TestCase):
 
     self.AssertOutputEquals('')
 
-  def testList_NoRegionsHaveMetadata(self, track):
-    self.SetUpForTrack(track)
+  def testList_NoRegionsHaveMetadata(self):
     region1_nometadata = self._MakeRegion('region1_nometadata')
     region2_nometadata = self._MakeRegion('region2_nometadata')
     self._ExpectRegionsList([region1_nometadata, region2_nometadata])
@@ -128,6 +121,17 @@ class ListTest(redis_test_base.UnitTestBase, parameterized.TestCase):
 
     return region
 
+
+class ListTestBeta(ListTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class ListTestAlpha(ListTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 if __name__ == '__main__':
   test_case.main()

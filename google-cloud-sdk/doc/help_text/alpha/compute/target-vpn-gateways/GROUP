@@ -1,16 +1,17 @@
 NAME
     gcloud alpha compute target-vpn-gateways - read and manipulate Google
-        Compute Engine VPN Gateways
+        Compute Engine Classic VPN Gateways
 
 SYNOPSIS
     gcloud alpha compute target-vpn-gateways COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Read and manipulate Google Compute Engine VPN Gateways.
+    (ALPHA) read and manipulate Classic VPN Gateways.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -18,19 +19,22 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        (ALPHA) Create a target VPN Gateway.
+        (ALPHA) Create a Cloud VPN Classic Target VPN Gateway.
 
      delete
-        (ALPHA) Delete target vpn gateways.
+        (ALPHA) Delete Cloud VPN Classic Target VPN Gateways.
 
      describe
-        (ALPHA) Describe a Google Compute Engine target vpn gateway.
+        (ALPHA) Describe a Google Compute Engine Cloud VPN Classic Target VPN
+        Gateway.
 
      list
-        (ALPHA) List Google Compute Engine target VPN gateways.
+        (ALPHA) List Google Compute Engine Cloud VPN Classic Target VPN
+        Gateways.
 
      update
-        (ALPHA) Update a Google Compute Engine target VPN gateway.
+        (ALPHA) Update a Google Compute Engine Cloud VPN Classic Target VPN
+        Gateway.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

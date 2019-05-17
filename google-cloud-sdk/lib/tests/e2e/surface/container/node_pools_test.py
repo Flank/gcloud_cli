@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -57,12 +57,10 @@ class NodePoolsTestGA(testbase.IntegrationTestBase):
                          .format(self.cluster_name, location_flag))
     self.assertTrue(node_pool.management.autoUpgrade)
 
-  @test_case.Filters.skip('Failing', 'b/121028601')
   def testNodePoolsUpdateZone(self):
     self.NodePoolsUpdate('--zone=' + self.ZONE, 'test-pool',
                          self.releasetrack)
 
-  @test_case.Filters.skip('Failing', 'b/121028601')
   def testNodePoolsUpdateRegion(self):
     self.NodePoolsUpdate('--region=' + self.REGION,
                          'test-pool-region', self.releasetrack)

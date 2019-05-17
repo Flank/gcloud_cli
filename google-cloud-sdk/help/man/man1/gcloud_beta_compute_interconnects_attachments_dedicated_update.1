@@ -11,7 +11,7 @@ gcloud beta compute interconnects attachments dedicated update \- update a Googl
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute interconnects attachments dedicated update\fR \fINAME\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-admin\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute interconnects attachments dedicated update\fR \fINAME\fR [\fB\-\-bandwidth\fR=\fIBANDWIDTH\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-admin\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -38,6 +38,45 @@ Name of the interconnect attachment to patch.
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-bandwidth\fR=\fIBANDWIDTH\fR
+Provisioned capacity of the attachment. \fIBANDWIDTH\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fB50m\fR
+50 Mbit/s
+.TP 2m
+\fB100m\fR
+100 Mbit/s
+.TP 2m
+\fB200m\fR
+200 Mbit/s
+.TP 2m
+\fB300m\fR
+300 Mbit/s
+.TP 2m
+\fB400m\fR
+400 Mbit/s
+.TP 2m
+\fB500m\fR
+500 Mbit/s
+.TP 2m
+\fB1g\fR
+1 Gbit/s
+.TP 2m
+\fB2g\fR
+2 Gbit/s
+.TP 2m
+\fB5g\fR
+5 Gbit/s
+.TP 2m
+\fB10g\fR
+10 Gbit/s
+.RE
+.sp
+
+
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
 Human\-readable plain\-text description of attachment.
@@ -120,10 +159,11 @@ List of label keys to remove. If a label does not exist it is silently ignored.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

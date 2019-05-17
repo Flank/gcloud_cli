@@ -1,12 +1,12 @@
 title: Create a managed zone with private visibility
-release_tracks: [BETA]
+release_tracks: [BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: dns managed-zones create $$zone$$ --dns-name $$zone$$.com --description
       ZONE! --visibility private --networks ''
   - stderr: |
-      Created [https://www.googleapis.com/dns/v1beta2/projects/cloud-sdk-integration-testing/managedZones/$$zone$$].
+      Created [https://www.googleapis.com/dns/$$api-version$$/projects/cloud-sdk-integration-testing/managedZones/$$zone$$].
 - execute:
   - command: dns managed-zones update $$zone$$ --description ZONE!!!! --networks default
 - execute:
@@ -20,12 +20,18 @@ summary:
 - execute:
   - command: dns managed-zones delete $$zone$$
   - stderr: |
-      Deleted [https://www.googleapis.com/dns/v1beta2/projects/cloud-sdk-integration-testing/managedZones/$$zone$$].
+      Deleted [https://www.googleapis.com/dns/$$api-version$$/projects/cloud-sdk-integration-testing/managedZones/$$zone$$].
 actions:
 
 - generate_resource_id:
     reference: zone
     prefix: managed-zones
+
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1
+      BETA: v1beta2
 
 - execute_command:
     command: dns managed-zones create $$zone$$ --dns-name $$zone$$.com --description
@@ -33,7 +39,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/dns/v1beta2/projects/cloud-sdk-integration-testing/managedZones?alt=json
+          uri: https://www.googleapis.com/dns/$$api-version$$/projects/cloud-sdk-integration-testing/managedZones?alt=json
           method: POST
           headers: {}
           body:
@@ -48,20 +54,20 @@ actions:
             cache-control: private
             content-length: '330'
             content-type: application/json; charset=UTF-8
-            etag: 5de6556150ebfb660000016678f803c3
+            etag: 4283226b5e61271e000001699bb77f6b
             status: '200'
           body:
             name: $$zone$$
             dnsName: $$zone$$.com.
             description: ZONE!
-            id: '6766189366628580198'
+            id: '4792712272992610078'
             nameServers:
             - ns-gcp-private.googledomains.com.
-            creationTime: '2018-10-15T18:23:31.779Z'
+            creationTime: '2019-03-20T15:28:08.043Z'
             visibility: private
             kind: dns#managedZone
     - expect_stderr: |
-        Created [https://www.googleapis.com/dns/v1beta2/projects/cloud-sdk-integration-testing/managedZones/$$zone$$].
+        Created [https://www.googleapis.com/dns/$$api-version$$/projects/cloud-sdk-integration-testing/managedZones/$$zone$$].
     - expect_exit:
         code: 0
 
@@ -70,7 +76,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/dns/v1beta2/projects/cloud-sdk-integration-testing/managedZones/$$zone$$?alt=json
+          uri: https://www.googleapis.com/dns/$$api-version$$/projects/cloud-sdk-integration-testing/managedZones/$$zone$$?alt=json
           method: PATCH
           headers: {}
           body:
@@ -87,8 +93,8 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            id: 08e8d4d0-ae7a-48b0-8a91-b60961d8c40f
-            startTime: '2018-10-15T18:23:33.817Z'
+            id: f0f2a095-6731-4b3f-856e-c5f69747c287
+            startTime: '2019-03-20T15:28:09.810Z'
             status: done
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             type: UPDATE
@@ -97,20 +103,20 @@ actions:
                 name: $$zone$$
                 dnsName: $$zone$$.com.
                 description: ZONE!
-                id: '6766189366628580198'
+                id: '4792712272992610078'
                 nameServers:
                 - ns-gcp-private.googledomains.com.
-                creationTime: '2018-10-15T18:23:31.779Z'
+                creationTime: '2019-03-20T15:28:08.043Z'
                 visibility: private
                 kind: dns#managedZone
               newValue:
                 name: $$zone$$
                 dnsName: $$zone$$.com.
                 description: ZONE!!!!
-                id: '6766189366628580198'
+                id: '4792712272992610078'
                 nameServers:
                 - ns-gcp-private.googledomains.com.
-                creationTime: '2018-10-15T18:23:31.779Z'
+                creationTime: '2019-03-20T15:28:08.043Z'
                 visibility: private
                 privateVisibilityConfig:
                   networks:
@@ -127,7 +133,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/dns/v1beta2/projects/cloud-sdk-integration-testing/managedZones/$$zone$$?alt=json
+          uri: https://www.googleapis.com/dns/$$api-version$$/projects/cloud-sdk-integration-testing/managedZones/$$zone$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -136,16 +142,16 @@ actions:
             cache-control: private
             content-length: '653'
             content-type: application/json; charset=UTF-8
-            etag: 5de6556150ebfb660000016678f80607
+            etag: 4283226b5e61271e000001699bb78191
             status: '200'
           body:
             name: $$zone$$
             dnsName: $$zone$$.com.
             description: ZONE!!!!
-            id: '6766189366628580198'
+            id: '4792712272992610078'
             nameServers:
             - ns-gcp-private.googledomains.com.
-            creationTime: '2018-10-15T18:23:31.779Z'
+            creationTime: '2019-03-20T15:28:08.043Z'
             visibility: private
             privateVisibilityConfig:
               networks:
@@ -168,7 +174,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/dns/v1beta2/projects/cloud-sdk-integration-testing/managedZones/$$zone$$?alt=json
+          uri: https://www.googleapis.com/dns/$$api-version$$/projects/cloud-sdk-integration-testing/managedZones/$$zone$$?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -178,8 +184,9 @@ actions:
             content-length: '3'
             content-type: application/json; charset=UTF-8
             status: '200'
-          body: {}
+          body: |
+            {}
     - expect_stderr: |
-        Deleted [https://www.googleapis.com/dns/v1beta2/projects/cloud-sdk-integration-testing/managedZones/$$zone$$].
+        Deleted [https://www.googleapis.com/dns/$$api-version$$/projects/cloud-sdk-integration-testing/managedZones/$$zone$$].
     - expect_exit:
         code: 0

@@ -124,7 +124,8 @@ class ScpTest(ScpBaseTest):
         port=None,
         recursive=False,
         compress=False,
-        options=dict(self.options, HostKeyAlias='compute.11111'))
+        options=dict(self.options, HostKeyAlias='compute.11111'),
+        iap_tunnel_args=None)
 
     self.scp_run.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SCPCommand),
@@ -171,7 +172,8 @@ class ScpTest(ScpBaseTest):
         port=None,
         recursive=False,
         compress=False,
-        options=None)
+        options=None,
+        iap_tunnel_args=None)
 
     self.scp_run.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SCPCommand),
@@ -221,7 +223,8 @@ class ScpTest(ScpBaseTest):
         port=None,
         recursive=False,
         compress=False,
-        options=dict(self.options, HostKeyAlias='compute.11111'))
+        options=dict(self.options, HostKeyAlias='compute.11111'),
+        iap_tunnel_args=None)
 
     scp_build.assert_called_once_with(self.env)
 
@@ -265,7 +268,8 @@ class ScpTest(ScpBaseTest):
         port='2222',
         recursive=True,
         compress=True,
-        options=dict(self.options, HostKeyAlias='compute.11111'))
+        options=dict(self.options, HostKeyAlias='compute.11111'),
+        iap_tunnel_args=None)
 
     self.scp_run.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SCPCommand),
@@ -320,7 +324,8 @@ class ScpTest(ScpBaseTest):
         identity_file=self.private_key_file,
         max_wait_ms=ssh_utils.SSH_KEY_PROPAGATION_TIMEOUT_SEC,
         options=dict(self.options, HostKeyAlias='compute.11111'),
-        extra_flags=None)
+        extra_flags=None,
+        iap_tunnel_args=None)
     self.poller_poll.assert_called_once()
 
     # SCP Command
@@ -333,7 +338,8 @@ class ScpTest(ScpBaseTest):
         port=None,
         recursive=False,
         compress=False,
-        options=dict(self.options, HostKeyAlias='compute.11111'))
+        options=dict(self.options, HostKeyAlias='compute.11111'),
+        iap_tunnel_args=None)
 
     self.scp_run.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SCPCommand),
@@ -390,7 +396,8 @@ class ScpTest(ScpBaseTest):
         identity_file=self.private_key_file,
         max_wait_ms=ssh_utils.SSH_KEY_PROPAGATION_TIMEOUT_SEC,
         options=dict(self.options, HostKeyAlias='compute.11111'),
-        extra_flags=None)
+        extra_flags=None,
+        iap_tunnel_args=None)
     self.poller_poll.assert_called_once()
 
     self.scp_run.assert_not_called()
@@ -470,7 +477,8 @@ class ScpTest(ScpBaseTest):
         port=None,
         recursive=False,
         compress=False,
-        options=dict(self.options, HostKeyAlias='compute.11111'))
+        options=dict(self.options, HostKeyAlias='compute.11111'),
+        iap_tunnel_args=None)
 
   def testWithManyRemoteFilesToLocalDestination(self):
     self.make_requests.side_effect = iter([
@@ -516,7 +524,8 @@ class ScpTest(ScpBaseTest):
         port=None,
         recursive=False,
         compress=False,
-        options=dict(self.options, HostKeyAlias='compute.11111'))
+        options=dict(self.options, HostKeyAlias='compute.11111'),
+        iap_tunnel_args=None)
 
     self.scp_run.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SCPCommand),
@@ -626,7 +635,8 @@ class ScpTest(ScpBaseTest):
         port=None,
         recursive=False,
         compress=False,
-        options=dict(self.options, HostKeyAlias='compute.11111'))
+        options=dict(self.options, HostKeyAlias='compute.11111'),
+        iap_tunnel_args=None)
 
     self.scp_run.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SCPCommand),
@@ -714,7 +724,8 @@ class ScpOsloginTest(test_base.BaseSSHTest):
         port=None,
         recursive=False,
         compress=False,
-        options=dict(self.options, HostKeyAlias='compute.44444'))
+        options=dict(self.options, HostKeyAlias='compute.44444'),
+        iap_tunnel_args=None)
 
     self.scp_run.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SCPCommand),
@@ -773,7 +784,8 @@ class SCPPrivateIpTest(test_base.BaseSSHTest, parameterized.TestCase):
         port=None,
         recursive=False,
         compress=False,
-        options=dict(self.options, HostKeyAlias='compute.33333'))
+        options=dict(self.options, HostKeyAlias='compute.33333'),
+        iap_tunnel_args=None)
 
     self.ssh_init.assert_has_calls(
         [
@@ -801,12 +813,7 @@ class ScpTunnelThroughIapTestBeta(ScpBaseTest, parameterized.TestCase):
 
   @parameterized.parameters((_INSTANCE_WITH_EXTERNAL_IP_ADDRESS_KEY,),
                             (_INSTANCE_WITHOUT_EXTERNAL_IP_ADDRESS_KEY,))
-  @mock.patch.object(iap_tunnel, 'IapTunnelConnectionHelper', autospec=True)
-  def testSimpleCase(self, test_instance_key, helper_cls_mock):
-    helper_mock = mock.MagicMock()
-    helper_mock.GetLocalPort.return_value = 8822
-    helper_cls_mock.return_value = helper_mock
-
+  def testSimpleCase(self, test_instance_key):
     test_instance = self.instances[test_instance_key]
     self.make_requests.side_effect = iter([
         [test_instance],
@@ -829,12 +836,6 @@ class ScpTunnelThroughIapTestBeta(ScpBaseTest, parameterized.TestCase):
               project='my-project'))],
     )
 
-    # IAP Tunnel Connection Helpers
-    helper_cls_mock.assert_called_once_with(
-        mock.ANY, 'my-project', 'zone-1', test_instance.name, 'nic0', 22)
-    helper_mock.StartListener.assert_called_once_with()
-    helper_mock.StopListener.assert_called_once_with()
-
     # Require SSH keys
     self.ensure_keys.assert_called_once_with(
         self.keys, None, allow_passphrase=True)
@@ -842,9 +843,17 @@ class ScpTunnelThroughIapTestBeta(ScpBaseTest, parameterized.TestCase):
     # No polling
     self.poller_poll.assert_not_called()
 
+    expected_tunnel_args = iap_tunnel.SshTunnelArgs()
+    expected_tunnel_args.track = self.track.prefix
+    expected_tunnel_args.project = 'my-project'
+    expected_tunnel_args.zone = 'zone-1'
+    expected_tunnel_args.instance = test_instance.name
+    expected_tunnel_args.interface = 'nic0'
+
     # SCP Command
     remote_file = ssh.FileReference(
-        '~/remote-file', remote=ssh.Remote.FromArg('me@localhost'))
+        '~/remote-file',
+        remote=ssh.Remote.FromArg('me@compute.%s' % test_instance.id))
     local_dir = ssh.FileReference('~/local-dir')
     self.scp_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SCPCommand),
@@ -852,11 +861,12 @@ class ScpTunnelThroughIapTestBeta(ScpBaseTest, parameterized.TestCase):
         local_dir,
         identity_file=self.private_key_file,
         extra_flags=[],
-        port='8822',
+        port=None,
         recursive=False,
         compress=False,
         options=dict(self.options,
-                     HostKeyAlias='compute.%s' % test_instance.id))
+                     HostKeyAlias='compute.%s' % test_instance.id),
+        iap_tunnel_args=expected_tunnel_args)
 
     self.scp_run.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SCPCommand),
@@ -864,14 +874,7 @@ class ScpTunnelThroughIapTestBeta(ScpBaseTest, parameterized.TestCase):
 
   @parameterized.parameters((_INSTANCE_WITH_EXTERNAL_IP_ADDRESS_KEY,),
                             (_INSTANCE_WITHOUT_EXTERNAL_IP_ADDRESS_KEY,))
-  @mock.patch.object(iap_tunnel, 'IapTunnelConnectionHelper', autospec=True)
-  def testWithAlternateUser(self, test_instance_key, helper_cls_mock):
-    helper_mock = mock.MagicMock()
-    helper_mock.GetLocalPort.return_value = 8822
-    helper_poller_mock = mock.MagicMock()
-    helper_poller_mock.GetLocalPort.return_value = 9922
-    helper_cls_mock.side_effect = [helper_mock, helper_poller_mock]
-
+  def testWithAlternateUser(self, test_instance_key):
     project_resource = self.messages.Project(
         name='my-project',
     )
@@ -909,16 +912,15 @@ class ScpTunnelThroughIapTestBeta(ScpBaseTest, parameterized.TestCase):
               project='my-project'))],
     )
 
-    # IAP Tunnel Connection Helpers
-    self.assertEqual(helper_cls_mock.call_count, 2)
-    helper_mock.StartListener.assert_called_once_with()
-    helper_mock.StopListener.assert_called_once_with()
-    helper_poller_mock.StartListener.assert_called_once_with(
-        accept_multiple_connections=True)
-    helper_poller_mock.StopListener.assert_called_once_with()
+    expected_tunnel_args = iap_tunnel.SshTunnelArgs()
+    expected_tunnel_args.track = self.track.prefix
+    expected_tunnel_args.project = 'my-project'
+    expected_tunnel_args.zone = 'zone-1'
+    expected_tunnel_args.instance = test_instance.name
+    expected_tunnel_args.interface = 'nic0'
 
     # Polling
-    remote = ssh.Remote.FromArg('hapoo@localhost')
+    remote = ssh.Remote.FromArg('hapoo@compute.%s' % test_instance.id)
     self.poller_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHPoller),
         remote=remote,
@@ -927,7 +929,7 @@ class ScpTunnelThroughIapTestBeta(ScpBaseTest, parameterized.TestCase):
         options=dict(self.options,
                      HostKeyAlias='compute.%s' % test_instance.id),
         extra_flags=None,
-        port='9922')
+        iap_tunnel_args=expected_tunnel_args)
     self.poller_poll.assert_called_once()
 
     # SCP Command
@@ -938,11 +940,12 @@ class ScpTunnelThroughIapTestBeta(ScpBaseTest, parameterized.TestCase):
         ssh.FileReference('~/local-dir'),
         identity_file=self.private_key_file,
         extra_flags=[],
-        port='8822',
+        port=None,
         recursive=False,
         compress=False,
         options=dict(self.options,
-                     HostKeyAlias='compute.%s' % test_instance.id))
+                     HostKeyAlias='compute.%s' % test_instance.id),
+        iap_tunnel_args=expected_tunnel_args)
 
     self.scp_run.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SCPCommand),
@@ -950,14 +953,7 @@ class ScpTunnelThroughIapTestBeta(ScpBaseTest, parameterized.TestCase):
 
   @parameterized.parameters((_INSTANCE_WITH_EXTERNAL_IP_ADDRESS_KEY,),
                             (_INSTANCE_WITHOUT_EXTERNAL_IP_ADDRESS_KEY,))
-  @mock.patch.object(iap_tunnel, 'IapTunnelConnectionHelper', autospec=True)
-  def testWithPollingTimeout(self, test_instance_key, helper_cls_mock):
-    helper_mock = mock.MagicMock()
-    helper_mock.GetLocalPort.return_value = 8822
-    helper_poller_mock = mock.MagicMock()
-    helper_poller_mock.GetLocalPort.return_value = 9922
-    helper_cls_mock.side_effect = [helper_mock, helper_poller_mock]
-
+  def testWithPollingTimeout(self, test_instance_key):
     self.poller_poll.side_effect = retry.WaitException('msg', 'result', 'state')
     project_resource = self.messages.Project(
         name='my-project',
@@ -998,16 +994,15 @@ class ScpTunnelThroughIapTestBeta(ScpBaseTest, parameterized.TestCase):
               project='my-project'))],
     )
 
-    # IAP Tunnel Connection Helpers
-    self.assertEqual(helper_cls_mock.call_count, 2)
-    helper_mock.StartListener.assert_called_once_with()
-    helper_mock.StopListener.assert_called_once_with()
-    helper_poller_mock.StartListener.assert_called_once_with(
-        accept_multiple_connections=True)
-    helper_poller_mock.StopListener.assert_called_once_with()
+    expected_tunnel_args = iap_tunnel.SshTunnelArgs()
+    expected_tunnel_args.track = self.track.prefix
+    expected_tunnel_args.project = 'my-project'
+    expected_tunnel_args.zone = 'zone-1'
+    expected_tunnel_args.instance = test_instance.name
+    expected_tunnel_args.interface = 'nic0'
 
     # Polling
-    remote = ssh.Remote.FromArg('hapoo@localhost')
+    remote = ssh.Remote.FromArg('hapoo@compute.%s' % test_instance.id)
     self.poller_init.assert_called_once_with(
         mock_matchers.TypeMatcher(ssh.SSHPoller),
         remote=remote,
@@ -1016,7 +1011,7 @@ class ScpTunnelThroughIapTestBeta(ScpBaseTest, parameterized.TestCase):
         options=dict(self.options,
                      HostKeyAlias='compute.%s' % test_instance.id),
         extra_flags=None,
-        port='9922')
+        iap_tunnel_args=expected_tunnel_args)
     self.poller_poll.assert_called_once()
 
     self.scp_run.assert_not_called()

@@ -281,7 +281,20 @@ class EventsTest(test_case.TestCase, parameterized.TestCase):
          'body': {'json': {}}},
         backing_data['api_call']['expect_response'])
 
-  def testApiCallExtractRef(self):
+  def testRequestExtractRef(self):
+    e = events.HTTPAssertion.ForRequest(
+        {'extract_references': [
+            {'field': 'name', 'reference': 'operation'},
+            {'field': 'name', 'reference': 'operation-base',
+             'modifiers': {'basename': True}}
+        ]})
+
+    rrr = reference_resolver.ResourceReferenceResolver()
+    e.ExtractReferences(rrr, '{"name": "foo/bar/my-op"}')
+    self.assertEqual(rrr._extracted_ids,
+                     {'operation': 'foo/bar/my-op', 'operation-base': 'my-op'})
+
+  def testResponseExtractRef(self):
     e = events.HTTPAssertion.ForResponse(
         {'extract_references': [
             {'field': 'name', 'reference': 'operation'},

@@ -8,21 +8,28 @@ DESCRIPTION
     with projections can be used to format and change the default output to a
     more meaningful result.
 
-    To change the default output format of a command, use the --format flag.
-    For details run $ gcloud topic formats.
+    Use the --format flag to change the default output format of a command. For
+    details run $ gcloud topic formats.
 
-    To select resources to be listed, use the --filter flag. Resource filters
+    Use the --filter flag to select resources to be listed. Resource filters
     are described in detail below.
 
-    To reach resource items through a unique path of names from the root, use
-    resource-keys. For details run $ gcloud topic resource-keys.
+    Use resource-keys to reach resource items through a unique path of names
+    from the root. For details run $ gcloud topic resource-keys.
 
-    To list a subset of resource keys in a resource, use projections. For
+    Use projections to list a subset of resource keys in a resource. For
     details run $ gcloud topic projections.
+
+    Note: To refer to a list of fields you can sort, filter, and format by for
+    each resource, you can run a list command with the format set to text or
+    json. For example, $ gcloud compute instances list --limit=1 --format=text.
 
     To work through an interactive tutorial about using the filter and format
     flags instead, see:
     https://console.cloud.google.com/cloudshell/open?git_repo=https://github.com/GoogleCloudPlatform/cloud-shell-tutorials&page=editor&tutorial=cloudsdk/tutorial.md
+
+    Note: Depending on the specific server API, filtering may be done entirely
+    by the client, entirely by the server, or by a combination of both.
 
   Filter Expressions
     A filter expression is a Boolean function that selects the resources to
@@ -195,7 +202,8 @@ EXAMPLES
     For more about ISO8601 durations, see:
     https://en.wikipedia.org/wiki/ISO_8601
 
-    This table shows : operator pattern matching:
+    The table below shows examples of pattern matching if used with the :
+    operator:
 
       PATTERN  VALUE        MATCHES  DEPRECATED_MATCHES
       abc*     abcpdqxyz    True     True

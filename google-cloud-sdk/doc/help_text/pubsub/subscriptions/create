@@ -5,7 +5,9 @@ NAME
 SYNOPSIS
     gcloud pubsub subscriptions create SUBSCRIPTION [SUBSCRIPTION ...]
         (--topic=TOPIC : --topic-project=TOPIC_PROJECT)
-        [--ack-deadline=ACK_DEADLINE] [--push-endpoint=PUSH_ENDPOINT]
+        [--ack-deadline=ACK_DEADLINE] [--expiration-period=EXPIRATION_PERIOD]
+        [--message-retention-duration=MESSAGE_RETENTION_DURATION]
+        [--push-endpoint=PUSH_ENDPOINT] [--retain-acked-messages]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -44,13 +46,37 @@ OPTIONAL FLAGS
         The number of seconds the system will wait for a subscriber to
         acknowledge receiving a message before re-attempting delivery.
 
+     --expiration-period=EXPIRATION_PERIOD
+        The subscription will expire if it is inactive for the given period.
+        Valid values are strings of the form INTEGER[UNIT], where UNIT is one
+        of "s", "m", "h", and "d" for seconds, minutes, hours, and days,
+        respectively. If the unit is omitted, seconds is assumed. This flag
+        additionally accepts the special value "never" to indicate that the
+        subscription will never expire.
+
+     --message-retention-duration=MESSAGE_RETENTION_DURATION
+        How long to retain unacknowledged messages in the subscription's
+        backlog, from the moment a message is published. If
+        --retain-acked-messages is true, this also configures the retention of
+        acknowledged messages. The default value is 7 days, the minimum is 10
+        minutes, and the maximum is 7 days. Valid values are strings of the
+        form INTEGER[UNIT], where UNIT is one of "s", "m", "h", and "d" for
+        seconds, minutes, hours, and days, respectively. If the unit is
+        omitted, seconds is assumed.
+
      --push-endpoint=PUSH_ENDPOINT
         A URL to use as the endpoint for this subscription. This will also
         automatically set the subscription type to PUSH.
 
+     --retain-acked-messages
+        Whether or not to retain acknowledged messages. If true, messages are
+        not expunged from the subscription's backlog until they fall out of the
+        --message-retention-duration window.
+
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

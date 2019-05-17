@@ -27,7 +27,10 @@ _CLASSNAME = 'com.google.appengine.tools.KickStart'
 
 # Additional arguments, comes before sys.argv.
 # The KickStart main class accepts this classname as its first arg
-_ARGS = ['com.google.appengine.tools.development.DevAppServerMain']
+_ARGS = [
+    'com.google.appengine.tools.development.DevAppServerMain',
+    '--promote_yaml'
+]
 
 
 def main():

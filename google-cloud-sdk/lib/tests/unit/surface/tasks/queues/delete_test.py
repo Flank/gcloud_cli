@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.tasks import app
 from googlecloudsdk.command_lib.tasks import constants
@@ -102,6 +103,12 @@ class QueuesDeleteTest(test_base.CloudTasksTestBase, test_case.WithInput):
     self.assertIsNone(output)
     self.AssertErrContains(constants.QUEUE_MANAGEMENT_WARNING)
     self.AssertErrContains('Deleted queue [my-queue].')
+
+
+class QueuesDeleteTestBeta(QueuesDeleteTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 if __name__ == '__main__':

@@ -1,0 +1,46 @@
+NAME
+    gcloud alpha dataproc jobs delete - delete the record of an inactive job
+
+SYNOPSIS
+    gcloud alpha dataproc jobs delete JOB [--region=REGION]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Delete the record of an inactive job.
+
+POSITIONAL ARGUMENTS
+     JOB
+        The ID of the job to delete.
+
+FLAGS
+     --region=REGION
+        Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
+        independent resource namespace constrained to deploying instances into
+        Compute Engine zones inside the region. The default value of global is
+        a special multi-region namespace which is capable of deploying
+        instances into all Compute Engine zones globally, and is disjoint from
+        other Cloud Dataproc regions. Overrides the default dataproc/region
+        property value for this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+EXAMPLES
+    To delete the record of a job, run:
+
+        $ gcloud alpha dataproc jobs delete job_id
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
+
+        $ gcloud dataproc jobs delete
+        $ gcloud beta dataproc jobs delete
+

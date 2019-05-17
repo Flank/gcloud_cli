@@ -61,6 +61,7 @@ class ComputeV1(base_api.BaseApiClient):
     self.licenseCodes = self.LicenseCodesService(self)
     self.licenses = self.LicensesService(self)
     self.machineTypes = self.MachineTypesService(self)
+    self.networkEndpointGroups = self.NetworkEndpointGroupsService(self)
     self.networks = self.NetworksService(self)
     self.nodeGroups = self.NodeGroupsService(self)
     self.nodeTemplates = self.NodeTemplatesService(self)
@@ -271,7 +272,7 @@ class ComputeV1(base_api.BaseApiClient):
     )
 
     def Insert(self, request, global_params=None):
-      r"""Creates an address resource in the specified project using the data included in the request.
+      r"""Creates an address resource in the specified project by using the data included in the request.
 
       Args:
         request: (ComputeAddressesInsertRequest) input message
@@ -1807,7 +1808,7 @@ class ComputeV1(base_api.BaseApiClient):
     )
 
     def Insert(self, request, global_params=None):
-      r"""Creates an address resource in the specified project using the data included in the request.
+      r"""Creates an address resource in the specified project by using the data included in the request.
 
       Args:
         request: (ComputeGlobalAddressesInsertRequest) input message
@@ -3509,7 +3510,7 @@ If the group is part of a backend service that has enabled connection draining, 
           }
 
     def Delete(self, request, global_params=None):
-      r"""Deletes the specified instance template. Deleting an instance template is permanent and cannot be undone. It's not possible to delete templates which are in use by an instance group.
+      r"""Deletes the specified instance template. Deleting an instance template is permanent and cannot be undone. It is not possible to delete templates that are already in use by a managed instance group.
 
       Args:
         request: (ComputeInstanceTemplatesDeleteRequest) input message
@@ -3613,7 +3614,7 @@ If the group is part of a backend service that has enabled connection draining, 
     )
 
     def List(self, request, global_params=None):
-      r"""Retrieves a list of instance templates that are contained within the specified project and zone.
+      r"""Retrieves a list of instance templates that are contained within the specified project.
 
       Args:
         request: (ComputeInstanceTemplatesListRequest) input message
@@ -3934,6 +3935,32 @@ If the group is part of a backend service that has enabled connection draining, 
         supports_download=False,
     )
 
+    def GetShieldedInstanceIdentity(self, request, global_params=None):
+      r"""Returns the Shielded Instance Identity of an instance.
+
+      Args:
+        request: (ComputeInstancesGetShieldedInstanceIdentityRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (ShieldedInstanceIdentity) The response message.
+      """
+      config = self.GetMethodConfig('GetShieldedInstanceIdentity')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    GetShieldedInstanceIdentity.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.instances.getShieldedInstanceIdentity',
+        ordered_params=[u'project', u'zone', u'instance'],
+        path_params=[u'instance', u'project', u'zone'],
+        query_params=[],
+        relative_path=u'projects/{project}/zones/{zone}/instances/{instance}/getShieldedInstanceIdentity',
+        request_field='',
+        request_type_name=u'ComputeInstancesGetShieldedInstanceIdentityRequest',
+        response_type_name=u'ShieldedInstanceIdentity',
+        supports_download=False,
+    )
+
     def Insert(self, request, global_params=None):
       r"""Creates an instance resource in the specified project using the data included in the request.
 
@@ -4013,7 +4040,7 @@ If the group is part of a backend service that has enabled connection draining, 
     )
 
     def Reset(self, request, global_params=None):
-      r"""Performs a reset on the instance. For more information, see Resetting an instance.
+      r"""Performs a reset on the instance. This is a hard reset the VM does not do a graceful shutdown. For more information, see Resetting an instance.
 
       Args:
         request: (ComputeInstancesResetRequest) input message
@@ -4298,6 +4325,32 @@ If the group is part of a backend service that has enabled connection draining, 
         supports_download=False,
     )
 
+    def SetShieldedInstanceIntegrityPolicy(self, request, global_params=None):
+      r"""Sets the Shielded Instance integrity policy for an instance. You can only use this method on a running instance. This method supports PATCH semantics and uses the JSON merge patch format and processing rules.
+
+      Args:
+        request: (ComputeInstancesSetShieldedInstanceIntegrityPolicyRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('SetShieldedInstanceIntegrityPolicy')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    SetShieldedInstanceIntegrityPolicy.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'PATCH',
+        method_id=u'compute.instances.setShieldedInstanceIntegrityPolicy',
+        ordered_params=[u'project', u'zone', u'instance'],
+        path_params=[u'instance', u'project', u'zone'],
+        query_params=[u'requestId'],
+        relative_path=u'projects/{project}/zones/{zone}/instances/{instance}/setShieldedInstanceIntegrityPolicy',
+        request_field=u'shieldedInstanceIntegrityPolicy',
+        request_type_name=u'ComputeInstancesSetShieldedInstanceIntegrityPolicyRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
     def SetTags(self, request, global_params=None):
       r"""Sets network tags for the specified instance to the data included in the request.
 
@@ -4502,6 +4555,32 @@ If the group is part of a backend service that has enabled connection draining, 
         relative_path=u'projects/{project}/zones/{zone}/instances/{instance}/updateNetworkInterface',
         request_field=u'networkInterfaceResource',
         request_type_name=u'ComputeInstancesUpdateNetworkInterfaceRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def UpdateShieldedInstanceConfig(self, request, global_params=None):
+      r"""Updates the Shielded Instance config for an instance. You can only use this method on a stopped instance. This method supports PATCH semantics and uses the JSON merge patch format and processing rules.
+
+      Args:
+        request: (ComputeInstancesUpdateShieldedInstanceConfigRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('UpdateShieldedInstanceConfig')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    UpdateShieldedInstanceConfig.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'PATCH',
+        method_id=u'compute.instances.updateShieldedInstanceConfig',
+        ordered_params=[u'project', u'zone', u'instance'],
+        path_params=[u'instance', u'project', u'zone'],
+        query_params=[u'requestId'],
+        relative_path=u'projects/{project}/zones/{zone}/instances/{instance}/updateShieldedInstanceConfig',
+        request_field=u'shieldedInstanceConfig',
+        request_type_name=u'ComputeInstancesUpdateShieldedInstanceConfigRequest',
         response_type_name=u'Operation',
         supports_download=False,
     )
@@ -5239,6 +5318,250 @@ If the group is part of a backend service that has enabled connection draining, 
         request_field='',
         request_type_name=u'ComputeMachineTypesListRequest',
         response_type_name=u'MachineTypeList',
+        supports_download=False,
+    )
+
+  class NetworkEndpointGroupsService(base_api.BaseApiService):
+    """Service class for the networkEndpointGroups resource."""
+
+    _NAME = u'networkEndpointGroups'
+
+    def __init__(self, client):
+      super(ComputeV1.NetworkEndpointGroupsService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def AggregatedList(self, request, global_params=None):
+      r"""Retrieves the list of network endpoint groups and sorts them by zone.
+
+      Args:
+        request: (ComputeNetworkEndpointGroupsAggregatedListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (NetworkEndpointGroupAggregatedList) The response message.
+      """
+      config = self.GetMethodConfig('AggregatedList')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    AggregatedList.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.networkEndpointGroups.aggregatedList',
+        ordered_params=[u'project'],
+        path_params=[u'project'],
+        query_params=[u'filter', u'maxResults', u'orderBy', u'pageToken'],
+        relative_path=u'projects/{project}/aggregated/networkEndpointGroups',
+        request_field='',
+        request_type_name=u'ComputeNetworkEndpointGroupsAggregatedListRequest',
+        response_type_name=u'NetworkEndpointGroupAggregatedList',
+        supports_download=False,
+    )
+
+    def AttachNetworkEndpoints(self, request, global_params=None):
+      r"""Attach a list of network endpoints to the specified network endpoint group.
+
+      Args:
+        request: (ComputeNetworkEndpointGroupsAttachNetworkEndpointsRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('AttachNetworkEndpoints')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    AttachNetworkEndpoints.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.networkEndpointGroups.attachNetworkEndpoints',
+        ordered_params=[u'project', u'zone', u'networkEndpointGroup'],
+        path_params=[u'networkEndpointGroup', u'project', u'zone'],
+        query_params=[u'requestId'],
+        relative_path=u'projects/{project}/zones/{zone}/networkEndpointGroups/{networkEndpointGroup}/attachNetworkEndpoints',
+        request_field=u'networkEndpointGroupsAttachEndpointsRequest',
+        request_type_name=u'ComputeNetworkEndpointGroupsAttachNetworkEndpointsRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def Delete(self, request, global_params=None):
+      r"""Deletes the specified network endpoint group. The network endpoints in the NEG and the VM instances they belong to are not terminated when the NEG is deleted. Note that the NEG cannot be deleted if there are backend services referencing it.
+
+      Args:
+        request: (ComputeNetworkEndpointGroupsDeleteRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Delete')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Delete.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'DELETE',
+        method_id=u'compute.networkEndpointGroups.delete',
+        ordered_params=[u'project', u'zone', u'networkEndpointGroup'],
+        path_params=[u'networkEndpointGroup', u'project', u'zone'],
+        query_params=[u'requestId'],
+        relative_path=u'projects/{project}/zones/{zone}/networkEndpointGroups/{networkEndpointGroup}',
+        request_field='',
+        request_type_name=u'ComputeNetworkEndpointGroupsDeleteRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def DetachNetworkEndpoints(self, request, global_params=None):
+      r"""Detach a list of network endpoints from the specified network endpoint group.
+
+      Args:
+        request: (ComputeNetworkEndpointGroupsDetachNetworkEndpointsRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('DetachNetworkEndpoints')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    DetachNetworkEndpoints.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.networkEndpointGroups.detachNetworkEndpoints',
+        ordered_params=[u'project', u'zone', u'networkEndpointGroup'],
+        path_params=[u'networkEndpointGroup', u'project', u'zone'],
+        query_params=[u'requestId'],
+        relative_path=u'projects/{project}/zones/{zone}/networkEndpointGroups/{networkEndpointGroup}/detachNetworkEndpoints',
+        request_field=u'networkEndpointGroupsDetachEndpointsRequest',
+        request_type_name=u'ComputeNetworkEndpointGroupsDetachNetworkEndpointsRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def Get(self, request, global_params=None):
+      r"""Returns the specified network endpoint group. Gets a list of available network endpoint groups by making a list() request.
+
+      Args:
+        request: (ComputeNetworkEndpointGroupsGetRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (NetworkEndpointGroup) The response message.
+      """
+      config = self.GetMethodConfig('Get')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.networkEndpointGroups.get',
+        ordered_params=[u'project', u'zone', u'networkEndpointGroup'],
+        path_params=[u'networkEndpointGroup', u'project', u'zone'],
+        query_params=[],
+        relative_path=u'projects/{project}/zones/{zone}/networkEndpointGroups/{networkEndpointGroup}',
+        request_field='',
+        request_type_name=u'ComputeNetworkEndpointGroupsGetRequest',
+        response_type_name=u'NetworkEndpointGroup',
+        supports_download=False,
+    )
+
+    def Insert(self, request, global_params=None):
+      r"""Creates a network endpoint group in the specified project using the parameters that are included in the request.
+
+      Args:
+        request: (ComputeNetworkEndpointGroupsInsertRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Operation) The response message.
+      """
+      config = self.GetMethodConfig('Insert')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Insert.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.networkEndpointGroups.insert',
+        ordered_params=[u'project', u'zone'],
+        path_params=[u'project', u'zone'],
+        query_params=[u'requestId'],
+        relative_path=u'projects/{project}/zones/{zone}/networkEndpointGroups',
+        request_field=u'networkEndpointGroup',
+        request_type_name=u'ComputeNetworkEndpointGroupsInsertRequest',
+        response_type_name=u'Operation',
+        supports_download=False,
+    )
+
+    def List(self, request, global_params=None):
+      r"""Retrieves the list of network endpoint groups that are located in the specified project and zone.
+
+      Args:
+        request: (ComputeNetworkEndpointGroupsListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (NetworkEndpointGroupList) The response message.
+      """
+      config = self.GetMethodConfig('List')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    List.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'compute.networkEndpointGroups.list',
+        ordered_params=[u'project', u'zone'],
+        path_params=[u'project', u'zone'],
+        query_params=[u'filter', u'maxResults', u'orderBy', u'pageToken'],
+        relative_path=u'projects/{project}/zones/{zone}/networkEndpointGroups',
+        request_field='',
+        request_type_name=u'ComputeNetworkEndpointGroupsListRequest',
+        response_type_name=u'NetworkEndpointGroupList',
+        supports_download=False,
+    )
+
+    def ListNetworkEndpoints(self, request, global_params=None):
+      r"""Lists the network endpoints in the specified network endpoint group.
+
+      Args:
+        request: (ComputeNetworkEndpointGroupsListNetworkEndpointsRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (NetworkEndpointGroupsListNetworkEndpoints) The response message.
+      """
+      config = self.GetMethodConfig('ListNetworkEndpoints')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    ListNetworkEndpoints.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.networkEndpointGroups.listNetworkEndpoints',
+        ordered_params=[u'project', u'zone', u'networkEndpointGroup'],
+        path_params=[u'networkEndpointGroup', u'project', u'zone'],
+        query_params=[u'filter', u'maxResults', u'orderBy', u'pageToken'],
+        relative_path=u'projects/{project}/zones/{zone}/networkEndpointGroups/{networkEndpointGroup}/listNetworkEndpoints',
+        request_field=u'networkEndpointGroupsListEndpointsRequest',
+        request_type_name=u'ComputeNetworkEndpointGroupsListNetworkEndpointsRequest',
+        response_type_name=u'NetworkEndpointGroupsListNetworkEndpoints',
+        supports_download=False,
+    )
+
+    def TestIamPermissions(self, request, global_params=None):
+      r"""Returns permissions that a caller has on the specified resource.
+
+      Args:
+        request: (ComputeNetworkEndpointGroupsTestIamPermissionsRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (TestPermissionsResponse) The response message.
+      """
+      config = self.GetMethodConfig('TestIamPermissions')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    TestIamPermissions.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'POST',
+        method_id=u'compute.networkEndpointGroups.testIamPermissions',
+        ordered_params=[u'project', u'zone', u'resource'],
+        path_params=[u'project', u'resource', u'zone'],
+        query_params=[],
+        relative_path=u'projects/{project}/zones/{zone}/networkEndpointGroups/{resource}/testIamPermissions',
+        request_field=u'testPermissionsRequest',
+        request_type_name=u'ComputeNetworkEndpointGroupsTestIamPermissionsRequest',
+        response_type_name=u'TestPermissionsResponse',
         supports_download=False,
     )
 
@@ -6125,7 +6448,7 @@ If the group is part of a backend service that has enabled connection draining, 
     )
 
     def DisableXpnResource(self, request, global_params=None):
-      r"""Disable a serivce resource (a.k.a service project) associated with this host project.
+      r"""Disable a service resource (also known as service project) associated with this host project.
 
       Args:
         request: (ComputeProjectsDisableXpnResourceRequest) input message

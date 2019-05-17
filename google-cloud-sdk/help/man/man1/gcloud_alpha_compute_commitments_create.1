@@ -11,7 +11,7 @@ gcloud alpha compute commitments create \- create Google Compute Engine commitme
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute commitments create\fR \fICOMMITMENT\fR \fB\-\-plan\fR=\fIPLAN\fR \fB\-\-resources\fR=[\fIRESOURCE\fR=\fICOMMITMENT\fR,...] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-type\fR=\fITYPE\fR;\ default="general\-purpose"] [\fB\-\-allocations\-from\-file\fR=\fIALLOCATIONS_FROM_FILE\fR\ |\ [\fB\-\-allocation\fR=\fIALLOCATION\fR\ :\ \fB\-\-allocation\-zone\fR=\fIALLOCATION_ZONE\fR\ \fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]\ \fB\-\-local\-ssd\fR=[\fIinterface\fR=\fIINTERFACE\fR],[\fIsize\fR=\fISIZE\fR]\ \fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR\ \fB\-\-min\-cpu\-platform\fR=\fIMIN_CPU_PLATFORM\fR\ \fB\-\-require\-specific\-allocation\fR\ \fB\-\-vm\-count\fR=\fIVM_COUNT\fR]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute commitments create\fR \fICOMMITMENT\fR \fB\-\-plan\fR=\fIPLAN\fR (\fB\-\-resources\fR=[\fIlocal\-ssd\fR=\fILOCAL\-SSD\fR],[\fImemory\fR=\fIMEMORY\fR],[\fIvcpu\fR=\fIVCPU\fR]\ :\ \fB\-\-resources\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]) [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-type\fR=\fITYPE\fR;\ default="general\-purpose"] [\fB\-\-reservations\-from\-file\fR=\fIRESERVATIONS_FROM_FILE\fR\ |\ [\fB\-\-reservation\fR=\fIRESERVATION\fR\ :\ \fB\-\-reservation\-zone\fR=\fIRESERVATION_ZONE\fR\ \fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]\ \fB\-\-local\-ssd\fR=[\fIinterface\fR=\fIINTERFACE\fR],[\fIsize\fR=\fISIZE\fR]\ \fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR\ \fB\-\-min\-cpu\-platform\fR=\fIMIN_CPU_PLATFORM\fR\ \fB\-\-require\-specific\-reservation\fR\ \fB\-\-vm\-count\fR=\fIVM_COUNT\fR]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -41,22 +41,43 @@ Duration of the commitment. \fIPLAN\fR must be one of: \fB12\-month\fR,
 \fB36\-month\fR.
 
 .TP 2m
-\fB\-\-resources\fR=[\fIRESOURCE\fR=\fICOMMITMENT\fR,...]
-Resources to be included in the commitment commitment:
+
+Manage the commitment for particular resources. This must be specified.
+
 .RS 2m
-.IP "\(em" 2m
-MEMORY should include unit (eg. 3072MB or 9GB). If no units are specified, GB is
-assumed.
-.IP "\(em" 2m
-VCPU is number of committed cores.
+.TP 2m
+\fB\-\-resources\fR=[\fIlocal\-ssd\fR=\fILOCAL\-SSD\fR],[\fImemory\fR=\fIMEMORY\fR],[\fIvcpu\fR=\fIVCPU\fR]
+Resources to be included in the commitment, the ratio between number of vCPU
+cores and memory must conform to limits described at:
+https://cloud.google.com/compute/docs/instances/creating\-instance\-with\-custom\-machine\-type#specifications.
+.TP 2m
+\fBmemory\fR
+The size of the memory, should include units (e.g. 3072MB or 9GB). If no units
+are specified, GB is assumed.
+.TP 2m
+\fBvcpu\fR
+The number of the vCPU cores.
+.TP 2m
+\fBlocal\-ssd\fR
+The size of local SSD. This flag must be specified if any of the other arguments
+in this group are specified.
+
+.TP 2m
+\fB\-\-resources\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]
+Manage the configuration of the type and number of accelerator cards to include
+in the commitment.
+.TP 2m
+\fBcount\fR
+The number of accelerators to include.
+.TP 2m
+\fBtype\fR
+The specific type (e.g. nvidia\-tesla\-k80 for NVIDIA Tesla K80) of the
+accelerator. Use \f5gcloud compute accelerator\-types list\fR to learn about all
+available accelerator types.
+
 .RE
 .RE
 .sp
-Ratio between number of VCPU cores and memory must conform to limits described
-on:
-https://cloud.google.com/compute/docs/instances/creating\-instance\-with\-custom\-machine\-type
-
-
 
 .SH "OPTIONAL FLAGS"
 
@@ -91,32 +112,32 @@ Alternatively, the region can be stored in the environment variable
 .TP 2m
 \fB\-\-type\fR=\fITYPE\fR; default="general\-purpose"
 Type of commitment. \f5memory\-optimized\fR indicates that the commitment is for
-memory\-optimized VMs. \fITYPE\fR must be one of: \fBgeneral\-purpose\fR,
-\fBmemory\-optimized\fR.
+memory\-optimized VMs. \fITYPE\fR must be one of: \fBcompute\-optimized\fR,
+\fBgeneral\-purpose\fR, \fBmemory\-optimized\fR.
 
 .TP 2m
 
-Manage the allocations to be created with the commitment. At most one of these
+Manage the reservations to be created with the commitment. At most one of these
 may be specified:
 
 .RS 2m
 .TP 2m
-\fB\-\-allocations\-from\-file\fR=\fIALLOCATIONS_FROM_FILE\fR
-The path to a YAML file of multiple allocations' configuration.
+\fB\-\-reservations\-from\-file\fR=\fIRESERVATIONS_FROM_FILE\fR
+Path to a YAML file of multiple reservations' configuration.
 
 .TP 2m
 
-Manage the allocation to be created with the commitment.
+Manage the reservation to be created with the commitment.
 
 .RS 2m
 .TP 2m
-\fB\-\-allocation\fR=\fIALLOCATION\fR
-Name of the zonal allocation to operate on. This flag must be specified if any
-of the other arguments in this group are specified.
+\fB\-\-reservation\fR=\fIRESERVATION\fR
+Name of the reservation to operate on. This flag must be specified if any of the
+other arguments in this group are specified.
 
 .TP 2m
-\fB\-\-allocation\-zone\fR=\fIALLOCATION_ZONE\fR
-Zone of the zonal allocation to operate on. If not specified and the
+\fB\-\-reservation\-zone\fR=\fIRESERVATION_ZONE\fR
+Zone of the reservation to operate on. If not specified and the
 \f5\fIcompute/zone\fR\fR property isn't set, you may be prompted to select a
 zone.
 
@@ -144,64 +165,62 @@ Alternatively, the zone can be stored in the environment variable
 
 .TP 2m
 
-Manage the specific SKU allocation properties to create.
+Manage the specific SKU reservation properties to create.
 
 .RS 2m
 .TP 2m
 \fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]
 Manage the configuration of the type and number of accelerator cards attached.
-
 .RE
 .RE
 .sp
 .TP 2m
 \fBcount\fR
-The number of pieces of the accelerator to attach to the allocation.
-
+The number of accelerators to attach to each instance in the reservation.
 .TP 2m
 \fBtype\fR
-The specific type (e.g. nvidia\-tesla\-k80 for nVidia Tesla K80) of accelerator
-to attach to the allocation. Use 'gcloud compute accelerator\-types list' to
-learn about all available accelerator types.
+The specific type (e.g. \f5nvidia\-tesla\-k80\fR for nVidia Tesla K80) of
+accelerator to attach to instances in the reservation. Use \f5gcloud compute
+accelerator\-types list\fR to learn about all available accelerator types.
 
 .RS 2m
 .TP 2m
 \fB\-\-local\-ssd\fR=[\fIinterface\fR=\fIINTERFACE\fR],[\fIsize\fR=\fISIZE\fR]
-Manage the size and the interface of local SSD to use.
-
+Manage the size and the interface of local SSD to use. See
+https://cloud.google.com/compute/docs/disks/local\-ssd for more information.
 .RE
 .sp
 .TP 2m
 \fBinterface\fR
 The kind of disk interface exposed to the VM for this SSD. Valid values are
-\f5\fIscsi\fR\fR and \f5\fInvme\fR\fR. SCSI is the default and is supported by
-more guest operating systems. NVME may provide higher performance.
-
+\f5scsi\fR and \f5nvme\fR. SCSI is the default and is supported by more guest
+operating systems. NVME may provide higher performance.
 .TP 2m
 \fBsize\fR
 The size of the local SSD in base\-2 GB.
 .RS 2m
 .TP 2m
 \fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR
-The type of machine (name only) which has fixed number of vCPUs and fixed amount
-of memory. This also includes specifying custom machine type following
-custom\-NUMBER_OF_CPUS\-AMOUNT_OF_MEMORY pattern.
+The type of machine (name only) which has a fixed number of vCPUs and a fixed
+amount of memory. This also includes specifying custom machine type following
+\f5custom\-number_of_CPUs\-amount_of_memory\fR pattern, e.g.
+\f5custom\-32\-29440\fR.
 
 .RS 2m
 .TP 2m
 \fB\-\-min\-cpu\-platform\fR=\fIMIN_CPU_PLATFORM\fR
-The minimum cpu platform of the allocation.
+Optional minimum CPU platform of the reservation to create.
 
 .TP 2m
-\fB\-\-require\-specific\-allocation\fR
-Indicates whether the allocation can be consumed by VMs with "any allocation"
-defined. If enabled, then only VMs that target the allocation by name using
-\-\-allocation\-affinity can consume this allocation. It also indicates that if
-true, the existing instances are also accounted in the allocation.
+\fB\-\-require\-specific\-reservation\fR
+Indicates whether the reservation can be consumed by VMs with "any reservation"
+defined. If enabled, then only VMs that target this reservation by name using
+\f5\-\-reservation\-affinity=specific\fR can consume from this reservation.
 
 .TP 2m
 \fB\-\-vm\-count\fR=\fIVM_COUNT\fR
-The number of resources that are allocated to this allocation.
+The number of VM instances that are allocated to this reservation. The value of
+this field must be an int in the range [1, 1000].
 
 
 .RE
@@ -212,10 +231,11 @@ The number of resources that are allocated to this allocation.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

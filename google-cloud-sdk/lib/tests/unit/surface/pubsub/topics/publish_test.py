@@ -115,8 +115,9 @@ class TopicsPublishTest(base.CloudPubsubTestBase):
   def testTopicsPublishMessageWithMalformedAttributes(self):
     with self.AssertRaisesArgumentErrorRegexp(
         r'^argument --attribute: Bad syntax for dict arg: \[a_b\]\. Please see '
-        r'`gcloud topic escaping` if you would like information on escaping '
-        r'list or dictionary flag values\.$'):
+        r'`gcloud topic flags-file` or `gcloud topic escaping` for information '
+        r'on providing list or dictionary flag values with special '
+        r'characters.'):
       self.Run('pubsub topics publish topic1 --attribute a_b')
 
   def testTopicsPublishMessageWithOutput(self):

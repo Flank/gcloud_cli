@@ -43,6 +43,17 @@ from ruamel.yaml import comments
 import six
 
 
+def SkipIfSkipped(skip_data, execution_mode):
+  if skip_data and not (execution_mode == session.ExecutionMode.LOCAL
+                        and not skip_data.get('locally')):
+    if skip_data.get('always'):
+      skip_decorator = test_case.Filters.skipAlways
+    else:
+      skip_decorator = test_case.Filters.skip
+    return skip_decorator(skip_data['reason'], skip_data['bug'])
+  return lambda x: x
+
+
 def CreateStreamMocker(test_base_instance):
   """Make a stream mocker that points to the given test base instance."""
 
@@ -76,10 +87,6 @@ class ScenarioTestBase(cli_test_base.CliTestBase, sdk_test_base.WithTempCWD):
       self.fail(e)
 
     spec = schema.Scenario.FromData(spec_data)
-    if spec.skip:
-      # pylint: disable=protected-access, This is part of our testing framework.
-      self.skipTest(
-          test_case.Filters._GetSkipString(spec.skip[0], spec.skip[1]))
 
     self.track = track
     stream_mocker = CreateStreamMocker(self)

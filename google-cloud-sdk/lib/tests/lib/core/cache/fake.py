@@ -173,7 +173,7 @@ class Cache(metadata_table.CacheUsingMetadataTable):
         _Table, name, create=create, timeout=timeout, version=version)
     self._restricted = set([])
     self._tables = {}
-    self._metadata = None  # type: _Table
+    self._metadata = None
     self._start = persistent_cache_base.Now()
     if not create:
       raise exceptions.CacheNotFound('[{}] not found.'.format(name))

@@ -62,12 +62,14 @@ definitions:
     items:
       type: object
       additionalProperties: false
+      required: [arg_value]
       properties:
         # The choice as it appears on the command line
         # (should be lower-kebab-case).
         arg_value: {type: [string, number, boolean]}
         # The string representation of the API enum value that will be used
-        # when this choice is selected.
+        # when this choice is selected. Default is derived from arg_value by
+        # converting to upper case and replacing hyphens with underscores.
         enum_value: {type: string}
         # The help text to show next to the choice on the man page.
         help_text: {type: string}
@@ -331,17 +333,17 @@ properties:
   # looks something like this (brief and description are required):
   # help_text:
   #   brief: Delete a Compute Engine virtual machine.
-  #   DESCRIPTION: |
+  #   description: |
   #     This command stops, and deletes the given virtual machine instance. Any
   #     boot disks associated with this instance are also deleted.
-  #   EXAMPLES: |
+  #   examples: |
   #     To delete an instance:
   #
   #       $ {command} INSTANCE_NAME --zone ZONE
   help_text:
     type: object
     additionalProperties: false
-    required: [brief, DESCRIPTION]
+    required: [brief, description]
     patternProperties:
       brief: {type: string}
       description: {type: string}
@@ -365,11 +367,23 @@ properties:
     properties:
       # The full collection name of the resource the command operates on.
       collection: {type: string}
+      # If true, will disable validating that a resource arg is specified if
+      # the collection requires a params from a resource.
+      disable_resource_check: {type: boolean}
+      # The type of the resource the command operates on to be used for logging.
+      display_resource_type: {type: string}
       # The API version to use, defaults to API set as gcloud default.
       api_version: {type: string}
       # The name of the method to call to perform the operation. Optional if
       # your command is one of the supported command types (not Generic).
       method: {type: string}
+      # The module path to a function to call to modify the API method
+      # to call to perform the operation. The provided or default `method`
+      # will be used to parse the arguments, then this function will be called
+      # with two arguments: a resource ref to the parsed resource and the parsed
+      # args namespace. The returned string will be the method used to create
+      # and issue the request.
+      modify_method_hook: {$ref: "#/definitions/python_hook"}
       # A mapping of method parameter to resource reference field (or '', to use
       # the full method name) for references or APIs that use non-standard
       # naming. For example, if a resource ref has a project, location, and
@@ -503,6 +517,16 @@ properties:
       # extract_resource_result is False, this is an attribute on the
       # operation, if True it is on the resource itself.
       result_attribute: {$ref: "#/definitions/attribute"}
+      # The module path to a function to call to modify the API request
+      # before it is invoked. All registered arguments will be processed
+      # into the request, before this is called. This is a function
+      # that takes 3 arguments: a resource ref to the parsed resource,
+      # the parsed args namespace, and the created request. It must return
+      # an apitools request message that will be passed to the API method
+      # defined in this section.
+      modify_request_hooks:
+        type: array
+        items: {$ref: "#/definitions/python_hook"}
       state:
         type: object
         additionalProperties: false
@@ -558,6 +582,8 @@ properties:
           # Set to True if the resource spec is for the parent of the request
           # collection instead of for the collection itself.  This allows for
           # create commands that do not require a name for the new resource.
+          # Set the `resource_type` property on `request` to include the
+          # resource type in log messages.
           is_parent_resource: {type: boolean}
           # The name to use for the resource arg. If set this is the name that
           # will be used for the resource arg in the command. If not set,
@@ -657,3 +683,6 @@ properties:
       # True when the update command requires an extra get api call.
       # False by default.
       read_modify_update: {type: boolean}
+      # Disable the field mask auto generation in the update commands.
+      # False by default.
+      disable_auto_field_mask: {type: boolean}

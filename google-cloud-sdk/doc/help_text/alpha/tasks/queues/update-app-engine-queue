@@ -1,5 +1,5 @@
 NAME
-    gcloud alpha tasks queues update-app-engine-queue - update an App Engine
+    gcloud alpha tasks queues update-app-engine-queue - update a Cloud Tasks
         queue
 
 SYNOPSIS
@@ -17,14 +17,16 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) The flags available to this command represent the fields of an App
-    Engine queue that are mutable. Attempting to use this command on a
-    different type of queue will result in an error.
+    (ALPHA) (DEPRECATED) This command is deprecated. Use gcloud alpha tasks
+    queues update instead
 
-    If you have early access to Cloud Tasks, refer to the following guide for
-    more information about the different queue target types:
-    https://cloud.google.com/cloud-tasks/docs/queue-types. For access, sign up
-    here: https://goo.gl/Ya0AZd
+    (ALPHA) (DEPRECATED) Update a Cloud Tasks queue.
+
+    This command is deprecated. Use gcloud alpha tasks queues update instead
+
+    The flags available to this command represent the fields of a queue that
+    are mutable. Attempting to use this command on a different type of queue
+    will result in an error.
 
 POSITIONAL ARGUMENTS
      QUEUE
@@ -121,10 +123,22 @@ FLAGS
           missing keys will use the default.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
+
+EXAMPLES
+    To update a Cloud Tasks queue:
+
+        $ gcloud alpha tasks queues update-app-engine-queue my-queue
+          --clear-max-attempts --clear-max-retry-duration
+          --clear-max-doublings --clear-min-backoff
+          --clear-max-backoff
+          --clear-max-tasks-dispatched-per-second
+          --clear-max-concurrent-tasks
+          --clear-routing-override
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

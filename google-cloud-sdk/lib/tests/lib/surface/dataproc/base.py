@@ -63,15 +63,22 @@ class DataprocTestBase(cli_test_base.CliTestBase):
     return self.Run(cmd)
 
 
+class DataprocTestBaseAlpha(DataprocTestBase):
+  """Base class for all Dataproc alpha tests."""
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+
 class DataprocTestBaseBeta(DataprocTestBase):
   """Base class for all Dataproc beta tests."""
 
-  def SetUp(self):
+  def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
 
 
 class DataprocTestBaseGA(DataprocTestBase):
   """Base class for all Dataproc GA tests."""
 
-  def SetUp(self):
+  def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.GA

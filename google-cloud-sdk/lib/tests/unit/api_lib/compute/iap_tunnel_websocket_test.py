@@ -18,7 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from collections import deque
+import collections
 import functools
 import threading
 import time
@@ -117,7 +117,6 @@ class IapTunnelWebSocketTest(cli_test_base.CliTestBase, parameterized.TestCase):
 
     url = utils.CreateWebSocketConnectUrl(self.tunnel_target)
     headers = ['User-Agent: my-user-agent/1234',
-               'Sec-WebSocket-Protocol: relay.tunnel.cloudproxy.app',
                'Authorization: Bearer one-access-token']
     websocket_helper_cls_mock.assert_called_once()
     websocket_helper_cls_mock.assert_called_with(
@@ -146,7 +145,6 @@ class IapTunnelWebSocketTest(cli_test_base.CliTestBase, parameterized.TestCase):
     url = utils.CreateWebSocketReconnectUrl(
         self.tunnel_target, 'I am a SID', 4567)
     headers = ['User-Agent: my-user-agent/1234',
-               'Sec-WebSocket-Protocol: relay.tunnel.cloudproxy.app',
                'Authorization: Bearer one-access-token']
     websocket_helper_cls_mock.assert_called_once()
     websocket_helper_cls_mock.assert_called_with(
@@ -174,7 +172,7 @@ class IapTunnelWebSocketTest(cli_test_base.CliTestBase, parameterized.TestCase):
         [mock.call(b'\x00\x04\x00\x00\x00\x07testing'),
          mock.call(b'\x00\x04\x00\x00\x00\x05again')])
 
-  def testWaitForOpenOrRaiseError(self):
+  def testWaitForOpenOrRaiseErrorWithSuccess(self):
     # Should exit if _connect_msg_received gets set to True
     self.iap_tunnel_websocket._connect_msg_received = False
     self.iap_tunnel_websocket._websocket_helper.IsClosed.return_value = False
@@ -192,9 +190,33 @@ class IapTunnelWebSocketTest(cli_test_base.CliTestBase, parameterized.TestCase):
     self.assertFalse(
         self.iap_tunnel_websocket._send_and_reconnect_thread.isAlive())
 
-    # Check that websocket recv thread not running exits
+  def testWaitForOpenOrRaiseErrorWithError(self):
     self.iap_tunnel_websocket._connect_msg_received = False
-    with self.assertRaises(iap_tunnel_websocket.ConnectionCreationError):
+    self.iap_tunnel_websocket._websocket_helper.IsClosed.return_value = True
+    self.iap_tunnel_websocket._websocket_helper.ErrorMsg.return_value = ''
+    with self.assertRaisesRegexp(iap_tunnel_websocket.ConnectionCreationError,
+                                 r'Unexpected error while connecting'):
+      self.iap_tunnel_websocket._WaitForOpenOrRaiseError()
+
+  def testWaitForOpenOrRaiseErrorWithErrorMsg(self):
+    self.iap_tunnel_websocket._connect_msg_received = False
+    self.iap_tunnel_websocket._websocket_helper.IsClosed.return_value = True
+    self.iap_tunnel_websocket._websocket_helper.ErrorMsg.return_value = (
+        'Handshake status 500')
+    error_regexp = r'^Error while connecting \[Handshake status 500\]\.$'
+    with self.assertRaisesRegexp(iap_tunnel_websocket.ConnectionCreationError,
+                                 error_regexp):
+      self.iap_tunnel_websocket._WaitForOpenOrRaiseError()
+
+  def testWaitForOpenOrRaiseErrorWith400ErrorMsg(self):
+    self.iap_tunnel_websocket._connect_msg_received = False
+    self.iap_tunnel_websocket._websocket_helper.IsClosed.return_value = True
+    self.iap_tunnel_websocket._websocket_helper.ErrorMsg.return_value = (
+        'Handshake status 400')
+    error_regexp = (r'^Error while connecting \[Handshake status 400\]\. '
+                    r'\(May be due to missing permissions\)$')
+    with self.assertRaisesRegexp(iap_tunnel_websocket.ConnectionCreationError,
+                                 error_regexp):
       self.iap_tunnel_websocket._WaitForOpenOrRaiseError()
 
   def testSendOneDataFrame(self):
@@ -217,7 +239,7 @@ class IapTunnelWebSocketTest(cli_test_base.CliTestBase, parameterized.TestCase):
 
   def testOnDataSubprotocolAck(self):
     self.iap_tunnel_websocket._total_bytes_confirmed = 5
-    self.iap_tunnel_websocket._unconfirmed_data = deque()
+    self.iap_tunnel_websocket._unconfirmed_data = collections.deque()
     self.iap_tunnel_websocket._unconfirmed_data.append(b'12')
     self.iap_tunnel_websocket._OnData(
         b'\x00\x07\x00\x00\x00\x00\x00\x00\x00\x07')
@@ -233,7 +255,7 @@ class IapTunnelWebSocketTest(cli_test_base.CliTestBase, parameterized.TestCase):
   def testOnDataSubprotocolReconnectSuccessAck(self):
     self.iap_tunnel_websocket._connect_msg_received = False
     self.iap_tunnel_websocket._total_bytes_confirmed = 7
-    self.iap_tunnel_websocket._unconfirmed_data = deque()
+    self.iap_tunnel_websocket._unconfirmed_data = collections.deque()
     self.iap_tunnel_websocket._unconfirmed_data.append(b'123')
     self.iap_tunnel_websocket._OnData(
         b'\x00\x02\x00\x00\x00\x00\x00\x00\x00\x0a')
@@ -281,7 +303,7 @@ class IapTunnelWebSocketTest(cli_test_base.CliTestBase, parameterized.TestCase):
                       confirm_data_size, resulting_bytes_confirmed,
                       remaining_unconfirmed_data):
     self.iap_tunnel_websocket._total_bytes_confirmed = start_bytes_confirmed
-    self.iap_tunnel_websocket._unconfirmed_data = deque()
+    self.iap_tunnel_websocket._unconfirmed_data = collections.deque()
     self.iap_tunnel_websocket._unconfirmed_data.extend(unconfirmed_data)
     self.iap_tunnel_websocket._ConfirmData(confirm_data_size)
     self.assertEqual(self.iap_tunnel_websocket._total_bytes_confirmed,
@@ -302,7 +324,7 @@ class IapTunnelWebSocketTest(cli_test_base.CliTestBase, parameterized.TestCase):
                                  confirm_data_size, expected_error,
                                  expected_msg):
     self.iap_tunnel_websocket._total_bytes_confirmed = start_bytes_confirmed
-    self.iap_tunnel_websocket._unconfirmed_data = deque()
+    self.iap_tunnel_websocket._unconfirmed_data = collections.deque()
     self.iap_tunnel_websocket._unconfirmed_data.extend(unconfirmed_data)
     with self.AssertRaisesExceptionMatches(expected_error, expected_msg):
       self.iap_tunnel_websocket._ConfirmData(confirm_data_size)

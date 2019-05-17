@@ -79,7 +79,7 @@ APP_YAML_GO_VM_FALSE = textwrap.dedent("""\
     """)
 
 
-@test_case.Filters.SkipOnPy3('Deprecated command; no py3 support', 'b/76013940')
+@test_case.Filters.DoNotRunOnPy3('Deprecated command; no py3 support')
 @test_case.Filters.DoNotRunIf(not properties.VALUES.app.runtime_root.Get(),
                               'No app runtime root is configured')
 class GenConfigTest(cli_test_base.CliTestBase, util.WithAppData,

@@ -78,15 +78,7 @@ An index for the field.
 
 This flag can be repeated to provide multiple indexes. Any existing indexes will
 be overwritten with the ones provided. Any omitted indexes will be deleted if
-they currently exist. For example, to explicitly set the list of indexes for the
-\fBtags\fR field in the \fBEvents\fR collection group to \fB[ascending,
-contains]\fR, run:
-
-.RS 2m
-$ gcloud alpha firestore indexes fields update tags \e
-    \-\-collection\-group=Events \e
-    \-\-index order=ascending \-\-index array\-config=contains
-.RE
+they currently exist.
 
 The following keys are allowed:
 
@@ -121,10 +113,11 @@ operation to complete.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

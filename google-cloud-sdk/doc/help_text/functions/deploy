@@ -4,8 +4,9 @@ NAME
 SYNOPSIS
     gcloud functions deploy (NAME : --region=REGION)
         [--entry-point=ENTRY_POINT] [--memory=MEMORY] [--retry]
-        [--runtime=RUNTIME] [--source=SOURCE] [--stage-bucket=STAGE_BUCKET]
-        [--timeout=TIMEOUT] [--update-labels=[KEY=VALUE,...]]
+        [--runtime=RUNTIME] [--service-account=SERVICE_ACCOUNT]
+        [--source=SOURCE] [--stage-bucket=STAGE_BUCKET] [--timeout=TIMEOUT]
+        [--update-labels=[KEY=VALUE,...]]
         [--clear-env-vars | --env-vars-file=FILE_PATH
           | --set-env-vars=[KEY=VALUE,...]
           | --remove-env-vars=[KEY,...] --update-env-vars=[KEY=VALUE,...]]
@@ -38,12 +39,12 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --entry-point=ENTRY_POINT
-        By default when a Google Cloud Function is triggered, it executes a
-        JavaScript function with the same name. Or, if it cannot find a
-        function with the same name, it executes a function named function. You
-        can use this flag to override the default behavior, by specifying the
-        name of a JavaScript function that will be executed when the Google
-        Cloud Function is triggered.
+        Name of a Google Cloud Function (as defined in source code) that will
+        be executed. Defaults to the resource name suffix, if not specified.
+        For backward compatibility, if function with given name is not found,
+        then the system will try to use function named "function". For Node.js
+        this is name of a function exported by the module specified in
+        source_location.
 
      --memory=MEMORY
         Limit on the amount of memory the function can use.
@@ -57,13 +58,26 @@ FLAGS
         If specified, then the function will be retried in case of a failure.
 
      --runtime=RUNTIME
-        The runtime in which to run the function. Defaults to Node.js 6.
+        Runtime in which to run the function.
+
+        Required when deploying a new function; optional when updating an
+        existing function.
 
         Choices:
 
-        * nodejs6: Node.js 6
         * nodejs8: Node.js 8
+        * nodejs10: Node.js 10
         * python37: Python 3.7
+        * go111: Go 1.11
+        * nodejs6: Node.js 6 (deprecated)
+
+     --service-account=SERVICE_ACCOUNT
+        The email address of the IAM service account associated with the
+        function at runtime. The service account represents the identity of the
+        running function, and determines what permissions the function has.
+
+        If not provided, the function will use the project's default service
+        account.
 
      --source=SOURCE
         Location of source code to deploy.
@@ -73,6 +87,15 @@ FLAGS
         * Source code in Google Cloud Storage (must be a .zip archive),
         * Reference to source repository or,
         * Local filesystem path (root directory of function source).
+
+    Note that if you do not specify the --source flag:
+
+      o Current directory will be used for new function deployments.
+      o If the function is previously deployed using a local filesystem path,
+    then function's source code will be updated using the current directory.
+      o If the function is previously deployed using a Google Cloud Storage
+    location or a source repository, then the function's source code will not
+    be updated.
 
     The value of the flag will be interpreted as a Cloud Storage location, if
     it starts with gs://.
@@ -115,13 +138,15 @@ FLAGS
         https://source.developers.google.com/projects/123456789/repos/testrepo/
         moveable-aliases/alternate-branch/paths/path-to=source
 
-    If the source location is not explicitly set, new functions will deploy
-    from the current directory. Existing functions keep their old source.
-
      --stage-bucket=STAGE_BUCKET
         When deploying a function from a local directory, this flag's value is
         the name of the Google Cloud Storage bucket in which source code will
-        be stored.
+        be stored. Note that if you set the --stage-bucket flag when deploying
+        a function, you will need to specify --source or --stage-bucket in
+        subsequent deployments to update your source code. To use this flag
+        successfully, the account in use must have permissions to write to this
+        bucket. For help granting access, refer to this guide:
+        https://cloud.google.com/storage/docs/access-control/
 
      --timeout=TIMEOUT
         The function execution timeout, e.g. 30s for 30 seconds. Defaults to
@@ -217,8 +242,9 @@ FLAGS
           functions event-types list.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

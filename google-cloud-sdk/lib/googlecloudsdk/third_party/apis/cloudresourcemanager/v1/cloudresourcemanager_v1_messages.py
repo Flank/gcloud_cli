@@ -95,10 +95,10 @@ class Binding(_messages.Message):
   r"""Associates `members` with a `role`.
 
   Fields:
-    condition: Unimplemented. The condition that is associated with this
-      binding. NOTE: an unsatisfied condition will not allow user access via
-      current binding. Different bindings, including their conditions, are
-      examined independently.
+    condition: The condition that is associated with this binding. NOTE: An
+      unsatisfied condition will not allow user access via current binding.
+      Different bindings, including their conditions, are examined
+      independently.
     members: Specifies the identities requesting access for a Cloud Platform
       resource. `members` can have the following values:  * `allUsers`: A
       special identifier that represents anyone who is    on the internet;
@@ -110,8 +110,8 @@ class Binding(_messages.Message):
       service    account. For example, `my-other-
       app@appspot.gserviceaccount.com`.  * `group:{emailid}`: An email address
       that represents a Google group.    For example, `admins@example.com`.
-      * `domain:{domain}`: A Google Apps domain name that represents all the
-      users of that domain. For example, `google.com` or `example.com`.
+      * `domain:{domain}`: The G Suite domain (primary) that represents all
+      the    users of that domain. For example, `google.com` or `example.com`.
     role: Role that is assigned to `members`. For example, `roles/viewer`,
       `roles/editor`, or `roles/owner`.
   """
@@ -373,7 +373,8 @@ class CloudresourcemanagerOrganizationsGetRequest(_messages.Message):
 
   Fields:
     organizationsId: Part of `name`. The resource name of the Organization to
-      fetch, e.g. "organizations/1234".
+      fetch. This is the organization's relative path in the API, formatted as
+      "organizations/[organizationId]". For example, "organizations/1234".
   """
 
   organizationsId = _messages.StringField(1, required=True)
@@ -579,24 +580,26 @@ class CloudresourcemanagerProjectsListRequest(_messages.Message):
   Fields:
     filter: An expression for filtering the results of the request.  Filter
       rules are case insensitive. The fields eligible for filtering are:  +
-      `name` + `id` + <code>labels.<em>key</em></code> where *key* is the name
-      of a label  Some examples of using labels as filters:
-      |Filter|Description| |------|-----------| |name:how*|The project's name
-      starts with "how".| |name:Howl|The project's name is `Howl` or `howl`.|
-      |name:HOWL|Equivalent to above.| |NAME:howl|Equivalent to above.|
-      |labels.color:*|The project has the label `color`.|
-      |labels.color:red|The project's label `color` has the value `red`.|
-      |labels.color:red&nbsp;labels.size:big|The project's label `color` has
-      the value `red` and its label `size` has the value `big`.  If you
-      specify a filter that has both `parent.type` and `parent.id`, then the
-      `resourcemanager.projects.list` permission is checked on the parent. If
-      the user has this permission, all projects under the parent will be
-      returned after remaining filters have been applied. If the user lacks
-      this permission, then all projects for which the user has the
-      `resourcemanager.projects.get` permission will be returned after
-      remaining filters have been applied. If no filter is specified, the call
-      will return projects for which the user has
-      `resourcemanager.projects.get` permissions.  Optional.
+      `name` + `id` + `labels.<key>` (where *key* is the name of a label) +
+      `parent.type` + `parent.id`  Some examples of using labels as filters:
+      | Filter           | Description
+      | |------------------|--------------------------------------------------
+      ---| | name:how*        | The project's name starts with "how".
+      | | name:Howl        | The project's name is `Howl` or `howl`.
+      | | name:HOWL        | Equivalent to above.
+      | | NAME:howl        | Equivalent to above.
+      | | labels.color:*   | The project has the label `color`.
+      | | labels.color:red | The project's label `color` has the value `red`.
+      | | labels.color:red&nbsp;labels.size:big |The project's label `color`
+      has   the value `red` and its label `size` has the value `big`.
+      |  If no filter is specified, the call will return projects for which
+      the user has the `resourcemanager.projects.get` permission.  NOTE: To
+      perform a by-parent query (eg., what projects are directly in a Folder),
+      the caller must have the `resourcemanager.projects.list` permission on
+      the parent and the filter must contain both a `parent.type` and a
+      `parent.id` restriction (example: "parent.type:folder parent.id:123").
+      In this case an alternate search index is used which provides more
+      consistent results.  Optional.
     pageSize: The maximum number of Projects to return in the response. The
       server can return fewer Projects than requested. If unspecified, server
       picks an appropriate default.  Optional.
@@ -1132,7 +1135,8 @@ class Operation(_messages.Message):
       if any.
     name: The server-assigned name, which is only unique within the same
       service that originally returns it. If you use the default HTTP mapping,
-      the `name` should have the format of `operations/some/unique/name`.
+      the `name` should be a resource name ending with
+      `operations/{unique_id}`.
     response: The normal response of the operation in case of success.  If the
       original method returns no data on success, such as `Delete`, the
       response is `google.protobuf.Empty`.  If the original method is standard
@@ -1379,10 +1383,11 @@ class Project(_messages.Message):
       not depend on specific characters being disallowed.  Example:
       <code>"environment" : "dev"</code> Read-write.
     lifecycleState: The Project lifecycle state.  Read-only.
-    name: The user-assigned display name of the Project. It must be 4 to 30
-      characters. Allowed characters are: lowercase and uppercase letters,
-      numbers, hyphen, single-quote, double-quote, space, and exclamation
-      point.  Example: <code>My Project</code> Read-write.
+    name: The optional user-assigned display name of the Project. When present
+      it must be between 4 to 30 characters. Allowed characters are: lowercase
+      and uppercase letters, numbers, hyphen, single-quote, double-quote,
+      space, and exclamation point.  Example: <code>My Project</code> Read-
+      write.
     parent: An optional reference to a parent Resource.  Supported parent
       types include "organization" and "folder". Once set, the parent cannot
       be cleared. The `parent` can be set on creation or using the
@@ -1512,12 +1517,13 @@ class SearchOrganizationsRequest(_messages.Message):
     filter: An optional query string used to filter the Organizations to
       return in the response. Filter rules are case-insensitive.
       Organizations may be filtered by `owner.directoryCustomerId` or by
-      `domain`, where the domain is a G Suite domain, for example:
-      |Filter|Description| |------|-----------|
-      |owner.directorycustomerid:123456789|Organizations with
-      `owner.directory_customer_id` equal to `123456789`.|
-      |domain:google.com|Organizations corresponding to the domain
-      `google.com`.|  This field is optional.
+      `domain`, where the domain is a G Suite domain, for example:  | Filter
+      | Description                      | |----------------------------------
+      ---|----------------------------------| |
+      owner.directorycustomerid:123456789 | Organizations with
+      `owner.directory_customer_id` equal to `123456789`.| | domain:google.com
+      | Organizations corresponding to the domain `google.com`.|  This field
+      is optional.
     pageSize: The maximum number of Organizations to return in the response.
       This field is optional.
     pageToken: A pagination token returned from a previous call to

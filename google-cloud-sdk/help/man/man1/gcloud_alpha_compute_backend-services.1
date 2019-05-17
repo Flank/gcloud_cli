@@ -23,10 +23,11 @@ gcloud alpha compute backend\-services \- list, create, and delete backend servi
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -64,8 +65,16 @@ gcloud help\fR for details.
 \fB(ALPHA)\fR Modify backend services.
 
 .TP 2m
+\fBexport\fR
+\fB(ALPHA)\fR Export a backend service.
+
+.TP 2m
 \fBget\-health\fR
 \fB(ALPHA)\fR Get backend health statuses from a backend service.
+
+.TP 2m
+\fBimport\fR
+\fB(ALPHA)\fR Import a backend service.
 
 .TP 2m
 \fBlist\fR

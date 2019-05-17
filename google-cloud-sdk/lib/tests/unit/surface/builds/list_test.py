@@ -53,6 +53,7 @@ class ListTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
         self.cloudbuild_v1_messages.CloudbuildProjectsBuildsListRequest(
             pageToken=None,
             projectId='my-project',
+            pageSize=20,
         ),
         response=self.cloudbuild_v1_messages.ListBuildsResponse(
             builds=[],
@@ -66,6 +67,7 @@ class ListTest(cli_test_base.CliTestBase, sdk_test_base.WithFakeAuth):
         self.cloudbuild_v1_messages.CloudbuildProjectsBuildsListRequest(
             pageToken=None,
             projectId='my-project',
+            pageSize=20,
         ),
         response=self.cloudbuild_v1_messages.ListBuildsResponse(
             builds=[
@@ -106,6 +108,7 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
         self.cloudbuild_v1_messages.CloudbuildProjectsBuildsListRequest(
             pageToken=None,
             projectId='my-project',
+            pageSize=20,
         ),
         response=self.cloudbuild_v1_messages.ListBuildsResponse(
             builds=[
@@ -131,6 +134,7 @@ https://cloudbuild.googleapis.com/v1/projects/my-project/builds/123-456-789
             pageToken=None,
             projectId='my-project',
             filter='status="WORKING" OR status="QUEUED"',
+            pageSize=20,
         ),
         response=self.cloudbuild_v1_messages.ListBuildsResponse(
             builds=[
@@ -160,6 +164,7 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
         self.cloudbuild_v1_messages.CloudbuildProjectsBuildsListRequest(
             pageToken=None,
             projectId='my-project',
+            pageSize=20,
             filter='status="WORKING" OR status="QUEUED"',
         ),
         response=self.cloudbuild_v1_messages.ListBuildsResponse(
@@ -183,6 +188,7 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
         self.cloudbuild_v1_messages.CloudbuildProjectsBuildsListRequest(
             pageToken='123',
             projectId='my-project',
+            pageSize=20,
             filter='status="WORKING" OR status="QUEUED"',
         ),
         response=self.cloudbuild_v1_messages.ListBuildsResponse(
@@ -214,6 +220,7 @@ ID CREATE_TIME DURATION SOURCE IMAGES STATUS
         self.cloudbuild_v1_messages.CloudbuildProjectsBuildsListRequest(
             pageToken=None,
             projectId='my-project',
+            pageSize=2
         ),
         response=self.cloudbuild_v1_messages.ListBuildsResponse(
             builds=[

@@ -29,16 +29,19 @@ from googlecloudsdk.core import properties
 import six
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA)
-class CreateBeta(base.CreateCommand):
+def _CommonArgs(parser, api_version=filestore_client.V1_API_VERSION):
+  instances_flags.AddInstanceCreateArgs(parser, api_version)
+
+
+@base.ReleaseTracks(base.ReleaseTrack.GA)
+class Create(base.CreateCommand):
   """Create a Cloud Filestore instance."""
 
-  _API_VERSION = filestore_client.FILESTORE_API_VERSION
+  _API_VERSION = filestore_client.V1_API_VERSION
 
   @staticmethod
   def Args(parser):
-    instances_flags.AddInstanceCreateArgs(
-        parser, filestore_client.FILESTORE_API_VERSION)
+    _CommonArgs(parser)
 
   def Run(self, args):
     """Create a Cloud Filestore instance in the current project."""
@@ -51,7 +54,7 @@ class CreateBeta(base.CreateCommand):
     instance = client.ParseFilestoreConfig(
         tier=tier, description=args.description,
         file_share=args.file_share, network=args.network,
-        labels=labels)
+        labels=labels, zone=instance_ref.locationsId)
     try:
       client.ValidateFileShares(instance)
     except filestore_client.InvalidCapacityError as e:
@@ -68,21 +71,33 @@ class CreateBeta(base.CreateCommand):
     return result
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class CreateAlpha(CreateBeta):
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class CreateBeta(Create):
   """Create a Cloud Filestore instance."""
 
-  _API_VERSION = filestore_client.FILESTORE_ALPHA_API_VERSION
+  _API_VERSION = filestore_client.BETA_API_VERSION
 
   @staticmethod
   def Args(parser):
-    instances_flags.AddInstanceCreateArgs(
-        parser, filestore_client.FILESTORE_ALPHA_API_VERSION)
+    _CommonArgs(parser, CreateBeta._API_VERSION)
 
 
-CreateBeta.detailed_help = {
-    'DESCRIPTION': 'Create a Cloud Filestore instance.',
-    'EXAMPLES': """\
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class CreateAlpha(Create):
+  """Create a Cloud Filestore instance."""
+
+  _API_VERSION = filestore_client.ALPHA_API_VERSION
+
+  @staticmethod
+  def Args(parser):
+    _CommonArgs(parser, CreateAlpha._API_VERSION)
+
+
+Create.detailed_help = {
+    'DESCRIPTION':
+        'Create a Cloud Filestore instance.',
+    'EXAMPLES':
+        """\
 The following command creates a Cloud Filestore instance named NAME with a
 single volume.
 

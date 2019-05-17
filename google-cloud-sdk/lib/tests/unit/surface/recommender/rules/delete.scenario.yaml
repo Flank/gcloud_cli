@@ -1,0 +1,32 @@
+title: Delete a rule
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: recommender rules delete my-rule --project=my-project
+  - prompt:
+      message: You are about to delete rule [my-rule]
+      input: y
+  - stderr: |
+      Deleted rule [my-rule].
+actions:
+- execute_command:
+    command: recommender rules delete my-rule --project=my-project
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete rule [my-rule]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://recommender.googleapis.com/v1alpha1/projects/my-project/rules/my-rule?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: null
+    - expect_stderr: |
+        Deleted rule [my-rule].
+    - expect_exit:
+        code: 0

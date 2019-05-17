@@ -508,6 +508,8 @@ class BuildTrigger(_messages.Message):
     disabled: If true, the trigger will never result in a build.
     filename: Path, from the source root, to a file whose contents is used for
       the template.
+    github: GitHubEventsConfig describes the configuration of a trigger that
+      creates a build whenever a GitHub event is received.
     id: Output only. Unique identifier of the trigger.
     ignoredFiles: ignored_files and included_files are file glob matches using
       http://godoc/pkg/path/filepath#Match extended with support for "**".  If
@@ -523,6 +525,7 @@ class BuildTrigger(_messages.Message):
       is not empty, then we make sure that at least one of those files matches
       a included_files glob. If not, then we do not trigger a build.
     substitutions: Substitutions data for Build resource.
+    tags: Tags for annotation of a `BuildTrigger`
     triggerTemplate: Template describing the types of source changes to
       trigger a build.  Branch and tag names in trigger templates are
       interpreted as regular expressions. Any branch or tag change that
@@ -559,11 +562,13 @@ class BuildTrigger(_messages.Message):
   description = _messages.StringField(3)
   disabled = _messages.BooleanField(4)
   filename = _messages.StringField(5)
-  id = _messages.StringField(6)
-  ignoredFiles = _messages.StringField(7, repeated=True)
-  includedFiles = _messages.StringField(8, repeated=True)
-  substitutions = _messages.MessageField('SubstitutionsValue', 9)
-  triggerTemplate = _messages.MessageField('RepoSource', 10)
+  github = _messages.MessageField('GitHubEventsConfig', 6)
+  id = _messages.StringField(7)
+  ignoredFiles = _messages.StringField(8, repeated=True)
+  includedFiles = _messages.StringField(9, repeated=True)
+  substitutions = _messages.MessageField('SubstitutionsValue', 10)
+  tags = _messages.StringField(11, repeated=True)
+  triggerTemplate = _messages.MessageField('RepoSource', 12)
 
 
 class BuiltImage(_messages.Message):
@@ -588,6 +593,13 @@ class CancelBuildRequest(_messages.Message):
 
 class CancelOperationRequest(_messages.Message):
   r"""The request message for Operations.CancelOperation."""
+
+
+class CheckSuiteFilter(_messages.Message):
+  r"""A CheckSuiteFilter is a filter that indicates that we should build on
+  all check suite events.
+  """
+
 
 
 class CloudbuildOperationsCancelRequest(_messages.Message):
@@ -739,10 +751,14 @@ class CloudbuildProjectsTriggersListRequest(_messages.Message):
   r"""A CloudbuildProjectsTriggersListRequest object.
 
   Fields:
+    pageSize: Number of results to return in the list.
+    pageToken: Token to provide to skip to a particular spot in the list.
     projectId: ID of the project for which to list BuildTriggers.
   """
 
-  projectId = _messages.StringField(1, required=True)
+  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(2)
+  projectId = _messages.StringField(3, required=True)
 
 
 class CloudbuildProjectsTriggersPatchRequest(_messages.Message):
@@ -794,6 +810,28 @@ class FileHashes(_messages.Message):
   fileHash = _messages.MessageField('Hash', 1, repeated=True)
 
 
+class GitHubEventsConfig(_messages.Message):
+  r"""GitHubEventsConfig describes the configuration of a trigger that creates
+  a build whenever a GitHub event is received.  This message is experimental.
+
+  Fields:
+    checkSuite: Output only. Indicates that a build was generated from a check
+      suite event.
+    installationId: The installationID that emmits the GitHub event.
+    name: Name of the repository.
+    owner: Owner of the repository.
+    pullRequest: filter to match changes in pull requests.
+    push: filter to match changes in refs like branches, tags.
+  """
+
+  checkSuite = _messages.MessageField('CheckSuiteFilter', 1)
+  installationId = _messages.IntegerField(2)
+  name = _messages.StringField(3)
+  owner = _messages.StringField(4)
+  pullRequest = _messages.MessageField('PullRequestFilter', 5)
+  push = _messages.MessageField('PushFilter', 6)
+
+
 class Hash(_messages.Message):
   r"""Container message for hash values.
 
@@ -825,11 +863,13 @@ class ListBuildTriggersResponse(_messages.Message):
   r"""Response containing existing `BuildTriggers`.
 
   Fields:
+    nextPageToken: Token to receive the next page of results.
     triggers: `BuildTriggers` for the project, sorted by `create_time`
       descending.
   """
 
-  triggers = _messages.MessageField('BuildTrigger', 1, repeated=True)
+  nextPageToken = _messages.StringField(1)
+  triggers = _messages.MessageField('BuildTrigger', 2, repeated=True)
 
 
 class ListBuildsResponse(_messages.Message):
@@ -888,7 +928,8 @@ class Operation(_messages.Message):
       if any.
     name: The server-assigned name, which is only unique within the same
       service that originally returns it. If you use the default HTTP mapping,
-      the `name` should have the format of `operations/some/unique/name`.
+      the `name` should be a resource name ending with
+      `operations/{unique_id}`.
     response: The normal response of the operation in case of success.  If the
       original method returns no data on success, such as `Delete`, the
       response is `google.protobuf.Empty`.  If the original method is standard
@@ -964,6 +1005,55 @@ class Operation(_messages.Message):
   response = _messages.MessageField('ResponseValue', 5)
 
 
+class PullRequestFilter(_messages.Message):
+  r"""PullRequestFilter contains filter properties for matching GitHub Pull
+  Requests.
+
+  Enums:
+    CommentControlValueValuesEnum: Whether to block builds on a "/gcbrun"
+      comment from a repository owner or collaborator.
+
+  Fields:
+    branch: Regex of branches to match.  The syntax of the regular expressions
+      accepted is the syntax accepted by RE2 and described at
+      https://github.com/google/re2/wiki/Syntax
+    commentControl: Whether to block builds on a "/gcbrun" comment from a
+      repository owner or collaborator.
+  """
+
+  class CommentControlValueValuesEnum(_messages.Enum):
+    r"""Whether to block builds on a "/gcbrun" comment from a repository owner
+    or collaborator.
+
+    Values:
+      COMMENTS_DISABLED: Do not require comments on Pull Requests before
+        builds are triggered.
+      COMMENTS_ENABLED: Enforce that repository owners or collaborators must
+        comment on Pull Requests before builds are triggered.
+    """
+    COMMENTS_DISABLED = 0
+    COMMENTS_ENABLED = 1
+
+  branch = _messages.StringField(1)
+  commentControl = _messages.EnumField('CommentControlValueValuesEnum', 2)
+
+
+class PushFilter(_messages.Message):
+  r"""Push contains filter properties for matching GitHub git pushes.
+
+  Fields:
+    branch: Regexes of branches to match.  The syntax of the regular
+      expressions accepted is the syntax accepted by RE2 and described at
+      https://github.com/google/re2/wiki/Syntax
+    tag: Regexes of tags to match.  The syntax of the regular expressions
+      accepted is the syntax accepted by RE2 and described at
+      https://github.com/google/re2/wiki/Syntax
+  """
+
+  branch = _messages.StringField(1)
+  tag = _messages.StringField(2)
+
+
 class RepoSource(_messages.Message):
   r"""Location of the source in a Google Cloud Source Repository.
 
@@ -994,6 +1084,7 @@ class Results(_messages.Message):
   Fields:
     artifactManifest: Path to the artifact manifest. Only populated when
       artifacts are uploaded.
+    artifactTiming: Time to push all non-container artifacts.
     buildStepImages: List of build step digests, in the order corresponding to
       build step indices.
     buildStepOutputs: List of build step outputs, produced by builder images,
@@ -1007,10 +1098,11 @@ class Results(_messages.Message):
   """
 
   artifactManifest = _messages.StringField(1)
-  buildStepImages = _messages.StringField(2, repeated=True)
-  buildStepOutputs = _messages.BytesField(3, repeated=True)
-  images = _messages.MessageField('BuiltImage', 4, repeated=True)
-  numArtifacts = _messages.IntegerField(5)
+  artifactTiming = _messages.MessageField('TimeSpan', 2)
+  buildStepImages = _messages.StringField(3, repeated=True)
+  buildStepOutputs = _messages.BytesField(4, repeated=True)
+  images = _messages.MessageField('BuiltImage', 5, repeated=True)
+  numArtifacts = _messages.IntegerField(6)
 
 
 class RetryBuildRequest(_messages.Message):
@@ -1089,8 +1181,8 @@ class SourceProvenance(_messages.Message):
 
   Messages:
     FileHashesValue: Output only. Hash(es) of the build source, which can be
-      used to verify that the originalsource integrity was maintained in the
-      build. Note that `FileHashes` willonly be populated if `BuildOptions`
+      used to verify that the original source integrity was maintained in the
+      build. Note that `FileHashes` will only be populated if `BuildOptions`
       has requested a `SourceProvenanceHash`.  The keys to this map are file
       paths used as build source and the values contain the hash values for
       those files.  If the build source came in a single package such as a
@@ -1099,13 +1191,13 @@ class SourceProvenance(_messages.Message):
 
   Fields:
     fileHashes: Output only. Hash(es) of the build source, which can be used
-      to verify that the originalsource integrity was maintained in the build.
-      Note that `FileHashes` willonly be populated if `BuildOptions` has
-      requested a `SourceProvenanceHash`.  The keys to this map are file paths
-      used as build source and the values contain the hash values for those
-      files.  If the build source came in a single package such as a gzipped
-      tarfile (`.tar.gz`), the `FileHash` will be for the single path to that
-      file.
+      to verify that the original source integrity was maintained in the
+      build. Note that `FileHashes` will only be populated if `BuildOptions`
+      has requested a `SourceProvenanceHash`.  The keys to this map are file
+      paths used as build source and the values contain the hash values for
+      those files.  If the build source came in a single package such as a
+      gzipped tarfile (`.tar.gz`), the `FileHash` will be for the single path
+      to that file.
     resolvedRepoSource: A copy of the build's `source.repo_source`, if exists,
       with any revisions resolved.
     resolvedStorageSource: A copy of the build's `source.storage_source`, if
@@ -1115,8 +1207,8 @@ class SourceProvenance(_messages.Message):
   @encoding.MapUnrecognizedFields('additionalProperties')
   class FileHashesValue(_messages.Message):
     r"""Output only. Hash(es) of the build source, which can be used to verify
-    that the originalsource integrity was maintained in the build. Note that
-    `FileHashes` willonly be populated if `BuildOptions` has requested a
+    that the original source integrity was maintained in the build. Note that
+    `FileHashes` will only be populated if `BuildOptions` has requested a
     `SourceProvenanceHash`.  The keys to this map are file paths used as build
     source and the values contain the hash values for those files.  If the
     build source came in a single package such as a gzipped tarfile

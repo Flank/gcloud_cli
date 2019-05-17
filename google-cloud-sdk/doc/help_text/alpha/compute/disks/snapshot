@@ -5,8 +5,9 @@ NAME
 SYNOPSIS
     gcloud alpha compute disks snapshot DISK_NAME [DISK_NAME ...] [--async]
         [--csek-key-file=FILE] [--description=DESCRIPTION] [--guest-flush]
-        [--snapshot-names=SNAPSHOT_NAME,[...]] [--storage-location=LOCATION]
-        [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
+        [--labels=[KEY=VALUE,...]] [--snapshot-names=SNAPSHOT_NAME,[...]]
+        [--storage-location=LOCATION] [--region=REGION | --zone=ZONE]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha compute disks snapshot creates snapshots of persistent
@@ -16,8 +17,8 @@ DESCRIPTION
     snapshots may be managed (listed, deleted, resized etc.) via gcloud compute
     snapshots.
 
-    For best practices regarding managing snapshots, refer to this guide:
-    https://cloud.google.com/compute/docs/disks/create-snapshots#best_practices.
+    Refer to the Snapshot best practices guide.
+    https://cloud.google.com/compute/docs/disks/snapshot-best-practices
 
     gcloud alpha compute disks snapshot waits until the operation returns a
     status of READY or FAILED, or reaches the maximum timeout, and returns the
@@ -46,9 +47,17 @@ FLAGS
         Text to describe the snapshots being created.
 
      --guest-flush
-        Create an application consistent snapshot by informing the OS to
+        Create an application-consistent snapshot by informing the OS to
         prepare for the snapshot process. Currently only supported on Windows
         instances using the Volume Shadow Copy Service (VSS).
+
+     --labels=[KEY=VALUE,...]
+        List of label KEY=VALUE pairs to add.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
 
      --snapshot-names=SNAPSHOT_NAME,[...]
         Names to assign to the created snapshots. Without this option, the name
@@ -110,8 +119,9 @@ FLAGS
           CLOUDSDK_COMPUTE_ZONE.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

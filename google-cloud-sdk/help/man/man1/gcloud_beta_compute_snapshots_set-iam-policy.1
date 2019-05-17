@@ -55,10 +55,11 @@ or YAML file conforming to the structure of a Policy
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -73,11 +74,11 @@ https://developers.google.com/compute/docs/reference/latest/
 .SH "EXAMPLES"
 
 The following command will read am IAM policy defined in a JSON file
-\'policy.json' and set it for the snapshot \f5my_snapshot\fR:
+\'policy.json' and set it for the snapshot \f5my\-snapshot\fR:
 
-$ gcloud beta compute snapshots set\-iam\-policy my_snapshot \e.RS 2m
-policy.json
-
+.RS 2m
+$ gcloud beta compute snapshots set\-iam\-policy my\-snapshot \e
+    policy.json
 .RE
 
 See https://cloud.google.com/iam/docs/managing\-policies for details of the
@@ -87,10 +88,11 @@ policy file format and contents.
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
+$ gcloud compute snapshots set\-iam\-policy
 $ gcloud alpha compute snapshots set\-iam\-policy
 .RE
 

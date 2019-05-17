@@ -21,20 +21,16 @@ from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope.concepts import handlers as concepts_handler
 from googlecloudsdk.core import properties
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface import redis_test_base
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters([calliope_base.ReleaseTrack.ALPHA,
-                           calliope_base.ReleaseTrack.BETA,
-                           calliope_base.ReleaseTrack.GA])
-class DeleteTest(redis_test_base.InstancesUnitTestBase, parameterized.TestCase):
+class DeleteTestGA(redis_test_base.InstancesUnitTestBase):
 
-  def testDelete(self, track):
-    self.SetUpForTrack(track)
-    self.SetUpInstancesForTrack()
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def testDelete(self):
     self._ExpectDelete()
 
     self.WriteInput('y')
@@ -48,9 +44,7 @@ class DeleteTest(redis_test_base.InstancesUnitTestBase, parameterized.TestCase):
                            .format(self.instance_id))
     self.AssertErrContains('Deleted instance [{}].'.format(self.instance_id))
 
-  def testDelete_UsingRegionProperty(self, track):
-    self.SetUpForTrack(track)
-    self.SetUpInstancesForTrack()
+  def testDelete_UsingRegionProperty(self):
     self._ExpectDelete()
 
     properties.VALUES.redis.region.Set(self.region_id)
@@ -65,9 +59,7 @@ class DeleteTest(redis_test_base.InstancesUnitTestBase, parameterized.TestCase):
     self.AssertErrContains('Deleted instance [{}].'
                            .format(self.instance_id))
 
-  def testDelete_UsingRelativeInstanceName(self, track):
-    self.SetUpForTrack(track)
-    self.SetUpInstancesForTrack()
+  def testDelete_UsingRelativeInstanceName(self):
     self._ExpectDelete()
 
     self.WriteInput('y')
@@ -81,9 +73,7 @@ class DeleteTest(redis_test_base.InstancesUnitTestBase, parameterized.TestCase):
     self.AssertErrContains('Deleted instance [{}].'
                            .format(self.instance_id))
 
-  def testDelete_Async(self, track):
-    self.SetUpForTrack(track)
-    self.SetUpInstancesForTrack()
+  def testDelete_Async(self):
     self._ExpectDelete(is_async=True)
 
     self.WriteInput('y')
@@ -98,9 +88,7 @@ class DeleteTest(redis_test_base.InstancesUnitTestBase, parameterized.TestCase):
     self.AssertErrContains('Check operation [{}] for status.'
                            .format(self.wait_operation_id))
 
-  def testDelete_NoRegion(self, track):
-    self.SetUpForTrack(track)
-    self.SetUpInstancesForTrack()
+  def testDelete_NoRegion(self):
     with self.assertRaises(concepts_handler.ParseError):
       self.Run('redis instances delete {}'.format(self.instance_id))
 
@@ -119,6 +107,18 @@ class DeleteTest(redis_test_base.InstancesUnitTestBase, parameterized.TestCase):
         request=self.messages.RedisProjectsLocationsOperationsGetRequest(
             name=operation.name),
         response=operation)
+
+
+class DeleteTestBeta(DeleteTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class DeleteTestAlpha(DeleteTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

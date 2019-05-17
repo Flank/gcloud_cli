@@ -56,10 +56,11 @@ or YAML file conforming to the structure of a Policy
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -74,11 +75,11 @@ https://developers.google.com/compute/docs/reference/latest/
 .SH "EXAMPLES"
 
 The following command will read am IAM policy defined in a JSON file
-\'policy.json' and set it for the instance template \f5my_template\fR:
+\'policy.json' and set it for the instance template \f5my\-template\fR:
 
-$ gcloud alpha compute instance\-templates set\-iam\-policy \e.RS 2m
-my_template policy.json
-
+.RS 2m
+$ gcloud alpha compute instance\-templates set\-iam\-policy \e
+    my\-template policy.json
 .RE
 
 See https://cloud.google.com/iam/docs/managing\-policies for details of the
@@ -92,9 +93,10 @@ This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you will have to apply for early access and have your projects registered on the
 API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. This variant is also available:
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
+$ gcloud compute instance\-templates set\-iam\-policy
 $ gcloud beta compute instance\-templates set\-iam\-policy
 .RE
 

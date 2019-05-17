@@ -23,11 +23,11 @@ from googlecloudsdk.command_lib.compute import flags
 from googlecloudsdk.command_lib.compute import scope as compute_scope
 from googlecloudsdk.command_lib.compute.instance_groups import flags as instance_groups_flags
 from googlecloudsdk.command_lib.compute.managed_instance_groups import update_instances_utils
+from googlecloudsdk.core import exceptions
 from googlecloudsdk.core.util import times
 
 
 def CreateRequest(args,
-                  cleared_fields,
                   client,
                   resources,
                   minimal_action,
@@ -36,7 +36,6 @@ def CreateRequest(args,
 
   Args:
     args: argparse namespace
-    cleared_fields: Fields which are left cleared, but should be send in request
     client: The compute client
     resources: The compute resources
     minimal_action: MinimalActionValueValuesEnum value
@@ -80,9 +79,20 @@ def CreateRequest(args,
   update_policy = client.messages.InstanceGroupManagerUpdatePolicy(
       maxSurge=max_surge,
       maxUnavailable=max_unavailable,
-      minReadySec=args.min_ready,
       minimalAction=minimal_action,
       type=update_policy_type)
+  # min_ready is available in alpha and beta APIs only
+  if hasattr(args, 'min_ready'):
+    update_policy.minReadySec = args.min_ready
+  # replacement_method is available in alpha API only
+  if hasattr(args, 'replacement_method'):
+    replacement_method = update_instances_utils.ParseReplacementMethod(
+        args.replacement_method, client.messages)
+    update_policy.replacementMethod = replacement_method
+
+  ValidateAndFixUpdaterAgainstStateful(update_policy, igm_ref, igm_info, client,
+                                       args)
+
   igm_resource = client.messages.InstanceGroupManager(
       instanceTemplate=None, updatePolicy=update_policy, versions=versions)
   if igm_ref.Collection() == 'compute.instanceGroupManagers':
@@ -99,13 +109,47 @@ def CreateRequest(args,
         instanceGroupManagerResource=igm_resource,
         project=igm_ref.project,
         region=igm_ref.region)
-  # Due to 'Patch' semantics, we have to clear either 'fixed' or 'percent'.
-  # Otherwise, we'll get an error that both 'fixed' and 'percent' are set.
-  if max_surge is not None:
-    cleared_fields.append('updatePolicy.maxSurge.fixed' if max_surge.fixed is
-                          None else 'updatePolicy.maxSurge.percent')
-  if max_unavailable is not None:
-    cleared_fields.append('updatePolicy.maxUnavailable.fixed'
-                          if max_unavailable.fixed is None else
-                          'updatePolicy.maxUnavailable.percent')
   return (service, 'Patch', request)
+
+
+def ValidateAndFixUpdaterAgainstStateful(update_policy, igm_ref, igm_info,
+                                         client, args):
+  """Validates and fixes update policy for patching stateful IGM.
+
+  Updating stateful IGMs requires maxSurge=0 and replacementMethod=RECREATE.
+  If the field has the value set, it is validated.
+  If the field has the value not set, it is being set.
+
+  Args:
+    update_policy: Update policy to be validated
+    igm_ref: Reference of IGM being validated
+    igm_info: Full resource of IGM being validated
+    client: The compute API client
+    args: argparse namespace used to select used version
+  """
+  if not managed_instance_groups_utils.IsStateful(client, igm_info, igm_ref):
+    return
+  if hasattr(args, 'replacement_method'):
+    recreate = (
+        client.messages.InstanceGroupManagerUpdatePolicy
+        .ReplacementMethodValueValuesEnum.RECREATE)
+    if update_policy.replacementMethod is None:
+      update_policy.replacementMethod = recreate
+    elif update_policy.replacementMethod != recreate:
+      raise exceptions.Error(
+          'For performing this action on a stateful IGMs '
+          '--replacement-method has to be RECREATE')
+  if update_policy.maxSurge is None:
+    update_policy.maxSurge = client.messages.FixedOrPercent(fixed=0)
+  else:
+    max_surge_is_zero = True
+    if update_policy.maxSurge.fixed is not None:
+      if update_policy.maxSurge.fixed != 0:
+        max_surge_is_zero = False
+    if update_policy.maxSurge.percent is not None:
+      if update_policy.maxSurge.percent != 0:
+        max_surge_is_zero = False
+    if not max_surge_is_zero:
+      raise exceptions.Error(
+          'For performing this action on a stateful IGMs '
+          '--max-surge has to be 0')

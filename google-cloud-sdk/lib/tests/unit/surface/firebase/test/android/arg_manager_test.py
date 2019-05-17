@@ -23,6 +23,7 @@ import datetime
 from googlecloudsdk.api_lib.firebase.test import exceptions
 from googlecloudsdk.api_lib.firebase.test.android import arg_manager
 from googlecloudsdk.api_lib.firebase.test.android import catalog_manager
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions as core_exceptions
 from tests.lib import test_case
 from tests.lib.surface.firebase.test import fake_args
@@ -38,7 +39,9 @@ class AndroidArgsTests(unit_base.AndroidMockClientTest):
   def testGetSetOfAllTestArgs_OnActualRules(self):
     all_args = arg_manager.AllArgsSet()
     # arg_manager tests include GA and beta args
-    self.assertEquals(set(unit_base.ALL_TEST_RUN_ARGS['beta']), all_args)
+    self.assertEqual(
+        set(unit_base.ALL_TEST_RUN_ARGS[calliope_base.ReleaseTrack.BETA]),
+        all_args)
 
   def testArgNamesInRulesAreInternalNames(self):
     # Verify that ArgRules use internal arg names with underscores, not hyphens
@@ -84,12 +87,12 @@ class AndroidArgsTests(unit_base.AndroidMockClientTest):
 
   def testPrepareArgs_IncompatibleArgsWithExplicitTestType(self):
     args = self.NewTestArgs(
-        type='instrumentation', app='a', test='t', max_depth=100)
+        type='instrumentation', app='a', test='t', robo_script='foo.json')
     arg_mgr = _AndroidArgManagerWithFakeCatalog()
     with self.assertRaises(core_exceptions.InvalidArgumentException) as ex_ctx:
       arg_mgr.Prepare(args)
-    # --max-depth arg is only compatible with test type 'robo'
-    self.assertEqual(ex_ctx.exception.parameter_name, 'max-depth')
+    # --robo-script arg is only compatible with test type 'robo'
+    self.assertEqual(ex_ctx.exception.parameter_name, 'robo-script')
 
   def testPrepareArgs_IncompatibleArgsWithRoboTestType(self):
     args = self.NewTestArgs(type='robo', app='a', scenario_numbers=[2, 5])

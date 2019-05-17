@@ -1,25 +1,26 @@
 NAME
-    gcloud beta ml-engine - manage Cloud ML Engine jobs and models
+    gcloud beta ml-engine - manage AI Platform jobs and models
 
 SYNOPSIS
     gcloud beta ml-engine GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) The gcloud beta ml-engine command group lets you manage Google Cloud
-    ML Engine jobs and training models.
+    (BETA) The gcloud beta ml-engine command group lets you manage AI Platform
+    jobs and training models.
 
-    Cloud ML Engine is a managed service that enables you to easily build
-    machine learning models, that work on any type of data, of any size. Create
-    your model with the powerful TensorFlow framework that powers many Google
+    AI Platform is a managed service that enables you to easily build machine
+    learning models, that work on any type of data, of any size. Create your
+    model with the powerful TensorFlow framework that powers many Google
     products, from Google Photos to Google Cloud Speech.
 
-    More information on Cloud ML Engine can be found here:
+    More information on AI Platform can be found here:
     https://cloud.google.com/ml and detailed documentation can be found here:
     https://cloud.google.com/ml/docs/
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -27,25 +28,25 @@ GROUPS
     GROUP is one of the following:
 
      jobs
-        (BETA) Cloud ML Engine Jobs commands.
+        (BETA) AI Platform Jobs commands.
 
      local
-        (BETA) Cloud ML Engine Local commands.
+        (BETA) AI Platform Local commands.
 
      models
-        (BETA) Cloud ML Engine Models commands.
+        (BETA) AI Platform Models commands.
 
      operations
-        (BETA) Manage Cloud ML Engine operations.
+        (BETA) Manage AI Platform operations.
 
      versions
-        (BETA) Cloud ML Engine Versions commands.
+        (BETA) AI Platform Versions commands.
 
 COMMANDS
     COMMAND is one of the following:
 
      predict
-        (BETA) Run Cloud ML Engine online prediction.
+        (BETA) Run AI Platform online prediction.
 
 NOTES
     This command is currently in BETA and may change without notice. These

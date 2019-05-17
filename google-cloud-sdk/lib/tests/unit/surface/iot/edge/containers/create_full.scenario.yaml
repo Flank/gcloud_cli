@@ -1,0 +1,131 @@
+title: cloud iot edge containers create test scenario
+release_tracks: [ALPHA]
+description: tests full Edge Container creation
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      iot edge containers create foo --region asia-east1 --registry my-registry --device my-device --docker-image gcr.io/cloud-iot-edge/samples/ml-camera-python:x86_64
+      --env-vars KEY1=VALUE1,KEY2=VALUE2 --input-topic foo:input/topic/1,bar:input/topic2 --output-topic foo:output/topic/1,bar:output/topic2
+      --device-binding /dev/video0:/dev/video1,/dev/gpio/1:r --volume-binding /tmp:ro,/tmp/data:/data --no-autostart --description "edge container"
+      --memory 1GB
+  - stderr: |
+      Created container [foo].
+actions:
+- execute_command:
+    command: |
+      iot edge containers create foo --region asia-east1 --registry my-registry --device my-device --docker-image gcr.io/cloud-iot-edge/samples/ml-camera-python:x86_64
+      --env-vars KEY1=VALUE1,KEY2=VALUE2 --input-topic foo:input/topic/1,bar:input/topic2 --output-topic foo:output/topic/1,bar:output/topic2
+      --device-binding /dev/video0:/dev/video1,/dev/gpio/1:r --volume-binding /tmp:ro,/tmp/data:/data --no-autostart --description "edge container"
+      --memory 1GB
+    events:
+    - api_call:
+        expect_request:
+          uri: https://edge.googleapis.com/v1alpha1/projects/fake-project/locations/asia-east1/registries/my-registry/devices/my-device/containers?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              autostart: false
+              availableMemoryMb: 1024
+              description: edge container
+              deviceBindings:
+              - cgroupPermissions: rwm
+                destination: /dev/video1
+                source: /dev/video0
+              - cgroupPermissions: r
+                destination: /dev/gpio/1
+                source: /dev/gpio/1
+              dockerImageUri: gcr.io/cloud-iot-edge/samples/ml-camera-python:x86_64
+              environmentVariables:
+                KEY1: VALUE1
+                KEY2: VALUE2
+              inputTopics:
+              - topic: /container/foo/input
+              - id: foo
+                topic: input/topic/1
+              - id: bar
+                topic: input/topic2
+              name: projects/fake-project/locations/asia-east1/registries/my-registry/devices/my-device/containers/foo
+              outputTopics:
+              - topic: /container/foo/output
+              - id: foo
+                topic: output/topic/1
+              - id: bar
+                topic: output/topic2
+              volumeBindings:
+              - destination: /tmp
+                readOnly: true
+                source: /tmp
+              - destination: /data
+                readOnly: false
+                source: /tmp/data
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/asia-east1/registries/my-registry/devices/my-device/containers/foo",
+              "description": "edge container",
+              "dockerImageUri": "gcr.io/cloud-iot-edge/samples/ml-camera-python:x86_64",
+              "environmentVariables": {
+                "KEY2": "VALUE2",
+                "KEY1": "VALUE1"
+              },
+              "availableMemoryMb": 1024,
+              "volumeBindings": [
+                {
+                  "source": "/tmp",
+                  "destination": "/tmp",
+                  "readOnly": true
+                },
+                {
+                  "source": "/tmp/data",
+                  "destination": "/data"
+                }
+              ],
+              "deviceBindings": [
+                {
+                  "source": "/dev/video0",
+                  "destination": "/dev/video1",
+                  "cgroupPermissions": "rwm"
+                },
+                {
+                  "source": "/dev/gpio/1",
+                  "destination": "/dev/gpio/1",
+                  "cgroupPermissions": "r"
+                }
+              ],
+              "inputTopics": [
+                {
+                  "topic": "/container/foo/input"
+                },
+                {
+                  "topic": "input/topic/1",
+                  "id": "foo"
+                },
+                {
+                  "topic": "input/topic2",
+                  "id": "bar"
+                }
+              ],
+              "outputTopics": [
+                {
+                  "topic": "/container/foo/output"
+                },
+                {
+                  "topic": "output/topic/1",
+                  "id": "foo"
+                },
+                {
+                  "topic": "output/topic2",
+                  "id": "bar"
+                }
+              ],
+              "updateTime": "2019-02-26T17:05:16.936090322Z",
+              "version": "1"
+            }
+    - expect_stderr: |
+        Created container [foo].
+    - expect_exit:
+        code: 0

@@ -23,10 +23,13 @@ from tests.lib import test_case
 from tests.lib.surface.compute.networks.vpc_access import base
 
 
-class ConnectorsDeleteTest(base.VpcAccessUnitTestBase):
+class ConnectorsDeleteTestBeta(base.VpcAccessUnitTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'v1beta1'
 
   def testConnectorsDelete(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
     self._ExpectDelete()
 
     self.WriteInput('y')
@@ -41,7 +44,6 @@ class ConnectorsDeleteTest(base.VpcAccessUnitTestBase):
     self.AssertErrContains('Deleted connector [{}].'.format(self.connector_id))
 
   def testConnectorsDelete_Async(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
     self._ExpectDelete(is_async=True)
 
     self.WriteInput('y')
@@ -59,7 +61,6 @@ class ConnectorsDeleteTest(base.VpcAccessUnitTestBase):
                            .format(self.operation_id))
 
   def testConnectorsDelete_UsingRelativeConnectorName(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
     self._ExpectDelete()
 
     self.WriteInput('y')
@@ -88,6 +89,13 @@ class ConnectorsDeleteTest(base.VpcAccessUnitTestBase):
         request=self.messages.VpcaccessProjectsLocationsOperationsGetRequest(
             name=operation.name),
         response=operation)
+
+
+class ConnectorsDeleteTestAlpha(ConnectorsDeleteTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'v1alpha1'
 
 
 if __name__ == '__main__':

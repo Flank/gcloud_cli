@@ -9,8 +9,9 @@ DESCRIPTION
     Read and manipulate Google Compute Engine VPN Tunnels.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -21,10 +22,10 @@ COMMANDS
         Create a VPN tunnel.
 
      delete
-        Delete vpn tunnels.
+        Delete VPN tunnels.
 
      describe
-        Describe a Google Compute Engine vpn tunnel.
+        Describe a Google Compute Engine VPN tunnel.
 
      list
         List Google Compute Engine VPN tunnels.

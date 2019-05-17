@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2018 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,33 +30,36 @@ class InstanceGroupManagersSetInstanceTemplatesZonalTest(test_base.BaseTest):
 
   def SetUp(self):
     self.SelectApi(API_VERSION)
+    self.project = 'my-project'
+    self.zone = 'central2-a'
+    self.igm = 'group-1'
     self.make_requests.side_effect = iter([
         [
-            self.messages.Zone(name='central2-a'),
+            self.messages.Zone(name=self.zone),
         ],
     ])
+
+  def _GetPatchRequest(self):
+    instance_template_ref = ('{0}/projects/my-project/global/instanceTemplates/'
+                             'template-1'.format(self.compute_uri))
+    return (self.messages.ComputeInstanceGroupManagersPatchRequest(
+        project=self.project,
+        zone=self.zone,
+        instanceGroupManager=self.igm,
+        instanceGroupManagerResource=(self.messages.InstanceGroupManager(
+            instanceTemplate=instance_template_ref,
+            versions=[
+                self.messages.InstanceGroupManagerVersion(
+                    instanceTemplate=instance_template_ref)
+            ])),
+    ))
 
   def testWithName(self):
     self.Run('compute instance-groups managed set-instance-template group-1 '
              '--zone central2-a --template template-1')
 
-    request = (
-        self.messages.ComputeInstanceGroupManagersSetInstanceTemplateRequest(
-            instanceGroupManager='group-1',
-            instanceGroupManagersSetInstanceTemplateRequest=(
-                self.messages.InstanceGroupManagersSetInstanceTemplateRequest(
-                    instanceTemplate=(
-                        '{0}/projects/my-project/global/instanceTemplates/'
-                        'template-1'.format(self.compute_uri))
-                )
-            ),
-            project='my-project',
-            zone='central2-a'
-        )
-    )
-    self.CheckRequests(
-        [(self.compute.instanceGroupManagers, 'SetInstanceTemplate', request)],
-    )
+    self.CheckRequests([(self.compute.instanceGroupManagers, 'Patch',
+                         self._GetPatchRequest())])
 
   def testWithUri(self):
     igm_uri = ('{0}/projects/my-project/zones/central2-a/instanceGroupManagers/'
@@ -64,65 +67,31 @@ class InstanceGroupManagersSetInstanceTemplatesZonalTest(test_base.BaseTest):
     template_uri = ('{0}/projects/my-project/global/instanceTemplates/'
                     'template-1'.format(self.compute_uri))
     self.Run('compute instance-groups managed set-instance-template {0} --zone '
-             'central2-a --template {1}'.format(
-                 igm_uri, template_uri))
+             'central2-a --template {1}'.format(igm_uri, template_uri))
 
-    request = (
-        self.messages.ComputeInstanceGroupManagersSetInstanceTemplateRequest(
-            instanceGroupManager='group-1',
-            instanceGroupManagersSetInstanceTemplateRequest=(
-                self.messages.InstanceGroupManagersSetInstanceTemplateRequest(
-                    instanceTemplate=(
-                        '{0}/projects/my-project/global/instanceTemplates/'
-                        'template-1'.format(self.compute_uri))
-                )
-            ),
-            project='my-project',
-            zone='central2-a'
-        )
-    )
-    self.CheckRequests(
-        [(self.compute.instanceGroupManagers, 'SetInstanceTemplate', request)],
-    )
+    self.CheckRequests([(self.compute.instanceGroupManagers, 'Patch',
+                         self._GetPatchRequest())])
 
   def testZonePrompt(self):
-    self.StartPatch('googlecloudsdk.core.console.console_io.CanPrompt',
-                    return_value=True)
-    self.make_requests.side_effect = iter([
-        [
+    self.StartPatch(
+        'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
+    self.make_requests.side_effect = iter(
+        [[
             self.messages.Region(name='central1'),
             self.messages.Region(name='central2'),
         ],
-        [
-            self.messages.Zone(name='central1-a'),
-            self.messages.Zone(name='central1-b'),
-            self.messages.Zone(name='central2-a'),
-        ],
-        []
-    ])
+         [
+             self.messages.Zone(name='central1-a'),
+             self.messages.Zone(name='central1-b'),
+             self.messages.Zone(name='central2-a'),
+         ], []])
     self.WriteInput('5\n')
     self.Run('compute instance-groups managed set-instance-template group-1 '
              ' --template template-1')
 
-    request = (
-        self.messages.ComputeInstanceGroupManagersSetInstanceTemplateRequest(
-            instanceGroupManager='group-1',
-            instanceGroupManagersSetInstanceTemplateRequest=(
-                self.messages.InstanceGroupManagersSetInstanceTemplateRequest(
-                    instanceTemplate=(
-                        '{0}/projects/my-project/global/instanceTemplates/'
-                        'template-1'.format(self.compute_uri))
-                )
-            ),
-            project='my-project',
-            zone='central2-a'
-        )
-    )
-    self.CheckRequests(
-        self.regions_list_request,
-        self.zones_list_request,
-        [(self.compute.instanceGroupManagers, 'SetInstanceTemplate', request)],
-    )
+    self.CheckRequests(self.regions_list_request, self.zones_list_request,
+                       [(self.compute.instanceGroupManagers, 'Patch',
+                         self._GetPatchRequest())])
 
   @patch('googlecloudsdk.command_lib.compute.instance_groups.flags.'
          'MULTISCOPE_INSTANCE_GROUP_MANAGER_ARG',
@@ -137,9 +106,27 @@ class InstanceGroupManagersSetInstanceTemplatesRegionalTest(test_base.BaseTest):
 
   def SetUp(self):
     self.SelectApi(API_VERSION)
+    self.project = 'my-project'
+    self.region = 'central2'
+    self.igm = 'group-1'
     self.make_requests.side_effect = iter([
         [],
     ])
+
+  def _GetPatchRequest(self):
+    instance_template_ref = ('{0}/projects/my-project/global/instanceTemplates/'
+                             'template-1'.format(self.compute_uri))
+    return (self.messages.ComputeRegionInstanceGroupManagersPatchRequest(
+        project=self.project,
+        region=self.region,
+        instanceGroupManager=self.igm,
+        instanceGroupManagerResource=(self.messages.InstanceGroupManager(
+            instanceTemplate=instance_template_ref,
+            versions=[
+                self.messages.InstanceGroupManagerVersion(
+                    instanceTemplate=instance_template_ref)
+            ])),
+    ))
 
   def testWithName(self):
     self.Run("""
@@ -147,25 +134,8 @@ class InstanceGroupManagersSetInstanceTemplatesRegionalTest(test_base.BaseTest):
             --region central2 --template template-1
         """)
 
-    request = (
-        self.messages.
-        ComputeRegionInstanceGroupManagersSetInstanceTemplateRequest(
-            instanceGroupManager='group-1',
-            regionInstanceGroupManagersSetTemplateRequest=(
-                self.messages.RegionInstanceGroupManagersSetTemplateRequest(
-                    instanceTemplate=(
-                        '{0}/projects/my-project/global/instanceTemplates/'
-                        'template-1'.format(self.compute_uri))
-                )
-            ),
-            project='my-project',
-            region='central2'
-        )
-    )
-    self.CheckRequests(
-        [(self.compute.regionInstanceGroupManagers,
-          'SetInstanceTemplate', request)],
-    )
+    self.CheckRequests([(self.compute.regionInstanceGroupManagers, 'Patch',
+                         self._GetPatchRequest())])
 
   def testWithUri(self):
     igm_uri = ('{0}/projects/my-project/regions/central2/instanceGroupManagers/'
@@ -177,67 +147,33 @@ class InstanceGroupManagersSetInstanceTemplatesRegionalTest(test_base.BaseTest):
             --region central2 --template {1}
         """.format(igm_uri, template_uri))
 
-    request = (
-        self.messages.
-        ComputeRegionInstanceGroupManagersSetInstanceTemplateRequest(
-            instanceGroupManager='group-1',
-            regionInstanceGroupManagersSetTemplateRequest=(
-                self.messages.RegionInstanceGroupManagersSetTemplateRequest(
-                    instanceTemplate=(
-                        '{0}/projects/my-project/global/instanceTemplates/'
-                        'template-1'.format(self.compute_uri))
-                )
-            ),
-            project='my-project',
-            region='central2'
-        )
-    )
-    self.CheckRequests(
-        [(self.compute.regionInstanceGroupManagers,
-          'SetInstanceTemplate', request)],
-    )
+    self.CheckRequests([(self.compute.regionInstanceGroupManagers, 'Patch',
+                         self._GetPatchRequest())])
 
   def testZonePrompt(self):
-    self.StartPatch('googlecloudsdk.core.console.console_io.CanPrompt',
-                    return_value=True)
-    self.make_requests.side_effect = iter([
-        [
+    self.StartPatch(
+        'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
+    self.make_requests.side_effect = iter(
+        [[
             self.messages.Region(name='central1'),
             self.messages.Region(name='central2'),
         ],
-        [
-            self.messages.Zone(name='central1-a'),
-            self.messages.Zone(name='central1-b'),
-            self.messages.Zone(name='central2-a'),
-        ],
-        []
-    ])
+         [
+             self.messages.Zone(name='central1-a'),
+             self.messages.Zone(name='central1-b'),
+             self.messages.Zone(name='central2-a'),
+         ], []])
     self.WriteInput('2\n')
     self.Run("""
         compute instance-groups managed set-instance-template group-1
             --template template-1
         """)
 
-    request = (
-        self.messages.
-        ComputeRegionInstanceGroupManagersSetInstanceTemplateRequest(
-            instanceGroupManager='group-1',
-            regionInstanceGroupManagersSetTemplateRequest=(
-                self.messages.RegionInstanceGroupManagersSetTemplateRequest(
-                    instanceTemplate=(
-                        '{0}/projects/my-project/global/instanceTemplates/'
-                        'template-1'.format(self.compute_uri))
-                )
-            ),
-            project='my-project',
-            region='central2'
-        )
-    )
     self.CheckRequests(
         self.regions_list_request,
         self.zones_list_request,
-        [(self.compute.regionInstanceGroupManagers,
-          'SetInstanceTemplate', request)],
+        [(self.compute.regionInstanceGroupManagers, 'Patch',
+          self._GetPatchRequest())],
     )
 
 

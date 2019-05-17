@@ -1,0 +1,91 @@
+title: dicom stores import export tests
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: healthcare dicom-stores import my-store --location us-central1 --dataset
+      my-dataset --gcs-uri=gs://fake-bucket/fake/path/to/file.txt
+  - stdout: |
+      name: projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890
+- execute:
+  - command: healthcare dicom-stores export my-store --location us-central1 --dataset
+      my-dataset --bq-table=fake-table --overwrite-table
+  - stdout: |
+      name: projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890
+- execute:
+  - command: |
+      healthcare dicom-stores export my-store --location us-central1 --dataset
+      my-dataset --gcs-uri-prefix=gs://bucket-id/path/to/fake/dir
+      --mime-type=dicom
+  - stdout: |
+      name: projects/fake-project/locations/us-central1/datasets/my-dataset/operations/12345678901234567890
+actions:
+- execute_command:
+    command: healthcare dicom-stores import my-store --location us-central1 --dataset
+      my-dataset --gcs-uri=gs://fake-bucket/fake/path/to/file.txt
+    events:
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores/my-store:import?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              gcsSource: {}
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890"
+            }
+    - expect_stdout: |
+        name: projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: healthcare dicom-stores export my-store --location us-central1 --dataset
+      my-dataset --bq-table=fake-table --overwrite-table
+    events:
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores/my-store:export?alt=json
+          method: POST
+          headers: {}
+          body:
+            json: {}
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890"
+            }
+    - expect_stdout: |
+        name: projects/fake-project/locations/us-central1/datasets/my-dataset/operations/123456789012357890
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      healthcare dicom-stores export my-store --location us-central1 --dataset
+      my-dataset --gcs-uri-prefix=gs://bucket-id/path/to/fake/dir
+      --mime-type=dicom
+    events:
+    - api_call:
+        expect_request:
+          uri: https://healthcare.googleapis.com/v1alpha2/projects/fake-project/locations/us-central1/datasets/my-dataset/dicomStores/my-store:export?alt=json
+          method: POST
+          headers: {}
+          body:
+            json: {}
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/datasets/my-dataset/operations/12345678901234567890"
+            }
+    - expect_stdout: |
+        name: projects/fake-project/locations/us-central1/datasets/my-dataset/operations/12345678901234567890
+    - expect_exit:
+        code: 0

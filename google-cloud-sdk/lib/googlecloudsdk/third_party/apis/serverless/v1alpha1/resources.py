@@ -18,7 +18,7 @@ import enum
 
 
 BASE_URL = 'https://serverless.googleapis.com/v1alpha1/'
-DOCS_URL = 'https://docs.google.com/document/d/1uVywBe9aLYQvG31QkrQDtFMmWL5p1ONOr0DBzK6K384/'
+DOCS_URL = 'https://cloud.google.com/run/'
 
 
 class Collections(enum.Enum):
@@ -37,6 +37,16 @@ class Collections(enum.Enum):
       {
           '':
               'namespaces/{namespacesId}/configurations/{configurationsId}',
+      },
+      [u'name'],
+      True
+  )
+  NAMESPACES_DOMAINMAPPINGS = (
+      'namespaces.domainmappings',
+      '{+name}',
+      {
+          '':
+              'namespaces/{namespacesId}/domainmappings/{domainmappingsId}',
       },
       [u'name'],
       True
@@ -92,6 +102,17 @@ class Collections(enum.Enum):
           '':
               'projects/{projectsId}/locations/{locationsId}/configurations/'
               '{configurationsId}',
+      },
+      [u'name'],
+      True
+  )
+  PROJECTS_LOCATIONS_DOMAINMAPPINGS = (
+      'projects.locations.domainmappings',
+      '{+name}',
+      {
+          '':
+              'projects/{projectsId}/locations/{locationsId}/domainmappings/'
+              '{domainmappingsId}',
       },
       [u'name'],
       True

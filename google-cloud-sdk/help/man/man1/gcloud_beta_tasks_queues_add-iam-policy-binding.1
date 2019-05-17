@@ -63,11 +63,11 @@ Examples: \f5user:test\-user@gmail.com\fR, \f5group:admins@example.com\fR,
 Can also be one of the following special values:
 .RS 2m
 .IP "\(em" 2m
-\f5allUsers\fR \- anyone who is on the internet, with or without a Google
-account.
+\f5allUsers\fR \- Special identifier that represents anyone who is on the
+internet, with or without a Google account.
 .IP "\(em" 2m
-\f5allAuthenticatedUsers\fR \- anyone who is authenticated with a Google account
-or a service account.
+\f5allAuthenticatedUsers\fR \- Special identifier that represents anyone who is
+authenticated with a Google account or a service account.
 .RE
 .RE
 .sp
@@ -83,17 +83,18 @@ Define the role of the member.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
 .SH "API REFERENCE"
 
-This command uses the \fBcloudtasks/v2beta2\fR API. The full documentation for
-this API can be found at: https://cloud.google.com/tasks/
+This command uses the \fBcloudtasks/v2\fR API. The full documentation for this
+API can be found at: https://cloud.google.com/tasks/
 
 
 
@@ -115,10 +116,11 @@ role and member types.
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
+$ gcloud tasks queues add\-iam\-policy\-binding
 $ gcloud alpha tasks queues add\-iam\-policy\-binding
 .RE
 

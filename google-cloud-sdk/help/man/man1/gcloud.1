@@ -11,7 +11,7 @@ gcloud \- manage Google Cloud Platform resources and developer workflow
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud\fR \fIGROUP\fR | \fICOMMAND\fR [\fB\-\-account\fR=\fIACCOUNT\fR] [\fB\-\-configuration\fR=\fICONFIGURATION\fR] [\fB\-\-flags\-file\fR=\fIYAML_FILE\fR] [\fB\-\-flatten\fR=[\fIKEY\fR,...]] [\fB\-\-format\fR=\fIFORMAT\fR] [\fB\-\-help\fR] [\fB\-\-project\fR=\fIPROJECT_ID\fR] [\fB\-\-quiet\fR,\ \fB\-q\fR] [\fB\-\-verbosity\fR=\fIVERBOSITY\fR;\ default="warning"] [\fB\-\-version\fR,\ \fB\-v\fR] [\fB\-h\fR] [\fB\-\-log\-http\fR] [\fB\-\-trace\-token\fR=\fITRACE_TOKEN\fR] [\fB\-\-no\-user\-output\-enabled\fR]
+\f5gcloud\fR \fIGROUP\fR | \fICOMMAND\fR [\fB\-\-account\fR=\fIACCOUNT\fR] [\fB\-\-billing\-project\fR=\fIBILLING_PROJECT\fR] [\fB\-\-configuration\fR=\fICONFIGURATION\fR] [\fB\-\-flags\-file\fR=\fIYAML_FILE\fR] [\fB\-\-flatten\fR=[\fIKEY\fR,...]] [\fB\-\-format\fR=\fIFORMAT\fR] [\fB\-\-help\fR] [\fB\-\-project\fR=\fIPROJECT_ID\fR] [\fB\-\-quiet\fR,\ \fB\-q\fR] [\fB\-\-verbosity\fR=\fIVERBOSITY\fR;\ default="warning"] [\fB\-\-version\fR,\ \fB\-v\fR] [\fB\-h\fR] [\fB\-\-impersonate\-service\-account\fR=\fISERVICE_ACCOUNT_EMAIL\fR] [\fB\-\-log\-http\fR] [\fB\-\-trace\-token\fR=\fITRACE_TOKEN\fR] [\fB\-\-no\-user\-output\-enabled\fR]
 
 
 
@@ -29,6 +29,15 @@ workflow, and interactions with the Google Cloud Platform APIs.
 \fB\-\-account\fR=\fIACCOUNT\fR
 Google Cloud Platform user account to use for invocation. Overrides the default
 \fBcore/account\fR property value for this command invocation.
+
+.TP 2m
+\fB\-\-billing\-project\fR=\fIBILLING_PROJECT\fR
+The Google Cloud Platform project that will be charged quota for operations
+performed in gcloud. If you need to operate on one project, but need quota
+against a different project, you can use this flag to specify the billing
+project. If both \f5billing/quota_project\fR and \f5\-\-billing\-project\fR are
+specified, \f5\-\-billing\-project\fR takes precedence. Run \f5$ gcloud config
+set \-\-help\fR to see more information about \f5billing/quota_project\fR.
 
 .TP 2m
 \fB\-\-configuration\fR=\fICONFIGURATION\fR
@@ -109,6 +118,18 @@ Print a summary help and exit.
 
 .RS 2m
 .TP 2m
+\fB\-\-impersonate\-service\-account\fR=\fISERVICE_ACCOUNT_EMAIL\fR
+For this gcloud invocation, all API requests will be made as the given service
+account instead of the currently selected account. This is done without needing
+to create, download, and activate a key for the account. In order to perform
+operations as the service account, your currently selected account must have an
+IAM role that includes the iam.serviceAccounts.getAccessToken permission for the
+service account. The roles/iam.serviceAccountTokenCreator role has this
+permission or you may create a custom role. Overrides the default
+\fBauth/impersonate_service_account\fR property value for this command
+invocation.
+
+.TP 2m
 \fB\-\-log\-http\fR
 Log all HTTP server requests and responses to stderr. Overrides the default
 \fBcore/log_http\fR property value for this command invocation.
@@ -135,12 +156,24 @@ Print user intended output to the console. Overrides the default
 
 .RS 2m
 .TP 2m
+\fBaccess\-context\-manager\fR
+Manage Access Context Manager resources.
+
+.TP 2m
+\fBai\-platform\fR
+Manage AI Platform jobs and models.
+
+.TP 2m
 \fBalpha\fR
 \fB(ALPHA)\fR Alpha versions of gcloud commands.
 
 .TP 2m
 \fBapp\fR
 Manage your App Engine deployments.
+
+.TP 2m
+\fBasset\fR
+Manage the Cloud Asset Inventory.
 
 .TP 2m
 \fBauth\fR
@@ -211,6 +244,10 @@ Manage domains for your Google Cloud projects.
 Create, enable and manage API services.
 
 .TP 2m
+\fBfilestore\fR
+Create and manipulate Cloud Filestore resources.
+
+.TP 2m
 \fBfirebase\fR
 Work with Google Firebase.
 
@@ -240,7 +277,7 @@ Use Google Cloud machine learning capabilities.
 
 .TP 2m
 \fBml\-engine\fR
-Manage Cloud ML Engine jobs and models.
+Manage AI Platform jobs and models.
 
 .TP 2m
 \fBorganizations\fR
@@ -252,11 +289,15 @@ Create and manage project access policies.
 
 .TP 2m
 \fBpubsub\fR
-Manage Cloud Pub/Sub topics and subscriptions.
+Manage Cloud Pub/Sub topics, subscriptions, and snapshots.
 
 .TP 2m
 \fBredis\fR
 Manage Cloud Memorystore Redis resources.
+
+.TP 2m
+\fBresource\-manager\fR
+Manage Cloud Resources.
 
 .TP 2m
 \fBservices\fR
@@ -273,6 +314,10 @@ Command groups for Cloud Spanner.
 .TP 2m
 \fBsql\fR
 Create and manage Google Cloud SQL databases.
+
+.TP 2m
+\fBtasks\fR
+Manage Cloud Tasks queues and tasks.
 
 .TP 2m
 \fBtopic\fR

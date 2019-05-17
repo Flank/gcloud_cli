@@ -30,7 +30,7 @@ from tests.lib.surface.filestore import base
 class CloudFilestoreInstancesDeleteTest(base.CloudFilestoreUnitTestBase,
                                         parameterized.TestCase):
 
-  _TRACK = calliope_base.ReleaseTrack.BETA
+  _TRACK = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.SetUpTrack(self._TRACK)
@@ -53,7 +53,7 @@ class CloudFilestoreInstancesDeleteTest(base.CloudFilestoreUnitTestBase,
   def testCancelDeleteValidInstance(self):
     self.WriteInput('n')
     self.RunDelete(
-        'instance_name', '--location=us-central1-c',
+        'instance_name', '--zone=us-central1-c',
         '--async')
     self.AssertOutputEquals('')
     self.AssertErrContains(
@@ -64,11 +64,20 @@ class CloudFilestoreInstancesDeleteTest(base.CloudFilestoreUnitTestBase,
     self.WriteInput('y')
     self.ExpectDeleteInstance()
     self.RunDelete(
+        'instance_name', '--zone=us-central1-c',
+        '--async')
+    self.AssertOutputEquals('')
+    self.AssertErrContains(
+        'projects/{}/locations/us-central1-c/instances/instance_name'
+        .format(self.Project()))
+
+  def testDeleteValidInstanceUsingDeprecatedLocation(self):
+    self.WriteInput('y')
+    self.ExpectDeleteInstance()
+    self.RunDelete(
         'instance_name', '--location=us-central1-c',
         '--async')
     self.AssertOutputEquals('')
-    self.AssertErrContains('$ gcloud {} filestore instances list'
-                           .format(self._TRACK.prefix))
     self.AssertErrContains(
         'projects/{}/locations/us-central1-c/instances/instance_name'
         .format(self.Project()))
@@ -83,7 +92,7 @@ class CloudFilestoreInstancesDeleteTest(base.CloudFilestoreUnitTestBase,
             name=self.op_name,
             done=True))
     self.RunDelete(
-        'instance_name', '--location=us-central1-c')
+        'instance_name', '--zone=us-central1-c')
     self.AssertErrContains(
         'projects/{}/locations/us-central1-c/instances/instance_name'
         .format(self.Project()))
@@ -102,13 +111,30 @@ class CloudFilestoreInstancesDeleteTest(base.CloudFilestoreUnitTestBase,
   @parameterized.named_parameters(
       ('MissingLocation', handlers.ParseError, ['instance_name', '--async']),
       ('MissingInstanceName', cli_test_base.MockArgumentError,
-       ['--location=us-central1-c', '--async']))
+       ['--zone=us-central1-c', '--async']))
   def testMissingLocationWithoutDefault(self, expected_error, args):
     with self.assertRaises(expected_error):
       self.RunDelete(*args)
 
 
-class CloudFilestoreInstancesDeleteAlphaTest(CloudFilestoreInstancesDeleteTest):
+class CloudFilestoreInstancesDeleteBetaTest(CloudFilestoreInstancesDeleteTest):
+
+  _TRACK = calliope_base.ReleaseTrack.BETA
+
+  def testDeleteValidInstance(self):
+    self.WriteInput('y')
+    self.ExpectDeleteInstance()
+    self.RunDelete('instance_name', '--zone=us-central1-c', '--async')
+    self.AssertOutputEquals('')
+    self.AssertErrContains('$ gcloud {} filestore instances list'.format(
+        self._TRACK.prefix))
+    self.AssertErrContains(
+        'projects/{}/locations/us-central1-c/instances/instance_name'.format(
+            self.Project()))
+
+
+class CloudFilestoreInstancesDeleteAlphaTest(
+    CloudFilestoreInstancesDeleteBetaTest):
 
   _TRACK = calliope_base.ReleaseTrack.ALPHA
 

@@ -11,7 +11,7 @@ gcloud alpha filestore instances create \- create a Cloud Filestore instance
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha filestore instances create\fR (\fIINSTANCE\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) \fB\-\-file\-share\fR=[\fIcapacity\fR=\fICAPACITY\fR],[\fIname\fR=\fINAME\fR] \fB\-\-network\fR=[\fIname\fR=\fINAME\fR],[\fIreserved\-ip\-range\fR=\fIRESERVED\-IP\-RANGE\fR] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-tier\fR=\fITIER\fR;\ default="STANDARD"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha filestore instances create\fR (\fIINSTANCE\fR\ :\ \fB\-\-zone\fR=\fIZONE\fR) \fB\-\-file\-share\fR=[\fIcapacity\fR=\fICAPACITY\fR],[\fIname\fR=\fINAME\fR],[\fIsource\-snapshot\fR=\fISOURCE\-SNAPSHOT\fR],[\fIsource\-snapshot\-region\fR=\fISOURCE\-SNAPSHOT\-REGION\fR] \fB\-\-network\fR=[\fIname\fR=\fINAME\fR],[\fIreserved\-ip\-range\fR=\fIRESERVED\-IP\-RANGE\fR] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-location\fR=\fILOCATION\fR] [\fB\-\-tier\fR=\fITIER\fR;\ default="STANDARD"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -41,8 +41,8 @@ positional must be specified if any of the other arguments in this group are
 specified.
 
 .TP 2m
-\fB\-\-location\fR=\fILOCATION\fR
-The location of the instance.
+\fB\-\-zone\fR=\fIZONE\fR
+The zone of the instance.
 
 
 .RE
@@ -53,7 +53,7 @@ The location of the instance.
 
 .RS 2m
 .TP 2m
-\fB\-\-file\-share\fR=[\fIcapacity\fR=\fICAPACITY\fR],[\fIname\fR=\fINAME\fR]
+\fB\-\-file\-share\fR=[\fIcapacity\fR=\fICAPACITY\fR],[\fIname\fR=\fINAME\fR],[\fIsource\-snapshot\fR=\fISOURCE\-SNAPSHOT\fR],[\fIsource\-snapshot\-region\fR=\fISOURCE\-SNAPSHOT\-REGION\fR]
 File share configuration for an instance. Specifying both \f5name\fR and
 \f5capacity\fR is required.
 
@@ -68,6 +68,15 @@ for a premium instance is 2.5TB.
 .TP 2m
 \fBname\fR
 The desired logical name of the volume.
+
+.RS 2m
+*source\-snapshot*::: The name of the snapshot to restore from.
+.RE
+
+.TP 2m
+\fBsource\-snapshot\-region\fR
+The region of the source snapshot. If unspecified, the region of the instance
+will be used.
 
 .RE
 .sp
@@ -118,6 +127,12 @@ only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
 numbers.
 
 .TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+(DEPRECATED) Location of the Cloud Filestore instance.
+
+The \f5\-\-location\fR flag is deprecated. Use \f5\-\-zone\fR.
+
+.TP 2m
 \fB\-\-tier\fR=\fITIER\fR; default="STANDARD"
 The service tier for the Cloud Filestore instance. \fITIER\fR must be one of:
 
@@ -138,10 +153,11 @@ Standard Filestore instance.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -165,9 +181,10 @@ This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you will have to apply for early access and have your projects registered on the
 API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. This variant is also available:
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
+$ gcloud filestore instances create
 $ gcloud beta filestore instances create
 .RE
 

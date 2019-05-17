@@ -32,6 +32,11 @@ $ gcloud compute instances move example\-instance\-1 \e
 will move the instance called example\-instance\-1 with its all attached
 persistent disks, currently running in us\-central1\-b, to us\-central1\-f.
 
+Please note that gcloud compute instances move does not yet support instances
+which have regional persistent disks attached. Please see
+https://cloud.google.com/compute/docs/disks/regional\-persistent\-disk for more
+details.
+
 
 
 .SH "POSITIONAL ARGUMENTS"
@@ -99,10 +104,11 @@ Alternatively, the zone can be stored in the environment variable
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

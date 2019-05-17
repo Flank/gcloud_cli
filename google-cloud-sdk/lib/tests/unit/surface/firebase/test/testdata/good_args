@@ -7,7 +7,6 @@ my-group:
   type: instrumentation
   test: startrek.apk
   locales: [klingon, romulan]
-  max-steps: 333
   results-dir: my/results/dir
   robo-directives:
     resource1: value1

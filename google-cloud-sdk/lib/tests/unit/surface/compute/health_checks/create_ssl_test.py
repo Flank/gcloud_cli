@@ -25,7 +25,7 @@ from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
 
-class HealthChecksCreateSslTest(test_base.BaseTest):
+class HealthChecksCreateSslTest(test_base.BaseTest, parameterized.TestCase):
 
   def SetUp(self):
     self._health_check_api = self.compute.healthChecks
@@ -33,275 +33,8 @@ class HealthChecksCreateSslTest(test_base.BaseTest):
   def RunCreate(self, command):
     self.Run('compute health-checks create ssl ' + command)
 
-  def testDefaultOptions(self):
-    self.RunCreate('my-health-check')
-
-    self.CheckRequests(
-        [(self._health_check_api, 'Insert',
-          self.messages.ComputeHealthChecksInsertRequest(
-              healthCheck=self.messages.HealthCheck(
-                  name='my-health-check',
-                  type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
-                  sslHealthCheck=self.messages.SSLHealthCheck(
-                      port=80,
-                      proxyHeader=(self.messages.SSLHealthCheck.
-                                   ProxyHeaderValueValuesEnum.NONE)),
-                  checkIntervalSec=5,
-                  timeoutSec=5,
-                  healthyThreshold=2,
-                  unhealthyThreshold=2),
-              project='my-project'))],)
-
-  def testUriSupport(self):
-    self.Run("""
-        compute health-checks create ssl
-          https://www.googleapis.com/compute/v1/projects/my-project/global/healthChecks/my-health-check
-        """)
-
-    self.CheckRequests(
-        [(self._health_check_api, 'Insert',
-          self.messages.ComputeHealthChecksInsertRequest(
-              healthCheck=self.messages.HealthCheck(
-                  name='my-health-check',
-                  type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
-                  sslHealthCheck=self.messages.SSLHealthCheck(
-                      port=80,
-                      proxyHeader=(self.messages.SSLHealthCheck.
-                                   ProxyHeaderValueValuesEnum.NONE)),
-                  checkIntervalSec=5,
-                  timeoutSec=5,
-                  healthyThreshold=2,
-                  unhealthyThreshold=2),
-              project='my-project'))],)
-
-  def testRequestOption(self):
-    self.RunCreate('my-health-check --request req\x00\x01')
-
-    self.CheckRequests(
-        [(self._health_check_api, 'Insert',
-          self.messages.ComputeHealthChecksInsertRequest(
-              healthCheck=self.messages.HealthCheck(
-                  name='my-health-check',
-                  type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
-                  sslHealthCheck=self.messages.SSLHealthCheck(
-                      request='req\x00\01',
-                      port=80,
-                      proxyHeader=(self.messages.SSLHealthCheck.
-                                   ProxyHeaderValueValuesEnum.NONE)),
-                  checkIntervalSec=5,
-                  timeoutSec=5,
-                  healthyThreshold=2,
-                  unhealthyThreshold=2),
-              project='my-project'))],)
-
-  def testRequestOptionUnicode(self):
-    self.RunCreate('my-health-check --request Ṳᾔḯ¢◎ⅾℯ')
-
-    self.CheckRequests(
-        [(self._health_check_api, 'Insert',
-          self.messages.ComputeHealthChecksInsertRequest(
-              healthCheck=self.messages.HealthCheck(
-                  name='my-health-check',
-                  type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
-                  sslHealthCheck=self.messages.SSLHealthCheck(
-                      request='Ṳᾔḯ¢◎ⅾℯ',
-                      port=80,
-                      proxyHeader=(self.messages.SSLHealthCheck.
-                                   ProxyHeaderValueValuesEnum.NONE)),
-                  checkIntervalSec=5,
-                  timeoutSec=5,
-                  healthyThreshold=2,
-                  unhealthyThreshold=2),
-              project='my-project'))],)
-
-  def testResponseOptionUnicode(self):
-    self.RunCreate('my-health-check --response Ṳᾔḯ¢◎ⅾℯ')
-
-    self.CheckRequests(
-        [(self._health_check_api, 'Insert',
-          self.messages.ComputeHealthChecksInsertRequest(
-              healthCheck=self.messages.HealthCheck(
-                  name='my-health-check',
-                  type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
-                  sslHealthCheck=self.messages.SSLHealthCheck(
-                      response='Ṳᾔḯ¢◎ⅾℯ',
-                      port=80,
-                      proxyHeader=(self.messages.SSLHealthCheck.
-                                   ProxyHeaderValueValuesEnum.NONE)),
-                  checkIntervalSec=5,
-                  timeoutSec=5,
-                  healthyThreshold=2,
-                  unhealthyThreshold=2),
-              project='my-project'))],)
-
-  def testPortOption(self):
-    self.RunCreate('my-health-check --port 8888')
-
-    self.CheckRequests(
-        [(self._health_check_api, 'Insert',
-          self.messages.ComputeHealthChecksInsertRequest(
-              healthCheck=self.messages.HealthCheck(
-                  name='my-health-check',
-                  type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
-                  sslHealthCheck=self.messages.SSLHealthCheck(
-                      port=8888,
-                      proxyHeader=(self.messages.SSLHealthCheck.
-                                   ProxyHeaderValueValuesEnum.NONE)),
-                  checkIntervalSec=5,
-                  timeoutSec=5,
-                  healthyThreshold=2,
-                  unhealthyThreshold=2),
-              project='my-project'))],)
-
-  def testPortNameOption(self):
-    self.RunCreate('my-health-check --port-name magic-port')
-
-    self.CheckRequests(
-        [(self._health_check_api, 'Insert',
-          self.messages.ComputeHealthChecksInsertRequest(
-              healthCheck=self.messages.HealthCheck(
-                  name='my-health-check',
-                  type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
-                  sslHealthCheck=self.messages.SSLHealthCheck(
-                      portName='magic-port',
-                      proxyHeader=(self.messages.SSLHealthCheck.
-                                   ProxyHeaderValueValuesEnum.NONE)),
-                  checkIntervalSec=5,
-                  timeoutSec=5,
-                  healthyThreshold=2,
-                  unhealthyThreshold=2),
-              project='my-project'))],)
-
-  def testCheckIntervalOption(self):
-    self.RunCreate('my-health-check --check-interval 34s')
-
-    self.CheckRequests(
-        [(self._health_check_api, 'Insert',
-          self.messages.ComputeHealthChecksInsertRequest(
-              healthCheck=self.messages.HealthCheck(
-                  name='my-health-check',
-                  type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
-                  sslHealthCheck=self.messages.SSLHealthCheck(
-                      port=80,
-                      proxyHeader=(self.messages.SSLHealthCheck.
-                                   ProxyHeaderValueValuesEnum.NONE)),
-                  checkIntervalSec=34,
-                  timeoutSec=5,
-                  healthyThreshold=2,
-                  unhealthyThreshold=2),
-              project='my-project'))],)
-
-  def testTimeoutSecOption(self):
-    self.RunCreate('my-health-check --timeout 2m')
-
-    self.CheckRequests(
-        [(self._health_check_api, 'Insert',
-          self.messages.ComputeHealthChecksInsertRequest(
-              healthCheck=self.messages.HealthCheck(
-                  name='my-health-check',
-                  type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
-                  sslHealthCheck=self.messages.SSLHealthCheck(
-                      port=80,
-                      proxyHeader=(self.messages.SSLHealthCheck.
-                                   ProxyHeaderValueValuesEnum.NONE)),
-                  checkIntervalSec=5,
-                  timeoutSec=120,
-                  healthyThreshold=2,
-                  unhealthyThreshold=2),
-              project='my-project'))],)
-
-  def testHealthyThresholdOption(self):
-    self.RunCreate('my-health-check --healthy-threshold 7')
-
-    self.CheckRequests(
-        [(self._health_check_api, 'Insert',
-          self.messages.ComputeHealthChecksInsertRequest(
-              healthCheck=self.messages.HealthCheck(
-                  name='my-health-check',
-                  type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
-                  sslHealthCheck=self.messages.SSLHealthCheck(
-                      port=80,
-                      proxyHeader=(self.messages.SSLHealthCheck.
-                                   ProxyHeaderValueValuesEnum.NONE)),
-                  checkIntervalSec=5,
-                  timeoutSec=5,
-                  healthyThreshold=7,
-                  unhealthyThreshold=2),
-              project='my-project'))],)
-
-  def testUnhealthyThresholdOption(self):
-    self.RunCreate('my-health-check --unhealthy-threshold 8')
-
-    self.CheckRequests(
-        [(self._health_check_api, 'Insert',
-          self.messages.ComputeHealthChecksInsertRequest(
-              healthCheck=self.messages.HealthCheck(
-                  name='my-health-check',
-                  type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
-                  sslHealthCheck=self.messages.SSLHealthCheck(
-                      port=80,
-                      proxyHeader=(self.messages.SSLHealthCheck.
-                                   ProxyHeaderValueValuesEnum.NONE)),
-                  checkIntervalSec=5,
-                  timeoutSec=5,
-                  healthyThreshold=2,
-                  unhealthyThreshold=8),
-              project='my-project'))],)
-
-  def testDescriptionOption(self):
-    self.RunCreate("""
-        my-health-check --description "Circulation, Airway, Breathing"
-    """)
-
-    self.CheckRequests(
-        [(self._health_check_api, 'Insert',
-          self.messages.ComputeHealthChecksInsertRequest(
-              healthCheck=self.messages.HealthCheck(
-                  name='my-health-check',
-                  type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
-                  description='Circulation, Airway, Breathing',
-                  sslHealthCheck=self.messages.SSLHealthCheck(
-                      port=80,
-                      proxyHeader=(self.messages.SSLHealthCheck.
-                                   ProxyHeaderValueValuesEnum.NONE)),
-                  checkIntervalSec=5,
-                  timeoutSec=5,
-                  healthyThreshold=2,
-                  unhealthyThreshold=2),
-              project='my-project'))],)
-
-  def testProxyHeaderOption(self):
-    self.RunCreate('my-health-check --proxy-header PROXY_V1')
-
-    self.CheckRequests(
-        [(self._health_check_api, 'Insert',
-          self.messages.ComputeHealthChecksInsertRequest(
-              healthCheck=self.messages.HealthCheck(
-                  name='my-health-check',
-                  type=self.messages.HealthCheck.TypeValueValuesEnum.SSL,
-                  sslHealthCheck=self.messages.SSLHealthCheck(
-                      port=80,
-                      proxyHeader=(self.messages.SSLHealthCheck.
-                                   ProxyHeaderValueValuesEnum.PROXY_V1)),
-                  checkIntervalSec=5,
-                  timeoutSec=5,
-                  healthyThreshold=2,
-                  unhealthyThreshold=2),
-              project='my-project'))],)
-
-
-class HealthChecksCreateSslBetaTest(HealthChecksCreateSslTest,
-                                    parameterized.TestCase):
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.SelectApi(self.track.prefix)
-    self._health_check_api = self.compute_beta.healthChecks
-
   def testUseServingPortOption(self):
-    self.Run("""
-        compute health-checks create ssl my-health-check --use-serving-port
-        """)
+    self.RunCreate('my-health-check --use-serving-port')
 
     self.CheckRequests([(
         self.compute.healthChecks, 'Insert',
@@ -328,10 +61,8 @@ class HealthChecksCreateSslBetaTest(HealthChecksCreateSslTest,
         exceptions.InvalidArgumentException,
         'Invalid value for [--use-serving-port]: {0} cannot '
         'be specified when using: --use-serving-port'.format(flag)):
-      self.Run("""
-          compute health-checks create ssl my-health-check
-            --use-serving-port {0} {1}
-          """.format(flag, flag_value))
+      self.RunCreate('my-health-check --use-serving-port {0} {1}'.format(
+          flag, flag_value))
 
   def testDefaultOptions(self):
     self.RunCreate('my-health-check')
@@ -651,8 +382,15 @@ class HealthChecksCreateSslBetaTest(HealthChecksCreateSslTest,
               project='my-project'))],)
 
 
-class HealthChecksCreateSslAlphaTest(test_base.BaseTest,
-                                     parameterized.TestCase):
+class HealthChecksCreateSslBetaTest(HealthChecksCreateSslTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi(self.track.prefix)
+    self._health_check_api = self.compute_beta.healthChecks
+
+
+class HealthChecksCreateSslAlphaTest(HealthChecksCreateSslTest):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA

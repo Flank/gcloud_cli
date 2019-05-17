@@ -4,9 +4,9 @@ NAME
 
 SYNOPSIS
     gcloud alpha kms asymmetric-sign --digest-algorithm=DIGEST_ALGORITHM
-        --input-file=INPUT_FILE [--key=KEY] [--keyring=KEYRING]
-        [--location=LOCATION] [--signature-file=SIGNATURE_FILE]
-        [--version=VERSION] [GCLOUD_WIDE_FLAG ...]
+        --input-file=INPUT_FILE --signature-file=SIGNATURE_FILE [--key=KEY]
+        [--keyring=KEYRING] [--location=LOCATION] [--version=VERSION]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Creates a digital signature of the input file using the provided
@@ -22,6 +22,9 @@ REQUIRED FLAGS
      --input-file=INPUT_FILE
         Path to the input file to sign.
 
+     --signature-file=SIGNATURE_FILE
+        Path to the signature file to output.
+
 OPTIONAL FLAGS
      --key=KEY
         to use for signing.
@@ -32,15 +35,13 @@ OPTIONAL FLAGS
      --location=LOCATION
         Location of the keyring.
 
-     --signature-file=SIGNATURE_FILE
-        Path to the signature file to output.
-
      --version=VERSION
         Version to use for signing.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

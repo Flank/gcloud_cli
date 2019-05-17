@@ -25,7 +25,11 @@ from tests.lib import test_case
 from tests.lib.surface.compute.networks.vpc_access import base
 
 
-class OperationsListTest(base.VpcAccessUnitTestBase):
+class OperationsListTestBeta(base.VpcAccessUnitTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'v1beta1'
 
   def _ExpectList(self, expected_operations):
     self.client.projects_locations_operations.List.Expect(
@@ -43,20 +47,21 @@ class OperationsListTest(base.VpcAccessUnitTestBase):
     operations.append(
         self.messages.Operation(
             name=operation_prefix + 'my-operation-0',
-            metadata=self._MakeMetadata('my-connector-0', 'create',
+            metadata=self._MakeMetadata('my-connector-0', 'create', True,
                                         '2018-01-01T00:00:10'),
             done=False))
     # An operation is done.
     operations.append(
         self.messages.Operation(
             name=operation_prefix + 'my-operation-1',
-            metadata=self._MakeMetadata('my-connector-1', 'delete',
+            metadata=self._MakeMetadata('my-connector-1', 'delete', False,
                                         '2018-01-01T00:00:10',
                                         '2018-01-01T00:02:15'),
             done=True))
     return operations
 
-  def _MakeMetadata(self, target, method, insert_time='', end_time=''):
+  def _MakeMetadata(self, target, method, is_alpha, create_time='',
+                    end_time=''):
 
     def EncodeJsonValue(value):
       return encoding.PyValueToMessage(extra_types.JsonValue, value)
@@ -64,16 +69,16 @@ class OperationsListTest(base.VpcAccessUnitTestBase):
     metadata_dict = {
         'target': EncodeJsonValue(target),
         'method': EncodeJsonValue(method),
-        'insertTime': EncodeJsonValue(insert_time),
     }
+    if is_alpha:
+      metadata_dict['insertTime'] = EncodeJsonValue(create_time)
+    else:
+      metadata_dict['createTime'] = EncodeJsonValue(create_time)
     if end_time:
       metadata_dict['endTime'] = EncodeJsonValue(end_time)
 
     return encoding.DictToAdditionalPropertyMessage(
         metadata_dict, self.messages.Operation.MetadataValue)
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
 
   def testZeroOperationsList(self):
     self.client.projects_locations_operations.List.Expect(
@@ -120,6 +125,13 @@ class OperationsListTest(base.VpcAccessUnitTestBase):
             location=self.region_id),
         normalize_space=True)
     # pylint: enable=line-too-long
+
+
+class OperationsListTestAlpha(OperationsListTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'v1alpha1'
 
 
 if __name__ == '__main__':

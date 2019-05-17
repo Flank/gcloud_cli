@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2015 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,7 +29,6 @@ from googlecloudsdk.core import yaml
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 import mock
-import portpicker
 
 
 class UtilTests(sdk_test_base.WithOutputCapture):
@@ -107,7 +106,6 @@ class UtilTests(sdk_test_base.WithOutputCapture):
     properties.VALUES.emulator.datastore_data_dir.Set('hello')
     self.assertEqual('hello', util.GetDataDir('datastore'))
 
-  @test_case.Filters.skip('fails under IPv6', 'b/33234465')
   def testGetHostPort(self):
     socket_mock = self.StartObjectPatch(socket.socket, 'connect_ex')
     socket_mock.return_value = 1
@@ -121,12 +119,11 @@ class UtilTests(sdk_test_base.WithOutputCapture):
     self.assertEqual('[2620::1012:a:476:5b8a:e9d8:596f]:8080',
                      util.GetHostPort('datastore'))
 
-    port_picker_mock = self.StartObjectPatch(portpicker, 'pick_unused_port')
-    port_picker_mock.return_value = 8123
+    port_picker_mock = self.StartObjectPatch(util, 'GetHostPort')
+    port_picker_mock.return_value = '[::1]:8123'
     socket_mock.return_value = 0
     self.assertEqual('[::1]:8123', util.GetHostPort('pubsub'))
 
-  @test_case.Filters.skip('fails under IPv6', 'b/33234465')
   def testGetInvalidHostPort(self):
     properties.VALUES.emulator.pubsub_host_port.Set('invalidhostport8080')
     with self.assertRaises(util.InvalidHostError):
@@ -136,10 +133,9 @@ class UtilTests(sdk_test_base.WithOutputCapture):
     with self.assertRaises(util.InvalidHostError):
       util.GetHostPort('datastore')
 
-  @test_case.Filters.skip('fails under IPv6', 'b/33234465')
   def testEmulatorNoDefaultPort(self):
-    port_picker_mock = self.StartObjectPatch(portpicker, 'pick_unused_port')
-    port_picker_mock.return_value = 8123
+    port_picker_mock = self.StartObjectPatch(util, 'GetHostPort')
+    port_picker_mock.return_value = '[::1]:8123'
     self.assertEqual('[::1]:8123', util.GetHostPort('unknownemulator'))
 
 if __name__ == '__main__':

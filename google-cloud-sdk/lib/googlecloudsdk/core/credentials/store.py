@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2013 Google Inc. All Rights Reserved.
+# Copyright 2013 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import datetime
 import json
 import os
 import textwrap
+import time
 
 from googlecloudsdk.core import config
 from googlecloudsdk.core import exceptions
@@ -39,9 +40,12 @@ from googlecloudsdk.core.util import files
 
 import httplib2
 from oauth2client import client
+from oauth2client import crypt
+from oauth2client import service_account
 from oauth2client.contrib import gce as oauth2client_gce
 from oauth2client.contrib import reauth_errors
 import six
+from six.moves import urllib
 
 
 GOOGLE_OAUTH2_PROVIDER_AUTHORIZATION_URI = (
@@ -50,6 +54,7 @@ GOOGLE_OAUTH2_PROVIDER_REVOKE_URI = (
     'https://accounts.google.com/o/oauth2/revoke')
 GOOGLE_OAUTH2_PROVIDER_TOKEN_URI = (
     'https://accounts.google.com/o/oauth2/token')
+_GRANT_TYPE = 'urn:ietf:params:oauth:grant-type:jwt-bearer'
 
 
 class Error(exceptions.Error):
@@ -304,6 +309,12 @@ def Load(account=None, scopes=None, prevent_refresh=False,
   requires credentials (like printing out a token) vs logically requiring
   credentials (like for an http request).
 
+  Credential information may come from the stored credential file (representing
+  the last gcloud auth command), or the credential cache (representing the last
+  time the credentials were refreshed). If they come from the cache, the
+  token_response field will be None, as the full server response from the cached
+  request was not stored.
+
   Args:
     account: str, The account address for the credentials being fetched. If
         None, the account stored in the core.account property is used.
@@ -408,6 +419,8 @@ def Refresh(credentials, http_client=None):
   """Refresh credentials.
 
   Calls credentials.refresh(), unless they're SignedJwtAssertionCredentials.
+  If the credentials correspond to a service account, issue an additional
+  request to generate a fresh id_token.
 
   Args:
     credentials: oauth2client.client.Credentials, The credentials to refresh.
@@ -418,13 +431,62 @@ def Refresh(credentials, http_client=None):
     TokenRefreshReauthError: If the credentials fail to refresh due to reauth.
   """
   response_encoding = None if six.PY2 else 'utf-8'
+  request_client = http_client or http.Http(response_encoding=response_encoding)
   try:
-    credentials.refresh(http_client or
-                        http.Http(response_encoding=response_encoding))
+    credentials.refresh(request_client)
+
+    # Service accounts require an additional request to receive a fresh id_token
+    if isinstance(credentials, service_account.ServiceAccountCredentials):
+      id_token = _RefreshServiceAccountIdToken(credentials, request_client)
+      if credentials.token_response:
+        credentials.token_response['id_token'] = id_token
+      credentials.id_tokenb64 = id_token
+
   except (client.AccessTokenRefreshError, httplib2.ServerNotFoundError) as e:
     raise TokenRefreshError(six.text_type(e))
   except reauth_errors.ReauthError as e:
     raise TokenRefreshReauthError(e.message)
+
+
+def _RefreshServiceAccountIdToken(cred, http_client):
+  """Get a fresh id_token for the given service account.
+
+  Args:
+    cred: ServiceAccountCredentials, service account for which to refresh the
+        id_token.
+    http_client: httplib2.Http, the http transport to refresh with.
+
+  Returns:
+    str, The id_token if refresh was successful. Otherwise None.
+  """
+  http_request = http_client.request
+
+  now = int(time.time())
+  # pylint: disable=protected-access
+  payload = {
+      'aud': cred.token_uri,
+      'iat': now,
+      'exp': now + cred.MAX_TOKEN_LIFETIME_SECS,
+      'iss': cred._service_account_email,
+      'target_audience': config.CLOUDSDK_CLIENT_ID,
+  }
+  assertion = crypt.make_signed_jwt(
+      cred._signer, payload, key_id=cred._private_key_id)
+
+  body = urllib.parse.urlencode({
+      'assertion': assertion,
+      'grant_type': _GRANT_TYPE,
+  })
+
+  resp, content = http_request(
+      cred.token_uri.encode('idna'), method='POST', body=body,
+      headers=cred._generate_refresh_request_headers())
+  # pylint: enable=protected-access
+  if resp.status == 200:
+    d = json.loads(content)
+    return d.get('id_token', None)
+  else:
+    return None
 
 
 def Store(credentials, account=None, scopes=None):
@@ -504,12 +566,18 @@ def Revoke(account=None):
         'This comes from your browser session and will not persist outside'
         'of your connected Cloud Shell session.')
 
-  rv = True
+  rv = False
   try:
-    RevokeCredentials(credentials)
+    if not account.endswith('.gserviceaccount.com'):
+      RevokeCredentials(credentials)
+      rv = True
   except client.TokenRevokeError as e:
     if e.args[0] == 'invalid_token':
-      rv = False
+      # Malformed or already revoked
+      pass
+    elif e.args[0] == 'invalid_request':
+      # Service account token
+      pass
     else:
       raise
 
@@ -630,16 +698,8 @@ def AcquireFromGCE(account=None):
       be reached.
     TokenRefreshError: If the credentials fail to refresh.
     TokenRefreshReauthError: If the credentials fail to refresh due to reauth.
-    Error: If a non-default service account is used.
   """
-  default_account = c_gce.Metadata().DefaultAccount()
-  if account is None:
-    account = default_account
-  if account != default_account:
-    raise Error('Unable to use non-default GCE service accounts.')
-  # Metadata server does not yet provide multiple service accounts.
-
-  credentials = oauth2client_gce.AppAssertionCredentials()
+  credentials = oauth2client_gce.AppAssertionCredentials(email=account)
   Refresh(credentials)
   return credentials
 
@@ -676,7 +736,7 @@ def SaveCredentialsAsADC(credentials, file_path):
         credentials.revoke_uri)
   try:
     contents = json.dumps(credentials.serialization_data, sort_keys=True,
-                          indent=2, separators=(',', ': '))  # pytype: disable=wrong-arg-types
+                          indent=2, separators=(',', ': '))
     files.WriteFileContents(file_path, contents, private=True)
   except files.Error as e:
     log.debug(e, exc_info=True)

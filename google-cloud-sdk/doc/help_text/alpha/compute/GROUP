@@ -19,8 +19,9 @@ DESCRIPTION
     here: https://cloud.google.com/compute/docs/
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -32,9 +33,6 @@ GROUPS
 
      addresses
         (ALPHA) Read and manipulate Google Compute Engine addresses.
-
-     allocations
-        (ALPHA) Manage Compute Engine zonal allocations.
 
      backend-buckets
         (ALPHA) Read and manipulate backend buckets.
@@ -50,6 +48,10 @@ GROUPS
 
      disks
         (ALPHA) Read and manipulate Google Compute Engine disks.
+
+     external-vpn-gateways
+        (ALPHA) Read and manipulate Google Compute Engine External VPN
+        Gateways.
 
      firewall-rules
         (ALPHA) List, create, update, and delete Google Compute Engine firewall
@@ -102,6 +104,9 @@ GROUPS
      operations
         (ALPHA) Read and manipulate Google Compute Engine operations.
 
+     os-config
+        (ALPHA) Manage OS Config tasks for Compute Engine VMs.
+
      os-login
         (ALPHA) Create and manipulate Google Compute Engine OS Login resources.
 
@@ -111,6 +116,9 @@ GROUPS
 
      regions
         (ALPHA) List Google Compute Engine regions.
+
+     reservations
+        (ALPHA) Manage Compute Engine reservations.
 
      resource-policies
         (ALPHA) Manage Google Compute Engine Resource Policies.
@@ -163,13 +171,17 @@ GROUPS
         (ALPHA) List, create, and delete target TCP proxies.
 
      target-vpn-gateways
-        (ALPHA) Read and manipulate Google Compute Engine VPN Gateways.
+        (ALPHA) read and manipulate Google Compute Engine Classic VPN Gateways.
 
      tpus
         (ALPHA) List, create, and delete Cloud TPUs.
 
      url-maps
         (ALPHA) List, create, and delete URL maps.
+
+     vpn-gateways
+        (ALPHA) read and manipulate Google Compute Engine Highly Available VPN
+        Gateways.
 
      vpn-tunnels
         (ALPHA) Read and manipulate Google Compute Engine VPN Tunnels.
@@ -204,7 +216,7 @@ COMMANDS
         (ALPHA) SSH into a virtual machine instance.
 
      start-iap-tunnel
-        (ALPHA) Starts an IAP TCP Fordwarding tunnel over WebSocket connection.
+        (ALPHA) Starts an IAP TCP forwarding tunnel over WebSocket connection.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

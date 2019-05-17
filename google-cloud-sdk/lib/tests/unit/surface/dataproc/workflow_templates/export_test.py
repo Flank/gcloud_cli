@@ -93,8 +93,8 @@ class WorkflowTemplateExportUnitTest(unit_base.DataprocUnitTestBase,
 
 class WorkflowTemplateExportUnitTestBeta(WorkflowTemplateExportUnitTest):
 
-  def SetUp(self):
-    self.SetupForReleaseTrack(calliope.base.ReleaseTrack.BETA)
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.BETA
 
   def testExportWorkflowTemplatesToFile(self):
     dataproc = dp.Dataproc(calliope.base.ReleaseTrack.BETA)
@@ -116,6 +116,13 @@ class WorkflowTemplateExportUnitTestBeta(WorkflowTemplateExportUnitTest):
     exported_template = export_util.Import(
         message_type=msgs.WorkflowTemplate, stream=data)
     self.AssertMessagesEqual(expected_output, exported_template)
+
+
+class WorkflowTemplateExportUnitTestAlpha(WorkflowTemplateExportUnitTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.ALPHA
+
 
 if __name__ == '__main__':
   sdk_test_base.main()

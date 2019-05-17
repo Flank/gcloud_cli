@@ -133,5 +133,10 @@ class ClustersCreateFromFileUnitTestBeta(ClustersCreateFromFileUnitTest,
     self.AssertMessagesEqual(expected_response_cluster, result)
 
 
+class ClustersCreateFromFileUnitTestAlpha(ClustersCreateFromFileUnitTestBeta,
+                                          base.DataprocTestBaseAlpha):
+  pass
+
+
 if __name__ == '__main__':
   sdk_test_base.main()

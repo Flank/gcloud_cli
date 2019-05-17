@@ -1243,9 +1243,13 @@ class FeatureSettings(_messages.Message):
       instead of 'health_check' ones. Once the legacy 'health_check' behavior
       is deprecated, and this value is always true, this setting can be
       removed.
+    useContainerOptimizedOs: If true, use Container-Optimized OS
+      (https://cloud.google.com/container-optimized-os/) base image for VMs,
+      rather than a base Debian image.
   """
 
   splitHealthChecks = _messages.BooleanField(1)
+  useContainerOptimizedOs = _messages.BooleanField(2)
 
 
 class FileInfo(_messages.Message):
@@ -1749,6 +1753,8 @@ class Network(_messages.Message):
     name: Google Compute Engine network where the virtual machines are
       created. Specify the short name, not the resource path.Defaults to
       default.
+    sessionAffinity: Enable session affinity. Only applicable in the App
+      Engine flexible environment.
     subnetworkName: Google Cloud Platform sub-network where the virtual
       machines are created. Specify the short name, not the resource path.If a
       subnetwork name is specified, a network name will also be required
@@ -1768,7 +1774,8 @@ class Network(_messages.Message):
   forwardedPorts = _messages.StringField(1, repeated=True)
   instanceTag = _messages.StringField(2)
   name = _messages.StringField(3)
-  subnetworkName = _messages.StringField(4)
+  sessionAffinity = _messages.BooleanField(4)
+  subnetworkName = _messages.StringField(5)
 
 
 class NetworkUtilization(_messages.Message):
@@ -1819,7 +1826,7 @@ class Operation(_messages.Message):
       if any.
     name: The server-assigned name, which is only unique within the same
       service that originally returns it. If you use the default HTTP mapping,
-      the name should have the format of operations/some/unique/name.
+      the name should be a resource name ending with operations/{unique_id}.
     response: The normal response of the operation in case of success. If the
       original method returns no data on success, such as Delete, the response
       is google.protobuf.Empty. If the original method is standard
@@ -1893,29 +1900,6 @@ class Operation(_messages.Message):
   metadata = _messages.MessageField('MetadataValue', 3)
   name = _messages.StringField(4)
   response = _messages.MessageField('ResponseValue', 5)
-
-
-class OperationMetadata(_messages.Message):
-  r"""Metadata for the given google.longrunning.Operation.
-
-  Fields:
-    endTime: Timestamp that this operation completed.@OutputOnly
-    insertTime: Timestamp that this operation was created.@OutputOnly
-    method: API method that initiated this operation. Example:
-      google.appengine.v1beta4.Version.CreateVersion.@OutputOnly
-    operationType: Type of this operation. Deprecated, use method field
-      instead. Example: "create_version".@OutputOnly
-    target: Name of the resource that this operation is acting on. Example:
-      apps/myapp/modules/default.@OutputOnly
-    user: User who requested this operation.@OutputOnly
-  """
-
-  endTime = _messages.StringField(1)
-  insertTime = _messages.StringField(2)
-  method = _messages.StringField(3)
-  operationType = _messages.StringField(4)
-  target = _messages.StringField(5)
-  user = _messages.StringField(6)
 
 
 class OperationMetadataV1(_messages.Message):
@@ -2000,26 +1984,6 @@ class OperationMetadataV1Beta(_messages.Message):
   target = _messages.StringField(6)
   user = _messages.StringField(7)
   warning = _messages.StringField(8, repeated=True)
-
-
-class OperationMetadataV1Beta5(_messages.Message):
-  r"""Metadata for the given google.longrunning.Operation.
-
-  Fields:
-    endTime: Timestamp that this operation completed.@OutputOnly
-    insertTime: Timestamp that this operation was created.@OutputOnly
-    method: API method name that initiated this operation. Example:
-      google.appengine.v1beta5.Version.CreateVersion.@OutputOnly
-    target: Name of the resource that this operation is acting on. Example:
-      apps/myapp/services/default.@OutputOnly
-    user: User who requested this operation.@OutputOnly
-  """
-
-  endTime = _messages.StringField(1)
-  insertTime = _messages.StringField(2)
-  method = _messages.StringField(3)
-  target = _messages.StringField(4)
-  user = _messages.StringField(5)
 
 
 class ReadinessCheck(_messages.Message):
@@ -2751,6 +2715,7 @@ class Version(_messages.Message):
       ://cloud.google.com/appengine/docs/standard/<language>/config/appref
     runtimeChannel: The channel of the runtime to use. Only available for some
       runtimes. Defaults to the default channel.
+    runtimeMainExecutablePath: The path or name of the app's main executable.
     servingStatus: Current serving status of this version. Only the versions
       with a SERVING status create instances and can be
       billed.SERVING_STATUS_UNSPECIFIED is an invalid value. Defaults to
@@ -2760,8 +2725,9 @@ class Version(_messages.Message):
     versionUrl: Serving URL for this version. Example: "https://myversion-dot-
       myservice-dot-myapp.appspot.com"@OutputOnly
     vm: Whether to deploy this version in a container on a virtual machine.
+    vpcAccessConnector: Enables VPC connectivity for standard apps.
     zones: The Google Compute Engine zones that are supported by this version
-      in the App Engine flexible environment.
+      in the App Engine flexible environment. Deprecated.
   """
 
   class InboundServicesValueListEntryValuesEnum(_messages.Enum):
@@ -2887,11 +2853,13 @@ class Version(_messages.Message):
   runtime = _messages.StringField(28)
   runtimeApiVersion = _messages.StringField(29)
   runtimeChannel = _messages.StringField(30)
-  servingStatus = _messages.EnumField('ServingStatusValueValuesEnum', 31)
-  threadsafe = _messages.BooleanField(32)
-  versionUrl = _messages.StringField(33)
-  vm = _messages.BooleanField(34)
-  zones = _messages.StringField(35, repeated=True)
+  runtimeMainExecutablePath = _messages.StringField(31)
+  servingStatus = _messages.EnumField('ServingStatusValueValuesEnum', 32)
+  threadsafe = _messages.BooleanField(33)
+  versionUrl = _messages.StringField(34)
+  vm = _messages.BooleanField(35)
+  vpcAccessConnector = _messages.MessageField('VpcAccessConnector', 36)
+  zones = _messages.StringField(37, repeated=True)
 
 
 class Volume(_messages.Message):
@@ -2907,6 +2875,17 @@ class Volume(_messages.Message):
   name = _messages.StringField(1)
   sizeGb = _messages.FloatField(2)
   volumeType = _messages.StringField(3)
+
+
+class VpcAccessConnector(_messages.Message):
+  r"""VPC access connector specification.
+
+  Fields:
+    name: Full Serverless VPC Access Connector name e.g. /projects/my-
+      project/locations/us-central1/connectors/c1.
+  """
+
+  name = _messages.StringField(1)
 
 
 class ZipInfo(_messages.Message):

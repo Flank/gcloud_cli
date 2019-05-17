@@ -11,7 +11,7 @@ gcloud beta access\-context\-manager perimeters create \- create a new service p
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta access\-context\-manager perimeters create\fR (\fIPERIMETER\fR\ :\ \fB\-\-policy\fR=\fIPOLICY\fR) \fB\-\-resources\fR=[\fIRESOURCES\fR,...] \fB\-\-title\fR=\fITITLE\fR [\fB\-\-access\-levels\fR=[\fILEVEL\fR,...]] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-perimeter\-type\fR=\fIPERIMETER_TYPE\fR;\ default="regular"] [\fB\-\-restricted\-services\fR=[\fISERVICE\fR,...]\ |\ \fB\-\-unrestricted\-services\fR=[\fISERVICE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta access\-context\-manager perimeters create\fR (\fIPERIMETER\fR\ :\ \fB\-\-policy\fR=\fIPOLICY\fR) \fB\-\-resources\fR=[\fIRESOURCES\fR,...] \fB\-\-title\fR=\fITITLE\fR [\fB\-\-access\-levels\fR=[\fILEVEL\fR,...]] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-perimeter\-type\fR=\fIPERIMETER_TYPE\fR;\ default="regular"] [\fB\-\-restricted\-services\fR=[\fISERVICE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -105,37 +105,21 @@ A project may belong to at most one regular service perimeter.
 
 
 .TP 2m
-
-For a \fBregular\fR service perimeter, these parameters specify the services to
-which the perimeter boundary applies. Only one may be provided, and the other is
-implicitly provided as a wildcard (\f5*\fR) matching all other services. For
-instance, \f5\-\-restricted\-services storage.googleapis.com\fR applies the
-perimeter boundary to the Google Cloud Storage service, but \fBnot\fR any other
-services. At most one of these may be specified:
-
-
-.RS 2m
-.TP 2m
 \fB\-\-restricted\-services\fR=[\fISERVICE\fR,...]
 Comma\-separated list of services to which the perimeter boundary \fBdoes\fR
 apply (for example, \f5storage.googleapis.com\fR).
 
-.TP 2m
-\fB\-\-unrestricted\-services\fR=[\fISERVICE\fR,...]
-Comma\-separated list of services to which the perimeter boundary \fBdoes not\fR
-apply (for example, \f5storage.googleapis.com\fR).
 
-
-.RE
 .RE
 .sp
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -149,5 +133,11 @@ https://cloud.google.com/access\-context\-manager/docs/reference/rest/
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice.
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud access\-context\-manager perimeters create
+$ gcloud alpha access\-context\-manager perimeters create
+.RE
 

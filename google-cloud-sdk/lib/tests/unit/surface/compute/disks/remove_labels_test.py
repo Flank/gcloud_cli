@@ -19,16 +19,18 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.compute import disks_labels_test_base
 
 
-class RemoveLabelsTest(disks_labels_test_base.DisksLabelsTestBase):
+class RemoveLabelsTestGA(disks_labels_test_base.DisksLabelsTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
-    self._SetUp(calliope_base.ReleaseTrack.GA)
+    self._SetUp(self.track)
 
   def testZonalUpdateValidDisksWithLabelsAndRemoveLabels(self):
     disk_ref = self._GetDiskRef('disk-1', zone='atlanta')
@@ -136,37 +138,7 @@ class RemoveLabelsTest(disks_labels_test_base.DisksLabelsTestBase):
           'compute disks remove-labels {} --all'
           .format(disk_ref.SelfLink()))
 
-  def testScopePromptWithZone(self):
-    disk_ref = self._GetDiskRef('disk-1', zone='atlanta')
-    disk = self._MakeDiskProto(disk_ref, labels=[])
-    self._ExpectGetRequest(disk_ref, disk)
-
-    self.StartPatch('googlecloudsdk.core.console.console_io.CanPrompt',
-                    return_value=True)
-    self.StartPatch('googlecloudsdk.api_lib.compute.zones.service.List',
-                    return_value=[
-                        self.messages.Zone(name='atlanta'),
-                        self.messages.Zone(name='charlotte')],
-                   )
-    self.StartPatch('googlecloudsdk.api_lib.compute.regions.service.List',
-                    return_value=[
-                        self.messages.Region(name='georgia')],
-                   )
-    self.WriteInput('1\n')
-    self.Run('compute disks remove-labels disk-1 --labels key0')
-    self.AssertErrContains('atlanta')
-    self.AssertErrContains('charlotte')
-    self.AssertErrNotContains('georgia')
-
-
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA)
-class RemoveLabelsTestAlphaBeta(disks_labels_test_base.DisksLabelsTestBase,
-                                parameterized.TestCase):
-
-  def testRegionalUpdateValidDisksWithLabelsAndRemoveLabels(self, track):
-    self._SetUp(track)
+  def testRegionalUpdateValidDisksWithLabelsAndRemoveLabels(self):
     disk_ref = self._GetDiskRef('disk-1', region='us-central')
 
     disk_labels = (('key1', 'value1'), ('key2', 'value2'), ('key3', 'value3'))
@@ -189,8 +161,7 @@ class RemoveLabelsTestAlphaBeta(disks_labels_test_base.DisksLabelsTestBase,
         .format(disk_ref.SelfLink()))
     self.assertEqual(response, updated_disk)
 
-  def testScopePromptWithRegionAndZone(self, track):
-    self._SetUp(track)
+  def testScopePromptWithRegionAndZone(self):
     disk_ref = self._GetDiskRef('disk-1', region='us-central')
     disk = self._MakeDiskProto(disk_ref, labels=[])
     self._ExpectGetRequest(disk_ref, disk)
@@ -211,6 +182,18 @@ class RemoveLabelsTestAlphaBeta(disks_labels_test_base.DisksLabelsTestBase,
     self.AssertErrContains('us-central1')
     self.AssertErrContains('us-central2')
     self.AssertErrContains('us-central')
+
+
+class RemoveLabelsTestBeta(RemoveLabelsTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class RemoveLabelsTestAlpha(RemoveLabelsTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

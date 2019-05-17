@@ -31,10 +31,11 @@ import tests.unit.surface
 
 class ScenarioConfig(object):
 
-  def __init__(self, name, resource_path, tracks):
+  def __init__(self, name, resource_path, tracks, skip_data):
     self.name = name
     self.resource_path = resource_path
     self.tracks = tracks
+    self.skip_data = skip_data
 
   def __str__(self):
     return self.resource_path
@@ -70,11 +71,13 @@ def _Find(prefixes, scenario_root):
         file_path = os.path.join(root, f)
         name = (file_path[len(scenario_root) + 1:]
                 .replace('.scenario.yaml', '')
-                .title())
+                .replace('\\', '/'))
         if _MatchesPrefix(prefixes, file_path[len(module_root) + 1:]):
           resource_path = file_path[len(code_root) + 1:]
-          tracks = GetTracksFromFile(resource_path)
-          scenarios.append(ScenarioConfig(name, resource_path, tracks))
+          spec_data = LoadYAMLFile(resource_path)
+          tracks = GetTracks(spec_data)
+          scenarios.append(ScenarioConfig(
+              name, resource_path, tracks, spec_data.get('skip')))
   return scenarios
 
 
@@ -88,8 +91,11 @@ def _MatchesPrefix(prefixes, relative_path):
   return False
 
 
-def GetTracksFromFile(spec_path):
-  full_spec_path = sdk_test_base.SdkBase.Resource(spec_path)
-  spec_data = yaml.load_path(full_spec_path, round_trip=True)
+def LoadYAMLFile(path):
+  full_path = sdk_test_base.SdkBase.Resource(path)
+  return yaml.load_path(full_path, round_trip=True)
+
+
+def GetTracks(spec_data):
   return ([calliope_base.ReleaseTrack.FromId(t)
            for t in spec_data.get('release_tracks') or ['GA']])

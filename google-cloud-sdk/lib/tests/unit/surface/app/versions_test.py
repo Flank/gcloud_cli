@@ -19,6 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import copy
 from googlecloudsdk.api_lib.app import appengine_api_client
 from googlecloudsdk.api_lib.app import operations_util
 from googlecloudsdk.api_lib.app import service_util
@@ -38,18 +39,42 @@ class VersionsApiTestBase(api_test_util.ApiTestBase):
 
   def SetUp(self):
     properties.VALUES.core.project.Set(self.Project())
+    self.services = {'default': {'v6': {'traffic_split': 0},
+                                 'v7': {'traffic_spilt': 1.0}},
+                     'service1': {'v1': {'traffic_split': 0},
+                                  'v2': {'traffic_split': 0},
+                                  'v3': {'traffic_split': 1.0},
+                                  'v4': {'traffic_split': 0}},
+                     'service2': {'v1': {'traffic_split': 0},
+                                  'v2': {'traffic_split': 0}},
+                     'service3': {'v5': {'traffic_split': 1.0}},
+                     'emptyservice': {},}
 
   def _ExpectListAllServicesAndVersions(self):
-    services = {'default': {'v6': {'traffic_split': 0},
-                            'v7': {'traffic_spilt': 1.0}},
-                'service1': {'v1': {'traffic_split': 0},
-                             'v2': {'traffic_split': 0},
-                             'v3': {'traffic_split': 1.0},
-                             'v4': {'traffic_split': 0}},
-                'service2': {'v1': {'traffic_split': 0},
-                             'v2': {'traffic_split': 0}},
-                'service3': {'v5': {'traffic_split': 1.0}},
-                'emptyservice': {},}
+    """Expects that all services will be listed, then all versions for them all.
+
+    Set up the text fixture to expect (and return accordingly) the app to
+    enumerate all services, followed by enumerating all versions for those
+    services.
+    """
+    services = copy.deepcopy(self.services)
+    self.ExpectListServicesRequest(self.Project(), services=services)
+    for service in sorted(services):
+      self.ExpectListVersionsRequest(self.Project(), service, services)
+
+  def _ExpectListAllVersionsForServices(self, services_to_keep):
+    """Expect listing services, followed by listing versions for some of them.
+
+    Set up the text fixture to expect (and return accordingly) the app to
+    enumerate all services, followed by enumerating all versions for the
+    subset of them as specified in services_to_keep.
+
+    Args:
+      services_to_keep: A list of services whose versions will be enumerated.
+    """
+    services = copy.deepcopy(self.services)
+    services = {k: v for k, v in six.iteritems(services)
+                if k in services_to_keep}
     self.ExpectListServicesRequest(self.Project(), services=services)
     for service in sorted(services):
       self.ExpectListVersionsRequest(self.Project(), service, services)
@@ -94,12 +119,16 @@ class VersionsDescribeTest(VersionsApiTestBase):
 
 class VersionsListTest(VersionsApiTestBase):
 
+  def SetUp(self):
+    super(VersionsListTest, self).SetUp()
+    self.services = {'service1': {'v1': {'traffic_split': 0},
+                                  'v2': {'traffic_split': 2.0/3.0},
+                                  'v3': {'traffic_split': 1.0/3.0}},
+                     'service2': {'v1': {'traffic_split': 1.0},
+                                  'v2': {'traffic_split': 0}}}
+
   def _Services(self, **kwargs):
-    services = {'service1': {'v1': {'traffic_split': 0},
-                             'v2': {'traffic_split': 2.0/3.0},
-                             'v3': {'traffic_split': 1.0/3.0}},
-                'service2': {'v1': {'traffic_split': 1.0},
-                             'v2': {'traffic_split': 0}}}
+    services = copy.deepcopy(self.services)
     for service_info in six.itervalues(services):
       for version_info in six.itervalues(service_info):
         version_info.update(kwargs)
@@ -541,7 +570,7 @@ class VersionsDeleteTest(VersionsApiTestBase):
 
   def testDelete_OneServiceOneVersionError(self):
     """Ensure `delete` command raises if DeleteVersion raises error."""
-    self._ExpectListAllServicesAndVersions()
+    self._ExpectListAllVersionsForServices(['service1'])
     delete_version = self.StartObjectPatch(
         appengine_api_client.AppengineApiClient, 'DeleteVersion')
     delete_version.side_effect = operations_util.OperationError('foo')
@@ -553,7 +582,7 @@ class VersionsDeleteTest(VersionsApiTestBase):
 
   def testDelete_OneServiceOneVersion(self):
     """Ensure `delete` command deletes single version in single service."""
-    self._ExpectListAllServicesAndVersions()
+    self._ExpectListAllVersionsForServices(['service1'])
     versions = [
         version_util.Version(self.Project(), 'service1', 'v1')
     ]
@@ -563,7 +592,7 @@ class VersionsDeleteTest(VersionsApiTestBase):
 
   def testDelete_DefaultServiceAllVersions(self):
     """Ensure `delete` command raises if default versions would be deleted."""
-    self._ExpectListAllServicesAndVersions()
+    self._ExpectListAllVersionsForServices(['default'])
     with self.assertRaisesRegex(
         exceptions.Error,
         r'The default service \(module\) may not be deleted, and must '
@@ -572,7 +601,7 @@ class VersionsDeleteTest(VersionsApiTestBase):
 
   def testDelete_DefaultServiceOneVersion(self):
     """Test delete single version from default service."""
-    self._ExpectListAllServicesAndVersions()
+    self._ExpectListAllVersionsForServices(['default'])
     versions = [version_util.Version(self.Project(), 'default', 'v6')]
     self.ExpectDeleteServicesAndVersions(versions=versions)
     self.Run('app versions delete v6 --service=default')
@@ -580,7 +609,7 @@ class VersionsDeleteTest(VersionsApiTestBase):
 
   def testDelete_OneServiceMultiVersion(self):
     """Test deletion of two versions in single service."""
-    self._ExpectListAllServicesAndVersions()
+    self._ExpectListAllVersionsForServices(['service1'])
     versions = [version_util.Version(self.Project(), 'service1', 'v1'),
                 version_util.Version(self.Project(), 'service1', 'v2')]
     self.ExpectDeleteServicesAndVersions(versions=versions)
@@ -629,7 +658,7 @@ class VersionsDeleteTest(VersionsApiTestBase):
 
   def testDelete_WithTrafficVersion(self):
     """Test `delete` raises error if a version to delete has 100% of traffic."""
-    self._ExpectListAllServicesAndVersions()
+    self._ExpectListAllVersionsForServices(['service1'])
     with self.assertRaisesRegex(
         exceptions.Error,
         r'Version \[v3\] is currently serving 100.00% of traffic for service '
@@ -660,7 +689,7 @@ class VersionsDeleteTest(VersionsApiTestBase):
 
   def testDelete_OneServiceOnlyVersions(self):
     """Test `delete` command where all versions deleted in a service."""
-    self._ExpectListAllServicesAndVersions()
+    self._ExpectListAllVersionsForServices(['service3'])
     services = [service_util.Service(self.Project(), 'service3')]
     self.ExpectDeleteServicesAndVersions(services=services)
     self.Run('app versions delete v5 --service=service3')
@@ -692,14 +721,14 @@ class VersionsDeleteTest(VersionsApiTestBase):
 
   def testDelete_ServiceNotFound(self):
     """Test that `delete` fails if service does not exist."""
-    self._ExpectListAllServicesAndVersions()
+    self._ExpectListAllVersionsForServices(['notfound'])
     with self.assertRaisesRegex(exceptions.Error,
                                 r'Service \[notfound\] not found.'):
       self.Run('app versions delete --service=notfound v1')
 
   def testDelete_NoVersionsFound(self):
     """Test `delete` runs and gives correct message if version not found."""
-    self._ExpectListAllServicesAndVersions()
+    self._ExpectListAllVersionsForServices(['service1'])
     self.Run('app versions delete --service=service1 notfound')
     self.AssertErrNotContains('Deleting the following versions:')
     self.AssertErrContains('No matching versions found.')

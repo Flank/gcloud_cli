@@ -23,10 +23,11 @@ gcloud beta compute commitments \- manage Google Compute Engine commitments
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -46,6 +47,10 @@ gcloud help\fR for details.
 .TP 2m
 \fBlist\fR
 \fB(BETA)\fR List Google Compute Engine commitments.
+
+.TP 2m
+\fBupdate\-reservations\fR
+\fB(BETA)\fR Update the resource shape of reservations within the commitment.
 
 
 .RE

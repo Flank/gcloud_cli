@@ -1,0 +1,59 @@
+NAME
+    gcloud alpha filestore snapshots describe - describe a Cloud Filestore
+        snapshot
+
+SYNOPSIS
+    gcloud alpha filestore snapshots describe (SNAPSHOT : --region=REGION)
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Displays all data associated with a Cloud Filestore snapshot given
+    a valid snapshot name.
+
+    This command can fail for the following reasons:
+      o The snapshot specified does not exist.
+      o The active account does not have permission to access the given
+        snapshot.
+
+POSITIONAL ARGUMENTS
+     Snapshot resource - Arguments and flags that specify the Cloud Filestore
+     snapshot you want to describe. The arguments in this group can be used to
+     specify the attributes of this resource. (NOTE) Some attributes are not
+     given arguments in this group but can be set in other ways. To set the
+     [project] attribute: provide the argument [snapshot] on the command line
+     with a fully specified name; provide the argument [--project] on the
+     command line; set the property [core/project]. This must be specified.
+
+       SNAPSHOT
+          ID of the snapshot or fully qualified identifier for the snapshot.
+          This positional must be specified if any of the other arguments in
+          this group are specified.
+
+       --region=REGION
+          The region of the Filestore snapshot.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+API REFERENCE
+    This command uses the file/v1p1alpha1 API. The full documentation for this
+    API can be found at: https://cloud.google.com/filestore/
+
+EXAMPLES
+    To display all data associated with a snapshot of the name 'my-snapshot' in
+    the default region, run:
+
+        $ gcloud alpha filestore snapshots describe my-snapshot
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you will have to apply for early access and
+    have your projects registered on the API whitelist to use it. To do so,
+    contact Support at https://cloud.google.com/support/.
+

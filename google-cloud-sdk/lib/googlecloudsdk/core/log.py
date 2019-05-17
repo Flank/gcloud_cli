@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2013 Google Inc. All Rights Reserved.
+# Copyright 2013 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -63,7 +63,8 @@ _KNOWN_LOG_FILE_EXTENSIONS = [LOG_FILE_EXTENSION, '.sql3']
 # marker that marks the beginning of a new log line in a log file. It can be
 # used in parsing log files.
 LOG_PREFIX_PATTERN = r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}'
-
+# Regex used to extract used surfaces from user logs.
+USED_SURFACE_PATTERN = r'Running \[gcloud\.([-\w\.]+)\.[-\w]+\]'
 
 # These are the formats for the log directories and files.
 # For example, `logs/1970.01.01/12.00.00.000000.log`.
@@ -685,7 +686,7 @@ class _LogManager(object):
     try:
       log_file = self._SetupLogsDir(logs_dir)
       file_handler = logging.FileHandler(
-          log_file, encoding=LOG_FILE_ENCODING)  # pytype: disable=wrong-arg-types
+          log_file, encoding=LOG_FILE_ENCODING)
     except (OSError, IOError, files.Error) as exp:
       warning('Could not setup log file in {0}, ({1}: {2})'
               .format(logs_dir, type(exp).__name__, exp))

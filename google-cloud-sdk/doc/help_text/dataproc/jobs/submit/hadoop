@@ -82,8 +82,9 @@ OPTIONAL FLAGS
         property value for this command invocation.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -106,7 +107,8 @@ EXAMPLES
             -- wordcount gs://my_bucket/my_file.txt gs://my_bucket/output
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha dataproc jobs submit hadoop
         $ gcloud beta dataproc jobs submit hadoop
 

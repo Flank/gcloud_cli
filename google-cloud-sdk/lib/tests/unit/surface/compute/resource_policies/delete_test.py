@@ -18,12 +18,16 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from tests.lib import test_case
 from tests.lib.surface.compute import resource_policies_base
 
 
-class DeleteTest(resource_policies_base.TestBase):
+class DeleteBetaTest(resource_policies_base.TestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testDelete_Simple(self):
     properties.VALUES.core.disable_prompts.Set(True)
@@ -37,6 +41,12 @@ class DeleteTest(resource_policies_base.TestBase):
               project=self.Project(),
               region=self.region,
               resourcePolicy='pol1'))])
+
+
+class DeleteAlphaTest(DeleteBetaTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

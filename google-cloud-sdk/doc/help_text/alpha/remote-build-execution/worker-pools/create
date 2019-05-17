@@ -7,6 +7,7 @@ SYNOPSIS
         (WORKERPOOL : --instance=INSTANCE) --worker-count=WORKER_COUNT
         [--async] [--disk-size=DISK_SIZE; default=200]
         [--machine-type=MACHINE_TYPE; default="n1-standard-2"]
+        [--min-cpu-platform=MIN_CPU_PLATFORM] [--reserved]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -47,9 +48,18 @@ OPTIONAL FLAGS
 
         $ gcloud compute machine-types list
 
+     --min-cpu-platform=MIN_CPU_PLATFORM
+        Minimum CPU platform for the workers. For more information see
+        https://cloud.google.com/compute/docs/cpu-platforms.
+
+     --reserved
+        Determines the type of VM to use. If set then reserved VMs are used,
+        otherwise preemptable VMs are used.
+
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

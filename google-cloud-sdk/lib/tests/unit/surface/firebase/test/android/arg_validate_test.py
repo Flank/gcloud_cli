@@ -132,7 +132,8 @@ class AndroidArgValidateTests(unit_base.AndroidUnitTestBase):
     args = argparse.Namespace(robo_directives={
         'resource1': 'value1',
         'text:resource2': 2,
-        'click:resource3': ''
+        'click:resource3': '',
+        'ignore:resource4': ''
     })
     arg_validate.ValidateRoboDirectivesList(args)
 
@@ -174,7 +175,16 @@ class AndroidArgValidateTests(unit_base.AndroidUnitTestBase):
       arg_validate.ValidateRoboDirectivesList(args)
     self.assertIn('robo-directives', six.text_type(e.exception))
     self.assertIn(
-        'Input value not allowed for click action: [click:resource=value]',
+        'Input value not allowed for click or ignore actions: [click:resource=value]',
+        six.text_type(e.exception))
+
+  def testValidateRoboDirectivesList_WithIgnoreActionAndInputText(self):
+    args = argparse.Namespace(robo_directives={'ignore:resource': 'value'})
+    with self.assertRaises(exceptions.InvalidArgumentException) as e:
+      arg_validate.ValidateRoboDirectivesList(args)
+    self.assertIn('robo-directives', six.text_type(e.exception))
+    self.assertIn(
+        'Input value not allowed for click or ignore actions: [ignore:resource=value]',
         six.text_type(e.exception))
 
   def testValidateRoboDirectivesList_WithDuplicateResourceNames(self):

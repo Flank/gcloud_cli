@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.tasks import app
 from googlecloudsdk.command_lib.tasks import parsers
@@ -102,6 +103,12 @@ class TasksDeleteTest(test_base.CloudTasksTestBase,
       self.Run('tasks delete {} --queue {}'.format(self.task_id, self.queue_id))
 
     self.AssertErrContains('Requested entity was not found.')
+
+
+class TasksDeleteTestBeta(TasksDeleteTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 if __name__ == '__main__':

@@ -138,6 +138,35 @@ NAME                                  TYPE         START                        
 27e060bf-4e4b-4fbb-b451-a9ee6c8a433a  RESTART      2014-07-10T17:23:02.165+00:00  2014-07-10T17:23:03.165+00:00  -      DONE
 """, normalize_space=True)
 
+  def testOperationsListWithErrors(self):
+    self.instance = self.GetV2Instance('some-instance')
+    first_op = self.GetOperation(
+        'CREATE', 'DONE',
+        self.messages.OperationErrors(
+            errors=[self.messages.OperationError(code='problem')]))
+    first_op.name = 'operation-1'
+    second_op = self.GetOperation(
+        'EXPORT', 'DONE',
+        self.messages.OperationErrors(
+            errors=[self.messages.OperationError(code='badbadnotgood')]))
+    second_op.name = 'operation-2'
+    self.mocked_client.operations.List.Expect(
+        self.messages.SqlOperationsListRequest(
+            instance=self.instance.name,
+            maxResults=10,
+            pageToken=None,
+            project=self.Project(),
+        ), self.messages.OperationsListResponse(items=[first_op, second_op]))
+    self.Run('sql operations list -i=some-instance --limit=10')
+    # pylint: disable=line-too-long
+    self.AssertOutputContains(
+        """\
+NAME         TYPE    START                          END                            ERROR          STATUS
+operation-1  CREATE  2014-08-12T19:38:39.525+00:00  2014-08-12T19:39:26.601+00:00  problem        DONE
+operation-2  EXPORT  2014-08-12T19:38:39.525+00:00  2014-08-12T19:39:26.601+00:00  badbadnotgood  DONE
+""",
+        normalize_space=True)
+
 
 class OperationsListGATest(_BaseOperationsListTest, base.SqlMockTestGA):
   pass

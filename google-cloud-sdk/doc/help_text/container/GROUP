@@ -19,8 +19,9 @@ DESCRIPTION
     be found here: https://cloud.google.com/kubernetes-engine/docs/
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -38,6 +39,9 @@ GROUPS
 
      operations
         Get and list operations for Google Kubernetes Engine clusters.
+
+     subnets
+        Manage subnets to be used by Google Kubernetes Engine clusters.
 
 COMMANDS
     COMMAND is one of the following:

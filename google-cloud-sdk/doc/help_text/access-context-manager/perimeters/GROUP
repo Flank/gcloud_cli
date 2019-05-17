@@ -1,0 +1,45 @@
+NAME
+    gcloud access-context-manager perimeters - manage Access Context Manager
+        service perimeters
+
+SYNOPSIS
+    gcloud access-context-manager perimeters COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    A service perimeter describes a set of Google Cloud Platform resources
+    which can freely import and export data amongst themselves, but not
+    externally.
+
+    Currently, the only allowed members of a service perimeter are projects.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        Create a new service perimeter.
+
+     delete
+        Delete a service perimeter.
+
+     describe
+        Show details about a service perimeter.
+
+     list
+        List service perimeters.
+
+     update
+        Update an existing access zone.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha access-context-manager perimeters
+        $ gcloud beta access-context-manager perimeters
+

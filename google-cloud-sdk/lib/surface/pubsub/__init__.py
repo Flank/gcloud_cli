@@ -23,9 +23,9 @@ from googlecloudsdk.calliope import base
 
 
 class Pubsub(base.Group):
-  """Manage Cloud Pub/Sub topics and subscriptions."""
+  """Manage Cloud Pub/Sub topics, subscriptions, and snapshots."""
 
-  category = 'Data Analytics'
+  category = base.DATA_ANALYTICS_CATEGORY
 
   def Filter(self, context, args):
     del context, args

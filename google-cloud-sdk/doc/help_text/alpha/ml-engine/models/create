@@ -1,13 +1,14 @@
 NAME
-    gcloud alpha ml-engine models create - create a new Cloud ML Engine model
+    gcloud alpha ml-engine models create - create a new AI Platform model
 
 SYNOPSIS
     gcloud alpha ml-engine models create MODEL [--description=DESCRIPTION]
-        [--enable-logging] [--labels=[KEY=VALUE,...]]
-        [--regions=REGION,[REGION,...]] [GCLOUD_WIDE_FLAG ...]
+        [--enable-console-logging] [--enable-logging]
+        [--labels=[KEY=VALUE,...]] [--regions=REGION,[REGION,...]]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Create a new Cloud ML Engine model.
+    (ALPHA) Create a new AI Platform model.
 
 POSITIONAL ARGUMENTS
      MODEL
@@ -17,8 +18,15 @@ FLAGS
      --description=DESCRIPTION
         The description of the model.
 
+     --enable-console-logging
+        If set, enables StackDriver Logging of stderr and stdout streams for
+        online prediction. These logs are more verbose than the standard access
+        logs and can be helpful for debugging.
+
      --enable-logging
-        If set, enables StackDriver Logging for online prediction.
+        If set, enables StackDriver Logging for online prediction. These logs
+        are like standard server access logs, containing information such as
+        timestamps and latency for each request.
 
      --labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to add.
@@ -35,8 +43,9 @@ FLAGS
         Will soon be required, but defaults to 'us-central1' for now.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

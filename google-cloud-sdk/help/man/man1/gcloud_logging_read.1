@@ -88,10 +88,11 @@ interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -142,9 +143,10 @@ https://cloud.google.com/logging/docs/view/advanced_filters
 
 .SH "NOTES"
 
-This variant is also available:
+These variants are also available:
 
 .RS 2m
+$ gcloud alpha logging read
 $ gcloud beta logging read
 .RE
 

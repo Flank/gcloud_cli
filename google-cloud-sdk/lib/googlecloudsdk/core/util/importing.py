@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*- #
 #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ import types
 import six
 
 try:
-  # pytype: disable=import-error
   # pylint: disable=g-import-not-at-top
   from importlib._bootstrap import _ImportLockContext
 except ImportError:
@@ -48,9 +47,7 @@ def _find_module(module_name):
   parent_path = None
   if parent_module_name:
     parent_path = [_find_module(parent_module_name)[1]]
-  # pytype: disable=wrong-arg-types
   return imp.find_module(submodule_name, parent_path)
-  # pytype: enable=wrong-arg-types
 
 
 def _load_module(module):
@@ -88,10 +85,8 @@ def _load_module(module):
     module_path = getattr(module, '__path__', [None])[0]
     module_desc = getattr(module, '__desc__')
     del module.__desc__
-    # pytype: disable=wrong-arg-types
     real_module = imp.load_module(
         module_name, module_file, module_path, module_desc)
-    # pytype: enable=wrong-arg-types
     if module_file:
       module_file.close()
     module.__dict__.update(real_module.__dict__)

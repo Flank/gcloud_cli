@@ -258,8 +258,7 @@ class SdkBase(test_case.Base):
   def __Popen(self, *args, **kwargs):
     """Makes sure os.environ gets export to subprocess children."""
     if 'env' not in kwargs:
-      kwargs['env'] = {encoding.Encode(k): encoding.Encode(v)
-                       for k, v in six.iteritems(os.environ)}
+      kwargs['env'] = encoding.EncodeEnv(os.environ)
     return self._REAL_POPEN(*args, **kwargs)
 
   def SetUp(self):
@@ -763,7 +762,7 @@ class BundledBase(SdkBase):
     Returns:
       A copy of env with Python specific path vars added.
     """
-    env_with_pythonpaths = dict(env if env else os.environ)
+    env_with_pythonpaths = encoding.EncodeEnv(dict(env if env else os.environ))
     # sys.path was initialized from PYTHONPATH at startup so we don't have to
     # check PYTHONPATH here. The result will be the original PYTHONPATH dirs
     # plus and dirs inserted/appened by Python startup and test runner

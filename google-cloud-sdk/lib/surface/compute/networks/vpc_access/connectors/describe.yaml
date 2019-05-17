@@ -1,7 +1,8 @@
-- help_text:
+- release_tracks: [BETA, ALPHA]
+  help_text:
     brief: |
       Show metadata for a VPC Access connector.
-    DESCRIPTION: |
+    description: |
       Display all metadata associated with a VPC Access connector
       given a valid connector name.
 
@@ -9,7 +10,7 @@
       * The connector specified does not exist.
       * The active account does not have permission to access the given
         operation.
-    EXAMPLES: |
+    examples: |
       The following command prints metadata for a connector with name
       `my-vpcaccesss-connector` in region `us-central1`:
 
@@ -17,6 +18,9 @@
 
   request:
     collection: vpcaccess.projects.locations.connectors
+    api_version: v1beta1
+    ALPHA:
+      api_version: v1alpha1
 
   response:
     id_field: name

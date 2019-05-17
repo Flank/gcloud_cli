@@ -191,7 +191,8 @@ class TriggerTest(DeployE2ETestBase):
   def testHttpTriggerExample(self):
     """Test Simple HTTP Cloud Function Example w/local source."""
     with self._DeployFunction('--trigger-http',
-                              source=self.function_path) as function_name:
+                              source=self.function_path,
+                              runtime='nodejs6') as function_name:
       self.Run('functions describe {}'.format(function_name))
       self.AssertOutputContains(function_name)
       self.Run('functions call {}'.format(function_name))
@@ -202,7 +203,8 @@ class TriggerTest(DeployE2ETestBase):
     func_name = self._GenerateFunctionName()
     with files.ChDir(self.function_path):
       with self._DeployFunction('--trigger-http',
-                                name=func_name) as function_name:
+                                name=func_name,
+                                runtime='nodejs6') as function_name:
         self.Run('functions describe {}'.format(function_name))
         self.AssertOutputContains(function_name)
         self.Run('functions call {}'.format(function_name))
@@ -214,6 +216,7 @@ class TriggerTest(DeployE2ETestBase):
         source=self.function_path,
         trigger_event='providers/cloud.pubsub/eventTypes/topic.publish',
         trigger_resource='test-topic',
+        runtime='nodejs6',
         function_content=PUBSUB_JS_FILE) as function_name:
       self.Run('functions describe {}'.format(function_name))
       self.AssertOutputContains(function_name)
@@ -228,6 +231,7 @@ class TriggerTest(DeployE2ETestBase):
         source=self.function_path,
         trigger_event='google.storage.object.finalize',
         trigger_resource='e2e-input-functions',
+        runtime='nodejs6',
         function_content=STORAGE_JS_FILE) as function_name:
       self.Run('functions describe {}'.format(function_name))
       self.AssertOutputContains(function_name)
@@ -237,13 +241,12 @@ class TriggerTest(DeployE2ETestBase):
       self.assertTrue(call_result)
       self.assertTrue(call_result.executionId)
 
-  @test_case.Filters.SkipOnPy3('It is broken.', 'b/114745758')
   def testStagingBucketDeploy(self):
     """Test with --staging-bucket flag."""
     with self._DeployFunction('--trigger-http',
                               source=self.function_path,
-                              stage_bucket=FUNCTIONS_STAGING_BUCKET
-                             ) as function_name:
+                              stage_bucket=FUNCTIONS_STAGING_BUCKET,
+                              runtime='nodejs6') as function_name:
       self.Run('functions describe {}'.format(function_name))
       self.AssertOutputContains(function_name)
       self.Run('functions call {}'.format(function_name))
@@ -265,7 +268,8 @@ class RedeployTest(DeployE2ETestBase):
   def testRedeployNewFunction(self):
     """Test redeploy with source code update."""
     with self._DeployFunction('--trigger-http',
-                              source=self.function_path) as function_name:
+                              source=self.function_path,
+                              runtime='nodejs6') as function_name:
       self.AssertOutputContains(function_name)
       self.Run('functions call {}'.format(function_name))
       self.AssertOutputContains('Hello World!')
@@ -284,7 +288,8 @@ class RedeployTest(DeployE2ETestBase):
   def testRedeployMetadataUpdate(self):
     """Test redeploy with no source change, just metadata changes."""
     with self._DeployFunction('--trigger-http',
-                              source=self.function_path) as function_name:
+                              source=self.function_path,
+                              runtime='nodejs6') as function_name:
       self.AssertOutputContains(function_name)
       self.Run('functions call {}'.format(function_name))
       self.AssertOutputContains('Hello World!')
@@ -311,11 +316,10 @@ class RedeployTest(DeployE2ETestBase):
       self.assertEqual(describe_result.timeout, timeout)
       self.assertIn(region, describe_result.name)
 
-  @test_case.Filters.SkipOnPy3('Not working.', 'b/115326867')
   def testRedeployStagingBucket(self):
     """Test redeploy with staging bucket."""
     with self._DeployFunction(
-        '--trigger-http', source=self.function_path,
+        '--trigger-http', source=self.function_path, runtime='nodejs6',
         stage_bucket=FUNCTIONS_STAGING_BUCKET) as function_name:
       self.Run('functions describe {}'.format(function_name))
       self.AssertOutputContains(function_name)
@@ -347,7 +351,8 @@ class EnvVarRedeployTest(DeployE2ETestBase):
     """
     self.track = calliope_base.ReleaseTrack.GA
     with self._DeployFunction('--trigger-http', source=self.function_path,
-                              set_env_vars='FOO=bar') as function_name:
+                              set_env_vars='FOO=bar',
+                              runtime='nodejs6') as function_name:
       self.AssertOutputContains(function_name)
       self.Run('functions call {}'.format(function_name))
       self.AssertOutputContains('Hello World!')
@@ -380,7 +385,8 @@ class MiscWorkflowTest(DeployE2ETestBase):
   def testLogRead(self):
     """Test deploy and read logs."""
     with self._DeployFunction('--trigger-http',
-                              source=self.function_path) as function_name:
+                              source=self.function_path,
+                              runtime='nodejs6') as function_name:
       self.Run('functions call {}'.format(function_name))
       self.AssertOutputContains(function_name)
       log_retryer = retry.Retryer(exponential_sleep_multiplier=2)

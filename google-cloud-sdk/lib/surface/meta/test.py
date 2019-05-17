@@ -103,6 +103,10 @@ class Test(base.Command):
         '--uncaught-exception',
         action='store_true',
         help='Trigger an exception that is not caught.')
+    scenarios.add_argument(
+        '--staged-progress-tracker',
+        action='store_true',
+        help='Run example staged progress tracker.')
 
   def _RunArgDict(self, args):
     return args.arg_dict
@@ -156,6 +160,29 @@ class Test(base.Command):
   def _RunUncaughtException(self, args):
     raise ValueError('Catch me if you can.')
 
+  def _RunStagedProgressTracker(self, args):
+    get_bread = progress_tracker.Stage('Getting bread...', key='bread')
+    get_pb_and_j = progress_tracker.Stage('Getting peanut butter...', key='pb')
+    make_sandwich = progress_tracker.Stage('Making sandwich...', key='make')
+    stages = [get_bread, get_pb_and_j, make_sandwich]
+    with progress_tracker.StagedProgressTracker(
+        'Making sandwich...',
+        stages,
+        success_message='Time to eat!',
+        failure_message='Time to order delivery..!',
+        tracker_id='meta.make_sandwich') as tracker:
+      tracker.StartStage('bread')
+      time.sleep(0.5)
+      tracker.UpdateStage('bread', 'Looking for bread in the pantry')
+      time.sleep(0.5)
+      tracker.CompleteStage('bread', 'Got some whole wheat bread!')
+      tracker.StartStage('pb')
+      time.sleep(1)
+      tracker.CompleteStage('pb')
+      tracker.StartStage('make')
+      time.sleep(1)
+      tracker.CompleteStage('make')
+
   def Run(self, args):
     if args.arg_dict:
       r = self._RunArgDict(args)
@@ -179,4 +206,6 @@ class Test(base.Command):
       r = self._RunSleep(args)
     elif args.uncaught_exception:
       r = self._RunUncaughtException(args)
+    elif args.staged_progress_tracker:
+      r = self._RunStagedProgressTracker(args)
     return r

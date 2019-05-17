@@ -1,0 +1,183 @@
+
+.TH "GCLOUD_ALPHA_ML_VISION_PRODUCT\-SEARCH_PRODUCTS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha ml vision product\-search products update \- update a product
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha ml vision product\-search products update\fR (\fIPRODUCT\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-add\-product\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-clear\-product\-labels\fR\ |\ \fB\-\-remove\-product\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR update a product.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Product resource \- The product to update. The arguments in this group can be
+used to specify the attributes of this resource. (NOTE) Some attributes are not
+given arguments in this group but can be set in other ways. To set the [project]
+attribute: provide the argument [product] on the command line with a fully
+specified name; set the property [core/project]; provide the argument
+[\-\-project] on the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIPRODUCT\fR
+ID of the product or fully qualified identifier for the product. This positional
+must be specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+The location of product.
+
+
+.RE
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-add\-product\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of product labels to add. If a label already exists, it is silently
+ignored.
+
+For example, to add the product labels 'foo=baz' and 'baz=qux':
+
+.RS 2m
+$ gcloud alpha ml vision product\-search products update \e
+  \-\-add\-product\-labels='foo=baz,baz=qux'
+.RE
+
+To change the product label 'foo=baz' to 'foo=qux':
+
+.RS 2m
+$ gcloud alpha ml vision product\-search products update \e
+  \-\-remove\-product\-labels='foo=baz' \-\-add\-product\-labels='foo\-qux'
+.RE
+
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+An optional description of this product. It can be up to 4096 characters long.
+
+.TP 2m
+\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
+The display name of this product. It must not be empty and can be up to 4096
+characters long.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-product\-labels\fR
+Remove all product labels. If \f5\-\-add\-product\-labels\fR is also specified,
+then \f5\-\-clear\-product\-labels\fR is applied first.
+
+For example, to remove all product labels:
+
+.RS 2m
+$ gcloud alpha ml vision product\-search products update \e
+  \-\-clear\-product\-labels
+.RE
+
+To set the product labels to exactly "foo" and "baz":
+
+.RS 2m
+$ gcloud alpha ml vision product\-search products update \e
+  \-\-clear\-product\-labels \-\-add\-product\-labels='foo=bar,baz=qux'
+.RE
+
+.TP 2m
+\fB\-\-remove\-product\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of product labels to remove. If \f5\-\-add\-product\-labels\fR is also
+specified, then \f5\-\-remove\-product\-labels\fR is applied first. If a label
+does not exist it is silently ignored. Because each key can be associated with
+multiple values, both key and value need to be specified to remove the product
+label.
+
+For example, to remove the product labels 'foo=baz' and 'baz=qux':
+
+.RS 2m
+$ gcloud alpha ml vision product\-search products update \e
+  \-\-remove\-product\-labels='foo=baz,baz=qux'
+.RE
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBvision/v1\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/vision/
+
+
+
+.SH "EXAMPLES"
+
+To change the display name to 'new\-display\-\-name', and description to
+\'new\-description' of product 'my\-product' in location 'us\-east1', run:
+
+.RS 2m
+$ gcloud alpha ml vision product\-search products update my\-product \e
+    \-\-location=us\-east1 \-\-display\-name='new\-display\-name' \e
+    \-\-description='new\-description'
+.RE
+
+To add labels 'color=blue' to and remove 'weight=10lbs' from product
+\'my\-product' in location 'us\-east1', run:
+
+.RS 2m
+$ gcloud alpha ml vision product\-search products update my\-product \e
+    \-\-location=us\-east1 \-\-add\-product\-labels='color=blue' \e
+    \-\-remove\-product\-labels='weight=10lbs'
+.RE
+
+To clear all labels from product 'my\-product' in location 'us\-east1', run:
+
+.RS 2m
+$ gcloud alpha ml vision product\-search products update my\-product \e
+    \-\-location=us\-east1 \-\-clear\-product\-labels
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. This variant is also available:
+
+.RS 2m
+$ gcloud beta ml vision product\-search products update
+.RE
+

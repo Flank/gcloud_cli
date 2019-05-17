@@ -44,7 +44,9 @@ class BaseComputeUnitTest(cli_test_base.CliTestBase):
   def GetComputeApiVersion(self):
     if self.track == calliope_base.ReleaseTrack.GA:
       return 'v1'
-    return 'beta'
+    elif self.track == calliope_base.ReleaseTrack.BETA:
+      return 'beta'
+    return 'alpha'
 
   def SetUp(self):
     # Used by compute to find current zone for prompting.
@@ -54,6 +56,11 @@ class BaseComputeUnitTest(cli_test_base.CliTestBase):
   def SubnetUri(self):
     return ('https://www.googleapis.com/compute/{track}/projects/'
             '{project}/regions/us-central1/subnetworks/test-subnetwork'.format(
+                track=self.GetComputeApiVersion(), project=self.Project()))
+
+  def ImageUri(self):
+    return ('https://www.googleapis.com/compute/{track}/projects/'
+            '{project}/global/images/test-image'.format(
                 track=self.GetComputeApiVersion(), project=self.Project()))
 
   # Copied from compute.tests.unit.test_resources with slight modifications

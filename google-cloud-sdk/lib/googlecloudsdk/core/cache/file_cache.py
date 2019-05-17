@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2017 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -202,7 +202,7 @@ class Cache(metadata_table.CacheUsingMetadataTable):
     lock_name = '__lock__'
     self._restricted = set([lock_name])
     self._tables = {}
-    self._metadata = None  # type: _Table
+    self._metadata = None
     self._start = persistent_cache_base.Now()
     self._lock_path = os.path.join(self.name, lock_name)
     self._lock = None

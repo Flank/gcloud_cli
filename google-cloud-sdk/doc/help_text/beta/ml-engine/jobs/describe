@@ -1,12 +1,12 @@
 NAME
-    gcloud beta ml-engine jobs describe - describe a Cloud ML Engine job
+    gcloud beta ml-engine jobs describe - describe an AI Platform job
 
 SYNOPSIS
     gcloud beta ml-engine jobs describe JOB [--summarize]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Describe a Cloud ML Engine job.
+    (BETA) Describe an AI Platform job.
 
 POSITIONAL ARGUMENTS
      JOB
@@ -35,8 +35,9 @@ FLAGS
     line, a warning is displayed.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

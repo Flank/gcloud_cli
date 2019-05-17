@@ -37,28 +37,27 @@ ANDROID_CATALOG_GET = TESTING_V1_MSGS.TestingTestEnvironmentCatalogGetRequest(
     projectId=unit_base.TestUnitTestBase.PROJECT_ID)
 
 ALL_GA_TEST_RUN_ARGS = [
-    'app', 'app_initial_activity', 'app_package', 'async', 'auto_google_login',
-    'device', 'device_ids', 'directories_to_pull', 'environment_variables',
-    'locales', 'max_depth', 'max_steps', 'network_profile', 'obb_files',
-    'orientations', 'os_version_ids', 'performance_metrics', 'record_video',
-    'results_bucket', 'results_dir', 'results_history_name', 'robo_directives',
+    'app', 'app_package', 'async', 'auto_google_login', 'device', 'device_ids',
+    'directories_to_pull', 'environment_variables', 'locales',
+    'network_profile', 'num_flaky_test_attempts', 'obb_files', 'orientations',
+    'os_version_ids', 'performance_metrics', 'record_video', 'results_bucket',
+    'results_dir', 'results_history_name', 'robo_directives',
     'scenario_numbers', 'scenario_labels', 'test', 'test_package',
     'test_runner_class', 'test_targets', 'timeout', 'type', 'use_orchestrator'
 ]
 
 ALL_TEST_RUN_ARGS = {
-    'ga':
+    calliope_base.ReleaseTrack.GA:
         ALL_GA_TEST_RUN_ARGS,
-    'beta':
-        ALL_GA_TEST_RUN_ARGS +
-        ['robo_script', 'additional_apks', 'other_files']
+    calliope_base.ReleaseTrack.BETA:
+        ALL_GA_TEST_RUN_ARGS + ['robo_script', 'additional_apks', 'other_files']
 }
 
 
 class AndroidUnitTestBase(unit_base.TestUnitTestBase):
   """Base class for all 'gcloud firebase test android' unit tests."""
 
-  def NewTestArgs(self, release_track='ga', **kwargs):
+  def NewTestArgs(self, **kwargs):
     """Create a Namespace containing attributes for all `test run` args.
 
     All args, for the specified release track, except those appearing in
@@ -66,12 +65,11 @@ class AndroidUnitTestBase(unit_base.TestUnitTestBase):
     attribute errors.
 
     Args:
-      release_track: a map of release track (ga or beta) to all `test run` args.
       **kwargs: a map of any args which should have values other than None.
     Returns:
       The created argparse.Namespace instance.
     """
-    return test_utils.NewNameSpace(ALL_TEST_RUN_ARGS[release_track], **kwargs)
+    return test_utils.NewNameSpace(ALL_TEST_RUN_ARGS[self.track], **kwargs)
 
 
 class AndroidMockClientTest(unit_base.TestMockClientTest):
@@ -102,8 +100,8 @@ class AndroidMockClientTest(unit_base.TestMockClientTest):
         results_bucket='oak',
         results_dir='dir')
 
-  def NewTestArgs(self, release_track='ga', **kwargs):
-    return test_utils.NewNameSpace(ALL_TEST_RUN_ARGS[release_track], **kwargs)
+  def NewTestArgs(self, **kwargs):
+    return test_utils.NewNameSpace(ALL_TEST_RUN_ARGS[self.track], **kwargs)
 
   def CreateMatrixCreator(self,
                           args,

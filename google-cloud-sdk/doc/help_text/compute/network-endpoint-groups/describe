@@ -1,0 +1,53 @@
+NAME
+    gcloud compute network-endpoint-groups describe - describes a Google
+        Compute Engine network endpoint group
+
+SYNOPSIS
+    gcloud compute network-endpoint-groups describe NAME [--zone=ZONE]
+        [GCLOUD_WIDE_FLAG ...]
+
+POSITIONAL ARGUMENTS
+     NAME
+        Name of the network endpoint group to operate on.
+
+FLAGS
+     --zone=ZONE
+        Zone of the network endpoint group to operate on. If not specified and
+        the compute/zone property isn't set, you may be prompted to select a
+        zone.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/zone property:
+
+            $ gcloud config set compute/zone ZONE
+
+        A list of zones can be fetched by running:
+
+            $ gcloud compute zones list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/zone
+
+        Alternatively, the zone can be stored in the environment variable
+        CLOUDSDK_COMPUTE_ZONE.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+EXAMPLES
+    To describe a network endpoint group:
+
+        $ gcloud compute network-endpoint-groups describe my-neg \
+            --zone=us-central1-a
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha compute network-endpoint-groups describe
+        $ gcloud beta compute network-endpoint-groups describe
+

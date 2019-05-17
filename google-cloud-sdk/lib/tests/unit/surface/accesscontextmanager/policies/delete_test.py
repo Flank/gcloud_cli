@@ -24,10 +24,10 @@ from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
 
 
-class PoliciesDeleteTestBeta(accesscontextmanager.Base):
+class PoliciesDeleteTestGA(accesscontextmanager.Base):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)
@@ -43,10 +43,16 @@ class PoliciesDeleteTestBeta(accesscontextmanager.Base):
     self.Run('access-context-manager policies delete --quiet MY_POLICY')
 
 
-class PoliciesDeleteTestAlpha(PoliciesDeleteTestBeta):
+class PoliciesDeleteTestBeta(PoliciesDeleteTestGA):
 
   def PreSetUp(self):
-    self.tracl = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class PoliciesDeleteTestAlpha(PoliciesDeleteTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2015 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+import collections
 import io
 
 from googlecloudsdk.core.document_renderers import text_renderer
@@ -26,10 +27,10 @@ from googlecloudsdk.core.document_renderers import text_renderer
 class LinterRenderer(text_renderer.TextRenderer):
   """Renders markdown to a list of lines where there is a linter error."""
 
-  _HEADINGS_TO_LINT = ['NAME', 'EXAMPLES', 'DESCRIPTION']
-  _NAME_WORD_LIMIT = 15
-  _PERSONAL_PRONOUNS = [' me ', ' we ', ' I ', ' us ', ' he ', ' she ', ' him ',
-                        ' her ', ' them ', ' they ']
+  _HEADINGS_TO_LINT = ["NAME", "EXAMPLES", "DESCRIPTION"]
+  _NAME_WORD_LIMIT = 20
+  _PERSONAL_PRONOUNS = [" me ", " we ", " I ", " us ", " he ", " she ", " him ",
+                        " her ", " them ", " they "]
 
   def __init__(self, *args, **kwargs):
     super(LinterRenderer, self).__init__(*args, **kwargs)
@@ -37,17 +38,19 @@ class LinterRenderer(text_renderer.TextRenderer):
     self._null_out = io.StringIO()
     self._buffer = io.StringIO()
     self._out = self._buffer
-    self._analyze = {'NAME': self._analyze_name,
-                     'EXAMPLES': self._analyze_examples,
-                     'DESCRIPTION': self._analyze_description}
-    self._heading = ''
-    self._prev_heading = ''
+    self._analyze = {"NAME": self._analyze_name,
+                     "EXAMPLES": self._analyze_examples,
+                     "DESCRIPTION": self._analyze_description}
+    self._heading = ""
+    self._prev_heading = ""
     self.example = False
-    self.command_name = ''
-    self.name_section = ''
+    self.command_name = ""
+    self.name_section = ""
     self.command_name_length = 0
-    self.command_text = ''
-    self.violation_flags = []
+    self.command_text = ""
+    self.equals_violation_flags = []
+    self.nonexistent_violation_flags = []
+    self.json_object = collections.OrderedDict()
 
   def _CaptureOutput(self, heading):
     # check if buffer is full from previous heading
@@ -66,10 +69,14 @@ class LinterRenderer(text_renderer.TextRenderer):
     self._analyze[heading](section)
 
   def check_for_personal_pronouns(self, section):
-    warnings = ''
+    warnings = False
+    key_object = "# " + self._heading + "_PRONOUN_CHECK FAILED"
+    value_object = ("Please remove personal pronouns in the " +
+                    self._heading + " section.")
     for pronoun in self._PERSONAL_PRONOUNS:
       if pronoun in section:
-        warnings += '\nPlease remove personal pronouns.'
+        self.json_object[key_object] = value_object
+        warnings = True
         break
     return warnings
 
@@ -78,12 +85,17 @@ class LinterRenderer(text_renderer.TextRenderer):
       self._Analyze(self._prev_heading, self._buffer.getvalue())
     self._buffer.close()
     self._null_out.close()
-    # TODO(b/121258430): only check if it is command level and not group level
-    if not self.example:
-      self._file_out.write('Refer to the detailed style guide: '
-                           'go/cloud-sdk-help-guide#examples\nThis is the '
-                           'analysis for EXAMPLES:\nYou have not included an '
-                           'example in the Examples section.\n\n')
+    # exclude alpha commands from this requirement
+    if ("alpha" not in self.command_name and self.command_metadata and not
+        self.command_metadata.is_group and not self.example):
+      value_object = "You have not included an example in the Examples section."
+      self.json_object["# EXAMPLE_PRESENT_CHECK FAILED"] = value_object
+    for element in self.json_object:
+      if self.json_object[element]:
+        self._file_out.write(str(element) + ": " +
+                             str(self.json_object[element]) + "\n")
+      else:
+        self._file_out.write(str(element) + "\n")
 
   def Heading(self, level, heading):
     self._heading = heading
@@ -93,82 +105,111 @@ class LinterRenderer(text_renderer.TextRenderer):
       self._DiscardOutput(heading)
 
   def Example(self, line):
-    # ensure this example is in the EXAMPLES section
-    if self._heading == 'EXAMPLES':
+    # ensure this example is in the EXAMPLES section and it is not a group level
+    # command
+    if (self.command_metadata and not self.command_metadata.is_group and
+        self._heading == "EXAMPLES"):
       # if previous line ended in a backslash, it is not the last line of the
       # command so append new line of command to command_text
-      if self.command_text and self.command_text.endswith('\\'):
+      if self.command_text and self.command_text.endswith("\\"):
         self.command_text += line.strip()
       # This is the first line of the command and ignore the `$ ` in it.
       else:
-        self.command_text = line.replace('$ ', '')
-      # if the current line doesn't end with a `\`, it is the end of the command
+        self.command_text = line.replace("$ ", "")
+      # if the current line doesn"t end with a `\`, it is the end of the command
       # so self.command_text is the whole command
-      if not line.endswith('\\'):
-        self.example = True
+      if not line.endswith("\\"):
         # check that the example starts with the command of the help text
         if self.command_text.startswith(self.command_name):
+          self.example = True
+          self.json_object["# EXAMPLE_PRESENT_CHECK SUCCESS"] = ""
+          # self._file_out.write("# EXAMPLE_PRESENT_CHECK SUCCESS\n")
           rest_of_command = self.command_text[self.command_name_length:].split()
           flag_names = []
           for word in rest_of_command:
-            word = word.replace('\\--', '--')
-            if word.startswith('--'):
-              flag_names.append(word[2:])
-          # Until b/121254697 is resolved, this line will not be active
-          # self._analyze_example_flags_equals(flag_names)
+            word = word.replace("\\--", "--")
+            # Stop parsing arguments when ' -- ' is encountered.
+            if word == "--":
+              break
+            if word.startswith("--"):
+              flag_names.append(word)
+          self._analyze_example_flags_equals(flag_names)
+          flags = [flag.partition("=")[0] for flag in flag_names]
+          if self.command_metadata and self.command_metadata.flags:
+            self._check_valid_flags(flags)
 
-  # TODO(b/121254697): this check shouldn't apply to boolean flags
+  def _check_valid_flags(self, flags):
+    for flag in flags:
+      if flag not in self.command_metadata.flags:
+        self.nonexistent_violation_flags.append(flag)
+
   def _analyze_example_flags_equals(self, flags):
     for flag in flags:
-      if '=' not in flag:
-        self.violation_flags.append(flag)
+      if "=" not in flag and flag not in self.command_metadata.bool_flags:
+        self.equals_violation_flags.append(flag)
 
   def _analyze_name(self, section):
     warnings = self.check_for_personal_pronouns(section)
-    self.command_name = section.strip().split(' - ')[0]
-    if len(section.strip().split(' - ')) == 1:
-      self.name_section = ''
-      warnings += '\nPlease add an explanation for the command.'
+    if not warnings:
+      self.json_object["# NAME_PRONOUN_CHECK SUCCESS"] = ""
+      # successful_linters.append("# NAME_PRONOUN_CHECK SUCCESS")
+    self.command_name = section.strip().split(" -")[0]
+    if len(section.strip().split(" - ")) == 1:
+      self.name_section = ""
+      value_object = "Please add an explanation for the command."
+      self.json_object["# NAME_DESCRIPTION_CHECK FAILED"] = value_object
+      warnings = True
+    else:
+      self.name_section = section.strip().split(" -")[1]
+      self.json_object["# NAME_DESCRIPTION_CHECK SUCCESS"] = ""
     self.command_name_length = len(self.command_name)
     # check that name section is not too long
-    if len(section.split()) > self._NAME_WORD_LIMIT:
-      warnings += '\nPlease shorten the name section to less than '
-      warnings += str(self._NAME_WORD_LIMIT) + ' words.'
-    if warnings:
-      # TODO(b/119550825): remove the go/ link from open source code
-      self._file_out.write('Refer to the detailed style guide: '
-                           'go/cloud-sdk-help-guide#name\nThis is the '
-                           'analysis for NAME:')
-      self._file_out.write(warnings + '\n\n')
+    if len(self.name_section.split()) > self._NAME_WORD_LIMIT:
+      value_object = ("Please shorten the name section description to "
+                      "less than " + str(self._NAME_WORD_LIMIT) + " words.")
+      self.json_object["# NAME_LENGTH_CHECK FAILED"] = value_object
+      warnings = True
     else:
-      self._file_out.write('There are no errors for the NAME section.\n\n')
+      self.json_object["# NAME_LENGTH_CHECK SUCCESS"] = ""
+    if not warnings:
+      self.json_object["There are no errors for the NAME section."] = ""
 
   def _analyze_examples(self, section):
-    warnings = self.check_for_personal_pronouns(section)
-    if self.violation_flags:
-      warnings += '\nThere should be a `=` between the flag name and the value.'
-      warnings += '\nThe following flags are not formatted properly:'
-      for flag in self.violation_flags:
-        warnings += '\n' + flag
-    if warnings:
-      # TODO(b/119550825): remove the go/ link from open source code
-      self._file_out.write('Refer to the detailed style guide: '
-                           'go/cloud-sdk-help-guide#examples\n'
-                           'This is the analysis for EXAMPLES:')
-      self._file_out.write(warnings + '\n\n')
-    else:
-      self._file_out.write('There are no errors for the EXAMPLES '
-                           'section.\n\n')
+    if not self.command_metadata.is_group:
+      warnings = self.check_for_personal_pronouns(section)
+      if not warnings:
+        self.json_object["# EXAMPLES_PRONOUN_CHECK SUCCESS"] = ""
+      if self.equals_violation_flags:
+        warnings = True
+        list_contents = ""
+        for flag in range(len(self.equals_violation_flags) - 1):
+          list_contents += str(self.equals_violation_flags[flag]) + ", "
+        list_contents += str(self.equals_violation_flags[-1])
+        value_object = ("There should be an `=` between the flag name and "
+                        "the value for the following flags: " +  list_contents)
+        self.json_object["# EXAMPLE_FLAG_EQUALS_CHECK FAILED"] = value_object
+        warnings = True
+      else:
+        self.json_object["# EXAMPLE_FLAG_EQUALS_CHECK SUCCESS"] = ""
+      if self.nonexistent_violation_flags:
+        warnings = True
+        list_contents = ""
+        for flag in range(len(self.nonexistent_violation_flags) - 1):
+          list_contents += str(self.nonexistent_violation_flags[flag]) + ", "
+        list_contents += str(self.nonexistent_violation_flags[-1])
+        key_object = "# EXAMPLE_NONEXISTENT_FLAG_CHECK FAILED"
+        value_object = ("The following flags are not valid for the command: " +
+                        list_contents)
+        self.json_object[key_object] = value_object
+      else:
+        self.json_object["# EXAMPLE_NONEXISTENT_FLAG_CHECK SUCCESS"] = ""
+      if not warnings:
+        self.json_object["There are no errors for the EXAMPLES section."] = ""
 
   def _analyze_description(self, section):
     warnings = self.check_for_personal_pronouns(section)
-    if warnings:
-      # TODO(b/119550825): remove the go/ link from open source code
-      self._file_out.write('Refer to the detailed style guide: '
-                           'go/cloud-sdk-help-guide#description\n'
-                           'This is the analysis for DESCRIPTION:')
-      self._file_out.write(warnings + '\n\n')
-    else:
-      self._file_out.write('There are no errors for the DESCRIPTION '
-                           'section.\n\n')
+    if not warnings:
+      self.json_object["# DESCRIPTION_PRONOUN_CHECK SUCCESS"] = ""
+    if not warnings:
+      self.json_object["There are no errors for the DESCRIPTION section."] = ""
 

@@ -68,10 +68,12 @@ Partner interconnect. Only available to approved partners.
 
 .TP 2m
 \fB\-\-link\-type\fR=\fILINK_TYPE\fR
-Type of the link for the interconnect. \fILINK_TYPE\fR must be (currently only
-one value is supported):
+Type of the link for the interconnect. \fILINK_TYPE\fR must be one of:
 
 .RS 2m
+.TP 2m
+\fBLINK_TYPE_ETHERNET_100G_LR\fR
+100Gbps Ethernet, LR Optics.
 .TP 2m
 \fBLINK_TYPE_ETHERNET_10G_LR\fR
 10Gbps Ethernet, LR Optics.
@@ -118,10 +120,11 @@ notifications regarding this interconnect.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

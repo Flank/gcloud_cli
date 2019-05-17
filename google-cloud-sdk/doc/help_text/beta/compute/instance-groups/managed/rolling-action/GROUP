@@ -10,8 +10,9 @@ DESCRIPTION
     (BETA) Read and manipulate Google Compute Engine managed instance groups.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -31,8 +32,9 @@ COMMANDS
         (BETA) Stop the proactive update process of managed instance group.
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud compute instance-groups managed rolling-action
         $ gcloud alpha compute instance-groups managed rolling-action
 

@@ -25,10 +25,10 @@ from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
 
 
-class PoliciesUpdateTestBeta(accesscontextmanager.Base):
+class PoliciesUpdateTestGA(accesscontextmanager.Base):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)
@@ -68,7 +68,13 @@ class PoliciesUpdateTestBeta(accesscontextmanager.Base):
     self.assertEqual(results, policy)
 
 
-class PoliciesUpdateTestAlpha(PoliciesUpdateTestBeta):
+class PoliciesUpdateTestBeta(PoliciesUpdateTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class PoliciesUpdateTestAlpha(PoliciesUpdateTestGA):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA

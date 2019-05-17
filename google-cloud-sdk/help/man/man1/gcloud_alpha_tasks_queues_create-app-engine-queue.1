@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha tasks queues create\-app\-engine\-queue \- create an App Engine queue
+gcloud alpha tasks queues create\-app\-engine\-queue \- create a Cloud Tasks queue
 
 
 
@@ -17,14 +17,16 @@ gcloud alpha tasks queues create\-app\-engine\-queue \- create an App Engine que
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR An App Engine queue is a push queue sent to an App Engine
-endpoint. The flags available to this command represent the fields of an App
-Engine queue that are mutable.
+\fB(ALPHA)\fR \fB(DEPRECATED)\fR This command group is deprecated. Use \f5gcloud
+alpha tasks queues create\fR instead
 
-If you have early access to Cloud Tasks, refer to the following guide for more
-information about the different queue target types:
-https://cloud.google.com/cloud\-tasks/docs/queue\-types. For access, sign up
-here: https://goo.gl/Ya0AZd
+\fB(ALPHA)\fR \fB(DEPRECATED)\fR Create a Cloud Tasks queue.
+
+This command group is deprecated. Use \f5gcloud alpha tasks queues create\fR
+instead
+
+The flags available to this command represent the fields of a queue that are
+mutable.
 
 
 
@@ -105,10 +107,27 @@ use the default.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create a Cloud Tasks queue:
+
+.RS 2m
+$ gcloud alpha tasks queues create\-app\-engine\-queue my\-queue
+  \-\-max\-attempts=10 \-\-max\-retry\-duration=5s
+  \-\-max\-doublings=4 \-\-min\-backoff=1s
+  \-\-max\-backoff=10s
+  \-\-max\-tasks\-dispatched\-per\-second=100
+  \-\-max\-concurrent\-tasks=10
+  \-\-routing\-override=service:abc
+.RE
 
 
 

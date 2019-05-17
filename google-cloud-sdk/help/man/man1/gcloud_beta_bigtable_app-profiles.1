@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta bigtable app\-profiles \- manage Cloud Bigtable app_profiles
+gcloud beta bigtable app\-profiles \- manage Cloud Bigtable app profiles
 
 
 
@@ -17,16 +17,17 @@ gcloud beta bigtable app\-profiles \- manage Cloud Bigtable app_profiles
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Manage Cloud Bigtable app_profiles.
+\fB(BETA)\fR Manage Cloud Bigtable app profiles.
 
 
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -37,23 +38,23 @@ gcloud help\fR for details.
 .RS 2m
 .TP 2m
 \fBcreate\fR
-\fB(BETA)\fR Create a new Bigtable app_profile.
+\fB(BETA)\fR Create a new Bigtable app profile.
 
 .TP 2m
 \fBdelete\fR
-\fB(BETA)\fR Delete a Bigtable app\-profile.
+\fB(BETA)\fR Delete a Bigtable app profile.
 
 .TP 2m
 \fBdescribe\fR
-\fB(BETA)\fR Describe an existing Bigtable app\-profile.
+\fB(BETA)\fR Describe an existing Bigtable app profile.
 
 .TP 2m
 \fBlist\fR
-\fB(BETA)\fR List Bigtable app\-profiles.
+\fB(BETA)\fR List Bigtable app profiles.
 
 .TP 2m
 \fBupdate\fR
-\fB(BETA)\fR Update a Bigtable app_profile.
+\fB(BETA)\fR Update a Bigtable app profile.
 
 
 .RE
@@ -61,10 +62,11 @@ gcloud help\fR for details.
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
+$ gcloud bigtable app\-profiles
 $ gcloud alpha bigtable app\-profiles
 .RE
 

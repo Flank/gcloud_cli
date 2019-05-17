@@ -41,7 +41,7 @@ class ResizeTestGA(base.GATestBase, base.ClustersTestBase):
     self.ClearErr()
     with self.assertRaises(console_io.OperationCancelledError):
       self.Run(self.clusters_command_base.format(self.ZONE) +
-               ' resize {0} --size 4'.format(self.CLUSTER_NAME))
+               ' resize {0} --num-nodes 4'.format(self.CLUSTER_NAME))
     self.AssertErrContains('Aborted by user.')
 
   def testResizeWithSameNumberOfNodes(self):
@@ -53,7 +53,7 @@ class ResizeTestGA(base.GATestBase, base.ClustersTestBase):
     # self.ClearOutput()
     # self.ClearErr()
     # self.Run(self.clusters_command_base.format(self.ZONE) +
-    #         ' resize {0} --size 3'.format(self.CLUSTER_NAME))
+    #         ' resize {0} --num-nodes 3'.format(self.CLUSTER_NAME))
     # self.AssertErrContains('Cluster [my-cluster] already has a size of 3. '
     #                       'Please specify a different size.')
 
@@ -73,7 +73,7 @@ class ResizeTestGA(base.GATestBase, base.ClustersTestBase):
           statusMessage=op.statusMessage)
       self.ExpectGetOperation(doneop)
 
-  def _TestResizeMoreNodes(self, location):
+  def _TestResizeMoreNodes(self, location, size_cli_flag):
     properties.VALUES.core.disable_prompts.Set(False)
     kwargs = {'zone': location}
     cluster = self._RunningClusterWithNodePool(**kwargs)
@@ -85,16 +85,20 @@ class ResizeTestGA(base.GATestBase, base.ClustersTestBase):
     self.ClearErr()
     if location == self.REGION:
       self.Run(self.regional_clusters_command_base.format(location) +
-               ' resize {0} --size 4'.format(self.CLUSTER_NAME))
+               ' resize {0} {1} 4'.format(self.CLUSTER_NAME, size_cli_flag))
     else:
       self.Run(self.clusters_command_base.format(location) +
-               ' resize {0} --size 4'.format(self.CLUSTER_NAME))
+               ' resize {0} {1} 4'.format(self.CLUSTER_NAME, size_cli_flag))
     if self.api_mismatch and location == self.REGION:
       self.AssertErrContains('You invoked')
 
   def testResizeMoreNodes(self):
     self.WriteInput('y')
-    self._TestResizeMoreNodes(self.ZONE)
+    self._TestResizeMoreNodes(self.ZONE, '--num-nodes')
+
+  def testResizeOldSizeFlag(self):
+    self.WriteInput('y')
+    self._TestResizeMoreNodes(self.ZONE, '--size')
 
   def testResizeMoreNodesAsync(self):
     properties.VALUES.core.disable_prompts.Set(False)
@@ -106,7 +110,7 @@ class ResizeTestGA(base.GATestBase, base.ClustersTestBase):
     self.ClearOutput()
     self.ClearErr()
     self.Run(self.clusters_command_base.format(self.ZONE) +
-             ' resize {0} --size 4 --async'.format(self.CLUSTER_NAME))
+             ' resize {0} --num-nodes 4 --async'.format(self.CLUSTER_NAME))
 
   def testResizeLessNodes(self):
     properties.VALUES.core.disable_prompts.Set(False)
@@ -119,7 +123,7 @@ class ResizeTestGA(base.GATestBase, base.ClustersTestBase):
     self.ClearOutput()
     self.ClearErr()
     self.Run(self.clusters_command_base.format(self.ZONE) +
-             ' resize {0} --size 2'.format(self.CLUSTER_NAME))
+             ' resize {0} --num-nodes 2'.format(self.CLUSTER_NAME))
 
   def testResizeError(self):
     properties.VALUES.core.disable_prompts.Set(False)
@@ -136,7 +140,7 @@ class ResizeTestGA(base.GATestBase, base.ClustersTestBase):
     self.ClearErr()
     with self.assertRaises(c_util.Error):
       self.Run(self.clusters_command_base.format(self.ZONE) +
-               ' resize {0} --size 2'.format(self.CLUSTER_NAME))
+               ' resize {0} --num-nodes 2'.format(self.CLUSTER_NAME))
 
   def testResizeMultipleGroups(self):
     properties.VALUES.core.disable_prompts.Set(False)
@@ -151,7 +155,7 @@ class ResizeTestGA(base.GATestBase, base.ClustersTestBase):
     self.ClearOutput()
     self.ClearErr()
     self.Run(self.clusters_command_base.format(self.ZONE) +
-             ' resize {0} --size 2'.format(self.CLUSTER_NAME))
+             ' resize {0} --num-nodes 2'.format(self.CLUSTER_NAME))
 
   def testResizeMultiplePools(self):
     properties.VALUES.core.disable_prompts.Set(False)
@@ -171,7 +175,7 @@ class ResizeTestGA(base.GATestBase, base.ClustersTestBase):
     self.ClearOutput()
     self.ClearErr()
     self.Run(self.clusters_command_base.format(self.ZONE) +
-             ' resize {0} --node-pool {1} --size 2'.format(
+             ' resize {0} --node-pool {1} --num-nodes 2'.format(
                  cluster.name, pool2.name))
 
   def testResizeUnknownPool(self):
@@ -184,14 +188,14 @@ class ResizeTestGA(base.GATestBase, base.ClustersTestBase):
 
     with self.assertRaises(c_util.Error):
       self.Run(self.clusters_command_base.format(self.ZONE) +
-               ' resize {0} --node-pool bar --size 2'.format(
+               ' resize {0} --node-pool bar --num-nodes 2'.format(
                    cluster.name))
     self.AssertErrContains('No node pool named \'bar\' in {0}'.format(
         cluster.name))
 
   def testResizeMoreNodesRegional(self):
     self.WriteInput('y\ny')
-    self._TestResizeMoreNodes(self.REGION)
+    self._TestResizeMoreNodes(self.REGION, '--num-nodes')
 
   def testCanResizeAfterFailedGet(self):
     properties.VALUES.core.disable_prompts.Set(False)
@@ -210,7 +214,7 @@ class ResizeTestGA(base.GATestBase, base.ClustersTestBase):
     self.ClearOutput()
     self.ClearErr()
     self.Run(self.clusters_command_base.format(location) +
-             ' resize {0} --size 4'.format(self.CLUSTER_NAME))
+             ' resize {0} --num-nodes 4'.format(self.CLUSTER_NAME))
     self.AssertErrContains('Problem loading details of cluster')
 
 

@@ -35,52 +35,11 @@ class DatacatalogV1beta1(base_api.BaseApiClient):
         default_global_params=default_global_params,
         additional_http_headers=additional_http_headers,
         response_encoding=response_encoding)
-    self.catalog = self.CatalogService(self)
     self.entries = self.EntriesService(self)
-    self.projects_datasets_entries = self.ProjectsDatasetsEntriesService(self)
-    self.projects_datasets = self.ProjectsDatasetsService(self)
+    self.projects_locations_entryGroups_entries = self.ProjectsLocationsEntryGroupsEntriesService(self)
+    self.projects_locations_entryGroups = self.ProjectsLocationsEntryGroupsService(self)
+    self.projects_locations = self.ProjectsLocationsService(self)
     self.projects = self.ProjectsService(self)
-
-  class CatalogService(base_api.BaseApiService):
-    """Service class for the catalog resource."""
-
-    _NAME = u'catalog'
-
-    def __init__(self, client):
-      super(DatacatalogV1beta1.CatalogService, self).__init__(client)
-      self._upload_configs = {
-          }
-
-    def Search(self, request, global_params=None):
-      r"""Searches for Data Catalog for multiple resources like entries, tags that.
-match a query.
-This API is a custom method
-(https://cloud.google.com/apis/design/custom_methods), and does not return
-the complete resource, only the resource identifier and high level
-fields. Clients can subsequentally call Get APIs.
-
-      Args:
-        request: (DatacatalogCatalogSearchRequest) input message
-        global_params: (StandardQueryParameters, default: None) global arguments
-      Returns:
-        (GoogleCloudDatacatalogV1beta1SearchCatalogResponse) The response message.
-      """
-      config = self.GetMethodConfig('Search')
-      return self._RunMethod(
-          config, request, global_params=global_params)
-
-    Search.method_config = lambda: base_api.ApiMethodInfo(
-        http_method=u'GET',
-        method_id=u'datacatalog.catalog.search',
-        ordered_params=[],
-        path_params=[],
-        query_params=[u'orderBy', u'pageSize', u'pageToken', u'query'],
-        relative_path=u'v1beta1/catalog:search',
-        request_field='',
-        request_type_name=u'DatacatalogCatalogSearchRequest',
-        response_type_name=u'GoogleCloudDatacatalogV1beta1SearchCatalogResponse',
-        supports_download=False,
-    )
 
   class EntriesService(base_api.BaseApiService):
     """Service class for the entries resource."""
@@ -93,7 +52,9 @@ fields. Clients can subsequentally call Get APIs.
           }
 
     def Lookup(self, request, global_params=None):
-      r"""Get an entry by Resource name.
+      r"""Get an entry by target resource name. This method allows clients to use.
+the resource name from the source Google Cloud Platform service to get the
+Cloud Data Catalog Entry.
 
       Args:
         request: (DatacatalogEntriesLookupRequest) input message
@@ -110,7 +71,7 @@ fields. Clients can subsequentally call Get APIs.
         method_id=u'datacatalog.entries.lookup',
         ordered_params=[],
         path_params=[],
-        query_params=[u'fullResourceName'],
+        query_params=[u'linkedResource', u'sqlResource'],
         relative_path=u'v1beta1/entries:lookup',
         request_field='',
         request_type_name=u'DatacatalogEntriesLookupRequest',
@@ -118,50 +79,87 @@ fields. Clients can subsequentally call Get APIs.
         supports_download=False,
     )
 
-  class ProjectsDatasetsEntriesService(base_api.BaseApiService):
-    """Service class for the projects_datasets_entries resource."""
+  class ProjectsLocationsEntryGroupsEntriesService(base_api.BaseApiService):
+    """Service class for the projects_locations_entryGroups_entries resource."""
 
-    _NAME = u'projects_datasets_entries'
+    _NAME = u'projects_locations_entryGroups_entries'
 
     def __init__(self, client):
-      super(DatacatalogV1beta1.ProjectsDatasetsEntriesService, self).__init__(client)
+      super(DatacatalogV1beta1.ProjectsLocationsEntryGroupsEntriesService, self).__init__(client)
       self._upload_configs = {
           }
 
-    def List(self, request, global_params=None):
-      r"""Lists entries.
+    def Get(self, request, global_params=None):
+      r"""Gets an entry.
 
       Args:
-        request: (DatacatalogProjectsDatasetsEntriesListRequest) input message
+        request: (DatacatalogProjectsLocationsEntryGroupsEntriesGetRequest) input message
         global_params: (StandardQueryParameters, default: None) global arguments
       Returns:
-        (GoogleCloudDatacatalogV1beta1ListEntriesResponse) The response message.
+        (GoogleCloudDatacatalogV1beta1Entry) The response message.
       """
-      config = self.GetMethodConfig('List')
+      config = self.GetMethodConfig('Get')
       return self._RunMethod(
           config, request, global_params=global_params)
 
-    List.method_config = lambda: base_api.ApiMethodInfo(
-        flat_path=u'v1beta1/projects/{projectsId}/datasets/{datasetsId}/entries',
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1beta1/projects/{projectsId}/locations/{locationsId}/entryGroups/{entryGroupsId}/entries/{entriesId}',
         http_method=u'GET',
-        method_id=u'datacatalog.projects.datasets.entries.list',
-        ordered_params=[u'parent'],
-        path_params=[u'parent'],
-        query_params=[u'pageSize', u'pageToken'],
-        relative_path=u'v1beta1/{+parent}/entries',
+        method_id=u'datacatalog.projects.locations.entryGroups.entries.get',
+        ordered_params=[u'name'],
+        path_params=[u'name'],
+        query_params=[],
+        relative_path=u'v1beta1/{+name}',
         request_field='',
-        request_type_name=u'DatacatalogProjectsDatasetsEntriesListRequest',
-        response_type_name=u'GoogleCloudDatacatalogV1beta1ListEntriesResponse',
+        request_type_name=u'DatacatalogProjectsLocationsEntryGroupsEntriesGetRequest',
+        response_type_name=u'GoogleCloudDatacatalogV1beta1Entry',
         supports_download=False,
     )
 
-  class ProjectsDatasetsService(base_api.BaseApiService):
-    """Service class for the projects_datasets resource."""
+    def Patch(self, request, global_params=None):
+      r"""Updates an existing entry.
 
-    _NAME = u'projects_datasets'
+      Args:
+        request: (DatacatalogProjectsLocationsEntryGroupsEntriesPatchRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (GoogleCloudDatacatalogV1beta1Entry) The response message.
+      """
+      config = self.GetMethodConfig('Patch')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Patch.method_config = lambda: base_api.ApiMethodInfo(
+        flat_path=u'v1beta1/projects/{projectsId}/locations/{locationsId}/entryGroups/{entryGroupsId}/entries/{entriesId}',
+        http_method=u'PATCH',
+        method_id=u'datacatalog.projects.locations.entryGroups.entries.patch',
+        ordered_params=[u'name'],
+        path_params=[u'name'],
+        query_params=[u'updateMask'],
+        relative_path=u'v1beta1/{+name}',
+        request_field=u'googleCloudDatacatalogV1beta1Entry',
+        request_type_name=u'DatacatalogProjectsLocationsEntryGroupsEntriesPatchRequest',
+        response_type_name=u'GoogleCloudDatacatalogV1beta1Entry',
+        supports_download=False,
+    )
+
+  class ProjectsLocationsEntryGroupsService(base_api.BaseApiService):
+    """Service class for the projects_locations_entryGroups resource."""
+
+    _NAME = u'projects_locations_entryGroups'
 
     def __init__(self, client):
-      super(DatacatalogV1beta1.ProjectsDatasetsService, self).__init__(client)
+      super(DatacatalogV1beta1.ProjectsLocationsEntryGroupsService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+  class ProjectsLocationsService(base_api.BaseApiService):
+    """Service class for the projects_locations resource."""
+
+    _NAME = u'projects_locations'
+
+    def __init__(self, client):
+      super(DatacatalogV1beta1.ProjectsLocationsService, self).__init__(client)
       self._upload_configs = {
           }
 

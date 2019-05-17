@@ -23,7 +23,6 @@ from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import grpc_util
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
-from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 
@@ -47,14 +46,15 @@ if six.PY2:
       # pylint:disable=invalid-name
       self.ListTables = mock.MagicMock()
 
-
 @test_case.Filters.SkipOnPy3('Not yet py3 compatible', 'b/78118402')
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA)
-class ListTests(sdk_test_base.WithFakeAuth,
-                cli_test_base.CliTestBase,
-                sdk_test_base.WithOutputCapture):
+
+
+class ListTestsBeta(sdk_test_base.WithFakeAuth,
+                    cli_test_base.CliTestBase,
+                    sdk_test_base.WithOutputCapture):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     self.StartObjectPatch(grpc_util, 'MakeSecureChannel')
@@ -75,23 +75,12 @@ class ListTests(sdk_test_base.WithFakeAuth,
         tablesId=name,
         **instance_ref.AsDict())
 
-  def testEmpty_DefaultName(self, track):
-    self.track = track
-    instance_ref = self._MakeInstanceRef('-')
-    request = bigtable_table_admin_pb2.ListTablesRequest(
-        parent=instance_ref.RelativeName(),
-    )
-    self.stub.ListTables.return_value = (
-        bigtable_table_admin_pb2.ListTablesResponse())
+  def testInstanceFlagMissingError(self):
+    with self.AssertRaisesArgumentErrorMatches(
+        'argument --instances: Must be specified.'):
+      self.Run('bigtable instances tables list')
 
-    self.Run('bigtable instances tables list')
-
-    self.AssertOutputEquals('')
-    self.AssertErrEquals('Listed 0 items.\n')
-    self.stub.ListTables.assert_called_once_with(request)
-
-  def testSingle_Name(self, track):
-    self.track = track
+  def testSingle_Name(self):
     instance_ref = self._MakeInstanceRef('ocean')
     request = bigtable_table_admin_pb2.ListTablesRequest(
         parent=instance_ref.RelativeName(),
@@ -111,8 +100,7 @@ class ListTests(sdk_test_base.WithFakeAuth,
     self.AssertErrEquals('')
     self.stub.ListTables.assert_called_once_with(request)
 
-  def testMultiple_Uri(self, track):
-    self.track = track
+  def testMultiple_Uri(self):
     instance_ref = self._MakeInstanceRef('ocean')
     request = bigtable_table_admin_pb2.ListTablesRequest(
         parent=instance_ref.RelativeName(),
@@ -130,6 +118,11 @@ class ListTests(sdk_test_base.WithFakeAuth,
     self.AssertErrEquals('')
     self.stub.ListTables.assert_called_once_with(request)
 
+
+class ListTestsAlpha(ListTestsBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 if __name__ == '__main__':
   test_case.main()

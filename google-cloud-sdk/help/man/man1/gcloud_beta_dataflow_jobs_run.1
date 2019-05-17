@@ -11,7 +11,7 @@ gcloud beta dataflow jobs run \- runs a job from the specified path
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta dataflow jobs run\fR \fIJOB_NAME\fR \fB\-\-gcs\-location\fR=\fIGCS_LOCATION\fR [\fB\-\-max\-workers\fR=\fIMAX_WORKERS\fR] [\fB\-\-parameters\fR=[\fIPARAMETERS\fR,...]] [\fB\-\-region\fR=\fIREGION_ID\fR] [\fB\-\-service\-account\-email\fR=\fISERVICE_ACCOUNT_EMAIL\fR] [\fB\-\-staging\-location\fR=\fISTAGING_LOCATION\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta dataflow jobs run\fR \fIJOB_NAME\fR \fB\-\-gcs\-location\fR=\fIGCS_LOCATION\fR [\fB\-\-max\-workers\fR=\fIMAX_WORKERS\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-num\-workers\fR=\fINUM_WORKERS\fR] [\fB\-\-parameters\fR=[\fIPARAMETERS\fR,...]] [\fB\-\-region\fR=\fIREGION_ID\fR] [\fB\-\-service\-account\-email\fR=\fISERVICE_ACCOUNT_EMAIL\fR] [\fB\-\-staging\-location\fR=\fISTAGING_LOCATION\fR] [\fB\-\-subnetwork\fR=\fISUBNETWORK\fR] [\fB\-\-worker\-machine\-type\fR=\fIWORKER_MACHINE_TYPE\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -52,6 +52,14 @@ beginning with 'gs://'.)
 The maximum number of workers to run.
 
 .TP 2m
+\fB\-\-network\fR=\fINETWORK\fR
+The Compute Engine network for launching instances to run your pipeline.
+
+.TP 2m
+\fB\-\-num\-workers\fR=\fINUM_WORKERS\fR
+The initial number of workers to use.
+
+.TP 2m
 \fB\-\-parameters\fR=[\fIPARAMETERS\fR,...]
 The parameters to pass to the job.
 
@@ -69,6 +77,14 @@ The Google Cloud Storage location to stage temporary files. (Must be a URL
 beginning with 'gs://'.)
 
 .TP 2m
+\fB\-\-subnetwork\fR=\fISUBNETWORK\fR
+The Compute Engine subnetwork for launching instances to run your pipeline.
+
+.TP 2m
+\fB\-\-worker\-machine\-type\fR=\fIWORKER_MACHINE_TYPE\fR
+The type of machine to use for workers. Defaults to server\-specified.
+
+.TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
 The zone to run the workers in.
 
@@ -78,10 +94,11 @@ The zone to run the workers in.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

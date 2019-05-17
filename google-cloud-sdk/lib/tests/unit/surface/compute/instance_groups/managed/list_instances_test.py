@@ -45,11 +45,11 @@ class InstanceGroupsListInstancesZonalTest(test_base.BaseTest):
         """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME   ZONE       STATUS  ACTION     LAST_ERROR
-            inst-1 central2-a RUNNING NONE
-            inst-2 central2-a STOPPED RECREATING
-            inst-3 central2-a RUNNING DELETING
-            inst-4 central2-a         CREATING   Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
+            NAME   ZONE       STATUS          ACTION     INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
+            inst-1 central2-a RUNNING         NONE       template-1        xxx
+            inst-2 central2-a STOPPED         RECREATING template-1
+            inst-3 central2-a RUNNING         DELETING   template-2        yyy
+            inst-4 central2-a                 CREATING   template-3                     Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
             """), normalize_space=True)
 
   def testListInstancesWithLimit(self):
@@ -60,9 +60,9 @@ class InstanceGroupsListInstancesZonalTest(test_base.BaseTest):
         """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME   ZONE       STATUS  ACTION     LAST_ERROR
-            inst-1 central2-a RUNNING NONE
-            inst-2 central2-a STOPPED RECREATING
+            NAME   ZONE       STATUS          ACTION     INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
+            inst-1 central2-a RUNNING         NONE       template-1        xxx
+            inst-2 central2-a STOPPED         RECREATING template-1
             """), normalize_space=True)
 
   def testListInstancesByUri(self):
@@ -73,11 +73,11 @@ class InstanceGroupsListInstancesZonalTest(test_base.BaseTest):
         """.format(API_VERSION))
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME   ZONE       STATUS  ACTION     LAST_ERROR
-            inst-1 central2-a RUNNING NONE
-            inst-2 central2-a STOPPED RECREATING
-            inst-3 central2-a RUNNING DELETING
-            inst-4 central2-a         CREATING   Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
+            NAME   ZONE       STATUS          ACTION     INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
+            inst-1 central2-a RUNNING         NONE       template-1        xxx
+            inst-2 central2-a STOPPED         RECREATING template-1
+            inst-3 central2-a RUNNING         DELETING   template-2        yyy
+            inst-4 central2-a                 CREATING   template-3                     Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
             """), normalize_space=True)
 
   def testListInstancesBySorted(self):
@@ -88,11 +88,11 @@ class InstanceGroupsListInstancesZonalTest(test_base.BaseTest):
         """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME   ZONE       STATUS  ACTION     LAST_ERROR
-            inst-4 central2-a         CREATING   Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
-            inst-3 central2-a RUNNING DELETING
-            inst-2 central2-a STOPPED RECREATING
-            inst-1 central2-a RUNNING NONE
+            NAME   ZONE       STATUS          ACTION     INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
+            inst-4 central2-a                 CREATING   template-3                     Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
+            inst-3 central2-a RUNNING         DELETING   template-2        yyy
+            inst-2 central2-a STOPPED         RECREATING template-1
+            inst-1 central2-a RUNNING         NONE       template-1        xxx
             """), normalize_space=True)
 
   def testListInstancesUriOutput(self):
@@ -128,11 +128,11 @@ class InstanceGroupsListInstancesRegionalTest(test_base.BaseTest):
         """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME   ZONE       STATUS  ACTION     LAST_ERROR
-            inst-1 central2-a RUNNING NONE
-            inst-2 central2-a STOPPED RECREATING
-            inst-3 central2-a RUNNING DELETING
-            inst-4 central2-a         CREATING   Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
+            NAME   ZONE       STATUS          ACTION     INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
+            inst-1 central2-a RUNNING         NONE       template-1        xxx
+            inst-2 central2-a STOPPED         RECREATING template-1
+            inst-3 central2-a RUNNING         DELETING   template-2        yyy
+            inst-4 central2-a                 CREATING   template-3                     Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
             """), normalize_space=True)
 
   def testListInstancesWithLimit(self):
@@ -143,9 +143,9 @@ class InstanceGroupsListInstancesRegionalTest(test_base.BaseTest):
         """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME   ZONE       STATUS  ACTION     LAST_ERROR
-            inst-1 central2-a RUNNING NONE
-            inst-2 central2-a STOPPED RECREATING
+            NAME   ZONE       STATUS          ACTION     INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
+            inst-1 central2-a RUNNING         NONE       template-1        xxx
+            inst-2 central2-a STOPPED         RECREATING template-1
             """), normalize_space=True)
 
   def testListInstancesByUri(self):
@@ -156,11 +156,11 @@ class InstanceGroupsListInstancesRegionalTest(test_base.BaseTest):
         """.format(API_VERSION))
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME   ZONE       STATUS  ACTION     LAST_ERROR
-            inst-1 central2-a RUNNING NONE
-            inst-2 central2-a STOPPED RECREATING
-            inst-3 central2-a RUNNING DELETING
-            inst-4 central2-a         CREATING   Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
+            NAME   ZONE       STATUS          ACTION     INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
+            inst-1 central2-a RUNNING         NONE       template-1        xxx
+            inst-2 central2-a STOPPED         RECREATING template-1
+            inst-3 central2-a RUNNING         DELETING   template-2        yyy
+            inst-4 central2-a                 CREATING   template-3                     Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
             """), normalize_space=True)
 
   def testListInstancesBySorted(self):
@@ -171,11 +171,11 @@ class InstanceGroupsListInstancesRegionalTest(test_base.BaseTest):
         """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME   ZONE       STATUS  ACTION     LAST_ERROR
-            inst-4 central2-a         CREATING   Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
-            inst-3 central2-a RUNNING DELETING
-            inst-2 central2-a STOPPED RECREATING
-            inst-1 central2-a RUNNING NONE
+            NAME   ZONE       STATUS          ACTION     INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
+            inst-4 central2-a                 CREATING   template-3                     Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
+            inst-3 central2-a RUNNING         DELETING   template-2        yyy
+            inst-2 central2-a STOPPED         RECREATING template-1
+            inst-1 central2-a RUNNING         NONE       template-1        xxx
             """), normalize_space=True)
 
   def testListInstancesUriOutput(self):
@@ -193,6 +193,7 @@ class InstanceGroupsListInstancesRegionalTest(test_base.BaseTest):
             """.format(API_VERSION)))
 
   def testPrompting(self):
+    # ResourceArgument checks if this is true before attempting to prompt.
     self.StartPatch('googlecloudsdk.core.console.console_io.CanPrompt',
                     return_value=True)
     self.make_requests.side_effect = iter([
@@ -209,13 +210,12 @@ class InstanceGroupsListInstancesRegionalTest(test_base.BaseTest):
         """)
     self.AssertOutputEquals(
         textwrap.dedent("""\
-            NAME   ZONE       STATUS  ACTION     LAST_ERROR
-            inst-1 central2-a RUNNING NONE
-            inst-2 central2-a STOPPED RECREATING
-            inst-3 central2-a RUNNING DELETING
-            inst-4 central2-a         CREATING   Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
+            NAME   ZONE       STATUS          ACTION     INSTANCE_TEMPLATE VERSION_NAME LAST_ERROR
+            inst-1 central2-a RUNNING         NONE       template-1        xxx
+            inst-2 central2-a STOPPED         RECREATING template-1
+            inst-3 central2-a RUNNING         DELETING   template-2        yyy
+            inst-4 central2-a                 CREATING   template-3                     Error CONDITION_NOT_MET: True is not False, Error QUOTA_EXCEEDED: Limit is 5
             """), normalize_space=True)
 
 if __name__ == '__main__':
   test_case.main()
-

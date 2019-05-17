@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2017 Google Inc. All Rights Reserved.
+# Copyright 2019 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""`gcloud tasks queues create-app-engine-queue` command."""
+"""`gcloud tasks queues create command."""
+
 
 from __future__ import absolute_import
 from __future__ import division
@@ -26,25 +27,42 @@ from googlecloudsdk.command_lib.tasks import parsers
 from googlecloudsdk.core import log
 
 
+@base.Deprecate(is_removed=False,
+                warning='This command is deprecated. '
+                        'Use `gcloud beta tasks queues create` instead')
 @base.ReleaseTracks(base.ReleaseTrack.BETA)
 class CreateAppEngine(base.CreateCommand):
-  """Create an App Engine queue.
+  """Create a Cloud Tasks queue.
 
-  An App Engine queue is a push queue sent to an App Engine endpoint. The flags
-  available to this command represent the fields of an App Engine queue that are
+  The flags available to this command represent the fields of a queue that are
   mutable.
-
-  If you have early access to Cloud Tasks, refer to the following guide for
-  more information about the different queue target types:
-  https://cloud.google.com/cloud-tasks/docs/queue-types.
-  For access, sign up here: https://goo.gl/Ya0AZd
   """
+  detailed_help = {
+      'DESCRIPTION': """\
+          {description}
+          """,
+      'EXAMPLES': """\
+          To create a Cloud Tasks queue:
+
+              $ {command} my-queue
+                --max-attempts=10 --max-retry-duration=5s
+                --max-doublings=4 --min-backoff=1s
+                --max-backoff=10s
+                --max-dispatches-per-second=100
+                --max-concurrent-dispatches=10
+                --routing-override=service:abc
+         """,
+  }
+
+  def __init__(self, *args, **kwargs):
+    super(CreateAppEngine, self).__init__(*args, **kwargs)
+    self.is_alpha = False
 
   @staticmethod
   def Args(parser):
     flags.AddQueueResourceArg(parser, 'to create')
     flags.AddLocationFlag(parser)
-    flags.AddCreateAppEngineQueueFlags(parser)
+    flags.AddCreatePushQueueFlags(parser)
 
   def Run(self, args):
     api = GetApiAdapter(self.ReleaseTrack())
@@ -52,51 +70,61 @@ class CreateAppEngine(base.CreateCommand):
     queue_ref = parsers.ParseQueue(args.queue, args.location)
     location_ref = parsers.ExtractLocationRefFromQueueRef(queue_ref)
     queue_config = parsers.ParseCreateOrUpdateQueueArgs(
-        args, constants.APP_ENGINE_QUEUE, api.messages)
+        args, constants.PUSH_QUEUE, api.messages,
+        release_track=self.ReleaseTrack())
     log.warning(constants.QUEUE_MANAGEMENT_WARNING)
-    create_response = queues_client.Create(
-        location_ref,
-        queue_ref,
-        retry_config=queue_config.retryConfig,
-        rate_limits=queue_config.rateLimits,
-        app_engine_http_queue=queue_config.appEngineHttpQueue)
+    if not self.is_alpha:
+      create_response = queues_client.Create(
+          location_ref,
+          queue_ref,
+          retry_config=queue_config.retryConfig,
+          rate_limits=queue_config.rateLimits,
+          app_engine_http_queue=queue_config.appEngineHttpQueue)
+    else:
+      create_response = queues_client.Create(
+          location_ref,
+          queue_ref,
+          retry_config=queue_config.retryConfig,
+          rate_limits=queue_config.rateLimits,
+          app_engine_http_target=queue_config.appEngineHttpTarget)
     log.CreatedResource(queue_ref.Name(), 'queue')
     return create_response
 
 
+@base.Deprecate(is_removed=False,
+                warning='This command group is deprecated. '
+                        'Use `gcloud alpha tasks queues create` instead')
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class AlphaCreateAppEngine(base.CreateCommand):
-  """Create an App Engine queue.
+class AlphaCreateAppEngine(CreateAppEngine):
+  """Create a Cloud Tasks queue.
 
-  An App Engine queue is a push queue sent to an App Engine endpoint. The flags
-  available to this command represent the fields of an App Engine queue that are
+  The flags available to this command represent the fields of a queue that are
   mutable.
-
-  If you have early access to Cloud Tasks, refer to the following guide for
-  more information about the different queue target types:
-  https://cloud.google.com/cloud-tasks/docs/queue-types.
-  For access, sign up here: https://goo.gl/Ya0AZd
   """
+
+  detailed_help = {
+      'DESCRIPTION': """\
+          {description}
+          """,
+      'EXAMPLES': """\
+          To create a Cloud Tasks queue:
+
+              $ {command} my-queue
+                --max-attempts=10 --max-retry-duration=5s
+                --max-doublings=4 --min-backoff=1s
+                --max-backoff=10s
+                --max-tasks-dispatched-per-second=100
+                --max-concurrent-tasks=10
+                --routing-override=service:abc
+          """,
+  }
+
+  def __init__(self, *args, **kwargs):
+    super(AlphaCreateAppEngine, self).__init__(*args, **kwargs)
+    self.is_alpha = True
 
   @staticmethod
   def Args(parser):
     flags.AddQueueResourceArg(parser, 'to create')
     flags.AddLocationFlag(parser)
-    flags.AddCreateAppEngineQueueFlags(parser, is_alpha=True)
-
-  def Run(self, args):
-    api = GetApiAdapter(self.ReleaseTrack())
-    queues_client = api.queues
-    queue_ref = parsers.ParseQueue(args.queue, args.location)
-    location_ref = parsers.ExtractLocationRefFromQueueRef(queue_ref)
-    queue_config = parsers.ParseCreateOrUpdateQueueArgs(
-        args, constants.APP_ENGINE_QUEUE, api.messages, is_alpha=True)
-    log.warning(constants.QUEUE_MANAGEMENT_WARNING)
-    create_response = queues_client.Create(
-        location_ref,
-        queue_ref,
-        retry_config=queue_config.retryConfig,
-        rate_limits=queue_config.rateLimits,
-        app_engine_http_target=queue_config.appEngineHttpTarget)
-    log.CreatedResource(queue_ref.Name(), 'queue')
-    return create_response
+    flags.AddCreatePushQueueFlags(parser, is_alpha=True)

@@ -39,13 +39,13 @@ class FlagsTest(test_case.TestCase):
                           side_effect=self.MockAddArgument)
 
   def MockAddArgument(self, *args, **kwargs):
-    self.choices = sorted(kwargs.get('choices').keys())
+    self.choices = set(kwargs.get('choices').keys())
 
   def testSessionAffinityChoices_InternalLb(self):
-    expected_choices = sorted(
+    expected_choices = set(
         beta_messages.BackendService.SessionAffinityValueValuesEnum.names())
     flags.AddSessionAffinity(self.parser)
-    self.assertEqual(expected_choices, self.choices)
+    self.assertTrue(self.choices.issubset(expected_choices))
 
 
 if __name__ == '__main__':

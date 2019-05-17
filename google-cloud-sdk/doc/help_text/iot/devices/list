@@ -3,15 +3,16 @@ NAME
 
 SYNOPSIS
     gcloud iot devices list (--registry=REGISTRY : --region=REGION)
-        [--device-ids=[[ID,...],...]] [--device-num-ids=[[NUM_ID,...],...]]
-        [--filter=EXPRESSION] [--limit=LIMIT] [--page-size=PAGE_SIZE]
-        [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
+        [--device-ids=[DEVICE_IDS,...]] [--device-num-ids=[DEVICE_NUM_IDS,...]]
+        [--device-type=DEVICE_TYPE] [--filter=EXPRESSION] [--limit=LIMIT]
+        [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     List devices.
 
 REQUIRED FLAGS
-     Registry resource - The device registry in which to show devices. The
+     Registry resource - The registry you want to list the devices for. The
      arguments in this group can be used to specify the attributes of this
      resource. (NOTE) Some attributes are not given arguments in this group but
      can be set in other ways. To set the [project] attribute: provide the
@@ -25,14 +26,18 @@ REQUIRED FLAGS
           group are specified.
 
        --region=REGION
-          The Cloud region for the registry.
+          The name of the Cloud IoT region.
 
 FLAGS
-     --device-ids=[[ID,...],...]
+     --device-ids=[DEVICE_IDS,...]
         If given, show only devices with one of the provided IDs.
 
-     --device-num-ids=[[NUM_ID,...],...]
+     --device-num-ids=[DEVICE_NUM_IDS,...]
         If given, show only devices with one of the provided numerical IDs.
+
+     --device-type=DEVICE_TYPE
+        If specified, show only devices of that type. If left unspecified, show
+        devices of any type. DEVICE_TYPE must be one of: gateway, non-gateway.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -64,10 +69,15 @@ LIST COMMAND FLAGS
         Print a list of resource URIs instead of the default output.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
+
+API REFERENCE
+    This command uses the cloudiot/v1 API. The full documentation for this API
+    can be found at: https://cloud.google.com/iot
 
 NOTES
     These variants are also available:

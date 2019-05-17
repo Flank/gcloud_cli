@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta compute disks remove\-iam\-policy\-binding \- remove IAM policy binding of a Google Compute Engine disk
+gcloud beta compute disks remove\-iam\-policy\-binding \- remove IAM policy binding from a Google Compute Engine disk
 
 
 
@@ -17,7 +17,7 @@ gcloud beta compute disks remove\-iam\-policy\-binding \- remove IAM policy bind
 
 .SH "DESCRIPTION"
 
-\fB(BETA)\fR Remove an IAM policy binding of a Google Compute Engine disk.
+\fB(BETA)\fR Remove an IAM policy binding from a Google Compute Engine disk.
 
 
 
@@ -63,11 +63,11 @@ Examples: \f5user:test\-user@gmail.com\fR, \f5group:admins@example.com\fR,
 Can also be one of the following special values:
 .RS 2m
 .IP "\(em" 2m
-\f5allUsers\fR \- anyone who is on the internet, with or without a Google
-account.
+\f5allUsers\fR \- Special identifier that represents anyone who is on the
+internet, with or without a Google account.
 .IP "\(em" 2m
-\f5allAuthenticatedUsers\fR \- anyone who is authenticated with a Google account
-or a service account.
+\f5allAuthenticatedUsers\fR \- Special identifier that represents anyone who is
+authenticated with a Google account or a service account.
 .RE
 .RE
 .sp
@@ -83,10 +83,11 @@ The role to remove the member from.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -105,7 +106,7 @@ for the user 'test\-user@gmail.com' with disk 'my\-disk' and zone 'ZONE', run:
 
 .RS 2m
 $ gcloud beta compute disks remove\-iam\-policy\-binding my\-disk \e
-    \-\-zone='ZONE' \-\-member='user:test\-user@gmail.com' \e
+    \-\-zone=ZONE \-\-member='user:test\-user@gmail.com' \e
     \-\-role='roles/compute.securityAdmin'
 .RE
 
@@ -116,10 +117,11 @@ role and member types.
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
+$ gcloud compute disks remove\-iam\-policy\-binding
 $ gcloud alpha compute disks remove\-iam\-policy\-binding
 .RE
 

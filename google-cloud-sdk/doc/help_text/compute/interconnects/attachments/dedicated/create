@@ -4,7 +4,7 @@ NAME
 
 SYNOPSIS
     gcloud compute interconnects attachments dedicated create NAME
-        --interconnect=INTERCONNECT --router=ROUTER
+        --interconnect=INTERCONNECT --router=ROUTER [--bandwidth=BANDWIDTH]
         [--candidate-subnets=[SUBNET,...]] [--description=DESCRIPTION]
         [--enable-admin] [--region=REGION] [--vlan=VLAN] [GCLOUD_WIDE_FLAG ...]
 
@@ -26,6 +26,30 @@ REQUIRED FLAGS
         The Google Cloud Router to use for dynamic routing.
 
 OPTIONAL FLAGS
+     --bandwidth=BANDWIDTH
+        Provisioned capacity of the attachment. BANDWIDTH must be one of:
+
+         50m
+            50 Mbit/s
+         100m
+            100 Mbit/s
+         200m
+            200 Mbit/s
+         300m
+            300 Mbit/s
+         400m
+            400 Mbit/s
+         500m
+            500 Mbit/s
+         1g
+            1 Gbit/s
+         2g
+            2 Gbit/s
+         5g
+            5 Gbit/s
+         10g
+            10 Gbit/s
+
      --candidate-subnets=[SUBNET,...]
         Up to 16 candidate prefixes that can be used to restrict the allocation
         of cloudRouterIpAddress and customerRouterIpAddress for this
@@ -70,8 +94,9 @@ OPTIONAL FLAGS
         Google will automatically select a VLAN.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

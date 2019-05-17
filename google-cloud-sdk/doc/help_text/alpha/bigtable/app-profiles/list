@@ -1,5 +1,5 @@
 NAME
-    gcloud alpha bigtable app-profiles list - list Bigtable app-profiles
+    gcloud alpha bigtable app-profiles list - list Bigtable app profiles
 
 SYNOPSIS
     gcloud alpha bigtable app-profiles list --instance=INSTANCE
@@ -7,10 +7,10 @@ SYNOPSIS
         [--sort-by=[FIELD,...]] [--uri] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) List Bigtable app-profiles.
+    (ALPHA) List Bigtable app profiles.
 
 REQUIRED FLAGS
-     Instance resource - The instance to list app-profiles for. This represents
+     Instance resource - The instance to list app profiles for. This represents
      a Cloud resource. (NOTE) Some attributes are not given arguments in this
      group but can be set in other ways. To set the [project] attribute:
      provide the argument [--instance] on the command line with a fully
@@ -50,8 +50,9 @@ LIST COMMAND FLAGS
         Print a list of resource URIs instead of the default output.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -60,7 +61,8 @@ NOTES
     command fails with API permission errors despite specifying the right
     project, you will have to apply for early access and have your projects
     registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    https://cloud.google.com/support/. These variants are also available:
 
+        $ gcloud bigtable app-profiles list
         $ gcloud beta bigtable app-profiles list
 

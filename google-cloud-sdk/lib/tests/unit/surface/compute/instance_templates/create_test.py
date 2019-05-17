@@ -4302,13 +4302,13 @@ class LabelsTest(test_base.BaseTest):
           """)
 
 
-class InstanceTemplatesCreateShieldedVMConfigAlphaTest(
+class InstanceTemplatesCreateShieldedInstanceConfigGATest(
     InstanceTemplatesCreateTest, parameterized.TestCase):
   """Test creation of VM instances with shielded VM config."""
 
   def SetUp(self):
-    SetUp(self, 'alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    SetUp(self, 'v1')
+    self.track = calliope_base.ReleaseTrack.GA
 
   def testCreateSVMCkWithNoProperties(self):
     m = self.messages
@@ -4353,26 +4353,25 @@ class InstanceTemplatesCreateShieldedVMConfigAlphaTest(
     )
 
   @parameterized.named_parameters(
-      ('EnableSecureBoot', '--shielded-vm-secure-boot', True, None, None),
-      ('EnableVtpm', '--shielded-vm-vtpm', None, True, None),
-      ('EnableIntegrity', '--shielded-vm-integrity-monitoring', None, None,
-       True),
-      ('DisableSecureBoot', '--no-shielded-vm-secure-boot', False, None, None),
-      ('DisableVtpm', '--no-shielded-vm-vtpm', None, False, None),
-      ('DisableIntegrity', '--no-shielded-vm-integrity-monitoring', None, None,
-       False),
-      ('ESecureBootEvtpm', '--shielded-vm-secure-boot --shielded-vm-vtpm', True,
-       True, None),
-      ('DSecureBootDvtpm', '--no-shielded-vm-secure-boot --no-shielded-vm-vtpm',
-       False, False, None),
-      ('ESecureBootDvtpm', '--shielded-vm-secure-boot --no-shielded-vm-vtpm',
+      ('-InstanceEnableSecureBoot', '--shielded-secure-boot', True, None, None),
+      ('-InstanceEnableVtpm', '--shielded-vtpm', None, True, None),
+      ('-InstanceEnableIntegrity', '--shielded-integrity-monitoring', None,
+       None, True), ('-InstanceDisableSecureBoot', '--no-shielded-secure-boot',
+                     False, None, None),
+      ('-InstanceDisableVtpm', '--no-shielded-vtpm', None, False, None),
+      ('-InstanceDisableIntegrity', '--no-shielded-integrity-monitoring', None,
+       None, False),
+      ('-InstanceESecureBootEvtpm', '--shielded-secure-boot --shielded-vtpm',
+       True, True, None),
+      ('-InstanceDSecureBootDvtpm',
+       '--no-shielded-secure-boot --no-shielded-vtpm', False, False, None),
+      ('-InstanceESecureBootDvtpm', '--shielded-secure-boot --no-shielded-vtpm',
        True, False, None),
-      ('DSecureBootEvtpm', '--no-shielded-vm-secure-boot --shielded-vm-vtpm',
+      ('-InstanceDSecureBootEvtpm', '--no-shielded-secure-boot --shielded-vtpm',
        False, True, None),
-      ('DSecureBootEvtpmEIntegrity',
-       ('--no-shielded-vm-secure-boot --shielded-vm-vtpm'
-        ' --shielded-vm-integrity-monitoring'), False, True, True),
-  )
+      ('-InstanceDSecureBootEvtpmEIntegrity',
+       ('--no-shielded-secure-boot --shielded-vtpm'
+        ' --shielded-integrity-monitoring'), False, True, True))
   def testCreateSVMCkWithAllProperties(self, cmd_flag, enable_secure_boot,
                                        enable_vtpm,
                                        enable_integrity_monitoring):
@@ -4405,7 +4404,7 @@ class InstanceTemplatesCreateShieldedVMConfigAlphaTest(
     )
 
     # Add shielded vm config info.
-    prop.shieldedVmConfig = m.ShieldedVmConfig(
+    prop.shieldedInstanceConfig = m.ShieldedInstanceConfig(
         enableSecureBoot=enable_secure_boot,
         enableVtpm=enable_vtpm,
         enableIntegrityMonitoring=enable_integrity_monitoring)
@@ -4426,13 +4425,22 @@ class InstanceTemplatesCreateShieldedVMConfigAlphaTest(
     )
 
 
-class InstanceTemplatesCreateShieldedVMConfigBetaTest(
-    InstanceTemplatesCreateShieldedVMConfigAlphaTest):
+class InstanceTemplatesCreateShieldedInstanceConfigBetaTest(
+    InstanceTemplatesCreateShieldedInstanceConfigGATest):
   """Test creation of VM instances with shielded VM config."""
 
   def SetUp(self):
     SetUp(self, 'beta')
     self.track = calliope_base.ReleaseTrack.BETA
+
+
+class InstanceTemplatesCreateShieldedInstanceConfigAlphaTest(
+    InstanceTemplatesCreateShieldedInstanceConfigGATest):
+  """Test creation of VM instances with shielded VM config."""
+
+  def SetUp(self):
+    SetUp(self, 'alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 class InstanceTemplatesCreateWithNodeAffinity(test_base.BaseTest,
@@ -4858,6 +4866,152 @@ class InstanceTemplatesCreateWithKmsTestAlpha(
     InstanceTemplatesCreateWithKmsTestGa):
 
   def SetupApiAndTrack(self):
+    SetUp(self, 'alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class InstanceTemplatesCreateWithReservationBeta(test_base.BaseTest):
+
+  def SetUp(self):
+    SetUp(self, 'beta')
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def testCreateWithNoReservationAffinity(self):
+    m = self.messages
+    self.Run('compute instance-templates create template-1 '
+             '--reservation-affinity=none')
+
+    template = m.InstanceTemplate(
+        name='template-1',
+        properties=m.InstanceProperties(
+            canIpForward=False,
+            disks=[
+                m.AttachedDisk(
+                    autoDelete=True,
+                    boot=True,
+                    initializeParams=m.AttachedDiskInitializeParams(
+                        sourceImage=self._default_image,),
+                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+            ],
+            machineType=_DEFAULT_MACHINE_TYPE,
+            metadata=m.Metadata(),
+            networkInterfaces=[
+                m.NetworkInterface(
+                    accessConfigs=[self._default_access_config],
+                    network=self._default_network)
+            ],
+            serviceAccounts=[
+                m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
+            ],
+            scheduling=m.Scheduling(automaticRestart=True),
+            reservationAffinity=m.ReservationAffinity(
+                consumeReservationType=m.ReservationAffinity
+                .ConsumeReservationTypeValueValuesEnum.NO_RESERVATION)))
+
+    self.CheckRequests(
+        self.get_default_image_requests,
+        [(self.compute.instanceTemplates, 'Insert',
+          m.ComputeInstanceTemplatesInsertRequest(
+              instanceTemplate=template,
+              project='my-project',
+          ))],
+    )
+
+  def testCreateWithSpecificReservationAffinity(self):
+    m = self.messages
+    self.Run('compute instance-templates create template-1 '
+             '--reservation-affinity=specific --reservation=my-reservation')
+
+    template = m.InstanceTemplate(
+        name='template-1',
+        properties=m.InstanceProperties(
+            canIpForward=False,
+            disks=[
+                m.AttachedDisk(
+                    autoDelete=True,
+                    boot=True,
+                    initializeParams=m.AttachedDiskInitializeParams(
+                        sourceImage=self._default_image,),
+                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+            ],
+            machineType=_DEFAULT_MACHINE_TYPE,
+            metadata=m.Metadata(),
+            networkInterfaces=[
+                m.NetworkInterface(
+                    accessConfigs=[self._default_access_config],
+                    network=self._default_network)
+            ],
+            serviceAccounts=[
+                m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
+            ],
+            scheduling=m.Scheduling(automaticRestart=True),
+            reservationAffinity=m.ReservationAffinity(
+                consumeReservationType=m.ReservationAffinity
+                .ConsumeReservationTypeValueValuesEnum.SPECIFIC_RESERVATION,
+                key='compute.googleapis.com/reservation-name',
+                values=['my-reservation'])))
+
+    self.CheckRequests(self.get_default_image_requests,
+                       [(self.compute.instanceTemplates, 'Insert',
+                         m.ComputeInstanceTemplatesInsertRequest(
+                             instanceTemplate=template,
+                             project='my-project',
+                         ))])
+
+  def testCreateWithAnyReservationAffinity(self):
+    m = self.messages
+    self.Run('compute instance-templates create template-1 '
+             '--reservation-affinity=any')
+
+    template = m.InstanceTemplate(
+        name='template-1',
+        properties=m.InstanceProperties(
+            canIpForward=False,
+            disks=[
+                m.AttachedDisk(
+                    autoDelete=True,
+                    boot=True,
+                    initializeParams=m.AttachedDiskInitializeParams(
+                        sourceImage=self._default_image,),
+                    mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                    type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+            ],
+            machineType=_DEFAULT_MACHINE_TYPE,
+            metadata=m.Metadata(),
+            networkInterfaces=[
+                m.NetworkInterface(
+                    accessConfigs=[self._default_access_config],
+                    network=self._default_network)
+            ],
+            serviceAccounts=[
+                m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
+            ],
+            scheduling=m.Scheduling(automaticRestart=True),
+            reservationAffinity=m.ReservationAffinity(
+                consumeReservationType=m.ReservationAffinity
+                .ConsumeReservationTypeValueValuesEnum.ANY_RESERVATION)))
+
+    self.CheckRequests(self.get_default_image_requests,
+                       [(self.compute.instanceTemplates, 'Insert',
+                         m.ComputeInstanceTemplatesInsertRequest(
+                             instanceTemplate=template,
+                             project='my-project',
+                         ))])
+
+  def testCreateWithNotSpecifiedReservation(self):
+    with self.AssertRaisesExceptionRegexp(
+        exceptions.InvalidArgumentException,
+        'The name the specific reservation must be specified.'):
+      self.Run('compute instance-templates create template-1 '
+               '--reservation-affinity=specific')
+
+
+class InstanceTemplatesCreateWithReservationAlpha(
+    InstanceTemplatesCreateWithReservationBeta):
+
+  def SetUp(self):
     SetUp(self, 'alpha')
     self.track = calliope_base.ReleaseTrack.ALPHA
 

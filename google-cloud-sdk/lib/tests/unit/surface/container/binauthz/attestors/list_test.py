@@ -22,12 +22,16 @@ from __future__ import unicode_literals
 import datetime
 import textwrap
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core.util import times
 from tests.lib import test_case
 from tests.lib.surface.container.binauthz import base
 
 
-class ListTest(base.BinauthzMockedBetaPolicyClientUnitTest):
+class ListTest(base.WithMockBetaBinauthz, base.BinauthzTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testSuccess_SinglePage(self):
     name1 = 'bar'
@@ -70,8 +74,7 @@ class ListTest(base.BinauthzMockedBetaPolicyClientUnitTest):
         attestors=[attestor1, attestor2],
         nextPageToken=None)
 
-    self.client.projects_attestors.List.Expect(
-        req, response=attestor_list)
+    self.mock_client.projects_attestors.List.Expect(req, response=attestor_list)
 
     self.RunBinauthz('attestors list')
 
@@ -97,12 +100,17 @@ class ListTest(base.BinauthzMockedBetaPolicyClientUnitTest):
         attestors=[],
         nextPageToken=None)
 
-    self.client.projects_attestors.List.Expect(
-        req, response=attestor_list)
+    self.mock_client.projects_attestors.List.Expect(req, response=attestor_list)
 
     self.RunBinauthz('attestors list')
 
     self.AssertOutputMatches('')
+
+
+class ListAlphaTest(base.WithMockAlphaBinauthz, ListTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

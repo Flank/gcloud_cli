@@ -272,6 +272,35 @@ class RunTest(base.GenomicsUnitTest):
         '--service-account-email', 'test@google.com',
         '--service-account-scopes', 'https://www.googleapis.com/auth/compute'])
 
+  def testPipelinesRun_NetworkAndSubnetwork(self):
+    request = copy.deepcopy(PIPELINE_MINIMAL_OBJECT)
+    request.pipeline.resources.virtualMachine.network = (
+        self.messages_v2.Network(
+            name='test-network-name',
+            subnetwork='test-subnetwork-name'))
+    self._runFileTest(request, PIPELINE_MINIMAL_JSON, [
+        '--network', 'test-network-name',
+        '--subnetwork', 'test-subnetwork-name'])
+
+  def testPipelinesRun_NetworkOrSubnetwork(self):
+    request = copy.deepcopy(PIPELINE_MINIMAL_OBJECT)
+    request.pipeline.resources.virtualMachine.network = (
+        self.messages_v2.Network(name='test-network-name'))
+    self._runFileTest(request, PIPELINE_MINIMAL_JSON, [
+        '--network', 'test-network-name'])
+
+    request = copy.deepcopy(PIPELINE_MINIMAL_OBJECT)
+    request.pipeline.resources.virtualMachine.network = (
+        self.messages_v2.Network(subnetwork='test-subnetwork-name'))
+    self._runFileTest(request, PIPELINE_MINIMAL_JSON, [
+        '--subnetwork', 'test-subnetwork-name'])
+
+  def testPipelinesRun_BootDiskSize(self):
+    request = copy.deepcopy(PIPELINE_MINIMAL_OBJECT)
+    request.pipeline.resources.virtualMachine.bootDiskSizeGb = 20
+    self._runFileTest(request, PIPELINE_MINIMAL_JSON, [
+        '--boot-disk-size', '20'])
+
   def testPipelinesRun_Logging(self):
     request = copy.deepcopy(PIPELINE_MINIMAL_OBJECT)
     request.pipeline.actions.append(messages.Action(

@@ -3,12 +3,12 @@ release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
-  - command: compute networks create $$network1$$ --subnet-mode custom --format 'text(name,x_gcloud_subnet_mode)'
+  - command: compute networks create $$network1$$ --subnet-mode custom --format 'yaml(name,x_gcloud_subnet_mode)'
   - stderr: |
       Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network1$$].
   - stdout: |
       ---
-      name:                 $$network1$$
+      name: $$network1$$
       x_gcloud_subnet_mode: CUSTOM
 - execute:
   - command: compute networks subnets create $$subnet1$$ --region us-central1 --network
@@ -21,12 +21,12 @@ summary:
       name:        $$subnet1$$
       network:     https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network1$$
 - execute:
-  - command: compute networks create $$network2$$ --subnet-mode custom --format 'text(name,x_gcloud_subnet_mode)'
+  - command: compute networks create $$network2$$ --subnet-mode custom --format 'yaml(name,x_gcloud_subnet_mode)'
   - stderr: |
       Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network2$$].
   - stdout: |
       ---
-      name:                 $$network2$$
+      name: $$network2$$
       x_gcloud_subnet_mode: CUSTOM
 - execute:
   - command: compute networks subnets create $$subnet2$$ --region us-central1 --network
@@ -69,7 +69,9 @@ summary:
   - stderr: |
       Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network2$$].
 actions:
-
+- define_reference:
+    reference: compute-uri
+    value: www.googleapis.com/compute
 - define_reference:
     reference: api-version
     track_values:
@@ -98,11 +100,11 @@ actions:
     prefix: multi-nic-template
 
 - execute_command:
-    command: compute networks create $$network1$$ --subnet-mode custom --format 'text(name,x_gcloud_subnet_mode)'
+    command: compute networks create $$network1$$ --subnet-mode custom --format 'yaml(name,x_gcloud_subnet_mode)'
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks?alt=json
           method: POST
           headers: {}
           body:
@@ -134,7 +136,7 @@ actions:
         Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network1$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network1$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network1$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -154,10 +156,8 @@ actions:
             autoCreateSubnetworks: false
             routingConfig:
               routingMode: REGIONAL
-    - expect_stdout: |
-        ---
-        name:                 $$network1$$
-        x_gcloud_subnet_mode: CUSTOM
+    - expect_stdout:
+        matches: ^(---\s)?name:\s$$network1$$\s+x_gcloud_subnet_mode:\sCUSTOM$
     - expect_exit:
         code: 0
 - execute_command:
@@ -166,7 +166,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks?alt=json
           method: POST
           headers: {}
           body:
@@ -199,7 +199,7 @@ actions:
         Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -230,11 +230,11 @@ actions:
     - expect_exit:
         code: 0
 - execute_command:
-    command: compute networks create $$network2$$ --subnet-mode custom --format 'text(name,x_gcloud_subnet_mode)'
+    command: compute networks create $$network2$$ --subnet-mode custom --format 'yaml(name,x_gcloud_subnet_mode)'
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks?alt=json
           method: POST
           headers: {}
           body:
@@ -266,7 +266,7 @@ actions:
         Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network2$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network2$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network2$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -286,10 +286,8 @@ actions:
             autoCreateSubnetworks: false
             routingConfig:
               routingMode: REGIONAL
-    - expect_stdout: |
-        ---
-        name:                 $$network2$$
-        x_gcloud_subnet_mode: CUSTOM
+    - expect_stdout:
+        matches: ^(---\s)?name:\s$$network2$$\s+x_gcloud_subnet_mode:\sCUSTOM$
     - expect_exit:
         code: 0
 - execute_command:
@@ -298,7 +296,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks?alt=json
           method: POST
           headers: {}
           body:
@@ -331,7 +329,7 @@ actions:
         Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet2$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet2$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet2$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -367,7 +365,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f?alt=json
           method: GET
           headers: {}
           body: null
@@ -394,7 +392,7 @@ actions:
             - Intel Ivy Bridge
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing?alt=json
           method: GET
           headers: {}
           body: null
@@ -417,14 +415,14 @@ actions:
               bucketName: cloud-sdk-integration-test-usage
               reportNamePrefix: ''
             enabledFeatures:
-            - alpha-api
+            - $$api-version$$-api
             selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing
             defaultServiceAccount: 462803083913-compute@developer.gserviceaccount.com
             xpnProjectStatus: UNSPECIFIED_XPN_PROJECT_STATUS
             defaultNetworkTier: PREMIUM
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances?alt=json
           method: POST
           headers: {}
           body:
@@ -486,7 +484,7 @@ actions:
         Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -582,7 +580,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -616,7 +614,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet1$$?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -650,7 +648,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet2$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/subnetworks/$$subnet2$$?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -684,7 +682,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network1$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network1$$?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -717,7 +715,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network2$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/$$network2$$?alt=json
           method: DELETE
           headers: {}
           body: null

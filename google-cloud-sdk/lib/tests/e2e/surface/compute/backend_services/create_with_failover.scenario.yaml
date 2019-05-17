@@ -40,7 +40,9 @@ summary:
   - stderr: |
       Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$].
 actions:
-
+- define_reference:
+    reference: compute-uri
+    value: www.googleapis.com/compute
 
 - generate_resource_id:
     reference: hc
@@ -66,7 +68,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices?alt=json
           method: POST
           headers: {}
           body:
@@ -103,7 +105,7 @@ actions:
         Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
           method: GET
           headers: {}
           body: null

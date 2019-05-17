@@ -29,7 +29,8 @@ class UpdateTest(base.DnsMockBetaTest):
                     description=None,
                     name_servers=None,
                     networks=None,
-                    forwarding=None):
+                    forwarding=None,
+                    logging=None):
     get_output = util_beta.GetPolicies(networks=[], num=1).pop()
     expected_output = util_beta.GetPolicies(networks=[], num=1).pop()
     get_req = self.messages.DnsPoliciesGetRequest(
@@ -47,6 +48,9 @@ class UpdateTest(base.DnsMockBetaTest):
 
     if forwarding is not None:
       expected_output.enableInboundForwarding = forwarding
+
+    if logging is not None:
+      expected_output.enableLogging = logging
 
     update_req = self.messages.DnsPoliciesUpdateRequest(
         policy=expected_output.name,
@@ -97,17 +101,25 @@ class UpdateTest(base.DnsMockBetaTest):
                              '--enable-inbound-forwarding')
     self.assertEqual(expected_response.policy, actual_output)
 
+  def testUpdateLogging(self):
+    expected_response = self._ExpectUpdate(logging=True)
+    actual_output = self.Run('dns policies update mypolicy0 '
+                             '--enable-logging')
+    self.assertEqual(expected_response.policy, actual_output)
+
   def testUpdateAll(self):
     expected_response = self._ExpectUpdate(
         name_servers=['1.0.1.1', '1.0.1.2'],
         networks=['networka', 'networkb'],
         description='New Description',
-        forwarding=True)
+        forwarding=True,
+        logging=True)
     actual_output = self.Run('dns policies update mypolicy0 '
                              '--description "New Description" '
                              '--alternative-name-servers 1.0.1.1,1.0.1.2 '
                              '--networks networka,networkb '
-                             '--enable-inbound-forwarding')
+                             '--enable-inbound-forwarding '
+                             '--enable-logging')
     self.assertEqual(expected_response.policy, actual_output)
 
   def testUpdateNone(self):

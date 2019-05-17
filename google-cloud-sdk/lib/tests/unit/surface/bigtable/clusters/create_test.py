@@ -19,17 +19,16 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.api_lib.util import waiter as waiter_test_base
 from tests.lib.surface.bigtable import base
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA)
-class CreateCommandTest(base.BigtableV2TestBase,
-                        waiter_test_base.CloudOperationsBase):
+class CreateCommandTestGA(base.BigtableV2TestBase,
+                          waiter_test_base.CloudOperationsBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.svc = self.client.projects_instances_clusters.Create
@@ -49,16 +48,14 @@ class CreateCommandTest(base.BigtableV2TestBase,
         parent='projects/{0}/instances/{1}'.format(self.Project(),
                                                    'theinstance'))
 
-  def testCreateDefault(self, track):
-    self.track = track
+  def testCreateDefault(self):
     self.svc.Expect(
         request=self.buildRequest('thecluster'),
         response=self.msgs.Operation(name='operations/theoperation'))
     self.Run('bigtable clusters create thecluster --instance theinstance '
              '--zone thezone --async')
 
-  def testCreateCustom(self, track):
-    self.track = track
+  def testCreateCustom(self):
     self.svc.Expect(
         request=self.buildRequest(
             'anothercluster',
@@ -68,8 +65,7 @@ class CreateCommandTest(base.BigtableV2TestBase,
     self.Run('bigtable clusters create anothercluster --instance theinstance '
              '--zone anotherzone --num-nodes 4 --async')
 
-  def testCreateWait(self, track):
-    self.track = track
+  def testCreateWait(self):
     self.svc.Expect(
         request=self.buildRequest('thecluster'),
         response=self.msgs.Operation(
@@ -89,12 +85,23 @@ name: p/thecluster
 state: READY
 """)
 
-  def testErrorResponse(self, track):
-    self.track = track
+  def testErrorResponse(self):
     with self.AssertHttpResponseError(self.svc,
                                       self.buildRequest('thecluster')):
       self.Run('bigtable clusters create thecluster --instance theinstance '
                '--zone thezone --async')
+
+
+class CreateCommandTestBeta(CreateCommandTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class CreateCommandTestAlpha(CreateCommandTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

@@ -73,12 +73,15 @@ def _CommonArgs(parser,
                 enable_kms=False,
                 enable_snapshots=False,
                 deprecate_maintenance_policy=False,
-                supports_display_device=False):
+                supports_display_device=False,
+                supports_reservation=False,
+                enable_resource_policy=False):
   """Register parser args common to all tracks."""
   metadata_utils.AddMetadataArgs(parser)
   instances_flags.AddDiskArgs(parser, enable_regional, enable_kms=enable_kms)
   instances_flags.AddCreateDiskArgs(parser, enable_kms=enable_kms,
-                                    enable_snapshots=enable_snapshots)
+                                    enable_snapshots=enable_snapshots,
+                                    resource_policy=enable_resource_policy)
   instances_flags.AddCanIpForwardArgs(parser)
   instances_flags.AddAddressArgs(parser, instances=True)
   instances_flags.AddAcceleratorArgs(parser)
@@ -97,12 +100,20 @@ def _CommonArgs(parser,
   instances_flags.AddCustomMachineTypeArgs(parser)
   instances_flags.AddNetworkArgs(parser)
   instances_flags.AddPrivateNetworkIpArgs(parser)
+  instances_flags.AddHostnameArg(parser)
   instances_flags.AddImageArgs(parser, enable_snapshots=enable_snapshots)
   instances_flags.AddDeletionProtectionFlag(parser)
   instances_flags.AddPublicPtrArgs(parser, instance=True)
   instances_flags.AddNetworkTierArgs(parser, instance=True)
+  instances_flags.AddShieldedInstanceConfigArgs(parser)
   if supports_display_device:
     instances_flags.AddDisplayDeviceArg(parser)
+
+  if supports_reservation:
+    instances_flags.AddReservationAffinityGroup(
+        parser,
+        group_text='Specifies the reservation for the instance.',
+        affinity_text='The type of reservation for the instance.')
 
   sole_tenancy_flags.AddNodeAffinityFlagToParser(parser)
 
@@ -132,6 +143,8 @@ class Create(base.CreateCommand):
   _support_public_dns = False
   _support_snapshots = False
   _support_display_device = False
+  _support_reservation = False
+  _support_disk_resource_policy = False
 
   @classmethod
   def Args(cls, parser):
@@ -156,14 +169,12 @@ class Create(base.CreateCommand):
     """Get sourceMachineImage value as required by API."""
     return None
 
-  def _BuildShieldedVMConfigMessage(self, messages, args):
+  def _BuildShieldedInstanceConfigMessage(self, messages, args):
     if (args.IsSpecified('shielded_vm_secure_boot') or
         args.IsSpecified('shielded_vm_vtpm') or
         args.IsSpecified('shielded_vm_integrity_monitoring')):
-      return instance_utils.CreateShieldedVmConfigMessage(
-          messages,
-          args.shielded_vm_secure_boot,
-          args.shielded_vm_vtpm,
+      return instance_utils.CreateShieldedInstanceConfigMessage(
+          messages, args.shielded_vm_secure_boot, args.shielded_vm_vtpm,
           args.shielded_vm_integrity_monitoring)
     else:
       return None
@@ -215,7 +226,8 @@ class Create(base.CreateCommand):
               getattr(args, 'create_disk', []),
               instance_ref,
               enable_kms=self._support_kms,
-              enable_snapshots=self._support_snapshots))
+              enable_snapshots=self._support_snapshots,
+              resource_policy=self._support_disk_resource_policy))
       local_nvdimms = []
       if self._support_nvdimm:
         local_nvdimms = instance_utils.CreateLocalNvdimmMessages(
@@ -367,14 +379,14 @@ class Create(base.CreateCommand):
     image_uri = self._GetImageUri(
         args, compute_client, create_boot_disk, instance_refs, resource_parser)
 
+    shielded_instance_config = self._BuildShieldedInstanceConfigMessage(
+        messages=compute_client.messages, args=args)
+
     # TODO(b/80138906): Release track should not be used like this.
     # These feature are only exposed in alpha/beta
-    shielded_vm_config = None
     allow_rsa_encrypted = False
     if self.ReleaseTrack() in [base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA]:
       allow_rsa_encrypted = True
-      shielded_vm_config = self._BuildShieldedVMConfigMessage(
-          messages=compute_client.messages, args=args)
 
     csek_keys = csek_utils.CsekKeyStore.FromArgs(args, allow_rsa_encrypted)
     disks_messages = self._GetDiskMessages(
@@ -398,6 +410,7 @@ class Create(base.CreateCommand):
           description=args.description,
           disks=disks,
           guestAccelerators=guest_accelerators,
+          hostname=args.hostname,
           labels=labels,
           machineType=machine_type_uri,
           metadata=metadata,
@@ -407,14 +420,6 @@ class Create(base.CreateCommand):
           serviceAccounts=project_to_sa[instance_ref.project],
           scheduling=scheduling,
           tags=tags)
-
-      if hasattr(args, 'hostname'):
-        instance.hostname = args.hostname
-
-      # TODO(b/80138906): These features are only exposed in alpha.
-      if self.ReleaseTrack() == base.ReleaseTrack.ALPHA:
-        instance.allocationAffinity = instance_utils.GetAllocationAffinity(
-            args, compute_client)
 
       resource_policies = getattr(
           args, 'resource_policies', None)
@@ -429,8 +434,8 @@ class Create(base.CreateCommand):
           parsed_resource_policies.append(resource_policy_ref.SelfLink())
         instance.resourcePolicies = parsed_resource_policies
 
-      if shielded_vm_config:
-        instance.shieldedVmConfig = shielded_vm_config
+      if shielded_instance_config:
+        instance.shieldedInstanceConfig = shielded_instance_config
 
       request = compute_client.messages.ComputeInstancesInsertRequest(
           instance=instance,
@@ -448,6 +453,10 @@ class Create(base.CreateCommand):
         request.instance.displayDevice = compute_client.messages.DisplayDevice(
             enableDisplay=args.enable_display_device)
 
+      if self._support_reservation:
+        request.instance.reservationAffinity = instance_utils.GetReservationAffinity(
+            args, compute_client)
+
       requests.append(
           (compute_client.apitools_client.instances, 'Insert', request))
     return requests
@@ -461,7 +470,9 @@ class Create(base.CreateCommand):
     instances_flags.ValidateServiceAccountAndScopeArgs(args)
     instances_flags.ValidateAcceleratorArgs(args)
     instances_flags.ValidateNetworkTierArgs(args)
-    instances_flags.ValidateAllocationAffinityGroup(args)
+
+    if self._support_reservation:
+      instances_flags.ValidateReservationAffinityGroup(args)
 
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
     compute_client = holder.client
@@ -521,7 +532,9 @@ class CreateBeta(Create):
   _support_nvdimm = False
   _support_public_dns = False
   _support_snapshots = False
-  _support_display_device = False
+  _support_display_device = True
+  _support_reservation = True
+  _support_disk_resource_policy = True
 
   def _GetNetworkInterfaces(
       self, args, client, holder, instance_refs, skip_defaults):
@@ -534,12 +547,13 @@ class CreateBeta(Create):
         parser,
         enable_regional=True,
         enable_kms=True,
+        supports_display_device=True,
+        supports_reservation=cls._support_reservation,
+        enable_resource_policy=cls._support_disk_resource_policy
     )
     cls.SOURCE_INSTANCE_TEMPLATE = (
         instances_flags.MakeSourceInstanceTemplateArg())
     cls.SOURCE_INSTANCE_TEMPLATE.AddArgument(parser)
-    instances_flags.AddShieldedVMConfigArgs(parser)
-    instances_flags.AddHostnameArg(parser)
     instances_flags.AddLocalSsdArgs(parser)
     instances_flags.AddMinCpuPlatformArgs(parser, base.ReleaseTrack.BETA)
 
@@ -553,6 +567,8 @@ class CreateAlpha(CreateBeta):
   _support_public_dns = True
   _support_snapshots = True
   _support_display_device = True
+  _support_reservation = True
+  _support_disk_resource_policy = True
 
   def _GetNetworkInterfaces(
       self, args, client, holder, instance_refs, skip_defaults):
@@ -573,7 +589,9 @@ class CreateAlpha(CreateBeta):
         enable_kms=True,
         enable_snapshots=True,
         deprecate_maintenance_policy=True,
-        supports_display_device=True)
+        supports_display_device=True,
+        supports_reservation=cls._support_reservation,
+        enable_resource_policy=cls._support_disk_resource_policy)
     CreateAlpha.SOURCE_INSTANCE_TEMPLATE = (
         instances_flags.MakeSourceInstanceTemplateArg())
     CreateAlpha.SOURCE_INSTANCE_TEMPLATE.AddArgument(parser)
@@ -581,9 +599,6 @@ class CreateAlpha(CreateBeta):
         instances_flags.AddMachineImageArg())
     CreateAlpha.SOURCE_MACHINE_IMAGE.AddArgument(parser)
     instances_flags.AddMinCpuPlatformArgs(parser, base.ReleaseTrack.ALPHA)
-    instances_flags.AddShieldedVMConfigArgs(parser)
-    instances_flags.AddHostnameArg(parser)
-    instances_flags.AddAllocationAffinityGroup(parser)
     instances_flags.AddPublicDnsArgs(parser, instance=True)
     instances_flags.AddLocalSsdArgsWithSize(parser)
     instances_flags.AddLocalNvdimmArgs(parser)

@@ -4,6 +4,7 @@ summary:
 # This summary is generated automatically on update and should not be edited.
 - set_property: compute/zone us-central1-c
 - execute:
+  - label: With Cust Params
   - command: |
       compute tpus create mytpu --zone us-central1-c --range 10.240.0.0/29
       --accelerator-type 'v2-8' --network my-tf-network --version '1.6'
@@ -16,6 +17,7 @@ summary:
   - stderr: |
       Created tpu [mytpu].
 - execute:
+  - label: With Service Networking use user project
   - command: |
       compute tpus create mytpu --use-service-networking --version 1.6
       --network my-tf-network
@@ -27,6 +29,7 @@ summary:
   - stderr: |
       Created tpu [mytpu].
 - execute:
+  - label: With Service Networking use network project id
   - command: |
       compute tpus create mytpu --use-service-networking --version 1.6
       --network projects/999999999999/global/networks/my-tf-network
@@ -38,6 +41,7 @@ summary:
   - stderr: |
       Created tpu [mytpu].
 - execute:
+  - label: With Service Networking use network project name
   - command: |
       compute tpus create mytpu --use-service-networking --version 1.6
       --network projects/other-fake-project/global/networks/my-tf-network
@@ -49,18 +53,21 @@ summary:
   - stderr: |
       Created tpu [mytpu].
 - execute:
+  - label: Service Networking and project not peered
   - command: |
       compute tpus create mytpu --use-service-networking --version 1.6
       --network projects/other-fake-project/global/networks/my-tf-network
   - error: '1: Network [projects/other-fake-project/global/networks/my-tf-network]
       is invalid for use with Service Networking'
 - execute:
+  - label: With Service Networking bad network project
   - command: |
       compute tpus create mytpu --use-service-networking --version 1.6
       --network projects/badfake-project/global/networks/my-tf-network
   - error: '1: Error determining VPC peering status for network [projects/badfake-project/global/networks/my-tf-network]:
       [fake-project]'
 - execute:
+  - label: Service Networking and Range Mutually Exclusive
   - command: |
       compute tpus create mytpu --use-service-networking --range 10.240.0.0/29 --version 1.6
       --network projects/other-fake-project/global/networks/my-tf-network
@@ -68,13 +75,78 @@ summary:
       ERROR: (gcloud.alpha.compute.tpus.create) argument --range: Exactly one of (--range | --use-service-networking) must be specified.
       Usage: gcloud alpha compute tpus create (TPU : --zone=ZONE) --network=NETWORK --version=VERSION (--range=RANGE | --use-service-networking) [optional flags]
         optional flags may be  --accelerator-type | --async | --description | --help |
-                               --preemptible | --range | --use-service-networking |
+                               --model-base-path | --model-config-file |
+                               --model-name | --platform-config-file | --preemptible |
+                               --range | --reserved | --use-service-networking |
                                --zone
 
       For detailed information on this command and its flags, run:
         gcloud alpha compute tpus create --help
   - error: '1: argument --range: Exactly one of (--range | --use-service-networking)
       must be specified.'
+- execute:
+  - label: With Reservation
+  - command: |
+      compute tpus create mytpu --zone us-central1-c --range 10.240.0.0/29
+      --accelerator-type 'v2-8' --network my-tf-network --version '1.6'
+      --description 'My TF Node' --accelerator-type 'v2-8' --preemptible --reserved
+  - stderr: |
+      Create request issued for: [mytpu]
+  - progress_tracker:
+    - message: Waiting for operation [create] to complete
+    - status: SUCCESS
+  - stderr: |
+      Created tpu [mytpu].
+- execute:
+  - label: With model-config-file, platform-config-file.
+  - command: |
+      compute tpus create mytpu --zone us-central1-c --range 10.240.0.0/29
+      --accelerator-type 'v2-8' --network my-tf-network --version '1.6'
+      --description 'My TF Node' --accelerator-type 'v2-8' --preemptible
+      --model-config-file gs://a/model.pbtxt --platform-config-file gs://a/platform.pbtxt
+  - stderr: |
+      Create request issued for: [mytpu]
+  - progress_tracker:
+    - message: Waiting for operation [create] to complete
+    - status: SUCCESS
+  - stderr: |
+      Created tpu [mytpu].
+- execute:
+  - label: With model-base-path and model-name.
+  - command: |
+      compute tpus create mytpu --zone us-central1-c --range 10.240.0.0/29
+      --accelerator-type 'v2-8' --network my-tf-network --version '1.6'
+      --description 'My TF Node' --accelerator-type 'v2-8' --preemptible
+      --model-base-path basePath --model-name exampleModelName
+  - stderr: |
+      Create request issued for: [mytpu]
+  - progress_tracker:
+    - message: Waiting for operation [create] to complete
+    - status: SUCCESS
+  - stderr: |
+      Created tpu [mytpu].
+- execute:
+  - label: With model-config-file, platform-config-file and model-base-path, model-name
+      fails.
+  - command: |
+      compute tpus create mytpu --zone us-central1-c --range 10.240.0.0/29
+      --accelerator-type 'v2-8' --network my-tf-network --version '1.6'
+      --description 'My TF Node' --accelerator-type 'v2-8' --preemptible
+      --model-config-file gs://a/model.pbtxt --platform-config-file gs://a/platform.pbtxt
+      --model-base-path basePath --model-name exampleModelName
+  - stderr: |
+      ERROR: (gcloud.alpha.compute.tpus.create) argument --model-base-path --model-name: At most one of --model-base-path --model-name | --model-config-file --platform-config-file may be specified.
+      Usage: gcloud alpha compute tpus create (TPU : --zone=ZONE) --network=NETWORK --version=VERSION (--range=RANGE | --use-service-networking) [optional flags]
+        optional flags may be  --accelerator-type | --async | --description | --help |
+                               --model-base-path | --model-config-file |
+                               --model-name | --platform-config-file | --preemptible |
+                               --range | --reserved | --use-service-networking |
+                               --zone
+
+      For detailed information on this command and its flags, run:
+        gcloud alpha compute tpus create --help
+  - error: '1: argument --model-base-path --model-name: At most one of --model-base-path
+      --model-name | --model-config-file --platform-config-file may be specified.'
 actions:
 - set_property:
     compute/zone: us-central1-c
@@ -170,7 +242,7 @@ actions:
             projectNumber: '999999999999'
     - api_call:
         expect_request:
-          uri: https://servicenetworking.googleapis.com/v1beta/services/servicenetworking.googleapis.com/connections?alt=json&network=projects%2F999999999999%2Fglobal%2Fnetworks%2Fmy-tf-network
+          uri: https://servicenetworking.googleapis.com/v1/services/servicenetworking.googleapis.com/connections?alt=json&network=projects%2F999999999999%2Fglobal%2Fnetworks%2Fmy-tf-network
           method: GET
           headers: {}
           body: null
@@ -265,7 +337,7 @@ actions:
             projectNumber: '999999999999'
     - api_call:
         expect_request:
-          uri: https://servicenetworking.googleapis.com/v1beta/services/servicenetworking.googleapis.com/connections?alt=json&network=projects%2F999999999999%2Fglobal%2Fnetworks%2Fprojects%2F999999999999%2Fglobal%2Fnetworks%2Fmy-tf-network
+          uri: https://servicenetworking.googleapis.com/v1/services/servicenetworking.googleapis.com/connections?alt=json&network=projects%2F999999999999%2Fglobal%2Fnetworks%2Fprojects%2F999999999999%2Fglobal%2Fnetworks%2Fmy-tf-network
           method: GET
           headers: {}
           body: null
@@ -360,7 +432,7 @@ actions:
             projectNumber: '999999999999'
     - api_call:
         expect_request:
-          uri: https://servicenetworking.googleapis.com/v1beta/services/servicenetworking.googleapis.com/connections?alt=json&network=projects%2F999999999999%2Fglobal%2Fnetworks%2Fprojects%2Fother-fake-project%2Fglobal%2Fnetworks%2Fmy-tf-network
+          uri: https://servicenetworking.googleapis.com/v1/services/servicenetworking.googleapis.com/connections?alt=json&network=projects%2F999999999999%2Fglobal%2Fnetworks%2Fprojects%2Fother-fake-project%2Fglobal%2Fnetworks%2Fmy-tf-network
           method: GET
           headers: {}
           body: null
@@ -456,7 +528,7 @@ actions:
             projectNumber: '999999999999'
     - api_call:
         expect_request:
-          uri: https://servicenetworking.googleapis.com/v1beta/services/servicenetworking.googleapis.com/connections?alt=json&network=projects%2F999999999999%2Fglobal%2Fnetworks%2Fprojects%2Fother-fake-project%2Fglobal%2Fnetworks%2Fmy-tf-network
+          uri: https://servicenetworking.googleapis.com/v1/services/servicenetworking.googleapis.com/connections?alt=json&network=projects%2F999999999999%2Fglobal%2Fnetworks%2Fprojects%2Fother-fake-project%2Fglobal%2Fnetworks%2Fmy-tf-network
           method: GET
           headers: {}
           body: null
@@ -511,7 +583,9 @@ actions:
         ERROR: (gcloud.alpha.compute.tpus.create) argument --range: Exactly one of (--range | --use-service-networking) must be specified.
         Usage: gcloud alpha compute tpus create (TPU : --zone=ZONE) --network=NETWORK --version=VERSION (--range=RANGE | --use-service-networking) [optional flags]
           optional flags may be  --accelerator-type | --async | --description | --help |
-                                 --preemptible | --range | --use-service-networking |
+                                 --model-base-path | --model-config-file |
+                                 --model-name | --platform-config-file | --preemptible |
+                                 --range | --reserved | --use-service-networking |
                                  --zone
 
         For detailed information on this command and its flags, run:
@@ -520,3 +594,246 @@ actions:
         code: 1
         message: 'argument --range: Exactly one of (--range | --use-service-networking)
           must be specified.'
+- execute_command:
+    label: With Reservation
+    command: |
+      compute tpus create mytpu --zone us-central1-c --range 10.240.0.0/29
+      --accelerator-type 'v2-8' --network my-tf-network --version '1.6'
+      --description 'My TF Node' --accelerator-type 'v2-8' --preemptible --reserved
+    events:
+    - api_call:
+        expect_request:
+          uri: https://tpu.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1-c/nodes?alt=json&nodeId=mytpu
+          method: POST
+          headers: {}
+          body:
+            json:
+              acceleratorType: v2-8
+              cidrBlock: 10.240.0.0/29
+              description: My TF Node
+              network: my-tf-network
+              schedulingConfig:
+                preemptible: true
+                reserved: true
+              tensorflowVersion: '1.6'
+              useServiceNetworking: false
+        return_response:
+          headers:
+            status: '200'
+          body:
+            response:
+              acceleratorType: v2-8
+              cidrBlock: 10.240.0.0/29
+              description: My TF Node
+              network: my-tf-network
+              schedulingConfig:
+                preemptible: true
+                reserved: true
+              tensorflowVersion: '1.6'
+              useServiceNetworking: false
+            done: true
+            name: projects/fake-project/locations/us-central1-c/operations/create
+    - expect_stderr: |
+        Create request issued for: [mytpu]
+    - api_call:
+        poll_operation: false
+        repeatable: true
+        expect_request:
+          uri: https://tpu.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1-c/operations/create?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            response:
+              acceleratorType: v2-8
+              cidrBlock: 10.240.0.0/29
+              description: My TF Node
+              network: my-tf-network
+              schedulingConfig:
+                preemptible: true
+                reserved: true
+              tensorflowVersion: '1.6'
+              useServiceNetworking: false
+            done: true
+            name: projects/fake-project/locations/us-central1-c/operations/create
+    - expect_progress_tracker:
+        message: Waiting for operation [create] to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Created tpu [mytpu].
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: With model-config-file, platform-config-file.
+    command: |
+      compute tpus create mytpu --zone us-central1-c --range 10.240.0.0/29
+      --accelerator-type 'v2-8' --network my-tf-network --version '1.6'
+      --description 'My TF Node' --accelerator-type 'v2-8' --preemptible
+      --model-config-file gs://a/model.pbtxt --platform-config-file gs://a/platform.pbtxt
+    events:
+    - api_call:
+        expect_request:
+          uri: https://tpu.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1-c/nodes?alt=json&nodeId=mytpu
+          method: POST
+          headers: {}
+          body:
+            json:
+              acceleratorType: v2-8
+              cidrBlock: 10.240.0.0/29
+              modelConfigFile: gs://a/model.pbtxt
+              description: My TF Node
+              network: my-tf-network
+              platformConfigFile: gs://a/platform.pbtxt
+              schedulingConfig:
+                preemptible: true
+              tensorflowVersion: '1.6'
+        return_response:
+          headers:
+            status: '200'
+          body:
+            response:
+              acceleratorType: v2-8
+              cidrBlock: 10.240.0.0/29
+              description: My TF Node
+              network: my-tf-network
+              schedulingConfig:
+                preemptible: true
+              tensorflowVersion: '1.6'
+            done: true
+            name: projects/fake-project/locations/us-central1-c/operations/create
+    - expect_stderr: |
+        Create request issued for: [mytpu]
+    - api_call:
+        poll_operation: false
+        repeatable: true
+        expect_request:
+          uri: https://tpu.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1-c/operations/create?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            response:
+              acceleratorType: v2-8
+              modelConfigFile: gs://a/model_config.pbtxt
+              platformConfigFile: gs://a/platform_config.pbtxt
+              modelName: exampleModelName
+              modelBasePath: basePath
+              cidrBlock: 10.240.0.0/29
+              description: My TF Node
+              network: my-tf-network
+              schedulingConfig:
+                preemptible: true
+              tensorflowVersion: '1.6'
+            done: true
+            name: projects/fake-project/locations/us-central1-c/operations/create
+    - expect_progress_tracker:
+        message: Waiting for operation [create] to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Created tpu [mytpu].
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: With model-base-path and model-name.
+    command: |
+      compute tpus create mytpu --zone us-central1-c --range 10.240.0.0/29
+      --accelerator-type 'v2-8' --network my-tf-network --version '1.6'
+      --description 'My TF Node' --accelerator-type 'v2-8' --preemptible
+      --model-base-path basePath --model-name exampleModelName
+    events:
+    - api_call:
+        expect_request:
+          uri: https://tpu.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1-c/nodes?alt=json&nodeId=mytpu
+          method: POST
+          headers: {}
+          body:
+            json:
+              acceleratorType: v2-8
+              cidrBlock: 10.240.0.0/29
+              modelBasePath: basePath
+              modelName: exampleModelName
+              description: My TF Node
+              network: my-tf-network
+              schedulingConfig:
+                preemptible: true
+              tensorflowVersion: '1.6'
+        return_response:
+          headers:
+            status: '200'
+          body:
+            response:
+              acceleratorType: v2-8
+              cidrBlock: 10.240.0.0/29
+              description: My TF Node
+              network: my-tf-network
+              schedulingConfig:
+                preemptible: true
+              tensorflowVersion: '1.6'
+            done: true
+            name: projects/fake-project/locations/us-central1-c/operations/create
+    - expect_stderr: |
+        Create request issued for: [mytpu]
+    - api_call:
+        poll_operation: false
+        repeatable: true
+        expect_request:
+          uri: https://tpu.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1-c/operations/create?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            response:
+              acceleratorType: v2-8
+              modelConfigFile: gs://a/model_config.pbtxt
+              platformConfigFile: gs://a/platform_config.pbtxt
+              modelName: exampleModelName
+              modelBasePath: basePath
+              cidrBlock: 10.240.0.0/29
+              description: My TF Node
+              network: my-tf-network
+              schedulingConfig:
+                preemptible: true
+              tensorflowVersion: '1.6'
+            done: true
+            name: projects/fake-project/locations/us-central1-c/operations/create
+    - expect_progress_tracker:
+        message: Waiting for operation [create] to complete
+        status: SUCCESS
+    - expect_stderr: |
+        Created tpu [mytpu].
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: With model-config-file, platform-config-file and model-base-path, model-name
+      fails.
+    command: |
+      compute tpus create mytpu --zone us-central1-c --range 10.240.0.0/29
+      --accelerator-type 'v2-8' --network my-tf-network --version '1.6'
+      --description 'My TF Node' --accelerator-type 'v2-8' --preemptible
+      --model-config-file gs://a/model.pbtxt --platform-config-file gs://a/platform.pbtxt
+      --model-base-path basePath --model-name exampleModelName
+    events:
+    - expect_stderr: |
+        ERROR: (gcloud.alpha.compute.tpus.create) argument --model-base-path --model-name: At most one of --model-base-path --model-name | --model-config-file --platform-config-file may be specified.
+        Usage: gcloud alpha compute tpus create (TPU : --zone=ZONE) --network=NETWORK --version=VERSION (--range=RANGE | --use-service-networking) [optional flags]
+          optional flags may be  --accelerator-type | --async | --description | --help |
+                                 --model-base-path | --model-config-file |
+                                 --model-name | --platform-config-file | --preemptible |
+                                 --range | --reserved | --use-service-networking |
+                                 --zone
+
+        For detailed information on this command and its flags, run:
+          gcloud alpha compute tpus create --help
+    - expect_exit:
+        code: 1
+        message: 'argument --model-base-path --model-name: At most one of --model-base-path
+          --model-name | --model-config-file --platform-config-file may be specified.'

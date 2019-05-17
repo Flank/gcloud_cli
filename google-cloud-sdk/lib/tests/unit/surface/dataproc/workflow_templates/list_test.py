@@ -91,8 +91,10 @@ test-workflow-template-2  1     2017-08-14T23:49:50.654Z  1
 class WorkflowTemplatesListUnitTestBeta(WorkflowTemplatesListUnitTest):
   """Tests for dataproc workflow templates list."""
 
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
   def SetUp(self):
-    self.SetupForReleaseTrack(calliope_base.ReleaseTrack.BETA)
     ordered_job = self.MakeOrderedJob(
         step_id='001', start_after=['ABC'], hadoopJob=self.HADOOP_JOB)
     self.workflow_templates_list = [
@@ -103,6 +105,12 @@ class WorkflowTemplatesListUnitTestBeta(WorkflowTemplatesListUnitTest):
             update_time='2017-08-14T23:49:50.654Z',
             jobs=[ordered_job]) for template_id in self.WORKFLOW_TEMPLATE_IDS
     ]
+
+
+class WorkflowTemplatesListUnitTestAlpha(WorkflowTemplatesListUnitTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

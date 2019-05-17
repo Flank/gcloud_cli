@@ -11,7 +11,7 @@ gcloud alpha functions deploy \- create or update a Google Cloud Function
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha functions deploy\fR (\fINAME\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-entry\-point\fR=\fIENTRY_POINT\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-retry\fR] [\fB\-\-runtime\fR=\fIRUNTIME\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-source\fR=\fISOURCE\fR] [\fB\-\-stage\-bucket\fR=\fISTAGE_BUCKET\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-env\-vars\fR\ |\ \fB\-\-env\-vars\-file\fR=\fIFILE_PATH\fR\ |\ \fB\-\-set\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-env\-vars\fR=[\fIKEY\fR,...]\ \fB\-\-update\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-trigger\-bucket\fR=\fITRIGGER_BUCKET\fR\ |\ \fB\-\-trigger\-http\fR\ |\ \fB\-\-trigger\-topic\fR=\fITRIGGER_TOPIC\fR\ |\ \fB\-\-trigger\-event\fR=\fIEVENT_TYPE\fR\ \fB\-\-trigger\-resource\fR=\fIRESOURCE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha functions deploy\fR (\fINAME\fR\ :\ \fB\-\-region\fR=\fIREGION\fR) [\fB\-\-allow\-unauthenticated\fR] [\fB\-\-egress\-settings\fR=\fIEGRESS_SETTINGS\fR] [\fB\-\-entry\-point\fR=\fIENTRY_POINT\fR] [\fB\-\-ingress\-settings\fR=\fIINGRESS_SETTINGS\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-retry\fR] [\fB\-\-runtime\fR=\fIRUNTIME\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-source\fR=\fISOURCE\fR] [\fB\-\-stage\-bucket\fR=\fISTAGE_BUCKET\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-vpc\-connector\fR=\fIVPC_CONNECTOR\fR] [\fB\-\-clear\-env\-vars\fR\ |\ \fB\-\-env\-vars\-file\fR=\fIFILE_PATH\fR\ |\ \fB\-\-set\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]\ |\ \fB\-\-remove\-env\-vars\fR=[\fIKEY\fR,...]\ \fB\-\-update\-env\-vars\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-clear\-max\-instances\fR\ |\ \fB\-\-max\-instances\fR=\fIMAX_INSTANCES\fR] [\fB\-\-trigger\-bucket\fR=\fITRIGGER_BUCKET\fR\ |\ \fB\-\-trigger\-http\fR\ |\ \fB\-\-trigger\-topic\fR=\fITRIGGER_TOPIC\fR\ |\ \fB\-\-trigger\-event\fR=\fIEVENT_TYPE\fR\ \fB\-\-trigger\-resource\fR=\fIRESOURCE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -54,12 +54,30 @@ property value for this command invocation.
 
 .RS 2m
 .TP 2m
+\fB\-\-allow\-unauthenticated\fR
+If set, makes this a public function. This will allow all callers, without
+checking authentication.
+
+.TP 2m
+\fB\-\-egress\-settings\fR=\fIEGRESS_SETTINGS\fR
+Egress settings controls what traffic is diverted through the VPC Access
+Connector resource. By default private_ranges_only will be used.
+\fIEGRESS_SETTINGS\fR must be one of: \fBunspecified\fR, \fBprivate\fR,
+\fBall\fR.
+
+.TP 2m
 \fB\-\-entry\-point\fR=\fIENTRY_POINT\fR
-By default when a Google Cloud Function is triggered, it executes a JavaScript
-function with the same name. Or, if it cannot find a function with the same
-name, it executes a function named \f5function\fR. You can use this flag to
-override the default behavior, by specifying the name of a JavaScript function
-that will be executed when the Google Cloud Function is triggered.
+Name of a Google Cloud Function (as defined in source code) that will be
+executed. Defaults to the resource name suffix, if not specified. For backward
+compatibility, if function with given name is not found, then the system will
+try to use function named "function". For Node.js this is name of a function
+exported by the module specified in \f5source_location\fR.
+
+.TP 2m
+\fB\-\-ingress\-settings\fR=\fIINGRESS_SETTINGS\fR
+Ingress settings controls what traffic can reach the function.
+\fIINGRESS_SETTINGS\fR must be one of: \fBunspecified\fR, \fBall\fR,
+\fBinternal\-only\fR, \fBinternal\-and\-gclb\fR.
 
 .TP 2m
 \fB\-\-memory\fR=\fIMEMORY\fR
@@ -76,17 +94,24 @@ If specified, then the function will be retried in case of a failure.
 
 .TP 2m
 \fB\-\-runtime\fR=\fIRUNTIME\fR
-The runtime in which to run the function. Defaults to Node.js 6.
+Runtime in which to run the function.
+
+Required when deploying a new function; optional when updating an existing
+function.
 
 Choices:
 
 .RS 2m
 .IP "\(em" 2m
-\f5nodejs6\fR: Node.js 6
-.IP "\(em" 2m
 \f5nodejs8\fR: Node.js 8
 .IP "\(em" 2m
+\f5nodejs10\fR: Node.js 10
+.IP "\(em" 2m
 \f5python37\fR: Python 3.7
+.IP "\(em" 2m
+\f5go111\fR: Go 1.11
+.IP "\(em" 2m
+\f5nodejs6\fR: Node.js 6 (deprecated)
 .RE
 .RE
 .sp
@@ -117,6 +142,24 @@ Local filesystem path (root directory of function source).
 .RE
 .RE
 .sp
+Note that if you do not specify the \f5\-\-source\fR flag:
+
+.RS 2m
+.IP "\(bu" 2m
+Current directory will be used for new function deployments.
+.IP "\(bu" 2m
+If the function is previously deployed using a local filesystem path,
+.RE
+.sp
+then function's source code will be updated using the current directory.
+.RS 2m
+.IP "\(bu" 2m
+If the function is previously deployed using a Google Cloud Storage
+.RE
+.sp
+location or a source repository, then the function's source code will not be
+updated.
+
 The value of the flag will be interpreted as a Cloud Storage location, if it
 starts with \f5gs://\fR.
 
@@ -168,15 +211,18 @@ https://source.developers.google.com/projects/123456789/repos/testrepo/
 moveable\-aliases/alternate\-branch/paths/path\-to=source
 .RE
 
-If the source location is not explicitly set, new functions will deploy from the
-current directory. Existing functions keep their old source.
-
 
 .RS 2m
 .TP 2m
 \fB\-\-stage\-bucket\fR=\fISTAGE_BUCKET\fR
 When deploying a function from a local directory, this flag's value is the name
-of the Google Cloud Storage bucket in which source code will be stored.
+of the Google Cloud Storage bucket in which source code will be stored. Note
+that if you set the \f5\-\-stage\-bucket\fR flag when deploying a function, you
+will need to specify \f5\-\-source\fR or \f5\-\-stage\-bucket\fR in subsequent
+deployments to update your source code. To use this flag successfully, the
+account in use must have permissions to write to this bucket. For help granting
+access, refer to this guide:
+https://cloud.google.com/storage/docs/access\-control/
 
 .TP 2m
 \fB\-\-timeout\fR=\fITIMEOUT\fR
@@ -196,6 +242,13 @@ numbers.
 
 Label keys starting with \f5deployment\fR are reserved for use by deployment
 tools and cannot be specified manually.
+
+.TP 2m
+\fB\-\-vpc\-connector\fR=\fIVPC_CONNECTOR\fR
+The VPC Access connector that the function can connect to. It should be the
+fully\-qualified URI of the VPC Access connector resource whose format is:
+\f5projects/${PROJECT}/locations/${LOCATION}/connectors/${CONNECTOR}\fR or an
+empty string to clear the field.
 
 .TP 2m
 
@@ -267,6 +320,22 @@ deployment tools and cannot be specified manually.
 .sp
 .TP 2m
 
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-max\-instances\fR
+Clears the maximum instances setting for the function.
+
+.TP 2m
+\fB\-\-max\-instances\fR=\fIMAX_INSTANCES\fR
+Sets the maximum number of instances for the function. A function execution that
+would exceed max\-instances times out.
+
+.RE
+.sp
+.TP 2m
+
 If you don't specify a trigger when deploying an update to an existing function
 it will keep its current trigger. You must specify \f5\-\-trigger\-topic\fR,
 \f5\-\-trigger\-bucket\fR, \f5\-\-trigger\-http\fR or (\f5\-\-trigger\-event\fR
@@ -311,10 +380,11 @@ resources, call \f5gcloud functions event\-types list\fR.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

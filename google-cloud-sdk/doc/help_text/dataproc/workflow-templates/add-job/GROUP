@@ -17,8 +17,9 @@ FLAGS
         property value for this command invocation.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -78,7 +79,8 @@ EXAMPLES
             --workflow-template my_template --file my_queries.q
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha dataproc workflow-templates add-job
         $ gcloud beta dataproc workflow-templates add-job
 

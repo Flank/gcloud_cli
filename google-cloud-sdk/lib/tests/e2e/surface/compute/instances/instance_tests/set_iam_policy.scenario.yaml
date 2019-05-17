@@ -1,0 +1,369 @@
+title: compute instances set-iam-policy scenario test
+release_tracks: [GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute instances create $$instance$$ --zone=us-central1-f --format="yaml(name,zone)"
+  - stderr: |
+      Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+  - stdout: |
+      ---
+      name: $$instance$$
+      zone: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f
+- execute:
+  - command: compute instances set-iam-policy $$instance$$ --zone=us-central1-f policy.json
+      --format="yaml(bindings)"
+  - stderr: |
+      Updated IAM policy for instance [$$instance$$].
+  - stdout: |
+      bindings:
+      - members:
+        - user:testuser@google.com
+        role: roles/owner
+- execute:
+  - command: compute instances get-iam-policy $$instance$$ --zone=us-central1-f --format="yaml(bindings)"
+  - stdout: |
+      bindings:
+      - members:
+        - user:testuser@google.com
+        role: roles/owner
+- execute:
+  - command: compute instances delete $$instance$$ --zone=us-central1-f
+  - prompt:
+    - message: |
+        The following instances will be deleted. Any attached disks configured to be auto-deleted will be deleted unless they are attached to any other instances or the `--keep-disks` flag is given and specifies them for keeping. Deleting a disk is irreversible and any data on the disk will be lost.
+         - [$$instance$$] in [us-central1-f]
+    - input: y
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+actions:
+- define_reference:
+    reference: compute-uri
+    value: www.googleapis.com/compute
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1
+      BETA: beta
+      ALPHA: alpha
+
+- write_file:
+    path: policy.json
+    contents: |
+      {
+        "version": 1,
+        "bindings": [
+            {
+             "role": "roles/owner",
+             "members": ["user:testuser@google.com"]
+            }],
+         "etag": "ACAB"
+      }
+- generate_resource_id:
+    reference: instance
+    prefix: instance-set-iam-policy-test
+
+- execute_command:
+    command: compute instances create $$instance$$ --zone=us-central1-f --format="yaml(name,zone)"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '533'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"bI3jPRYomHMHxSI3znT-_FtWy0Q=/9nTSEOfUfk91O1ceZS02e-UVtLc="'
+            status: '200'
+          body:
+            kind: compute#zone
+            id: '2004'
+            creationTimestamp: '1969-12-31T16:00:00.000-08:00'
+            name: us-central1-f
+            description: us-central1-f
+            status: UP
+            region: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            availableCpuPlatforms:
+            - Intel Cascadelake
+            - Intel Skylake
+            - Intel Broadwell
+            - Intel Haswell
+            - Intel Ivy Bridge
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          omit_fields:
+          - commonInstanceMetadata
+          - quotas
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '547239'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"nDoDL06JIQmAVysUrHl-kz7ciIk=/8u5BSMCAry8FaBP2C2O5YLbiGB4="'
+            status: '200'
+          body:
+            kind: compute#project
+            id: '17966956004057981335'
+            creationTimestamp: '2014-09-30T07:55:22.502-07:00'
+            name: cloud-sdk-integration-testing
+            usageExportLocation:
+              bucketName: cloud-sdk-integration-test-usage
+              reportNamePrefix: ''
+            enabledFeatures:
+            - alpha-api
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing
+            defaultServiceAccount: 462803083913-compute@developer.gserviceaccount.com
+            xpnProjectStatus: UNSPECIFIED_XPN_PROJECT_STATUS
+            defaultNetworkTier: PREMIUM
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              canIpForward: false
+              deletionProtection: false
+              disks:
+              - autoDelete: true
+                boot: true
+                initializeParams:
+                  sourceImage: https://www.googleapis.com/compute/$$api-version$$/projects/debian-cloud/global/images/family/debian-9
+                mode: READ_WRITE
+                type: PERSISTENT
+              machineType: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-1
+              metadata: {}
+              name: $$instance$$
+              networkInterfaces:
+              - accessConfigs:
+                - name: external-nat
+                  type: ONE_TO_ONE_NAT
+                network: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/default
+              scheduling:
+                automaticRestart: true
+              serviceAccounts:
+              - email: default
+                scopes:
+                - https://www.googleapis.com/auth/devstorage.read_only
+                - https://www.googleapis.com/auth/logging.write
+                - https://www.googleapis.com/auth/monitoring.write
+                - https://www.googleapis.com/auth/pubsub
+                - https://www.googleapis.com/auth/service.management.readonly
+                - https://www.googleapis.com/auth/servicecontrol
+                - https://www.googleapis.com/auth/trace.append
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '833'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '4748352687433604618'
+            name: operation-1550704868136-5825b9cd116e7-1a3dff06-bf8fbee1
+            zone: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            operationType: insert
+            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
+            targetId: '2608796518269869579'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2019-02-20T15:21:09.454-08:00'
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1550704868136-5825b9cd116e7-1a3dff06-bf8fbee1
+        poll_operation: true
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '2591'
+            Content-Type: application/json; charset=UTF-8
+            ETag: '"N4LJnwEffa8ZqD1HW5x3Z6b-JCE=/uXk-STKxsvzSsA5FFjLo2E1hpWE="'
+            status: '200'
+          body:
+            kind: compute#instance
+            id: '2608796518269869579'
+            creationTimestamp: '2019-02-20T15:21:09.352-08:00'
+            name: $$instance$$
+            tags:
+              fingerprint: 42WmSpB8rSM=
+            machineType: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-1
+            status: RUNNING
+            zone: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            canIpForward: false
+            networkInterfaces:
+            - kind: compute#networkInterface
+              network: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/networks/default
+              networkIP: 10.240.0.10
+              name: nic0
+              accessConfigs:
+              - kind: compute#accessConfig
+                type: ONE_TO_ONE_NAT
+                name: external-nat
+                natIP: 35.193.185.78
+                networkTier: PREMIUM
+              fingerprint: VSi-oKPuVug=
+            disks:
+            - kind: compute#attachedDisk
+              type: PERSISTENT
+              mode: READ_WRITE
+              source: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$instance$$
+              deviceName: persistent-disk-0
+              index: 0
+              boot: true
+              autoDelete: true
+              licenses:
+              - https://www.googleapis.com/compute/$$api-version$$/projects/debian-cloud/global/licenses/debian-9-stretch
+              interface: SCSI
+              guestOsFeatures:
+              - type: VIRTIO_SCSI_MULTIQUEUE
+            metadata:
+              kind: compute#metadata
+              fingerprint: 4_QxQ57NQak=
+            serviceAccounts:
+            - email: 462803083913-compute@developer.gserviceaccount.com
+              scopes:
+              - https://www.googleapis.com/auth/devstorage.read_only
+              - https://www.googleapis.com/auth/logging.write
+              - https://www.googleapis.com/auth/monitoring.write
+              - https://www.googleapis.com/auth/pubsub
+              - https://www.googleapis.com/auth/service.management.readonly
+              - https://www.googleapis.com/auth/servicecontrol
+              - https://www.googleapis.com/auth/trace.append
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
+            scheduling:
+              onHostMaintenance: MIGRATE
+              automaticRestart: true
+              preemptible: false
+            cpuPlatform: Intel Ivy Bridge
+            labelFingerprint: 42WmSpB8rSM=
+            startRestricted: false
+            deletionProtection: false
+    - expect_stdout: |
+        ---
+        name: $$instance$$
+        zone: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute instances set-iam-policy $$instance$$ --zone=us-central1-f policy.json
+      --format="yaml(bindings)"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$/setIamPolicy?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              policy:
+                bindings:
+                - members:
+                  - user:testuser@google.com
+                  role: roles/owner
+                etag: ACAB
+                version: 1
+        return_response:
+          headers:
+            cache-control: no-cache, no-store, max-age=0, must-revalidate
+            content-length: '133'
+            content-type: application/json; charset=UTF-8
+            pragma: no-cache
+            status: '200'
+          body:
+            bindings:
+            - role: roles/owner
+              members:
+              - user:testuser@google.com
+            etag: BwWCW59AmjQ=
+    - expect_stderr: |
+        Updated IAM policy for instance [$$instance$$].
+    - expect_stdout: |
+        bindings:
+        - members:
+          - user:testuser@google.com
+          role: roles/owner
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute instances get-iam-policy $$instance$$ --zone=us-central1-f --format="yaml(bindings)"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$/getIamPolicy?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private, max-age=0, must-revalidate, no-transform
+            content-length: '133'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            bindings:
+            - role: roles/owner
+              members:
+              - user:testuser@google.com
+            etag: BwWCW59AmjQ=
+    - expect_stdout: |
+        bindings:
+        - members:
+          - user:testuser@google.com
+          role: roles/owner
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute instances delete $$instance$$ --zone=us-central1-f
+    cleanup_for: instance
+    events:
+    - expect_prompt_continue:
+        message: |
+          The following instances will be deleted. Any attached disks configured to be auto-deleted will be deleted unless they are attached to any other instances or the `--keep-disks` flag is given and specifies them for keeping. Deleting a disk is irreversible and any data on the disk will be lost.
+           - [$$instance$$] in [us-central1-f]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Cache-Control: private, max-age=0
+            Content-Length: '833'
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            kind: compute#operation
+            id: '2291475250585559009'
+            name: operation-1550704909921-5825b9f4eac57-beee027f-3b294e4b
+            zone: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            operationType: delete
+            targetLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
+            targetId: '2608796518269869579'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2019-02-20T15:21:50.450-08:00'
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1550704909921-5825b9f4eac57-beee027f-3b294e4b
+        poll_operation: true
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - expect_exit:
+        code: 0

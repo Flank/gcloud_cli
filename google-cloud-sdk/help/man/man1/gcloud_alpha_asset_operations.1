@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha asset operations \- manage CloudAsset operations
+gcloud alpha asset operations \- manage Cloud Asset Inventory operations
 
 
 
@@ -17,16 +17,17 @@ gcloud alpha asset operations \- manage CloudAsset operations
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Manage CloudAsset operations.
+\fB(ALPHA)\fR Manage Cloud Asset Inventory operations.
 
 
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -37,7 +38,7 @@ gcloud help\fR for details.
 .RS 2m
 .TP 2m
 \fBdescribe\fR
-\fB(ALPHA)\fR Describe a cloud asset operation.
+\fB(ALPHA)\fR Describe a Cloud Asset Inventory operation.
 
 
 .RE
@@ -49,5 +50,10 @@ This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you will have to apply for early access and have your projects registered on the
 API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+https://cloud.google.com/support/. These variants are also available:
+
+.RS 2m
+$ gcloud asset operations
+$ gcloud beta asset operations
+.RE
 

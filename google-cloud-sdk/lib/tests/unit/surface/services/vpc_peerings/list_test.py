@@ -20,21 +20,19 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.cloudresourcemanager import projects_api
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.services import unit_test_base
 import mock
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA)
 class ListTest(unit_test_base.SNUnitTestBase):
   """Unit tests for services vpc-peerings connect command."""
   NETWORK = 'hello'
 
-  def testList(self, track):
-    self.track = track
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def testList(self):
     want = [
         self.services_messages.Connection(
             network='projects/%s/global/networks/%s' % (self.PROJECT_NUMBER,
@@ -69,11 +67,58 @@ reservedPeeringRanges:
 """,
         normalize_space=True)
 
+  def testListWithDefaultService(self):
+    self.service = '-'
+    want = [
+        self.services_messages.Connection(
+            network='projects/%s/global/networks/%s' % (self.PROJECT_NUMBER,
+                                                        self.NETWORK),
+            peering='servicenetworking-googleapis-com',
+            reservedPeeringRanges=['google1', 'google2']),
+        self.services_messages.Connection(
+            network='projects/%s/global/networks/%s' % (self.PROJECT_NUMBER,
+                                                        self.NETWORK),
+            peering='cloudsql-googleapis-com',
+            reservedPeeringRanges=['google1', 'google2']),
+    ]
+    self.ExpectListConnections(self.NETWORK, want)
+    self.SetProjectNumber()
+
+    self.Run('services vpc-peerings list --network=%s' % self.NETWORK)
+    self.AssertOutputEquals(
+        """\
+---
+network: projects/12481632/global/networks/hello
+peering: servicenetworking-googleapis-com
+reservedPeeringRanges:
+- google1
+- google2
+---
+network: projects/12481632/global/networks/hello
+peering: cloudsql-googleapis-com
+reservedPeeringRanges:
+- google1
+- google2
+""",
+        normalize_space=True)
+
   def SetProjectNumber(self):
     mock_get = self.StartObjectPatch(projects_api, 'Get')
     p = mock.Mock()
     p.projectNumber = self.PROJECT_NUMBER
     mock_get.return_value = p
+
+
+class ListAlphaTest(ListTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class ListBetaTest(ListTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 if __name__ == '__main__':

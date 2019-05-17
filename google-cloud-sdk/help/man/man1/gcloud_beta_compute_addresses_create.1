@@ -56,6 +56,11 @@ The network tier to assign to the reserved IP addresses.
 \f5\fINETWORK_TIER\fR\fR must be one of: \f5PREMIUM\fR, \f5STANDARD\fR. The
 default value is \f5PREMIUM\fR.
 
+While regional external addresses (\f5\-\-region\fR specified, \f5\-\-subnet\fR
+omitted) can use either \f5PREMIUM\fR or \f5STANDARD\fR, global external
+addresses (\f5\-\-global\fR specified, \f5\-\-subnet\fR omitted) can only use
+\f5PREMIUM\fR. Internal addresses can only use \f5PREMIUM\fR.
+
 .TP 2m
 \fB\-\-prefix\-length\fR=\fIPREFIX_LENGTH\fR
 The prefix length of the IP range. It must be a value between 8 and 30
@@ -101,9 +106,14 @@ will be assigned to the IP addresses.
 
 .TP 2m
 \fB\-\-ip\-version\fR=\fIIP_VERSION\fR
-The version of the IP address to be allocated and reserved if \-\-addresses is
-not used. The default is IPv4. \fIIP_VERSION\fR must be one of: \fBIPV4\fR,
-\fBIPV6\fR.
+Version of the IP address to be allocated and reserved. The default is IPV4.
+
+IP version can only be specified for global addresses that are generated
+automatically (i.e., along with the \f5\-\-global\fR flag, given
+\f5\-\-addresses\fR is not specified) and if the \f5\-\-network\-tier\fR is
+\f5PREMIUM\fR.
+
+\fIIP_VERSION\fR must be one of: \fBIPV4\fR, \fBIPV6\fR.
 
 .RE
 .sp
@@ -128,10 +138,11 @@ property value for this command invocation.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

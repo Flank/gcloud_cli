@@ -46,19 +46,13 @@ def TypedArgRules():
       },
       'robo': {
           'required': [],
-          'optional': [
-              'app_initial_activity', 'max_depth', 'max_steps',
-              'robo_directives', 'robo_script'
-          ],
-          'defaults': {
-              'max_depth': 50,
-              'max_steps': -1,  # interpreted as 'no limit'
-          },
+          'optional': ['robo_directives', 'robo_script'],
+          'defaults': {}
       },
       'game-loop': {
           'required': [],
           'optional': ['scenario_numbers', 'scenario_labels'],
-          'defaults': {},
+          'defaults': {}
       },
   }
 
@@ -86,6 +80,7 @@ def SharedArgRules():
           'environment_variables',
           'locales',
           'network_profile',
+          'num_flaky_test_attempts',
           'obb_files',
           'orientations',
           'os_version_ids',
@@ -100,6 +95,7 @@ def SharedArgRules():
       'defaults': {
           'async': False,
           'auto_google_login': True,
+          'num_flaky_test_attempts': 0,
           'performance_metrics': True,
           'record_video': True,
           'timeout': 900,  # 15 minutes

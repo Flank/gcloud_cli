@@ -63,6 +63,7 @@ class CreateTest(base.DnsMockBetaTest):
     expected_output = util_beta.GetPolicies(
         networks=test_networks,
         forwarding=True,
+        logging=True,
         name_server_config=util_beta.GetAltNameServerConfig(test_nameservers),
         num=1).pop()
     create_req = self.messages.DnsPoliciesCreateRequest(
@@ -72,7 +73,8 @@ class CreateTest(base.DnsMockBetaTest):
     actual_output = self.Run('dns policies create mypolicy0 --description '
                              '"My policy 0" --networks default,network1 '
                              '--alternative-name-servers 1.0.1.1,1.0.1.2 '
-                             '--enable-inbound-forwarding')
+                             '--enable-inbound-forwarding '
+                             '--enable-logging ')
     self.assertEqual(expected_output, actual_output)
 
 

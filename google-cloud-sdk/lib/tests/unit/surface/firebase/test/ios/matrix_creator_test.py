@@ -63,7 +63,8 @@ class IosMatrixCreatorTests(unit_base.IosMockClientTest):
         results_dir='2018-02-24',
         results_history_name='darkages.1',
         timeout=321,
-        xctestrun_file='myxctestrun')
+        xctestrun_file='myxctestrun',
+        num_flaky_test_attempts=1)
 
     creator = self.CreateMatrixCreator(args)
     req = creator._BuildTestMatrixRequest('request-id-123')
@@ -73,6 +74,7 @@ class IosMatrixCreatorTests(unit_base.IosMockClientTest):
     self.assertEqual(matrix.clientInfo.name, 'gcloud')
     self.assertEqual(matrix.resultStorage.googleCloudStorage.gcsPath,
                      'gs://kfc/2018-02-24/')
+    self.assertEqual(matrix.flakyTestAttempts, 1)
 
     devices = matrix.environmentMatrix.iosDeviceList.iosDevices
     self.assertEqual(len(devices), 2)

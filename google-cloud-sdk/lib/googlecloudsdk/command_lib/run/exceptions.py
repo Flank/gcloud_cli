@@ -52,6 +52,11 @@ class AmbiguousContainerError(exceptions.Error):
   pass
 
 
+class CloudSQLError(exceptions.Error):
+  """Malformed instances string for CloudSQL."""
+  pass
+
+
 class ContainerIdError(exceptions.Error):
   """Container Id cannot be found by docker."""
   pass
@@ -85,6 +90,10 @@ class AppNotReadyError(exceptions.InternalError):
 class DeploymentFailedError(exceptions.Error):
   """An error was encountered during deployment."""
   pass
+
+
+class DomainMappingCreationError(exceptions.Error):
+  """An error was encountered during the creation of a domain mapping."""
 
 
 class BadImageError(exceptions_util.HttpException):

@@ -134,12 +134,12 @@ class NodeTemplatesCreateTest(test_base.BaseTest, parameterized.TestCase):
     self.AssertErrContains('--node-type')
 
 
-class NodeTemplatesCreateAlphaTest(NodeTemplatesCreateTest):
+class NodeTemplatesCreateBetaTest(NodeTemplatesCreateTest):
 
   def SetUp(self):
     self.region = 'us-central1'
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.SelectApi('alpha')
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi('beta')
 
   def _CreateBaseNodeTemplateMessage(self):
     affinity_labels = {'environment': 'prod', 'grouping': 'frontend'}
@@ -173,6 +173,14 @@ class NodeTemplatesCreateAlphaTest(NodeTemplatesCreateTest):
 
     self.CheckRequests([(self.compute.nodeTemplates, 'Insert', request)])
     self.assertEqual(result, template)
+
+
+class NodeTemplatesCreateAlphaTest(NodeTemplatesCreateBetaTest):
+
+  def SetUp(self):
+    self.region = 'us-central1'
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('alpha')
 
 
 if __name__ == '__main__':

@@ -24,9 +24,9 @@ import os
 
 from googlecloudsdk import calliope
 
+from googlecloudsdk.api_lib.dataproc import exceptions
 from googlecloudsdk.command_lib.export import util as export_util
 from googlecloudsdk.core import properties
-from googlecloudsdk.core import yaml_validator
 from googlecloudsdk.core.util import files
 from tests.lib.surface.dataproc import compute_base
 from tests.lib.surface.dataproc import unit_base
@@ -79,8 +79,8 @@ class ClustersImportUnitTest(unit_base.DataprocUnitTestBase,
 
 class ClustersImportUnitTestBeta(ClustersImportUnitTest):
 
-  def SetUp(self):
-    self.SetupForReleaseTrack(calliope.base.ReleaseTrack.BETA)
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.BETA
 
   def testImportClustersFromStdIn(self):
     # Cluster with only configuration-related information.
@@ -103,7 +103,7 @@ class ClustersImportUnitTestBeta(ClustersImportUnitTest):
   def testImportClustersInvalid(self):
     self.WriteInput('foo: bar')
     with self.AssertRaisesExceptionMatches(
-        yaml_validator.ValidationError,
+        exceptions.ValidationError,
         "Additional properties are not allowed ('foo' was unexpected)"):
       self.RunDataproc('clusters import {0}'.format(self.CLUSTER_NAME))
 
@@ -193,3 +193,9 @@ class ClustersImportUnitTestBeta(ClustersImportUnitTest):
         expected_request, response_cluster, region='us-test1')
     result = self.RunDataproc('clusters import {0}'.format(self.CLUSTER_NAME))
     self.AssertMessagesEqual(response_cluster, result)
+
+
+class ClustersImportUnitTestAlpha(ClustersImportUnitTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.ALPHA

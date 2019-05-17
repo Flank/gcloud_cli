@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- #
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,6 +24,8 @@ import sys
 
 from googlecloudsdk.core.util import files as file_utils
 from tests.lib import test_case
+
+import mock
 
 
 class AssertStreamCompareTest(test_case.WithOutputCapture):
@@ -415,6 +417,8 @@ class TestSkipDecorator(test_case.Base):
     self.bug = 'b/1234'
     self.bad_bug = 'later'
     self.expected_regex = r'.*Just Because.*b/1234.*'
+    # Disable running skipped tests.
+    self.StartEnvPatch({'CLOUDSDK_RUN_SKIPPED_TESTS': ''})
 
   @staticmethod
   def DummyCannedSkip(func):
@@ -429,6 +433,61 @@ class TestSkipDecorator(test_case.Base):
     with self.assertRaisesRegex(test_case.unittest.SkipTest,
                                 self.expected_regex):
       foo()
+
+  @mock.patch.object(test_case, 'pytest')
+  def testSilence(self, pytest_mock):
+    decorator_mock = mock.Mock()
+    pytest_mock.mark.silence.return_value = decorator_mock
+
+    def foo():
+      return 42
+
+    test_case.Filters._Silence(reason=self.why)(foo)
+    decorator_mock.assert_called_with(foo)
+
+  @test_case.Filters.RunOnlyIf(test_case.pytest, 'Requires pytest.')
+  def testSilenceMark(self):
+    @test_case.Filters._Silence(reason=self.why)
+    def foo():
+      return 42
+
+    self.assertTrue(hasattr(foo, 'silence'))
+
+  @mock.patch.object(test_case, 'pytest', mock.MagicMock())
+  @mock.patch.object(test_case.Filters, '_Silence')
+  def testRunSkippedTests(self, silence_mock):
+    self.StartEnvPatch({'CLOUDSDK_RUN_SKIPPED_TESTS': 'True'})
+    test_case.Filters.skip(self.why, self.bug)
+    silence_mock.assert_called_once()
+
+  @mock.patch.object(test_case, 'pytest', mock.MagicMock())
+  @mock.patch.object(test_case.Filters, '_Silence')
+  def testSkipAlways(self, silence_mock):
+    self.StartEnvPatch({'CLOUDSDK_RUN_SKIPPED_TESTS': 'True'})
+    @test_case.Filters.skipAlways(self.why, self.bug)
+    def foo():
+      return 42
+
+    with self.assertRaisesRegex(test_case.unittest.SkipTest,
+                                self.expected_regex):
+      foo()
+
+    silence_mock.assert_not_called()
+
+  @test_case.Filters.DoNotRunOnPy2('Python3 only functionality')
+  @mock.patch.object(test_case, 'pytest', mock.MagicMock())
+  @mock.patch.object(test_case.Filters, '_Silence')
+  def testSkipOnPy3Always(self, silence_mock):
+    self.StartEnvPatch({'CLOUDSDK_RUN_SKIPPED_TESTS': 'True'})
+    @test_case.Filters.SkipOnPy3Always(self.why, self.bug)
+    def foo():
+      return 42
+
+    with self.assertRaisesRegex(test_case.unittest.SkipTest,
+                                self.expected_regex):
+      foo()
+
+    silence_mock.assert_not_called()
 
   def testSkipIfTrue(self):
     @test_case.Filters.skipIf(True, self.why, self.bug)

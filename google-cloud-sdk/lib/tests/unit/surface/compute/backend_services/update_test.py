@@ -1027,6 +1027,90 @@ class WithHealthcheckApiTest(UpdateTestBase):
               project='my-project'))],
     )
 
+  def testWithUpdateCustomRequestHeaders(self):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [self._backend_services[0]],
+        [],
+    ])
+
+    self.RunUpdate(
+        'backend-service-1 --global --custom-request-header \'test: \' '
+        '--custom-request-header \'another: {client_country}\'')
+
+    self.CheckRequests(
+        [(self.compute.backendServices, 'Get',
+          messages.ComputeBackendServicesGetRequest(
+              backendService='backend-service-1', project='my-project'))],
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
+              backendService='backend-service-1',
+              backendServiceResource=messages.BackendService(
+                  backends=[],
+                  description='my backend service',
+                  healthChecks=[
+                      (self.compute_uri + '/projects/'
+                       'my-project/global/httpHealthChecks/my-health-check')
+                  ],
+                  name='backend-service-1',
+                  portName='http',
+                  protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
+                  selfLink=(self.compute_uri + '/projects/'
+                            'my-project/global/backendServices/'
+                            'backend-service-1'),
+                  timeoutSec=30,
+                  customRequestHeaders=['test: ', 'another: {client_country}']),
+              project='my-project'))],
+    )
+
+  def testWithClearingCustomRequestHeaders(self):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [
+            messages.BackendService(
+                backends=[],
+                description='my backend service',
+                healthChecks=[
+                    ('https://www.googleapis.com/compute/v1/projects/'
+                     'my-project/global/httpHealthChecks/my-health-check')
+                ],
+                name='backend-service-1',
+                portName='http',
+                protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
+                selfLink=(
+                    'https://www.googleapis.com/compute/v1/projects/'
+                    'my-project/global/backendServices/backend-service-1'),
+                timeoutSec=30,
+                customRequestHeaders=['test: '])
+        ],
+        [],
+    ])
+    self.RunUpdate('backend-service-1 --no-custom-request-headers')
+
+    self.CheckRequests(
+        [(self.compute.backendServices, 'Get',
+          messages.ComputeBackendServicesGetRequest(
+              backendService='backend-service-1', project='my-project'))],
+        [(self.compute.backendServices, 'Patch',
+          messages.ComputeBackendServicesPatchRequest(
+              backendService='backend-service-1',
+              backendServiceResource=messages.BackendService(
+                  backends=[],
+                  description='my backend service',
+                  healthChecks=[
+                      (self.compute_uri + '/projects/'
+                       'my-project/global/httpHealthChecks/my-health-check')
+                  ],
+                  name='backend-service-1',
+                  portName='http',
+                  protocol=messages.BackendService.ProtocolValueValuesEnum.HTTP,
+                  selfLink=(self.compute_uri + '/projects/'
+                            'my-project/global/backendServices/'
+                            'backend-service-1'),
+                  timeoutSec=30),
+              project='my-project'))],
+    )
+
 
 class WithCustomCacheKeysApiUpdateTest(UpdateTestBase):
   """Tests custom cache key update flags.

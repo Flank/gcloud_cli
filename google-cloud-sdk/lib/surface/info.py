@@ -48,7 +48,7 @@ class Info(base.Command):
      - {command} --show-log prints the contents of the most recent log file.
   """
 
-  category = 'SDK Tools'
+  category = base.SDK_TOOLS_CATEGORY
 
   @staticmethod
   def Args(parser):

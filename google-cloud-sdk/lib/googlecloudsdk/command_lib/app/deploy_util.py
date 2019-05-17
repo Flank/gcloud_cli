@@ -70,6 +70,11 @@ ORIGINAL_RUNTIME_RE = re.compile(ORIGINAL_RUNTIME_RE_STRING + r'\Z')
 # Max App Engine file size; see https://cloud.google.com/appengine/docs/quotas
 _MAX_FILE_SIZE_STANDARD = 32 * 1024 * 1024
 
+# 1rst gen runtimes that still need the _MAX_FILE_SIZE_STANDARD check:
+_RUNTIMES_WITH_FILE_SIZE_LIMITS = [
+    'java7', 'java8', 'java8g', 'python27', 'go19', 'php55'
+]
+
 
 class Error(core_exceptions.Error):
   """Base error for this module."""
@@ -338,7 +343,8 @@ class ServiceDeployer(object):
         (flex_image_build_option == FlexImageBuildOptions.ON_SERVER or
          not service_info.is_hermetic)):
       limit = None
-      if service_info.env == env.STANDARD:
+      if (service_info.env == env.STANDARD and
+          service_info.runtime in _RUNTIMES_WITH_FILE_SIZE_LIMITS):
         limit = _MAX_FILE_SIZE_STANDARD
       manifest = deploy_app_command_util.CopyFilesToCodeBucket(
           upload_dir, source_files, code_bucket_ref, max_file_size=limit)
@@ -455,8 +461,15 @@ def ArgsDeploy(parser):
       '--stop-previous-version',
       action=actions.StoreBooleanProperty(
           properties.VALUES.app.stop_previous_version),
-      help='Stop the previously running version when deploying a new version '
-           'that receives all traffic.')
+      help="""\
+      Stop the previously running version when deploying a new version that
+      receives all traffic.
+
+      Note that if the version is running on an instance
+      of an auto-scaled service in the App Engine Standard
+      environment, using `--stop-previous-version` will not work
+      and the previous version will continue to run because auto-scaled service
+      instances are always running.""")
   parser.add_argument(
       '--image-url',
       help='Deploy with a specific Docker image.  Docker url must be from one '
@@ -576,7 +589,10 @@ def RunDeploy(
 
     app = _PossiblyCreateApp(api_client, project)
     _RaiseIfStopped(api_client, app)
-    app = _PossiblyRepairApp(api_client, app)
+
+    # Call _PossiblyRepairApp when --bucket param is unspecified
+    if not args.bucket:
+      app = _PossiblyRepairApp(api_client, app)
 
     # Tell the user what is going to happen, and ask them to confirm.
     version_id = args.version or util.GenerateVersionId()

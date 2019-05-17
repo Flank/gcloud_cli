@@ -117,3 +117,8 @@ class WorkflowTemplatesJobSparkSqlUnitTestBeta(
         '--properties foo=bar,some.key=some.value '.format(
             self.WORKFLOW_TEMPLATE, self.SCRIPT_URI))
     self.AssertMessagesEqual(expected, result)
+
+
+class WorkflowTemplatesJobSparkSqlUnitTestAlpha(
+    WorkflowTemplatesJobSparkSqlUnitTestBeta, base.DataprocTestBaseAlpha):
+  pass

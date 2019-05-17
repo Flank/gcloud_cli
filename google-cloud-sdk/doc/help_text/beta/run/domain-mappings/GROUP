@@ -1,0 +1,44 @@
+NAME
+    gcloud beta run domain-mappings - view and manage your Cloud Run domain
+        mappings
+
+SYNOPSIS
+    gcloud beta run domain-mappings COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) This set of commands can be used to view and manage your service's
+    domain mappings.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (BETA) Create domain mappings.
+
+     delete
+        (BETA) Delete domain mappings.
+
+     describe
+        (BETA) Describe domain mappings.
+
+     list
+        (BETA) Lists domain mappings.
+
+EXAMPLES
+    To list your Cloud Run domain mappings, run:
+
+        $ gcloud beta run domain-mappings list
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha run domain-mappings
+

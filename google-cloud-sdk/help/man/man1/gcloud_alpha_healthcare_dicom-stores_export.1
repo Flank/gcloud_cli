@@ -1,0 +1,125 @@
+
+.TH "GCLOUD_ALPHA_HEALTHCARE_DICOM\-STORES_EXPORT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha healthcare dicom\-stores export \- export a Cloud Healthcare API API DICOM store
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha healthcare dicom\-stores export\fR (\fIDICOM_STORE\fR\ :\ \fB\-\-dataset\fR=\fIDATASET\fR\ \fB\-\-location\fR=\fILOCATION\fR) [[\fB\-\-bq\-table\fR=\fIBQ_TABLE\fR\ :\ \fB\-\-overwrite\-table\fR]\ |\ \fB\-\-gcs\-uri\-prefix\fR=\fIGCS_URI_PREFIX\fR\ \fB\-\-mime\-type\fR=\fIMIME_TYPE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Export a Cloud Healthcare API API DICOM store.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+DicomStore resource \- Cloud Healthcare API DICOM store to export. The arguments
+in this group can be used to specify the attributes of this resource. (NOTE)
+Some attributes are not given arguments in this group but can be set in other
+ways. To set the [project] attribute: provide the argument [dicom_store] on the
+command line with a fully specified name; provide the argument [\-\-project] on
+the command line; set the property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIDICOM_STORE\fR
+ID of the dicomStore or fully qualified identifier for the dicomStore. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-dataset\fR=\fIDATASET\fR
+Cloud Healthcare dataset.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Google Cloud location.
+
+
+.RE
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-bq\-table\fR=\fIBQ_TABLE\fR
+The BigQuery table where the DICOM store should be written. If this table does
+not exist, a new table with the given name will be created. This flag must be
+specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-overwrite\-table\fR
+If the destination table already exists and this flag is \f5TRUE\fR, the table
+will be overwritten by the contents of the DICOM store. If the flag is not set
+and the destination table already exists, the export call returns an error.
+
+.TP 2m
+\fB\-\-gcs\-uri\-prefix\fR=\fIGCS_URI_PREFIX\fR
+URI for a Google Cloud Storage directory to which result files should be written
+(for example, \f5gs://bucket\-id/path/to/destination/dir\fR). If there is no
+trailing slash, the service will append one when composing the object path. The
+user is responsible for creating the Google Cloud Storage bucket referenced in
+\f5uri_prefix\fR.
+
+.TP 2m
+\fB\-\-mime\-type\fR=\fIMIME_TYPE\fR
+\'MIME types supported by DICOM spec. Each file will be written in the following
+format:
+\f5.../{study_id}/{series_id}/{instance_id}[/{frame_number}].{extension}\fR The
+frame_number component will exist only for multi\-frame instances. Refer to the
+DICOM conformance statement for permissible MIME types:
+https://cloud.google.com/healthcare/docs/dicom#wado\-rs The following extensions
+will be used for output files: application/dicom \-> .dcm image/jpeg \-> .jpg
+image/png \-> .png If unspecified, the instances will be exported in their
+original DICOM format.'
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBhealthcare/v1alpha2\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/healthcare
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/.
+

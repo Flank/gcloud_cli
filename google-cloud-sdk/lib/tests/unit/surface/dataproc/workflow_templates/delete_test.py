@@ -82,8 +82,14 @@ class WorkflowTemplateDeleteUnitTest(unit_base.DataprocUnitTestBase,
 
 class WorkflowTemplateDeleteTestBeta(WorkflowTemplateDeleteUnitTest):
 
-  def SetUp(self):
-    self.SetupForReleaseTrack(calliope.base.ReleaseTrack.BETA)
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.BETA
+
+
+class WorkflowTemplateDeleteTestAlpha(WorkflowTemplateDeleteTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

@@ -18,7 +18,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import abc
 from apitools.base.py import encoding
 from apitools.base.py import exceptions as api_exceptions
 
@@ -33,7 +32,7 @@ from googlecloudsdk.core.util import times
 import six
 
 API_NAME = 'cloudasset'
-DEFAULT_API_VERSION = 'v1beta1'
+DEFAULT_API_VERSION = 'v1'
 BASE_URL = 'https://cloudasset.googleapis.com'
 _HEADERS = {'Content-Type': 'application/json', 'X-HTTP-Method-Override': 'GET'}
 _HTTP_ERROR_FORMAT = ('HTTP request failed with status code {}. '
@@ -89,7 +88,8 @@ def MakeGetAssetsHistoryHttpRequests(args, api_version=DEFAULT_API_VERSION):
   if args.IsSpecified('end_time'):
     query_params.extend([('readTimeWindow.endTime',
                           times.FormatDateTime(args.end_time))])
-  parent = asset_utils.GetParentName(args.organization, args.project)
+  parent = asset_utils.GetParentNameForGetHistory(args.organization,
+                                                  args.project)
   url_base = '{0}/{1}/{2}:{3}'.format(BASE_URL, api_version, parent,
                                       'batchGetAssetsHistory')
   url_query = six.moves.urllib.parse.urlencode(query_params)
@@ -115,13 +115,13 @@ def MakeGetAssetsHistoryHttpRequests(args, api_version=DEFAULT_API_VERSION):
     yield asset
 
 
-@six.add_metaclass(abc.ABCMeta)
 class AssetExportClient(object):
-  """Base class for exporting assets."""
+  """Client for export asset."""
 
-  def __init__(self, parent, api_version):
+  def __init__(self, parent, api_version=DEFAULT_API_VERSION):
     self.parent = parent
     self.message_module = GetMessages(api_version)
+    self.service = GetClient(api_version).v1
 
   def Export(self, args):
     """Export assets with the asset export method."""
@@ -129,8 +129,20 @@ class AssetExportClient(object):
     content_type = getattr(
         self.message_module.ExportAssetsRequest.ContentTypeValueValuesEnum,
         content_type)
-    output_config = self.message_module.OutputConfig(
-        gcsDestination=self.message_module.GcsDestination(uri=args.output_path))
+    # TODO(b/131354776): After flag --output_path_prefix is rolled out to GA, we
+    # can replace this if-else block with GcsDestination(uri=args.output_path,
+    # uriPrefix=args.output_path_prefix). Before that,
+    # GcsDestination(uri=args.output_path, uriPrefix=args.output_path_prefix)
+    # would break the GA track command since flag --output_path_prefix is not
+    # registered for GA track.
+    if args.output_path:
+      output_config = self.message_module.OutputConfig(
+          gcsDestination=self.message_module.GcsDestination(
+              uri=args.output_path))
+    else:
+      output_config = self.message_module.OutputConfig(
+          gcsDestination=self.message_module.GcsDestination(
+              uriPrefix=args.output_path_prefix))
     snapshot_time = None
     if args.snapshot_time:
       snapshot_time = times.FormatDateTime(args.snapshot_time)
@@ -139,23 +151,19 @@ class AssetExportClient(object):
         contentType=content_type,
         outputConfig=output_config,
         readTime=snapshot_time)
-    request_message = self.export_message(
+    request_message = self.message_module.CloudassetExportAssetsRequest(
         parent=self.parent, exportAssetsRequest=export_assets_request)
     operation = self.service.ExportAssets(request_message)
     return operation
 
 
-class AssetProjectExportClient(AssetExportClient):
+class AssetOperationClient(object):
+  """Client for operations."""
 
-  def __init__(self, parent, api_version=DEFAULT_API_VERSION):
-    super(AssetProjectExportClient, self).__init__(parent, api_version)
-    self.service = GetClient(api_version).projects
-    self.export_message = self.message_module.CloudassetProjectsExportAssetsRequest  # pylint: disable=line-too-long
+  def __init__(self, api_version=DEFAULT_API_VERSION):
+    self.service = GetClient(api_version).operations
+    self.message = GetMessages(api_version).CloudassetOperationsGetRequest
 
-
-class AssetOrganizationExportClient(AssetExportClient):
-
-  def __init__(self, parent, api_version=DEFAULT_API_VERSION):
-    super(AssetOrganizationExportClient, self).__init__(parent, api_version)
-    self.service = GetClient(api_version).organizations
-    self.export_message = self.message_module.CloudassetOrganizationsExportAssetsRequest  # pylint: disable=line-too-long
+  def Get(self, name):
+    request = self.message(name=name)
+    return self.service.Get(request)

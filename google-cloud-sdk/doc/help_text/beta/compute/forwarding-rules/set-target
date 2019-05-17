@@ -130,9 +130,13 @@ OPTIONAL FLAGS
             --target-instance.
          INTERNAL
             Internal load balancing or forwarding, used with --backend-service.
+         INTERNAL_SELF_MANAGED
+            Traffic director load balancing or forwarding, used with
+            --target-http-proxy, --target-https-proxy.
 
      --network=NETWORK
-        (Only for --load-balancing-scheme=INTERNAL) Network that this
+        (Only for --load-balancing-scheme=INTERNAL or
+        --load-balancing-scheme=INTERNAL_SELF_MANAGED) Network that this
         forwarding rule applies to. If this field is not specified, the default
         network will be used. In the absence of the default network, this field
         must be specified.
@@ -200,8 +204,9 @@ OPTIONAL FLAGS
           CLOUDSDK_COMPUTE_REGION.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

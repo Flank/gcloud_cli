@@ -24,11 +24,11 @@ from googlecloudsdk.command_lib.filestore import flags
 from googlecloudsdk.command_lib.util.concepts import concept_parsers
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA)
-class DescribeBeta(base.DescribeCommand):
+@base.ReleaseTracks(base.ReleaseTrack.GA)
+class Describe(base.DescribeCommand):
   """Describe a Cloud Filestore location."""
 
-  _API_VERSION = filestore_client.FILESTORE_API_VERSION
+  _API_VERSION = filestore_client.V1_API_VERSION
 
   @staticmethod
   def Args(parser):
@@ -37,21 +37,30 @@ class DescribeBeta(base.DescribeCommand):
 
   def Run(self, args):
     """Run the describe command."""
-    location_ref = args.CONCEPTS.location.Parse()
+    location_ref = args.CONCEPTS.zone.Parse().RelativeName()
     client = filestore_client.FilestoreClient(version=self._API_VERSION)
     return client.GetLocation(location_ref)
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class DescribeAlpha(DescribeBeta):
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class DescribeBeta(Describe):
   """Describe a Cloud Filestore location."""
 
-  _API_VERSION = filestore_client.FILESTORE_ALPHA_API_VERSION
+  _API_VERSION = filestore_client.BETA_API_VERSION
 
 
-DescribeBeta.detailed_help = {
-    'DESCRIPTION': 'Describe a Cloud Filestore location.',
-    'EXAMPLES': """\
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class DescribeAlpha(Describe):
+  """Describe a Cloud Filestore location."""
+
+  _API_VERSION = filestore_client.ALPHA_API_VERSION
+
+
+Describe.detailed_help = {
+    'DESCRIPTION':
+        'Describe a Cloud Filestore location.',
+    'EXAMPLES':
+        """\
 The following command shows the details for the Cloud Filestore location named
 NAME.
 

@@ -26,17 +26,13 @@ from googlecloudsdk.command_lib.compute.resource_policies import flags
 from googlecloudsdk.command_lib.compute.resource_policies import util
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class DisksRemoveResourcePolicies(base.UpdateCommand):
-  """Remove resource policies from a Google Compute Engine disk.
-
-    *{command}* removes resource policies from a Google Compute
-    Engine virtual disk.
-  """
+  """Remove resource policies from a Google Compute Engine disk."""
 
   @staticmethod
   def Args(parser):
-    disks_flags.MakeDiskArgZonalOrRegional(plural=False).AddArgument(
+    disks_flags.MakeDiskArg(plural=False).AddArgument(
         parser, operation_type='remove resource policies from')
     flags.AddResourcePoliciesArgs(
         parser, 'removed from', 'disk', required=True)
@@ -46,7 +42,7 @@ class DisksRemoveResourcePolicies(base.UpdateCommand):
     client = holder.client.apitools_client
     messages = holder.client.messages
 
-    disk_ref = disks_flags.MakeDiskArgZonalOrRegional(
+    disk_ref = disks_flags.MakeDiskArg(
         plural=False).ResolveAsResource(args, holder.resources)
     disk_info = api_util.GetDiskInfo(disk_ref, client, messages)
     disk_region = disk_info.GetDiskRegionName()
@@ -62,3 +58,19 @@ class DisksRemoveResourcePolicies(base.UpdateCommand):
 
     return disk_info.MakeRemoveResourcePoliciesRequest(resource_policies,
                                                        holder.client)
+
+
+DisksRemoveResourcePolicies.detailed_help = {
+    'DESCRIPTION':
+        """\
+Remove resource policies from a Google Compute Engine disk.
+
+*{command}* removes resource policies from a Google Compute Engine disk.
+""",
+    'EXAMPLES':
+        """\
+The following command removes one resource policy from a Google Compute Engine disk.
+
+  $ {command} my-disk --zone=ZONE --resource-policies=POLICY
+"""
+}

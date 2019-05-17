@@ -1,0 +1,212 @@
+title: surface unit tests for 'gcloud compute networks peerings list'
+release_tracks: [BETA, ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      compute networks peerings list
+  - stdout: |
+      NAME    NETWORK    PEER_PROJECT  PEER_NETWORK  IMPORT_CUSTOM_ROUTES  EXPORT_CUSTOM_ROUTES  STATE   STATE_DETAILS
+      peer-1  network-1  fake-project  network-2     True                  False                 ACTIVE  [2019-02-06T14:42:56.598-08:00]: Connected.
+      peer-2  network-2  fake-project  network-1     False                 True                  ACTIVE  [2019-02-06T14:42:56.598-08:00]: Connected.
+- execute:
+  - command: |
+      compute networks peerings list --network network-1
+  - stdout: |
+      NAME    NETWORK    PEER_PROJECT  PEER_NETWORK  IMPORT_CUSTOM_ROUTES  EXPORT_CUSTOM_ROUTES  STATE   STATE_DETAILS
+      peer-1  network-1  fake-project  network-2     True                  False                 ACTIVE  [2019-02-06T14:42:56.598-08:00]: Connected.
+- execute:
+  - command: |
+      compute networks peerings list --network network-does-not-exist
+  - stderr: |
+      Listed 0 items.
+actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1
+      BETA: beta
+      ALPHA: alpha
+- execute_command:
+    command: |
+      compute networks peerings list
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks?alt=json&maxResults=500
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            id: projects/fake-project/global/networks
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks
+            kind: compute#networkList
+            items:
+            - id: '4465277762394316593'
+              kind: compute#network
+              creationTimestamp: '2019-02-06T14:38:22.111-08:00'
+              name: network-1
+              selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-1
+              autoCreateSubnetworks: false
+              subnetworks:
+              - https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/subnetworks/subnet-1
+              peerings:
+              - name: peer-1
+                network: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-2
+                state: ACTIVE
+                stateDetails: '[2019-02-06T14:42:56.598-08:00]: Connected.'
+                autoCreateRoutes: true
+                exportCustomRoutes: false
+                importCustomRoutes: true
+                exchangeSubnetRoutes: true
+              routingConfig:
+                routingMode: REGIONAL
+            - id: '759048760670477445'
+              kind: compute#network
+              creationTimestamp: '2019-02-06T14:40:42.968-08:00'
+              name: network-2
+              selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-2
+              autoCreateSubnetworks: false
+              subnetworks:
+              - https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/subnetworks/subnet-2
+              peerings:
+              - name: peer-2
+                network: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-1
+                state: ACTIVE
+                stateDetails: '[2019-02-06T14:42:56.598-08:00]: Connected.'
+                autoCreateRoutes: true
+                exportCustomRoutes: true
+                importCustomRoutes: false
+                exchangeSubnetRoutes: true
+              routingConfig:
+                routingMode: REGIONAL
+    - expect_stdout: |
+        NAME    NETWORK    PEER_PROJECT  PEER_NETWORK  IMPORT_CUSTOM_ROUTES  EXPORT_CUSTOM_ROUTES  STATE   STATE_DETAILS
+        peer-1  network-1  fake-project  network-2     True                  False                 ACTIVE  [2019-02-06T14:42:56.598-08:00]: Connected.
+        peer-2  network-2  fake-project  network-1     False                 True                  ACTIVE  [2019-02-06T14:42:56.598-08:00]: Connected.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute networks peerings list --network network-1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks?alt=json&maxResults=500
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            id: projects/fake-project/global/networks
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks
+            kind: compute#networkList
+            items:
+            - id: '4465277762394316593'
+              kind: compute#network
+              creationTimestamp: '2019-02-06T14:38:22.111-08:00'
+              name: network-1
+              selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-1
+              autoCreateSubnetworks: false
+              subnetworks:
+              - https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/subnetworks/subnet-1
+              peerings:
+              - name: peer-1
+                network: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-2
+                state: ACTIVE
+                stateDetails: '[2019-02-06T14:42:56.598-08:00]: Connected.'
+                autoCreateRoutes: true
+                exportCustomRoutes: false
+                importCustomRoutes: true
+                exchangeSubnetRoutes: true
+              routingConfig:
+                routingMode: REGIONAL
+            - id: '759048760670477445'
+              kind: compute#network
+              creationTimestamp: '2019-02-06T14:40:42.968-08:00'
+              name: network-2
+              selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-2
+              autoCreateSubnetworks: false
+              subnetworks:
+              - https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/subnetworks/subnet-2
+              peerings:
+              - name: peer-2
+                network: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-1
+                state: ACTIVE
+                stateDetails: '[2019-02-06T14:42:56.598-08:00]: Connected.'
+                autoCreateRoutes: true
+                exportCustomRoutes: true
+                importCustomRoutes: false
+                exchangeSubnetRoutes: true
+              routingConfig:
+                routingMode: REGIONAL
+    - expect_stdout: |
+        NAME    NETWORK    PEER_PROJECT  PEER_NETWORK  IMPORT_CUSTOM_ROUTES  EXPORT_CUSTOM_ROUTES  STATE   STATE_DETAILS
+        peer-1  network-1  fake-project  network-2     True                  False                 ACTIVE  [2019-02-06T14:42:56.598-08:00]: Connected.
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute networks peerings list --network network-does-not-exist
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks?alt=json&maxResults=500
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body:
+            id: projects/fake-project/global/networks
+            selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks
+            kind: compute#networkList
+            items:
+            - id: '4465277762394316593'
+              kind: compute#network
+              creationTimestamp: '2019-02-06T14:38:22.111-08:00'
+              name: network-1
+              selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-1
+              autoCreateSubnetworks: false
+              subnetworks:
+              - https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/subnetworks/subnet-1
+              peerings:
+              - name: peer-1
+                network: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-2
+                state: ACTIVE
+                stateDetails: '[2019-02-06T14:42:56.598-08:00]: Connected.'
+                autoCreateRoutes: true
+                exportCustomRoutes: false
+                importCustomRoutes: true
+                exchangeSubnetRoutes: true
+              routingConfig:
+                routingMode: REGIONAL
+            - id: '759048760670477445'
+              kind: compute#network
+              creationTimestamp: '2019-02-06T14:40:42.968-08:00'
+              name: network-2
+              selfLink: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-2
+              autoCreateSubnetworks: false
+              subnetworks:
+              - https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/regions/us-central1/subnetworks/subnet-2
+              peerings:
+              - name: peer-2
+                network: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/networks/network-1
+                state: ACTIVE
+                stateDetails: '[2019-02-06T14:42:56.598-08:00]: Connected.'
+                autoCreateRoutes: true
+                exportCustomRoutes: true
+                importCustomRoutes: false
+                exchangeSubnetRoutes: true
+              routingConfig:
+                routingMode: REGIONAL
+    - expect_stderr: |
+        Listed 0 items.
+    - expect_exit:
+        code: 0

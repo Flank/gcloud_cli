@@ -103,7 +103,8 @@ class Operation(_messages.Message):
       if any.
     name: The server-assigned name, which is only unique within the same
       service that originally returns it. If you use the default HTTP mapping,
-      the `name` should have the format of `operations/some/unique/name`.
+      the `name` should be a resource name ending with
+      `operations/{unique_id}`.
     response: The normal response of the operation in case of success.  If the
       original method returns no data on success, such as `Delete`, the
       response is `google.protobuf.Empty`.  If the original method is standard
@@ -213,6 +214,14 @@ class RecognitionConfig(_messages.Message):
       AudioEncoding.
 
   Fields:
+    audioChannelCount: *Optional* The number of channels in the input audio
+      data. ONLY set this for MULTI-CHANNEL recognition. Valid values for
+      LINEAR16 and FLAC are `1`-`8`. Valid values for OGG_OPUS are '1'-'254'.
+      Valid value for MULAW, AMR, AMR_WB and SPEEX_WITH_HEADER_BYTE is only
+      `1`. If `0` or omitted, defaults to one channel (mono). Note: We only
+      recognize the first channel by default. To perform independent
+      recognition on each channel set
+      `enable_separate_recognition_per_channel` to 'true'.
     enableAutomaticPunctuation: *Optional* If 'true', adds punctuation to
       recognition result hypotheses. This feature is only available in select
       languages. Setting this for requests in other languages has no effect at
@@ -220,6 +229,13 @@ class RecognitionConfig(_messages.Message):
       hypotheses. Note: This is currently offered as an experimental service,
       complimentary to all users. In the future this may be exclusively
       available as a premium feature.
+    enableSeparateRecognitionPerChannel: This needs to be set to `true`
+      explicitly and `audio_channel_count` > 1 to get each channel recognized
+      separately. The recognition result will contain a `channel_tag` field to
+      state which channel that result belongs to. If this is not true, we will
+      only recognize the first channel. The request is billed cumulatively for
+      all channels recognized: `audio_channel_count` multiplied by the length
+      of the audio.
     enableWordTimeOffsets: *Optional* If `true`, the top result includes a
       list of words and the start and end time offsets (timestamps) for those
       words. If `false`, no word-level time offset information is returned.
@@ -237,6 +253,7 @@ class RecognitionConfig(_messages.Message):
       `SpeechRecognitionResult`. The server may return fewer than
       `max_alternatives`. Valid values are `0`-`30`. A value of `0` or `1`
       will return a maximum of one. If omitted, will return a maximum of one.
+    metadata: *Optional* Metadata regarding this request.
     model: *Optional* Which model to select for the given request. Select the
       model best suited to your domain to get best results. If a model is not
       explicitly specified, then we auto-select a model based on the
@@ -262,8 +279,8 @@ class RecognitionConfig(_messages.Message):
       `RecognitionAudio` messages. Valid values are: 8000-48000. 16000 is
       optimal. For best results, set the sampling rate of the audio source to
       16000 Hz. If that's not possible, use the native sample rate of the
-      audio source (instead of re-sampling). This field is optional for `FLAC`
-      and `WAV` audio files and required for all other audio formats. For
+      audio source (instead of re-sampling). This field is optional for FLAC
+      and WAV audio files, but is required for all other audio formats. For
       details, see AudioEncoding.
     speechContexts: *Optional* array of SpeechContext. A means to provide
       context to assist the speech recognition. For more information, see
@@ -326,16 +343,149 @@ class RecognitionConfig(_messages.Message):
     OGG_OPUS = 6
     SPEEX_WITH_HEADER_BYTE = 7
 
-  enableAutomaticPunctuation = _messages.BooleanField(1)
-  enableWordTimeOffsets = _messages.BooleanField(2)
-  encoding = _messages.EnumField('EncodingValueValuesEnum', 3)
-  languageCode = _messages.StringField(4)
-  maxAlternatives = _messages.IntegerField(5, variant=_messages.Variant.INT32)
-  model = _messages.StringField(6)
-  profanityFilter = _messages.BooleanField(7)
-  sampleRateHertz = _messages.IntegerField(8, variant=_messages.Variant.INT32)
-  speechContexts = _messages.MessageField('SpeechContext', 9, repeated=True)
-  useEnhanced = _messages.BooleanField(10)
+  audioChannelCount = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  enableAutomaticPunctuation = _messages.BooleanField(2)
+  enableSeparateRecognitionPerChannel = _messages.BooleanField(3)
+  enableWordTimeOffsets = _messages.BooleanField(4)
+  encoding = _messages.EnumField('EncodingValueValuesEnum', 5)
+  languageCode = _messages.StringField(6)
+  maxAlternatives = _messages.IntegerField(7, variant=_messages.Variant.INT32)
+  metadata = _messages.MessageField('RecognitionMetadata', 8)
+  model = _messages.StringField(9)
+  profanityFilter = _messages.BooleanField(10)
+  sampleRateHertz = _messages.IntegerField(11, variant=_messages.Variant.INT32)
+  speechContexts = _messages.MessageField('SpeechContext', 12, repeated=True)
+  useEnhanced = _messages.BooleanField(13)
+
+
+class RecognitionMetadata(_messages.Message):
+  r"""Description of audio data to be recognized.
+
+  Enums:
+    InteractionTypeValueValuesEnum: The use case most closely describing the
+      audio content to be recognized.
+    MicrophoneDistanceValueValuesEnum: The audio type that most closely
+      describes the audio being recognized.
+    OriginalMediaTypeValueValuesEnum: The original media the speech was
+      recorded on.
+    RecordingDeviceTypeValueValuesEnum: The type of device the speech was
+      recorded with.
+
+  Fields:
+    audioTopic: Description of the content. Eg. "Recordings of federal supreme
+      court hearings from 2012".
+    industryNaicsCodeOfAudio: The industry vertical to which this speech
+      recognition request most closely applies. This is most indicative of the
+      topics contained in the audio.  Use the 6-digit NAICS code to identify
+      the industry vertical - see https://www.naics.com/search/.
+    interactionType: The use case most closely describing the audio content to
+      be recognized.
+    microphoneDistance: The audio type that most closely describes the audio
+      being recognized.
+    obfuscatedId: Obfuscated (privacy-protected) ID of the user, to identify
+      number of unique users using the service.
+    originalMediaType: The original media the speech was recorded on.
+    originalMimeType: Mime type of the original audio file.  For example
+      `audio/m4a`, `audio/x-alaw-basic`, `audio/mp3`, `audio/3gpp`. A list of
+      possible audio mime types is maintained at
+      http://www.iana.org/assignments/media-types/media-types.xhtml#audio
+    recordingDeviceName: The device used to make the recording.  Examples
+      'Nexus 5X' or 'Polycom SoundStation IP 6000' or 'POTS' or 'VoIP' or
+      'Cardioid Microphone'.
+    recordingDeviceType: The type of device the speech was recorded with.
+  """
+
+  class InteractionTypeValueValuesEnum(_messages.Enum):
+    r"""The use case most closely describing the audio content to be
+    recognized.
+
+    Values:
+      INTERACTION_TYPE_UNSPECIFIED: Use case is either unknown or is something
+        other than one of the other values below.
+      DISCUSSION: Multiple people in a conversation or discussion. For example
+        in a meeting with two or more people actively participating. Typically
+        all the primary people speaking would be in the same room (if not, see
+        PHONE_CALL)
+      PRESENTATION: One or more persons lecturing or presenting to others,
+        mostly uninterrupted.
+      PHONE_CALL: A phone-call or video-conference in which two or more
+        people, who are not in the same room, are actively participating.
+      VOICEMAIL: A recorded message intended for another person to listen to.
+      PROFESSIONALLY_PRODUCED: Professionally produced audio (eg. TV Show,
+        Podcast).
+      VOICE_SEARCH: Transcribe spoken questions and queries into text.
+      VOICE_COMMAND: Transcribe voice commands, such as for controlling a
+        device.
+      DICTATION: Transcribe speech to text to create a written document, such
+        as a text-message, email or report.
+    """
+    INTERACTION_TYPE_UNSPECIFIED = 0
+    DISCUSSION = 1
+    PRESENTATION = 2
+    PHONE_CALL = 3
+    VOICEMAIL = 4
+    PROFESSIONALLY_PRODUCED = 5
+    VOICE_SEARCH = 6
+    VOICE_COMMAND = 7
+    DICTATION = 8
+
+  class MicrophoneDistanceValueValuesEnum(_messages.Enum):
+    r"""The audio type that most closely describes the audio being recognized.
+
+    Values:
+      MICROPHONE_DISTANCE_UNSPECIFIED: Audio type is not known.
+      NEARFIELD: The audio was captured from a closely placed microphone. Eg.
+        phone, dictaphone, or handheld microphone. Generally if there speaker
+        is within 1 meter of the microphone.
+      MIDFIELD: The speaker if within 3 meters of the microphone.
+      FARFIELD: The speaker is more than 3 meters away from the microphone.
+    """
+    MICROPHONE_DISTANCE_UNSPECIFIED = 0
+    NEARFIELD = 1
+    MIDFIELD = 2
+    FARFIELD = 3
+
+  class OriginalMediaTypeValueValuesEnum(_messages.Enum):
+    r"""The original media the speech was recorded on.
+
+    Values:
+      ORIGINAL_MEDIA_TYPE_UNSPECIFIED: Unknown original media type.
+      AUDIO: The speech data is an audio recording.
+      VIDEO: The speech data originally recorded on a video.
+    """
+    ORIGINAL_MEDIA_TYPE_UNSPECIFIED = 0
+    AUDIO = 1
+    VIDEO = 2
+
+  class RecordingDeviceTypeValueValuesEnum(_messages.Enum):
+    r"""The type of device the speech was recorded with.
+
+    Values:
+      RECORDING_DEVICE_TYPE_UNSPECIFIED: The recording device is unknown.
+      SMARTPHONE: Speech was recorded on a smartphone.
+      PC: Speech was recorded using a personal computer or tablet.
+      PHONE_LINE: Speech was recorded over a phone line.
+      VEHICLE: Speech was recorded in a vehicle.
+      OTHER_OUTDOOR_DEVICE: Speech was recorded outdoors.
+      OTHER_INDOOR_DEVICE: Speech was recorded indoors.
+    """
+    RECORDING_DEVICE_TYPE_UNSPECIFIED = 0
+    SMARTPHONE = 1
+    PC = 2
+    PHONE_LINE = 3
+    VEHICLE = 4
+    OTHER_OUTDOOR_DEVICE = 5
+    OTHER_INDOOR_DEVICE = 6
+
+  audioTopic = _messages.StringField(1)
+  industryNaicsCodeOfAudio = _messages.IntegerField(2, variant=_messages.Variant.UINT32)
+  interactionType = _messages.EnumField('InteractionTypeValueValuesEnum', 3)
+  microphoneDistance = _messages.EnumField('MicrophoneDistanceValueValuesEnum', 4)
+  obfuscatedId = _messages.IntegerField(5)
+  originalMediaType = _messages.EnumField('OriginalMediaTypeValueValuesEnum', 6)
+  originalMimeType = _messages.StringField(7)
+  recordingDeviceName = _messages.StringField(8)
+  recordingDeviceType = _messages.EnumField('RecordingDeviceTypeValueValuesEnum', 9)
 
 
 class RecognizeRequest(_messages.Message):
@@ -406,6 +556,42 @@ class SpeechOperationsListRequest(_messages.Message):
   pageToken = _messages.StringField(4)
 
 
+class SpeechProjectsLocationsOperationsGetRequest(_messages.Message):
+  r"""A SpeechProjectsLocationsOperationsGetRequest object.
+
+  Fields:
+    name: The name of the operation resource.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
+class SpeechProjectsLocationsOperationsListRequest(_messages.Message):
+  r"""A SpeechProjectsLocationsOperationsListRequest object.
+
+  Fields:
+    filter: The standard list filter.
+    name: The name of the operation's parent resource.
+    pageSize: The standard list page size.
+    pageToken: The standard list page token.
+  """
+
+  filter = _messages.StringField(1)
+  name = _messages.StringField(2, required=True)
+  pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(4)
+
+
+class SpeechProjectsOperationsManualRecognitionTasksGetRequest(_messages.Message):
+  r"""A SpeechProjectsOperationsManualRecognitionTasksGetRequest object.
+
+  Fields:
+    name: The name of the operation resource.
+  """
+
+  name = _messages.StringField(1, required=True)
+
+
 class SpeechRecognitionAlternative(_messages.Message):
   r"""Alternative hypotheses (a.k.a. n-best list).
 
@@ -437,9 +623,14 @@ class SpeechRecognitionResult(_messages.Message):
       (up to the maximum specified in `max_alternatives`). These alternatives
       are ordered in terms of accuracy, with the top (first) alternative being
       the most probable, as ranked by the recognizer.
+    channelTag: For multi-channel audio, this is the channel number
+      corresponding to the recognized result for the audio from that channel.
+      For audio_channel_count = N, its output values can range from '1' to
+      'N'.
   """
 
   alternatives = _messages.MessageField('SpeechRecognitionAlternative', 1, repeated=True)
+  channelTag = _messages.IntegerField(2, variant=_messages.Variant.INT32)
 
 
 class StandardQueryParameters(_messages.Message):

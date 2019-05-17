@@ -1,0 +1,23 @@
+title: Create and delete a membership
+release_tracks: [ALPHA]
+actions:
+
+- execute_command:
+    command: container memberships list
+    events:
+    - api_call:
+        expect_request:
+          uri: https://gkehub.googleapis.com/v1beta1/projects/cloud-sdk-integration-testing/locations/global/memberships?alt=json
+          method: GET
+          body:
+        return_response:
+          headers:
+            cache-control: private
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            status: RUNNING
+    - expect_stderr:
+        matches: .*Listed 0 items.
+    - expect_exit:
+        code: 0

@@ -1,0 +1,92 @@
+
+.TH "GCLOUD_ALPHA_LOGGING" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha logging \- manage Stackdriver Logging
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha logging\fR \fIGROUP\fR | \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Manage Stackdriver Logging.
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBbuckets\fR
+\fB(ALPHA)\fR Manage Stackdriver Logging buckets.
+
+.TP 2m
+\fBlogs\fR
+\fB(ALPHA)\fR Manages your project's logs.
+
+.TP 2m
+\fBmetrics\fR
+\fB(ALPHA)\fR Manages logs\-based metrics.
+
+.TP 2m
+\fBresource\-descriptors\fR
+\fB(ALPHA)\fR Get information about resource descriptors.
+
+.TP 2m
+\fBsinks\fR
+\fB(ALPHA)\fR Manages sinks used to export logs.
+
+
+.RE
+.sp
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBread\fR
+\fB(ALPHA)\fR Read log entries.
+
+.TP 2m
+\fBwrite\fR
+\fB(ALPHA)\fR Write a log entry.
+
+
+.RE
+.sp
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
+
+.RS 2m
+$ gcloud logging
+$ gcloud beta logging
+.RE
+

@@ -19,7 +19,9 @@ SYNOPSIS
         [--min-cpu-platform=PLATFORM] [--network=NETWORK]
         [--network-interface=[PROPERTY=VALUE,...]]
         [--network-tier=NETWORK_TIER] [--preemptible] [--region=REGION]
-        [--no-restart-on-failure] [--source-instance=SOURCE_INSTANCE]
+        [--no-restart-on-failure] [--shielded-integrity-monitoring]
+        [--shielded-secure-boot] [--shielded-vtpm]
+        [--source-instance=SOURCE_INSTANCE]
         [--source-instance-zone=SOURCE_INSTANCE_ZONE] [--subnet=SUBNET]
         [--tags=TAG,[TAG,...]] [--address=ADDRESS | --no-address]
         [--boot-disk-kms-key=BOOT_DISK_KMS_KEY
@@ -61,8 +63,8 @@ FLAGS
             types.
 
          count
-            The number of pieces of the accelerator to attach to the instances.
-            The default value is 1.
+            Number of accelerators to attach to each instance. The default
+            value is 1.
 
      --boot-disk-auto-delete
         Automatically delete boot disks when their instances are deleted.
@@ -248,7 +250,7 @@ FLAGS
             If yes, this persistent disk will be automatically deleted when the
             instance is deleted. However, if the disk is later detached from
             the instance, this option won't apply. The default value for this
-            is no.
+            is yes.
 
      --labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to add.
@@ -263,8 +265,8 @@ FLAGS
 
          device-name
             Optional. A name that indicates the disk name the guest operating
-            system will see. If omitted, a device name of the form local-ssd-N
-            will be used.
+            system will see. Can only be specified if interface is SCSI. If
+            omitted, a device name of the form local-ssd-N will be used.
 
          interface
             Optional. The kind of disk interface exposed to the VM for this
@@ -339,7 +341,8 @@ FLAGS
      --network-interface=[PROPERTY=VALUE,...]
         Adds a network interface to the instance. Mutually exclusive with any
         of these flags: --address, --network, --network-tier, --subnet,
-        --private-network-ip.
+        --private-network-ip. This flag can be repeated to specify multiple
+        network interfaces.
 
         The following keys are allowed:
          address
@@ -419,6 +422,21 @@ FLAGS
         The instances will be restarted if they are terminated by Compute
         Engine. This does not affect terminations performed by the user.
         Enabled by default, use --no-restart-on-failure to disable.
+
+     --shielded-integrity-monitoring
+        Enables monitoring and attestation of the boot integrity of the
+        instance. The attestation is performed against the integrity policy
+        baseline. This baseline is initially derived from the implicitly
+        trusted boot image when the instance is created. This baseline can be
+        updated by using --shielded-vm-learn-integrity-policy.
+
+     --shielded-secure-boot
+        The instance will boot with secure boot enabled.
+
+     --shielded-vtpm
+        The instance will boot with the TPM (Trusted Platform Module) enabled.
+        A TPM is a hardware module that can be used for different security
+        operations such as remote attestation, encryption and sealing of keys.
 
      --source-instance=SOURCE_INSTANCE
         The name of the source instance that the instance template will be
@@ -630,8 +648,9 @@ FLAGS
           Create instance without service account
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

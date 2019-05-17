@@ -2,11 +2,13 @@ NAME
     gcloud - manage Google Cloud Platform resources and developer workflow
 
 SYNOPSIS
-    gcloud GROUP | COMMAND [--account=ACCOUNT] [--configuration=CONFIGURATION]
+    gcloud GROUP | COMMAND [--account=ACCOUNT]
+        [--billing-project=BILLING_PROJECT] [--configuration=CONFIGURATION]
         [--flags-file=YAML_FILE] [--flatten=[KEY,...]] [--format=FORMAT]
         [--help] [--project=PROJECT_ID] [--quiet, -q]
         [--verbosity=VERBOSITY; default="warning"] [--version, -v] [-h]
-        [--log-http] [--trace-token=TRACE_TOKEN] [--no-user-output-enabled]
+        [--impersonate-service-account=SERVICE_ACCOUNT_EMAIL] [--log-http]
+        [--trace-token=TRACE_TOKEN] [--no-user-output-enabled]
 
 DESCRIPTION
     The gcloud CLI manages authentication, local configuration, developer
@@ -16,6 +18,15 @@ GLOBAL FLAGS
      --account=ACCOUNT
         Google Cloud Platform user account to use for invocation. Overrides the
         default core/account property value for this command invocation.
+
+     --billing-project=BILLING_PROJECT
+        The Google Cloud Platform project that will be charged quota for
+        operations performed in gcloud. If you need to operate on one project,
+        but need quota against a different project, you can use this flag to
+        specify the billing project. If both billing/quota_project and
+        --billing-project are specified, --billing-project takes precedence.
+        Run $ gcloud config set --help to see more information about
+        billing/quota_project.
 
      --configuration=CONFIGURATION
         The configuration to use for this command invocation. For more
@@ -80,6 +91,18 @@ GLOBAL FLAGS
         Print a summary help and exit.
 
 OTHER FLAGS
+     --impersonate-service-account=SERVICE_ACCOUNT_EMAIL
+        For this gcloud invocation, all API requests will be made as the given
+        service account instead of the currently selected account. This is done
+        without needing to create, download, and activate a key for the
+        account. In order to perform operations as the service account, your
+        currently selected account must have an IAM role that includes the
+        iam.serviceAccounts.getAccessToken permission for the service account.
+        The roles/iam.serviceAccountTokenCreator role has this permission or
+        you may create a custom role. Overrides the default
+        auth/impersonate_service_account property value for this command
+        invocation.
+
      --log-http
         Log all HTTP server requests and responses to stderr. Overrides the
         default core/log_http property value for this command invocation.
@@ -97,11 +120,20 @@ OTHER FLAGS
 GROUPS
     GROUP is one of the following:
 
+     access-context-manager
+        Manage Access Context Manager resources.
+
+     ai-platform
+        Manage AI Platform jobs and models.
+
      alpha
         (ALPHA) Alpha versions of gcloud commands.
 
      app
         Manage your App Engine deployments.
+
+     asset
+        Manage the Cloud Asset Inventory.
 
      auth
         Manage oauth2 credentials for the Google Cloud SDK.
@@ -154,6 +186,9 @@ GROUPS
      endpoints
         Create, enable and manage API services.
 
+     filestore
+        Create and manipulate Cloud Filestore resources.
+
      firebase
         Work with Google Firebase.
 
@@ -176,7 +211,7 @@ GROUPS
         Use Google Cloud machine learning capabilities.
 
      ml-engine
-        Manage Cloud ML Engine jobs and models.
+        Manage AI Platform jobs and models.
 
      organizations
         Create and manage Google Cloud Platform Organizations.
@@ -185,10 +220,13 @@ GROUPS
         Create and manage project access policies.
 
      pubsub
-        Manage Cloud Pub/Sub topics and subscriptions.
+        Manage Cloud Pub/Sub topics, subscriptions, and snapshots.
 
      redis
         Manage Cloud Memorystore Redis resources.
+
+     resource-manager
+        Manage Cloud Resources.
 
      services
         List, enable and disable APIs and services.
@@ -201,6 +239,9 @@ GROUPS
 
      sql
         Create and manage Google Cloud SQL databases.
+
+     tasks
+        Manage Cloud Tasks queues and tasks.
 
      topic
         gcloud supplementary help.

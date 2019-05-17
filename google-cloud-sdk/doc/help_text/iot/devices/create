@@ -3,7 +3,8 @@ NAME
 
 SYNOPSIS
     gcloud iot devices create (DEVICE : --region=REGION --registry=REGISTRY)
-        [--blocked] [--log-level=LOG_LEVEL] [--metadata=[KEY=VALUE,...]]
+        [--auth-method=AUTH_METHOD] [--blocked] [--device-type=DEVICE_TYPE]
+        [--log-level=LOG_LEVEL] [--metadata=[KEY=VALUE,...]]
         [--metadata-from-file=[KEY=PATH,...]]
         [--public-key=[path=PATH,
           type=TYPE,[expiration-time=EXPIRATION-TIME],...]]
@@ -33,6 +34,22 @@ POSITIONAL ARGUMENTS
           The name of the Cloud IoT registry.
 
 FLAGS
+     --auth-method=AUTH_METHOD
+        The authorization/authentication method used by devices in relation to
+        the gateway. This property is set only on gateways. If left
+        unspecified, devices will not be able to access the gateway.
+        AUTH_METHOD must be one of:
+
+         association-and-device-auth-token
+            The device is authenticated through both device credentials and
+            gateway association.
+         association-only
+            The device is authenticated through the gateway association only.
+            Device credentials are ignored if provided.
+         device-auth-token-only
+            The device is authenticated through its own credentials. Gateway
+            association is not checked.
+
      --blocked
         If blocked, connections from this device will fail.
 
@@ -40,6 +57,10 @@ FLAGS
         example, the sensor is generating bad data and needs maintenance.
 
         Connections to device is not blocked by default.
+
+     --device-type=DEVICE_TYPE
+        Whether this device is a gateway. If unspecified, non-gateway is
+        assumed. DEVICE_TYPE must be one of: gateway, non-gateway.
 
      --log-level=LOG_LEVEL
         The default logging verbosity for activity from devices in this
@@ -115,8 +136,9 @@ FLAGS
     3).
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

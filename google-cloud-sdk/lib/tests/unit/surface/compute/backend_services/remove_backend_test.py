@@ -403,13 +403,6 @@ class RemoveBackendTest(test_base.BaseTest):
               project='my-project'))],
     )
 
-
-class RemoveBackendBetaTest(RemoveBackendTest):
-
-  def SetUp(self):
-    self.SelectApi('beta')
-    self.track = calliope_base.ReleaseTrack.BETA
-
   def testWithExistingBackendNetworkEndpointGroup(self):
     messages = self.messages
     self.make_requests.side_effect = [
@@ -461,6 +454,13 @@ class RemoveBackendBetaTest(RemoveBackendTest):
                   timeoutSec=120),
               project='my-project'))],
     )
+
+
+class RemoveBackendBetaTest(RemoveBackendTest):
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class RemoveBackendAlphaTest(RemoveBackendBetaTest):

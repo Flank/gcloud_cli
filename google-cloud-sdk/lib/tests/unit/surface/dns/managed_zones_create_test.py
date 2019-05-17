@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
+from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.surface.dns import base
 from tests.lib.surface.dns import util
@@ -122,8 +123,8 @@ Created [https://www.googleapis.com/dns/{0}/projects/{1}/managedZones/mz].
 """.format(self.api_version, self.Project()))
 
   def testCreateDnssec(self):
-    test_zone = util.GetManagedZoneBeforeCreation(self.messages,
-                                                  dns_sec_config=True)
+    test_zone = util.GetManagedZoneBeforeCreation(
+        self.messages, dns_sec_config=True)
     zone_create_request = self.messages.DnsManagedZonesCreateRequest(
         managedZone=test_zone,
         project=self.Project())
@@ -144,8 +145,8 @@ Created [https://www.googleapis.com/dns/{0}/projects/{1}/managedZones/mz].
 """.format(self.api_version, self.Project()))
 
   def testCreateWithKeys(self):
-    test_zone = util.GetManagedZoneBeforeCreation(self.messages,
-                                                  dns_sec_config=True)
+    test_zone = util.GetManagedZoneBeforeCreation(
+        self.messages, dns_sec_config=True)
     spec_class = self.messages.DnsKeySpec
     key_specs = [
         spec_class(
@@ -179,19 +180,13 @@ Created [https://www.googleapis.com/dns/{0}/projects/{1}/managedZones/mz].
 Created [https://www.googleapis.com/dns/{0}/projects/{1}/managedZones/mz].
 """.format(self.api_version, self.Project()))
 
-
-class BetaManagedZonesCreateTest(ManagedZonesCreateTest):
-
-  def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.api_version = 'v1beta2'
-
   def testCreateWithPrivateVisibility(self):
-    visibility_settings = util_beta.GetDnsVisibilityDict(
+    visibility_settings = util.GetDnsVisibilityDict(
         self.api_version,
         visibility='private',
-        network_urls=['1.0.1.1', '1.2.1.1'])
-    test_zone = util_beta.GetManagedZoneBeforeCreation(
+        network_urls=['1.0.1.1', '1.2.1.1'],
+        messages=self.messages)
+    test_zone = util.GetManagedZoneBeforeCreation(
         self.messages,
         dns_sec_config=False,
         visibility_dict=visibility_settings)
@@ -211,9 +206,9 @@ Created [https://www.googleapis.com/dns/{0}/projects/{1}/managedZones/mz].
 """.format(self.api_version, self.Project()))
 
   def testCreateWithPrivateVisibilityAndMissingNetworks(self):
-    visibility_settings = util_beta.GetDnsVisibilityDict(
-        self.api_version, visibility='private')
-    test_zone = util_beta.GetManagedZoneBeforeCreation(
+    visibility_settings = util.GetDnsVisibilityDict(
+        self.api_version, visibility='private', messages=self.messages)
+    test_zone = util.GetManagedZoneBeforeCreation(
         self.messages,
         dns_sec_config=False, visibility_dict=visibility_settings)
     with self.assertRaises(exceptions.RequiredArgumentException):
@@ -223,11 +218,12 @@ Created [https://www.googleapis.com/dns/{0}/projects/{1}/managedZones/mz].
               test_zone.name, test_zone.dnsName, test_zone.description))
 
   def testCreateWithPrivateVisibilityErrors(self):
-    visibility_settings = util_beta.GetDnsVisibilityDict(
+    visibility_settings = util.GetDnsVisibilityDict(
         self.api_version,
         visibility='private',
-        network_urls=[])
-    test_zone = util_beta.GetManagedZoneBeforeCreation(
+        network_urls=[],
+        messages=self.messages)
+    test_zone = util.GetManagedZoneBeforeCreation(
         self.messages,
         dns_sec_config=False,
         visibility_dict=visibility_settings)
@@ -244,8 +240,9 @@ Created [https://www.googleapis.com/dns/{0}/projects/{1}/managedZones/mz].
                    test_zone.name, test_zone.dnsName, test_zone.description))
 
   def testCreateWithPublicVisibility(self):
-    visibility_settings = util_beta.GetDnsVisibilityDict(self.api_version)
-    test_zone = util_beta.GetManagedZoneBeforeCreation(
+    visibility_settings = util.GetDnsVisibilityDict(self.api_version,
+                                                    messages=self.messages)
+    test_zone = util.GetManagedZoneBeforeCreation(
         self.messages,
         dns_sec_config=False, visibility_dict=visibility_settings)
     zone_create_request = self.messages.DnsManagedZonesCreateRequest(
@@ -260,6 +257,13 @@ Created [https://www.googleapis.com/dns/{0}/projects/{1}/managedZones/mz].
     self.AssertErrContains("""\
 Created [https://www.googleapis.com/dns/{0}/projects/{1}/managedZones/mz].
 """.format(self.api_version, self.Project()))
+
+
+class BetaManagedZonesCreateTest(ManagedZonesCreateTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'v1beta2'
 
   def testCreateWithForwardingTargetsAndPrivateVisibility(self):
     forwarding_servers = ['1.0.1.1', '1.2.1.1']
@@ -304,6 +308,47 @@ Created [https://www.googleapis.com/dns/{0}/projects/{1}/managedZones/mz].
                '--format=disable --visibility public '
                '--forwarding-targets 1.0.0.1 --networks 1.0.0.1'.format(
                    test_zone.name, test_zone.dnsName, test_zone.description))
+
+  def testCreateWithDnsPeeringIncompleteTargetProjectSimpler(self):
+    test_zone = util_beta.GetManagedZoneBeforeCreation(
+        self.messages,
+        dns_sec_config=False,
+        visibility_dict=None)
+    # set target-project, no target-network.
+    with self.assertRaisesRegex(
+        cli_test_base.MockArgumentError,
+        'argument --target-network: Must be specified.'):
+      self.Run('dns managed-zones create {0} --dns-name {1} --description {2} '
+               '--target-project tp'.format(
+                   test_zone.name, test_zone.dnsName, test_zone.description))
+
+  def testCreateWithDnsPeeringIncompleteTargetNetworkSimpler(self):
+    test_zone = util_beta.GetManagedZoneBeforeCreation(
+        self.messages,
+        dns_sec_config=False,
+        visibility_dict=None)
+    # set target-network, no target-project.
+    with self.assertRaisesRegex(
+        cli_test_base.MockArgumentError,
+        'argument --target-project: Must be specified.'):
+      self.Run('dns managed-zones create {0} --dns-name {1} --description {2} '
+               '--target-network tn'.format(
+                   test_zone.name, test_zone.dnsName, test_zone.description))
+
+  def testCreateWithDnsPeering(self):
+    peering_config = util_beta.PeeringConfig('tp', 'tn')
+    test_zone = util_beta.GetManagedZoneBeforeCreation(
+        self.messages,
+        peering_config=peering_config
+        )
+
+    zone_create_request = self.messages.DnsManagedZonesCreateRequest(
+        managedZone=test_zone, project=self.Project())
+    self.client.managedZones.Create.Expect(zone_create_request, test_zone)
+
+    self.Run('dns managed-zones create {0} --dns-name {1} --description {2} '
+             '--target-network tn --target-project tp'.format(
+                 test_zone.name, test_zone.dnsName, test_zone.description))
 
 
 if __name__ == '__main__':

@@ -44,7 +44,6 @@ class Create(base.CreateCommand):
 
   @classmethod
   def Args(cls, parser):
-
     cls.INTERCONNECT_ARG = (
         interconnect_flags.InterconnectArgumentForOtherResource(
             'The interconnect for the interconnect attachment'))
@@ -60,6 +59,8 @@ class Create(base.CreateCommand):
     attachment_flags.AddAdminEnabled(parser, default_behavior=True)
     attachment_flags.AddVlan(parser)
     attachment_flags.AddCandidateSubnets(parser)
+    attachment_flags.AddBandwidth(
+        parser, required=False, track=cls._release_track)
 
   def Run(self, args):
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
@@ -94,7 +95,8 @@ class Create(base.CreateCommand):
         router=router_ref,
         vlan_tag_802_1q=args.vlan,
         admin_enabled=args.admin_enabled,
-        candidate_subnets=args.candidate_subnets)
+        candidate_subnets=args.candidate_subnets,
+        bandwidth=getattr(args, 'bandwidth', None))
 
   def Epilog(self, resources_were_displayed):
     message = ('You must configure your Google Cloud Router with an interface '

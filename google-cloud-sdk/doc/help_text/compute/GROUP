@@ -18,8 +18,9 @@ DESCRIPTION
     here: https://cloud.google.com/compute/docs/
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -79,6 +80,9 @@ GROUPS
 
      machine-types
         Read Google Compute Engine virtual machine types.
+
+     network-endpoint-groups
+        Read and manipulate Google Compute Engine network endpoint groups.
 
      networks
         List, create, and delete Google Compute Engine networks.
@@ -140,7 +144,7 @@ GROUPS
         List, create, and delete target TCP proxies.
 
      target-vpn-gateways
-        Read and manipulate Google Compute Engine VPN Gateways.
+        read and manipulate Google Compute Engine Classic VPN Gateways.
 
      tpus
         List, create, and delete Cloud TPUs.

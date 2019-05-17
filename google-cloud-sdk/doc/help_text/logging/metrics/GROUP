@@ -8,8 +8,9 @@ DESCRIPTION
     Manages logs-based metrics.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -32,7 +33,8 @@ COMMANDS
         Updates the definition of a logs-based metric.
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha logging metrics
         $ gcloud beta logging metrics
 

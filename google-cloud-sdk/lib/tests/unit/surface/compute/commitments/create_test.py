@@ -19,46 +19,22 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
-from googlecloudsdk.calliope import exceptions
 from tests.lib import cli_test_base
 from tests.lib import parameterized
 from tests.lib import test_case
-from tests.lib.surface.compute import test_base
+from tests.lib.surface.compute import commitments_test_base as test_base
 
 
-class CommitmentsCreateTest(test_base.BaseTest, test_case.WithOutputCapture):
+class CommitmentsCreateTestGA(test_base.TestBase):
 
-  def SetUp(self):
+  def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.GA
-    self.SelectApi('v1')
-
-  def MakeCommitment(self):
-    return self.messages.Commitment(
-        name='pledge',
-        plan=self.messages.Commitment.PlanValueValuesEnum.TWELVE_MONTH,
-        resources=[
-            self.messages.ResourceCommitment(
-                amount=500,
-                type=(self.messages.ResourceCommitment.
-                      TypeValueValuesEnum.VCPU),
-            ),
-            self.messages.ResourceCommitment(
-                amount=12*1024,
-                type=(self.messages.ResourceCommitment.
-                      TypeValueValuesEnum.MEMORY),
-            ),
-        ],
-    )
 
   def testSimpleInsert(self):
-    self.make_requests.side_effect = iter([
-        []
-    ])
-
     self.Run("""
         compute commitments create pledge
         --plan 12-month
-        --resources VCPU=500,MEMORY=12
+        --resources vcpu=500,memory=12
         --region erech-stone
         """)
 
@@ -90,19 +66,15 @@ class CommitmentsCreateTest(test_base.BaseTest, test_case.WithOutputCapture):
       self.Run("""
           compute commitments create pledge
           --plan 12-month
-          --resources VCPU=500,MEMORY=12
+          --resources vcpu=500,memory=12
           --region erech-stone
           """)
 
-  def testSimpleInsertwithUnit(self):
-    self.make_requests.side_effect = iter([
-        []
-    ])
-
+  def testSimpleInsertWithUnit(self):
     self.Run("""
         compute commitments create pledge
         --plan 12-month
-        --resources VCPU=500,MEMORY=12288MB
+        --resources vcpu=500,memory=12288MB
         --region erech-stone
         """)
 
@@ -133,7 +105,7 @@ class CommitmentsCreateTest(test_base.BaseTest, test_case.WithOutputCapture):
     self.Run("""
         compute commitments create pledge
         --plan 12-month
-        --resources VCPU=500,MEMORY=12
+        --resources vcpu=500,memory=12
         """)
 
     self.CheckRequests(
@@ -148,88 +120,156 @@ class CommitmentsCreateTest(test_base.BaseTest, test_case.WithOutputCapture):
          )],
     )
 
-  def testRequireVcpu(self):
-    with self.assertRaises(exceptions.InvalidArgumentException):
-      self.Run("""
-        compute commitments create pledge
-        --plan 12-month
-        --resources MEMORY=12
-        --region erech-stone
-        """)
-
-  def testRequireMemory(self):
-    with self.assertRaises(exceptions.InvalidArgumentException):
-      self.Run("""
-        compute commitments create pledge
-        --plan 12-month
-        --resources VCPU=12
-        --region erech-stone
-        """)
-
   def testValidatePlan(self):
     with self.assertRaises(cli_test_base.MockArgumentError):
       self.Run("""
         compute commitments create pledge
         --plan 3.1536e25as
-        --resources VCPU=12,MEMORY=3
+        --resources vcpu=12,memory=3
         --region erech-stone
         """)
 
 
-class CommitmentsCreateAlphaTest(CommitmentsCreateTest,
+class CommitmentsCreateTestBeta(CommitmentsCreateTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def testCreateWithLocalSsd(self):
+    resources = [
+        self.MakeVCPUResourceCommitment(),
+        self.MakeMemoryResourceCommitment(),
+        self.MakeLocalSsdResourceCommitment()
+    ]
+    self.Run("""
+        compute commitments create pledge
+        --plan 12-month
+        --resources vcpu=500,memory=12,local-ssd=1
+        --region erech-stone
+        """)
+
+    self.CheckRequests(
+        [(self.compute.regionCommitments, 'Insert',
+          self.messages.ComputeRegionCommitmentsInsertRequest(
+              commitment=self.MakeCommitment(resource_commitments=resources),
+              project='my-project',
+              region='erech-stone',
+          ))])
+
+  def testCreateWithAllResources(self):
+    resources = [
+        self.MakeVCPUResourceCommitment(),
+        self.MakeMemoryResourceCommitment(),
+        self.MakeLocalSsdResourceCommitment(),
+        self.MakeAcceleratorResourceCommitment(),
+    ]
+    self.Run("""
+        compute commitments create pledge
+        --plan 12-month
+        --resources vcpu=500,memory=12,local-ssd=1
+        --resources-accelerator count=3,type=ace-type
+        --region erech-stone
+        """)
+
+    self.CheckRequests(
+        [(self.compute.regionCommitments, 'Insert',
+          self.messages.ComputeRegionCommitmentsInsertRequest(
+              commitment=self.MakeCommitment(resource_commitments=resources),
+              project='my-project',
+              region='erech-stone',
+          ))])
+
+  def testCreateWithReservation(self):
+    commitment = self.MakeCommitment(
+        reservations=[self.MakeReservation('my-reservation')])
+
+    self.Run("""
+        compute commitments create pledge
+        --plan 12-month
+        --resources vcpu=500,memory=12
+        --region commitment-region
+        --reservation my-reservation
+        --reservation-zone=fake-zone
+        --require-specific-reservation
+        --vm-count 1
+        --min-cpu-platform="Intel Haswell"
+        --machine-type=n1-standard-1
+        --accelerator count=1,type=nvidia-tesla-k80
+        --local-ssd interface=scsi,size=375
+        --local-ssd interface=nvme,size=375
+        """)
+
+    self.CheckRequests(
+        [(self.compute.regionCommitments,
+          'Insert',
+          self.messages.ComputeRegionCommitmentsInsertRequest(
+              commitment=commitment,
+              project='my-project',
+              region='commitment-region',
+          ))],)
+
+  def testCreatWithReservationsFromFile(self):
+    commitment = self.MakeCommitment(reservations=[
+        self.MakeReservation('my-reservation'),
+        self.MakeReservation('another-reservation'),
+    ])
+    reservations_file = self.Touch(
+        self.temp_path,
+        'reservations.yaml',
+        contents="""\
+-  reservation: my-reservation
+   reservation_zone: fake-zone
+   require_specific_reservation: true
+   vm_count: 1
+   machine_type: n1-standard-1
+   min_cpu_platform: "Intel Haswell"
+   accelerator:
+   - count: 1
+     type: nvidia-tesla-k80
+   local_ssd:
+   - interface: scsi
+     size: 375
+   - interface: nvme
+     size: 375
+-  reservation: another-reservation
+   reservation_zone: fake-zone
+   require_specific_reservation: true
+   vm_count: 1
+   machine_type: n1-standard-1
+   min_cpu_platform: "Intel Haswell"
+   accelerator:
+   - count: 1
+     type: nvidia-tesla-k80
+   local_ssd:
+   - interface: scsi
+     size: 375
+   - interface: nvme
+     size: 375
+""")
+
+    self.Run("""
+        compute commitments create pledge
+        --plan 12-month
+        --resources vcpu=500,memory=12
+        --region commitment-region
+        --reservations-from-file {}
+        """.format(reservations_file))
+
+    self.CheckRequests(
+        [(self.compute.regionCommitments,
+          'Insert',
+          self.messages.ComputeRegionCommitmentsInsertRequest(
+              commitment=commitment,
+              project='my-project',
+              region='commitment-region',
+          ))],)
+
+
+class CommitmentsCreateAlphaTest(CommitmentsCreateTestBeta,
                                  parameterized.TestCase):
 
-  def SetUp(self):
+  def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
-    self.SelectApi('alpha')
-
-  def MakeCommitment(self, allocations=None):
-    return self.messages.Commitment(
-        allocations=allocations or [],
-        name='pledge',
-        plan=self.messages.Commitment.PlanValueValuesEnum.TWELVE_MONTH,
-        resources=[
-            self.messages.ResourceCommitment(
-                amount=500,
-                type=(self.messages.ResourceCommitment.
-                      TypeValueValuesEnum.VCPU),
-            ),
-            self.messages.ResourceCommitment(
-                amount=12*1024,
-                type=(self.messages.ResourceCommitment.
-                      TypeValueValuesEnum.MEMORY),
-            ),
-        ],
-        type=self.messages.Commitment.TypeValueValuesEnum.GENERAL_PURPOSE
-    )
-
-  def _MakeAllocation(self, name):
-    ssd_msgs = (
-        self.
-        messages.
-        AllocationSpecificSKUAllocationAllocatedInstancePropertiesAllocatedDisk)
-    return self.messages.Allocation(
-        name=name,
-        zone='fake-zone',
-        specificAllocationRequired=True,
-        specificAllocation=self.messages.AllocationSpecificSKUAllocation(
-            count=1,
-            instanceProperties=self.messages
-            .AllocationSpecificSKUAllocationAllocatedInstanceProperties(
-                machineType='n1-standard-1',
-                minCpuPlatform='Intel Haswell',
-                guestAccelerators=[
-                    self.messages.AcceleratorConfig(
-                        acceleratorCount=1, acceleratorType='nvidia-tesla-k80'),
-                ],
-                localSsds=[
-                    ssd_msgs(
-                        diskSizeGb=375,
-                        interface=ssd_msgs.InterfaceValueValuesEnum.SCSI),
-                    ssd_msgs(
-                        diskSizeGb=375,
-                        interface=ssd_msgs.InterfaceValueValuesEnum.NVME),
-                ])))
 
   @parameterized.named_parameters(
       ('DefaultSpecified', '--type general-purpose', 'GENERAL_PURPOSE'),
@@ -237,14 +277,10 @@ class CommitmentsCreateAlphaTest(CommitmentsCreateTest,
       ('MemoryOptimizedSpecified', '--type memory-optimized',
        'MEMORY_OPTIMIZED'))
   def testCreateWithTypeSpecified(self, flag_string, expected_type):
-    self.make_requests.side_effect = iter([
-        []
-    ])
-
     self.Run("""
         compute commitments create pledge
         --plan 12-month
-        --resources VCPU=500,MEMORY=12
+        --resources vcpu=500,memory=12
         --region erech-stone
         {}
         """.format(flag_string))
@@ -262,100 +298,6 @@ class CommitmentsCreateAlphaTest(CommitmentsCreateTest,
          )],
     )
 
-  def testCreateWithAllocation(self):
-    self.make_requests.side_effect = iter([
-        []
-    ])
-    commitment = self.MakeCommitment(
-        allocations=[self._MakeAllocation('my-allocation')])
-
-    self.Run("""
-        compute commitments create pledge
-        --plan 12-month
-        --resources VCPU=500,MEMORY=12
-        --region commitment-region
-        --allocation my-allocation
-        --allocation-zone=fake-zone
-        --require-specific-allocation
-        --vm-count 1
-        --min-cpu-platform="Intel Haswell"
-        --machine-type=n1-standard-1
-        --accelerator count=1,type=nvidia-tesla-k80
-        --local-ssd interface=scsi,size=375
-        --local-ssd interface=nvme,size=375
-        """)
-
-    self.CheckRequests(
-        [(self.compute.regionCommitments,
-          'Insert',
-          self.messages.ComputeRegionCommitmentsInsertRequest(
-              commitment=commitment,
-              project='my-project',
-              region='commitment-region',
-          )
-         )],
-    )
-
-  def testCreatWithAllocationsFromFile(self):
-    self.make_requests.side_effect = iter([
-        []
-    ])
-    commitment = self.MakeCommitment(
-        allocations=[
-            self._MakeAllocation('my-allocation'),
-            self._MakeAllocation('another-allocation')])
-    allocation_file = self.Touch(
-        self.temp_path,
-        'allocations.yaml',
-        contents="""\
--  allocation: my-allocation
-   allocation_zone: fake-zone
-   require_specific_allocation: true
-   vm_count: 1
-   machine_type: n1-standard-1
-   min_cpu_platform: "Intel Haswell"
-   accelerator:
-   - count: 1
-     type: nvidia-tesla-k80
-   local_ssd:
-   - interface: scsi
-     size: 375
-   - interface: nvme
-     size: 375
--  allocation: another-allocation
-   allocation_zone: fake-zone
-   require_specific_allocation: true
-   vm_count: 1
-   machine_type: n1-standard-1
-   min_cpu_platform: "Intel Haswell"
-   accelerator:
-   - count: 1
-     type: nvidia-tesla-k80
-   local_ssd:
-   - interface: scsi
-     size: 375
-   - interface: nvme
-     size: 375
-""")
-
-    self.Run("""
-        compute commitments create pledge
-        --plan 12-month
-        --resources VCPU=500,MEMORY=12
-        --region commitment-region
-        --allocations-from-file {}
-        """.format(allocation_file))
-
-    self.CheckRequests(
-        [(self.compute.regionCommitments,
-          'Insert',
-          self.messages.ComputeRegionCommitmentsInsertRequest(
-              commitment=commitment,
-              project='my-project',
-              region='commitment-region',
-          )
-         )],
-    )
 
 if __name__ == '__main__':
   test_case.main()

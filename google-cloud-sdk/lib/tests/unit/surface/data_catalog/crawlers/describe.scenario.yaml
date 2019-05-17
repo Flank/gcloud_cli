@@ -1,0 +1,40 @@
+title: Data Catalog describe crawler scenario test.
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: data-catalog crawlers describe crawler1
+  - stdout: |
+      config:
+        adHocRun: {}
+        organizationScope: {}
+      name: projects/fake-project/crawlers/crawler1
+# This summary is generated automatically on update and should not be edited.
+actions:
+- execute_command:
+    command: data-catalog crawlers describe crawler1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://datacatalog.googleapis.com/v1alpha3/projects/fake-project/crawlers/crawler1?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/crawlers/crawler1",
+              "config": {
+                "organizationScope": {},
+                "adHocRun": {}
+              }
+            }
+    - expect_stdout: |
+        config:
+          adHocRun: {}
+          organizationScope: {}
+        name: projects/fake-project/crawlers/crawler1
+    - expect_exit:
+        code: 0

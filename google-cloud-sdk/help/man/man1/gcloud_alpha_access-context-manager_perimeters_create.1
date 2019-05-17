@@ -1,0 +1,146 @@
+
+.TH "GCLOUD_ALPHA_ACCESS\-CONTEXT\-MANAGER_PERIMETERS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha access\-context\-manager perimeters create \- create a new service perimeter
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha access\-context\-manager perimeters create\fR (\fIPERIMETER\fR\ :\ \fB\-\-policy\fR=\fIPOLICY\fR) \fB\-\-resources\fR=[\fIRESOURCES\fR,...] \fB\-\-title\fR=\fITITLE\fR [\fB\-\-access\-levels\fR=[\fILEVEL\fR,...]] [\fB\-\-async\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-perimeter\-type\fR=\fIPERIMETER_TYPE\fR;\ default="regular"] [\fB\-\-restricted\-services\fR=[\fISERVICE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Create a new service perimeter in a given access policy.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Perimeter resource \- The service perimeter to create. The arguments in this
+group can be used to specify the attributes of this resource. This must be
+specified.
+
+.RS 2m
+.TP 2m
+\fIPERIMETER\fR
+ID of the perimeter or fully qualified identifier for the perimeter. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-policy\fR=\fIPOLICY\fR
+The ID of the access policy.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-resources\fR=[\fIRESOURCES\fR,...]
+Comma\-separated list of resources (currently only projects, in the form
+\f5projects/<projectnumber>\fR) in this perimeter.
+
+.TP 2m
+\fB\-\-title\fR=\fITITLE\fR
+Short human\-readable title for the service perimeter.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-access\-levels\fR=[\fILEVEL\fR,...]
+Comma\-separated list of IDs for access levels (in the same policy) that an
+intra\-perimeter request must satisfy to be allowed.
+
+.TP 2m
+\fB\-\-async\fR
+Display information about the operation in progress, without waiting for the
+operation to complete.
+
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+Long\-form description of service perimeter.
+
+.TP 2m
+\fB\-\-perimeter\-type\fR=\fIPERIMETER_TYPE\fR; default="regular"
+Type of the perimeter. \fIPERIMETER_TYPE\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBbridge\fR
+Allows resources in different regular service perimeters to import and export
+data between each other.
+
+A project may belong to multiple bridge service perimeters (only if it also
+belongs to a regular service perimeter). Both restricted and unrestricted
+service lists, as well as access level lists, must be empty.
+
+.TP 2m
+\fBregular\fR
+Allows resources within this service perimeter to import and export data amongst
+themselves.
+
+A project may belong to at most one regular service perimeter.
+
+.RE
+.sp
+
+
+.TP 2m
+\fB\-\-restricted\-services\fR=[\fISERVICE\fR,...]
+Comma\-separated list of services to which the perimeter boundary \fBdoes\fR
+apply (for example, \f5storage.googleapis.com\fR).
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBaccesscontextmanager/v1beta\fR API. The full
+documentation for this API can be found at:
+https://cloud.google.com/access\-context\-manager/docs/reference/rest/
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
+
+.RS 2m
+$ gcloud access\-context\-manager perimeters create
+$ gcloud beta access\-context\-manager perimeters create
+.RE
+

@@ -530,7 +530,7 @@ class RegionUrlMapsAddPathMatcherTest(test_base.BaseTest):
     self._url_map = self.messages.UrlMap(
         name='url-map-1',
         defaultService=self._backend_buckets_uri_prefix + 'default-bucket',
-        region='us-west-1',
+        region=self.compute_uri +'/projects/my-project/regions/us-west-1',
         hostRules=[
             self.messages.HostRule(
                 hosts=['*.youtube.com', 'youtube.com', '*-youtube.com'],
@@ -593,7 +593,7 @@ class RegionUrlMapsAddPathMatcherTest(test_base.BaseTest):
     expected_url_map = self.messages.UrlMap(
         name='url-map-1',
         defaultService=self._backend_buckets_uri_prefix + 'default-bucket',
-        region='us-west-1',
+        region=self.compute_uri + '/projects/my-project/regions/us-west-1',
         hostRules=[
             self.messages.HostRule(
                 hosts=['*.youtube.com', 'youtube.com', '*-youtube.com'],
@@ -668,7 +668,7 @@ class RegionUrlMapsAddPathMatcherTest(test_base.BaseTest):
     expected_url_map = self.messages.UrlMap(
         name='url-map-1',
         defaultService=self._backend_buckets_uri_prefix + 'default-bucket',
-        region='us-west-1',
+        region=self.compute_uri + '/projects/my-project/regions/us-west-1',
         hostRules=[
             self.messages.HostRule(
                 hosts=['*.youtube.com', 'youtube.com', '*-youtube.com'],
@@ -741,7 +741,7 @@ class RegionUrlMapsAddPathMatcherTest(test_base.BaseTest):
     expected_url_map = self.messages.UrlMap(
         name='url-map-1',
         defaultService=self._backend_buckets_uri_prefix + 'default-bucket',
-        region='us-west-1',
+        region=self.compute_uri + '/projects/my-project/regions/us-west-1',
         hostRules=[
             self.messages.HostRule(
                 hosts=['*.youtube.com', 'youtube.com', '*-youtube.com'],
@@ -813,7 +813,7 @@ class RegionUrlMapsAddPathMatcherTest(test_base.BaseTest):
     expected_url_map = self.messages.UrlMap(
         name='url-map-1',
         defaultService=self._backend_buckets_uri_prefix + 'default-bucket',
-        region='us-west-1',
+        region=self.compute_uri + '/projects/my-project/regions/us-west-1',
         hostRules=[
             self.messages.HostRule(
                 hosts=['*.youtube.com', 'youtube.com', '*-youtube.com'],
@@ -924,7 +924,7 @@ class RegionUrlMapsAddPathMatcherTest(test_base.BaseTest):
     expected_url_map = self.messages.UrlMap(
         name='url-map-1',
         defaultService=self._backend_buckets_uri_prefix + 'default-bucket',
-        region='us-west-1',
+        region=self.compute_uri + '/projects/my-project/regions/us-west-1',
         hostRules=[
             self.messages.HostRule(
                 hosts=['*.youtube.com', 'youtube.com', '*-youtube.com'],

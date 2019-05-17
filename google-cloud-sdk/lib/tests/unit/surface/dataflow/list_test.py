@@ -171,6 +171,22 @@ job4    job4_name  Batch  2013-09-06 17:54:10  Running  test4
 job5    job5_name  Batch  2013-09-06 17:54:10  Running  test5
 """)
 
+  def testListFiltering(self):
+    jobs = [self.SampleJob(job_id='job%d' % n) for n in range(1, 6)]
+    jobs.extend(
+        [self.SampleJob(job_id='job_selected%d' % n) for n in range(1, 6)])
+    self.MockAggregatedListJobs(jobs, page_size=5)
+
+    self.Run('beta dataflow jobs list --filter="name:selected" --limit=5')
+    self.AssertOutputEquals("""\
+JOB_ID         NAME                TYPE   CREATION_TIME        STATE  REGION
+job_selected1  job_selected1_name  Batch  2013-09-06 17:54:10  Done   us-central1
+job_selected2  job_selected2_name  Batch  2013-09-06 17:54:10  Done   us-central1
+job_selected3  job_selected3_name  Batch  2013-09-06 17:54:10  Done   us-central1
+job_selected4  job_selected4_name  Batch  2013-09-06 17:54:10  Done   us-central1
+job_selected5  job_selected5_name  Batch  2013-09-06 17:54:10  Done   us-central1
+""")
+
   def testRegionalListAll(self):
     status_enum = (base.MESSAGE_MODULE.Job.CurrentStateValueValuesEnum)
     self.MockListJobs(

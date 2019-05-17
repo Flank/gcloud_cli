@@ -1,0 +1,237 @@
+title: add/remove/list product of product set
+release_tracks: [BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: ml vision product-search product-sets create $$my-product-set$$ --location=us-east1
+      --display-name='fancy name'
+  - stderr: |
+      Created product set [$$my-product-set$$].
+- execute:
+  - command: ml vision product-search products create $$my-product$$ --location=us-east1
+      --display-name='fancy name' --category='toys'
+  - stderr: |
+      Created product [$$my-product$$].
+- execute:
+  - command: ml vision product-search product-sets add-product $$my-product-set$$
+      --location=us-east1 --product=$$my-product$$
+  - stdout: |
+      {}
+- execute:
+  - command: ml vision product-search product-sets list-products --product-set $$my-product-set$$
+      --location=us-east1
+  - stdout: |
+      [
+        {
+          "displayName": "fancy name",
+          "name": "projects/cloud-sdk-integration-testing/locations/us-east1/products/$$my-product$$",
+          "productCategory": "toys"
+        }
+      ]
+- execute:
+  - command: ml vision product-search product-sets remove-product $$my-product-set$$
+      --location=us-east1 --product=$$my-product$$
+  - stdout: |
+      {}
+- execute:
+  - command: ml vision product-search products delete $$my-product$$ --location=us-east1
+  - prompt:
+    - message: You are about to delete product [$$my-product$$]
+    - input: y
+  - stderr: |
+      Deleted product [$$my-product$$].
+- execute:
+  - command: ml vision product-search product-sets delete $$my-product-set$$ --location=us-east1
+  - prompt:
+    - message: You are about to delete product set [$$my-product-set$$]
+    - input: y
+  - stderr: |
+      Deleted product set [$$my-product-set$$].
+actions:
+- generate_resource_id:
+    reference: my-product
+    prefix: product-in-product-search
+- generate_resource_id:
+    reference: my-product-set
+    prefix: product-set-in-product-search
+- execute_command:
+    command: ml vision product-search product-sets create $$my-product-set$$ --location=us-east1
+      --display-name='fancy name'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://vision.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-east1/productSets?alt=json&productSetId=$$my-product-set$$
+          method: POST
+          headers: {}
+          body:
+            json:
+              displayName: fancy name
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '168'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-east1/productSets/$$my-product-set$$
+            displayName: fancy name
+    - expect_stderr: |
+        Created product set [$$my-product-set$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: ml vision product-search products create $$my-product$$ --location=us-east1
+      --display-name='fancy name' --category='toys'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://vision.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-east1/products?alt=json&productId=$$my-product$$
+          method: POST
+          headers: {}
+          body:
+            json:
+              displayName: fancy name
+              productCategory: toys
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '190'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/locations/us-east1/products/$$my-product$$
+            displayName: fancy name
+            productCategory: toys
+    - expect_stderr: |
+        Created product [$$my-product$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: ml vision product-search product-sets add-product $$my-product-set$$
+      --location=us-east1 --product=$$my-product$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://vision.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-east1/productSets/$$my-product-set$$:addProduct?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              product: projects/cloud-sdk-integration-testing/locations/us-east1/products/$$my-product$$
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '3'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body: |
+            {}
+    - expect_stdout: |
+        {}
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: ml vision product-search product-sets list-products --product-set $$my-product-set$$
+      --location=us-east1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://vision.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-east1/productSets/$$my-product-set$$/products?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '234'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            products:
+            - name: projects/cloud-sdk-integration-testing/locations/us-east1/products/$$my-product$$
+              displayName: fancy name
+              productCategory: toys
+    - expect_stdout: |
+        [
+          {
+            "displayName": "fancy name",
+            "name": "projects/cloud-sdk-integration-testing/locations/us-east1/products/$$my-product$$",
+            "productCategory": "toys"
+          }
+        ]
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: ml vision product-search product-sets remove-product $$my-product-set$$
+      --location=us-east1 --product=$$my-product$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://vision.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-east1/productSets/$$my-product-set$$:removeProduct?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              product: projects/cloud-sdk-integration-testing/locations/us-east1/products/$$my-product$$
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '3'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body: |
+            {}
+    - expect_stdout: |
+        {}
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: ml vision product-search products delete $$my-product$$ --location=us-east1
+    cleanup_for: my-product
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete product [$$my-product$$]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://vision.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-east1/products/$$my-product$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '3'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body: |
+            {}
+    - expect_stderr: |
+        Deleted product [$$my-product$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: ml vision product-search product-sets delete $$my-product-set$$ --location=us-east1
+    cleanup_for: my-product-set
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete product set [$$my-product-set$$]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://vision.googleapis.com/v1/projects/cloud-sdk-integration-testing/locations/us-east1/productSets/$$my-product-set$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '3'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body: |
+            {}
+    - expect_stderr: |
+        Deleted product set [$$my-product-set$$].
+    - expect_exit:
+        code: 0

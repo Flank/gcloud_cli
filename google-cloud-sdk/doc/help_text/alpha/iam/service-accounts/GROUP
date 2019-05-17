@@ -17,8 +17,9 @@ DESCRIPTION
     https://cloud.google.com/iam/docs/service-accounts
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -42,6 +43,12 @@ COMMANDS
 
      describe
         (ALPHA) Show metadata for a service account from a project.
+
+     disable
+        (ALPHA) Disable an IAM service account.
+
+     enable
+        (ALPHA) Enable an IAM service account.
 
      get-iam-policy
         (ALPHA) Get the IAM policy for a service account.

@@ -32,10 +32,11 @@ class GetIamPolicyTestBeta(parameterized.TestCase,
   """Tests for dataproc * get-iam-policy."""
 
   @parameterized.named_parameters(
-      ('Cluster', 'cluster'),
-      ('Job', 'job'),
-      ('Operation', 'operation'),
-      ('WorkflowTemplate', 'workflow-template')
+      ('Cluster', 'clusters'),
+      ('Job', 'jobs'),
+      ('Operation', 'operations'),
+      ('WorkflowTemplate', 'workflow-templates'),
+      ('AutoscalingPolicy', 'autoscaling-policies'),
   )
   def testGetIAMPolicy(self, collection):
     self.GetIamPolicyNoError(collection)
@@ -47,7 +48,7 @@ class GetIamPolicyTestBeta(parameterized.TestCase,
 
     self.ExpectGetIamPolicy(collection, expected_resource)
 
-    policy = self.RunDataproc('{0}s get-iam-policy test-{0}'.format(collection))
+    policy = self.RunDataproc('{0} get-iam-policy test-{0}'.format(collection))
     self.assertIsNotNone(policy)
     self.AssertMessagesEqual(policy, self.GetTestIamPolicy())
 
@@ -60,7 +61,7 @@ class GetIamPolicyTestBeta(parameterized.TestCase,
 
     with self.AssertRaisesHttpExceptionMatches(
         'Resource not found API reason: Resource not found.'):
-      self.RunDataproc('{0}s get-iam-policy test-{0}'.format(collection))
+      self.RunDataproc('{0} get-iam-policy test-{0}'.format(collection))
 
   def ExpectGetIamPolicy(self, collection, resource, exception=None):
     response = None
@@ -77,6 +78,10 @@ class GetIamPolicyTestBeta(parameterized.TestCase,
 
 class GetIamPolicyTestGA(GetIamPolicyTestBeta, base.DataprocTestBaseGA):
   """Tests for GA dataproc * get-iam-policy."""
+
+
+class GetIamPolicyTestAlpha(GetIamPolicyTestBeta, base.DataprocTestBaseAlpha):
+  pass
 
 
 if __name__ == '__main__':

@@ -11,7 +11,7 @@ gcloud beta dns managed\-zones create \- create a Cloud DNS managed\-zone
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta dns managed\-zones create\fR \fIZONE_NAME\fR \fB\-\-description\fR=\fIDESCRIPTION\fR \fB\-\-dns\-name\fR=\fIDNS_NAME\fR [\fB\-\-denial\-of\-existence\fR=\fIDENIAL_OF_EXISTENCE\fR] [\fB\-\-dnssec\-state\fR=\fIDNSSEC_STATE\fR] [\fB\-\-forwarding\-targets\fR=[\fIIP_ADDRESSES\fR,...]] [\fB\-\-ksk\-algorithm\fR=\fIKSK_ALGORITHM\fR] [\fB\-\-ksk\-key\-length\fR=\fIKSK_KEY_LENGTH\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-networks\fR=[\fINETWORK\fR,...]] [\fB\-\-visibility\fR=\fIVISIBILITY\fR;\ default="public"] [\fB\-\-zsk\-algorithm\fR=\fIZSK_ALGORITHM\fR] [\fB\-\-zsk\-key\-length\fR=\fIZSK_KEY_LENGTH\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta dns managed\-zones create\fR \fIZONE_NAME\fR \fB\-\-description\fR=\fIDESCRIPTION\fR \fB\-\-dns\-name\fR=\fIDNS_NAME\fR [\fB\-\-denial\-of\-existence\fR=\fIDENIAL_OF_EXISTENCE\fR] [\fB\-\-dnssec\-state\fR=\fIDNSSEC_STATE\fR] [\fB\-\-forwarding\-targets\fR=[\fIIP_ADDRESSES\fR,...]] [\fB\-\-ksk\-algorithm\fR=\fIKSK_ALGORITHM\fR] [\fB\-\-ksk\-key\-length\fR=\fIKSK_KEY_LENGTH\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-networks\fR=[\fINETWORK\fR,...]] [\fB\-\-visibility\fR=\fIVISIBILITY\fR;\ default="public"] [\fB\-\-zsk\-algorithm\fR=\fIZSK_ALGORITHM\fR] [\fB\-\-zsk\-key\-length\fR=\fIZSK_KEY_LENGTH\fR] [\fB\-\-target\-network\fR=\fITARGET_NETWORK\fR\ \fB\-\-target\-project\fR=\fITARGET_PROJECT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -76,7 +76,7 @@ Enable DNSSEC and allow transferring a signed zone in or out.
 .TP 2m
 \fB\-\-forwarding\-targets\fR=[\fIIP_ADDRESSES\fR,...]
 List of IPv4 addresses of target name servers that the zone will forward queries
-to. Ignored for \f5private\fR visibility.
+to. Ignored for \f5public\fR visibility.
 
 .TP 2m
 \fB\-\-ksk\-algorithm\fR=\fIKSK_ALGORITHM\fR
@@ -121,16 +121,27 @@ Requires DNSSEC enabled. \fIZSK_ALGORITHM\fR must be one of:
 \fB\-\-zsk\-key\-length\fR=\fIZSK_KEY_LENGTH\fR
 Length of the zone\-signing key in bits. Requires DNSSEC enabled.
 
+.TP 2m
+\fB\-\-target\-network\fR=\fITARGET_NETWORK\fR
+The network id of the Google Compute Engine private network to forward queries
+to.
+
+.TP 2m
+\fB\-\-target\-project\fR=\fITARGET_PROJECT\fR
+The project id of the Google Compute Engine private network to forward queries
+to.
+
 
 .RE
 .sp
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

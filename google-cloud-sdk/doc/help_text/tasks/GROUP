@@ -1,0 +1,49 @@
+NAME
+    gcloud tasks - manage Cloud Tasks queues and tasks
+
+SYNOPSIS
+    gcloud tasks GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Manage Cloud Tasks queues and tasks.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+GROUPS
+    GROUP is one of the following:
+
+     locations
+        Get information about Cloud Tasks locations.
+
+     queues
+        Manage Cloud Tasks queues.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create-app-engine-task
+        Create and add a task that targets App Engine.
+
+     delete
+        Delete a task from a queue.
+
+     describe
+        Show details about a task.
+
+     list
+        List tasks.
+
+     run
+        Force a task to run now.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha tasks
+        $ gcloud beta tasks
+

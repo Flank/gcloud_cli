@@ -102,6 +102,9 @@ summary:
   - stderr: |
       Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$].
 actions:
+- define_reference:
+    reference: compute-uri
+    value: www.googleapis.com/compute
 - generate_resource_id:
     reference: compute-peering-net1
     prefix: compute-peering-net
@@ -178,7 +181,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$/addPeering?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$/addPeering?alt=json
           method: POST
           headers: {}
           body:
@@ -211,7 +214,7 @@ actions:
         Updated [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -257,7 +260,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$/addPeering?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$/addPeering?alt=json
           method: POST
           headers: {}
           body:
@@ -288,7 +291,7 @@ actions:
         Updated [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -332,7 +335,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$/removePeering?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$/removePeering?alt=json
           method: POST
           headers: {}
           body:
@@ -361,7 +364,7 @@ actions:
         Updated [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net1$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -407,7 +410,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$/removePeering?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$/removePeering?alt=json
           method: POST
           headers: {}
           body:
@@ -438,7 +441,7 @@ actions:
         Updated [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/networks/$$compute-peering-net2$$?alt=json
           method: GET
           headers: {}
           body: null

@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Base class for all ml platform tests."""
+"""Base class for all Cloud IoT tests."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -267,10 +267,10 @@ class CloudIotDeviceBase(CloudIotBase):
       devices.append(device)
     return devices
 
-  def _ExpectListDevices(self, devices, device_ids=None, device_num_ids=None,
-                         registry='my-registry', field_mask='blocked,name',
-                         project=None, gateway_type=None,
-                         gateway_list_device=None):
+  def _ExpectListDevices(
+      self, devices, device_ids=None, device_num_ids=None,
+      registry='my-registry', field_mask='blocked,name,gatewayConfig',
+      project=None, gateway_type=None, gateway_list_device=None):
     registry_name = ('projects/{}/'
                      'locations/us-central1/'
                      'registries/{}').format(project or self.Project(),

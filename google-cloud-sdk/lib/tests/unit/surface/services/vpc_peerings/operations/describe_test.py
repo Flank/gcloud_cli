@@ -20,21 +20,19 @@ from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.services import exceptions
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.services import unit_test_base
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA)
-class ConnectTest(unit_test_base.SNUnitTestBase):
+class DescribeTest(unit_test_base.SNUnitTestBase):
   """Unit tests for services vpc-peerings operations describe command."""
   OPERATION_NAME = 'operations/abc.0000000000'
 
-  def testConnect(self, track):
-    self.track = track
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+
+  def testConnect(self):
     self.ExpectOperation(self.OPERATION_NAME, 0)
 
     self.Run('services vpc-peerings operations describe --name=%s' %
@@ -42,14 +40,25 @@ class ConnectTest(unit_test_base.SNUnitTestBase):
     self.AssertErrContains(self.OPERATION_NAME)
     self.AssertErrContains('finished successfully')
 
-  def testConnectPermissionDenied(self, track):
-    self.track = track
+  def testConnectPermissionDenied(self):
     server_error = http_error.MakeDetailedHttpError(code=403, message='Error.')
     self.ExpectOperation(self.OPERATION_NAME, 0, server_error)
 
     with self.assertRaisesRegex(exceptions.OperationErrorException, r'Error.'):
       self.Run('services vpc-peerings operations describe --name=%s' %
                self.OPERATION_NAME)
+
+
+class DescribeAlphaTest(DescribeTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class DescribeBetaTest(DescribeTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 if __name__ == '__main__':

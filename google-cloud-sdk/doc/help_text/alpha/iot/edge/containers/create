@@ -1,0 +1,115 @@
+NAME
+    gcloud alpha iot edge containers create - create an Edge Container
+
+SYNOPSIS
+    gcloud alpha iot edge containers create
+        (CONTAINER : --device=DEVICE --region=REGION --registry=REGISTRY)
+        [--no-autostart] [--description=DESCRIPTION]
+        [--device-binding=[DEVICE_BINDING,...]] [--docker-image=DOCKER_IMAGE]
+        [--input-topic=[INPUT_TOPIC,...]] [--memory=MEMORY]
+        [--output-topic=[OUTPUT_TOPIC,...]]
+        [--volume-binding=[VOLUME_BINDING,...]]
+        [--env-vars=[KEY=VALUE,...] | --env-vars-file=ENV_VARS_FILE]
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Create an Edge Container.
+
+POSITIONAL ARGUMENTS
+     Container resource - The Edge Container you want to create. The arguments
+     in this group can be used to specify the attributes of this resource.
+     (NOTE) Some attributes are not given arguments in this group but can be
+     set in other ways. To set the [project] attribute: provide the argument
+     [container] on the command line with a fully specified name; provide the
+     argument [--project] on the command line; set the property [core/project].
+     This must be specified.
+
+       CONTAINER
+          ID of the container or fully qualified identifier for the container.
+          This positional must be specified if any of the other arguments in
+          this group are specified.
+
+       --device=DEVICE
+          The name of the Cloud IoT Edge device.
+
+       --region=REGION
+          The name of the Cloud IoT region.
+
+       --registry=REGISTRY
+          The name of the Cloud IoT registry.
+
+FLAGS
+     --autostart
+        Autostart container on the device startup. Enabled by default, use
+        --no-autostart to disable.
+
+     --description=DESCRIPTION
+        Description for the Edge Container.
+
+     --device-binding=[DEVICE_BINDING,...]
+        Device to expose, provided in SOURCE[:DESTINATION][:CGROUP_PERMS]
+        format. (Same as 'docker run' command's --device options.) When
+        DESTINATION is not provided, SOURCE path will also be used for it.
+        Default value for cgroups permission is 'rwm'.
+
+     --docker-image=DOCKER_IMAGE
+        The identifier for a docker image which is in the form of
+        NAME[:TAG|@DIGEST].
+
+     --input-topic=[INPUT_TOPIC,...]
+        Input topic(s) for this component. The input topics feed information or
+        trigger actions in each components. Multiple topics can be specified by
+        using a comma-separated list of topics. Each topic can be specified in
+        [NAME:]TOPIC format, which means that an abstract name can optionally
+        be given to a topic. The NAME and TOPIC part must not contain any
+        colons.
+
+     --memory=MEMORY
+        Limit on the amount of memory the Edge function or container can use.
+        The memory size can be given by a number followed by unit - e.g. 128MB,
+        2GiB. Minimum allowed size for this flag is 1MB. When deploying an
+        update to an existing function or container, it will keep its old
+        memory limit unless you specify this flag.
+
+     --output-topic=[OUTPUT_TOPIC,...]
+        Output topic(s) for this component. The output topics are used to post
+        result from component logic execution. Multiple topics can be specified
+        by using a comma-separated list of topics. Each topic can be specified
+        in [NAME:]TOPIC format, which means that an abstract name can
+        optionally be given to a topic. The NAME and TOPIC part must not
+        contain any colons.
+
+     --volume-binding=[VOLUME_BINDING,...]
+        Volume mounts, provided in [SOURCE:]DESTINATION[:(rw|ro)] format. (Same
+        as 'docker run' command's -v/--volume options.) When SOURCE is not
+        provided, DESTINATION path will also be used for it. Default value for
+        third part is rw, which makes the volume writable. Use ro to mount
+        volume in read-only mode.
+
+     At most one of these may be specified:
+
+       --env-vars=[KEY=VALUE,...]
+          List of key-value pairs to set as environment variables.
+
+       --env-vars-file=ENV_VARS_FILE
+          Path to YAML file with definitions for all environment variables.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+API REFERENCE
+    This command uses the edge/v1alpha1 API. The full documentation for this
+    API can be found at: https://cloud.google.com/iot-edge/
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you will have to apply for early access and
+    have your projects registered on the API whitelist to use it. To do so,
+    contact Support at https://cloud.google.com/support/.
+

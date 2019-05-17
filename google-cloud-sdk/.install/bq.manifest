@@ -8,7 +8,11 @@ platform/bq/bigquery_client.py
 platform/bq/bq.py
 platform/bq/bq_auth_flags.py
 platform/bq/bq_flags.py
+platform/bq/bq_utils.py
 platform/bq/discovery/httpswwwgoogleapiscom.bigquery.v2.rest.json
+platform/bq/discovery_next/bigquery.json
+platform/bq/discovery_next/bigqueryconnection-discovery.json
+platform/bq/discovery_next/routines-discovery.json
 platform/bq/remove_pyreadline.py
 platform/bq/table_formatter.py
 platform/bq/table_formatter_test.py
@@ -52,6 +56,7 @@ platform/bq/third_party/google_reauth/reauth_creds.py
 platform/bq/third_party/googleapiclient/LICENSE
 platform/bq/third_party/googleapiclient/__init__.py
 platform/bq/third_party/googleapiclient/_auth.py
+platform/bq/third_party/googleapiclient/_helpers.py
 platform/bq/third_party/googleapiclient/channel.py
 platform/bq/third_party/googleapiclient/discovery.py
 platform/bq/third_party/googleapiclient/discovery_cache/__init__.py
@@ -65,8 +70,11 @@ platform/bq/third_party/googleapiclient/model.py
 platform/bq/third_party/googleapiclient/schema.py
 platform/bq/third_party/httplib2/LICENSE
 platform/bq/third_party/httplib2/__init__.py
+platform/bq/third_party/httplib2/ca_certs_locater.py
 platform/bq/third_party/httplib2/cacerts.txt
+platform/bq/third_party/httplib2/certs.py
 platform/bq/third_party/httplib2/iri2uri.py
+platform/bq/third_party/httplib2/socks.py
 platform/bq/third_party/oauth2client_4_0/LICENSE
 platform/bq/third_party/oauth2client_4_0/__init__.py
 platform/bq/third_party/oauth2client_4_0/_helpers.py
@@ -185,6 +193,7 @@ platform/bq/third_party/six/LICENSE
 platform/bq/third_party/six/__init__.py
 platform/bq/third_party/socks/LICENSE
 platform/bq/third_party/socks/__init__.py
+platform/bq/third_party/socks/sockshandler.py
 platform/bq/third_party/uritemplate/LICENSE
 platform/bq/third_party/uritemplate/__init__.py
 platform/bq/third_party/uritemplate/api.py

@@ -64,7 +64,25 @@ class ResourceYAMLDataTest(sdk_test_base.WithOutputCapture,
     self.assertEqual(project_data, resource_yaml_data.GetData())
     self.assertEqual('project', resource_yaml_data.GetArgName())
 
-  @parameterized.parameters('', 'a', 'abc.', 'a.b.c')
+  def testCreateResourceYAMLDataFromNestedPath(self):
+    resource_yaml_data = yaml_data.ResourceYAMLData.FromPath(
+        'ml.video.operation')
+    operation_data = {
+        'name':
+            'operation',
+        'collection':
+            'videointelligence.operations',
+        'attributes': [{
+            'attribute_name': 'operation',
+            'parameter_name': 'operationsId',
+            'help': 'The ID of the operation'
+        }]
+    }
+
+    self.assertEqual(operation_data, resource_yaml_data.GetData())
+    self.assertEqual('operation', resource_yaml_data.GetArgName())
+
+  @parameterized.parameters('', 'a', 'abc.', '.abc')
   def testInvalidResourcePath(self, invalid_path):
     error_msg = re.escape('Invalid resource_path: [{}].'.format(invalid_path))
     with self.assertRaisesRegex(yaml_data.InvalidResourcePathError, error_msg):

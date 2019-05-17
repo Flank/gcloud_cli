@@ -102,6 +102,44 @@ FORWARDING_RULES_OVERVIEW_ALPHA = """\
         """
 
 
+FORWARDING_RULES_OVERVIEW_BETA = """\
+        A forwarding rule directs traffic that matches a bound IP address to a
+        forwarding target (load balancer, VPN gateway or VM instance).
+
+        Forwarding rules can be either global or regional, specified with the
+        ``--global'' or ``--region=REGION'' flag. Global forwarding rules work
+        with global load balancers, which include target HTTP proxies, target
+        HTTPS proxies, target SSL proxies and target TCP proxies; regional
+        forwarding rules work with regional or zonal targets, which include
+        target pools, target instances and target VPN gateways and backend
+        services.
+
+        Forwarding rules can be either external, internal or internal self
+        managed, specified with the
+        ``--load-balancing-scheme=[EXTERNAL|INTERNAL|INTERNAL_SELF_MANAGED]''
+        flag. External forwarding rules are accessible from the internet, while
+        internal forwarding rules are only accessible from within their VPC
+        networks. You can specify a reserved static external or internal IP
+        address with the ``--address=ADDRESS'' flag for the forwarding rule.
+        Otherwise if the flag is unspecified, an external forwarding rule will
+        be automatically assigned an ephemeral external IP address (global IP
+        addresses for global forwarding rules and regional IP addresses for
+        regional forwarding rules); an internal forwarding rule will be
+        automatically assigned an ephemeral internal IP address from the subnet
+        specified with the ``--subnet'' flag. An IP Address must be provided for
+        an internal self managed forwarding rule.
+
+        There are different types of load balancers working at different layers
+        of the OSI networking model
+        (http://en.wikipedia.org/wiki/Network_layer). Layer 3 load balancer
+        targets include target pools, target SSL proxies, target TCP proxies and
+        backend services. Layer 7 load balancer targets include target HTTP
+        proxies and target HTTPS proxies. For more information on load
+        balancing, see
+        https://cloud.google.com/compute/docs/load-balancing-and-autoscaling/.
+        """
+
+
 class ForwardingRulesZonalCompleter(compute_completers.ListCommandCompleter):
 
   def __init__(self, **kwargs):
@@ -174,33 +212,32 @@ BACKEND_SERVICE_ARG = compute_flags.ResourceArgument(
     region_explanation=('If not specified, it will be set to the'
                         ' region of the forwarding rule.'))
 
-NETWORK_ARG_ALPHA = compute_flags.ResourceArgument(
-    name='--network',
-    required=False,
-    resource_name='networks',
-    global_collection='compute.networks',
-    short_help='Network that this forwarding rule applies to.',
-    detailed_help="""\
-        (Only for --load-balancing-scheme=INTERNAL,
-        --load-balancing-scheme=INTERNAL_MANAGED, or
-        --load-balancing-scheme=INTERNAL_SELF_MANAGED) Network that this
-        forwarding rule applies to. If this field is not specified, the default
-        network will be used. In the absence of the default network, this field
-        must be specified.
-        """)
 
-NETWORK_ARG = compute_flags.ResourceArgument(
-    name='--network',
-    required=False,
-    resource_name='networks',
-    global_collection='compute.networks',
-    short_help='Network that this forwarding rule applies to.',
-    detailed_help="""\
-        (Only for --load-balancing-scheme=INTERNAL) Network that this
-        forwarding rule applies to. If this field is not specified, the default
-        network will be used. In the absence of the default network, this field
-        must be specified.
-        """)
+def NetworkArg(include_traffic_director, include_l7_internal_load_balancing):
+  """Returns the network parameter."""
+
+  load_balancing_scheme = '--load-balancing-scheme=INTERNAL'
+  if include_traffic_director and not include_l7_internal_load_balancing:
+    load_balancing_scheme += ("""
+        or --load-balancing-scheme=INTERNAL_SELF_MANAGED""")
+  elif include_traffic_director and include_l7_internal_load_balancing:
+    load_balancing_scheme += (""",
+        --load-balancing-scheme=INTERNAL_MANAGED, or
+        --load-balancing-scheme=INTERNAL_SELF_MANAGED""")
+
+  return compute_flags.ResourceArgument(
+      name='--network',
+      required=False,
+      resource_name='networks',
+      global_collection='compute.networks',
+      short_help='Network that this forwarding rule applies to.',
+      detailed_help="""\
+          (Only for %s) Network that this
+          forwarding rule applies to. If this field is not specified, the default
+          network will be used. In the absence of the default network, this field
+          must be specified.
+          """ % load_balancing_scheme)
+
 
 SUBNET_ARG = compute_flags.ResourceArgument(
     name='--subnet',
@@ -219,7 +256,7 @@ SUBNET_ARG = compute_flags.ResourceArgument(
                         ' region of the forwarding rule.'))
 
 
-def TargetHttpProxyArg(include_alpha=False):
+def TargetHttpProxyArg(include_l7_internal_load_balancing=False):
   """Return a resource argument for parsing a target http proxy."""
 
   target_http_proxy_arg = compute_flags.ResourceArgument(
@@ -228,16 +265,16 @@ def TargetHttpProxyArg(include_alpha=False):
       resource_name='http proxy',
       global_collection='compute.targetHttpProxies',
       regional_collection='compute.regionTargetHttpProxies'
-      if include_alpha else None,
+      if include_l7_internal_load_balancing else None,
       short_help='Target HTTP proxy that will receive the traffic.',
       detailed_help=('Target HTTP proxy that will receive the traffic. '
                      'Acceptable values for --ports flag are: 80, 8080.'),
       region_explanation=compute_flags.REGION_PROPERTY_EXPLANATION
-      if include_alpha else None)
+      if include_l7_internal_load_balancing else None)
   return target_http_proxy_arg
 
 
-def TargetHttpsProxyArg(include_alpha=False):
+def TargetHttpsProxyArg(include_l7_internal_load_balancing=False):
   """Return a resource argument for parsing a target https proxy."""
 
   target_https_proxy_arg = compute_flags.ResourceArgument(
@@ -246,12 +283,12 @@ def TargetHttpsProxyArg(include_alpha=False):
       resource_name='https proxy',
       global_collection='compute.targetHttpsProxies',
       regional_collection='compute.regionTargetHttpsProxies'
-      if include_alpha else None,
+      if include_l7_internal_load_balancing else None,
       short_help='Target HTTPS proxy that will receive the traffic.',
       detailed_help=('Target HTTPS proxy that will receive the traffic. '
                      'Acceptable values for --ports flag are: 443.'),
       region_explanation=compute_flags.REGION_PROPERTY_EXPLANATION
-      if include_alpha else None)
+      if include_l7_internal_load_balancing else None)
   return target_https_proxy_arg
 
 TARGET_INSTANCE_ARG = compute_flags.ResourceArgument(
@@ -316,8 +353,23 @@ TARGET_VPN_GATEWAY_ARG = compute_flags.ResourceArgument(
                         ' region of the forwarding rule.'))
 
 
-def AddressArgHelp(include_alpha):
+def AddressArgHelp(include_l7_internal_load_balancing,
+                   include_traffic_director):
   """Build the help text for the address argument."""
+
+  lb_schemes = '(EXTERNAL, INTERNAL'
+  if include_l7_internal_load_balancing:
+    lb_schemes += ', INTERNAL_MANAGED'
+  if include_traffic_director:
+    lb_schemes += ', INTERNAL_SELF_MANAGED'
+  lb_schemes += ')'
+
+  address_help = ''
+  if include_traffic_director:
+    address_help = """
+    When the --load-balancing-scheme is INTERNAL_SELF_MANAGED, this must
+    be a URL reference to an existing Address resource.
+    """
 
   detailed_help = """\
     IP address that the forwarding rule will serve. All
@@ -354,46 +406,39 @@ def AddressArgHelp(include_alpha):
     - regions/us-central1/addresses/address-1
     - global/addresses/address-1
     - address-1
-  """ % ('EXTERNAL, INTERNAL, INTERNAL_MANAGED or INTERNAL_SELF_MANAGED'
-         if include_alpha else 'EXTERNAL or INTERNAL', """
-    When the --load-balancing-scheme is INTERNAL_SELF_MANAGED, this must
-    be a URL reference to an existing Address resource.
-         """ if include_alpha else '')
+  """ % (lb_schemes, address_help)
 
   return textwrap.dedent(detailed_help)
 
 
-ADDRESS_ARG_ALPHA = compute_flags.ResourceArgument(
-    name='--address',
-    required=False,
-    resource_name='address',
-    completer=addresses_flags.AddressesCompleter,
-    regional_collection='compute.addresses',
-    global_collection='compute.globalAddresses',
-    region_explanation=compute_flags.REGION_PROPERTY_EXPLANATION,
-    short_help='IP address that the forwarding rule will serve.',
-    detailed_help=AddressArgHelp(include_alpha=True))
-
-ADDRESS_ARG = compute_flags.ResourceArgument(
-    name='--address',
-    required=False,
-    resource_name='address',
-    completer=addresses_flags.AddressesCompleter,
-    regional_collection='compute.addresses',
-    global_collection='compute.globalAddresses',
-    region_explanation=compute_flags.REGION_PROPERTY_EXPLANATION,
-    short_help='IP address that the forwarding rule will serve.',
-    detailed_help=AddressArgHelp(include_alpha=False))
+def AddressArg(include_traffic_director, include_l7_internal_load_balancing):
+  return compute_flags.ResourceArgument(
+      name='--address',
+      required=False,
+      resource_name='address',
+      completer=addresses_flags.AddressesCompleter,
+      regional_collection='compute.addresses',
+      global_collection='compute.globalAddresses',
+      region_explanation=compute_flags.REGION_PROPERTY_EXPLANATION,
+      short_help='IP address that the forwarding rule will serve.',
+      detailed_help=AddressArgHelp(
+          include_l7_internal_load_balancing=include_l7_internal_load_balancing,
+          include_traffic_director=include_traffic_director))
 
 
-def AddUpdateArgs(parser, include_beta=False, include_alpha=False):
+def AddUpdateArgs(parser,
+                  include_traffic_director=False,
+                  include_l7_internal_load_balancing=False):
   """Adds common flags for mutating forwarding rule targets."""
-  del include_beta
   target = parser.add_mutually_exclusive_group(required=True)
 
-  TargetHttpProxyArg(include_alpha=include_alpha).AddArgument(
+  TargetHttpProxyArg(
+      include_l7_internal_load_balancing=include_l7_internal_load_balancing
+  ).AddArgument(
       parser, mutex_group=target)
-  TargetHttpsProxyArg(include_alpha=include_alpha).AddArgument(
+  TargetHttpsProxyArg(
+      include_l7_internal_load_balancing=include_l7_internal_load_balancing
+  ).AddArgument(
       parser, mutex_group=target)
   TARGET_INSTANCE_ARG.AddArgument(parser, mutex_group=target)
   TARGET_POOL_ARG.AddArgument(parser, mutex_group=target)
@@ -402,16 +447,21 @@ def AddUpdateArgs(parser, include_beta=False, include_alpha=False):
   TARGET_VPN_GATEWAY_ARG.AddArgument(parser, mutex_group=target)
 
   BACKEND_SERVICE_ARG.AddArgument(parser, mutex_group=target)
-  if include_alpha:
-    NETWORK_ARG_ALPHA.AddArgument(parser)
-  else:
-    NETWORK_ARG.AddArgument(parser)
+  NetworkArg(
+      include_traffic_director=include_traffic_director,
+      include_l7_internal_load_balancing=include_l7_internal_load_balancing
+  ).AddArgument(parser)
   SUBNET_ARG.AddArgument(parser)
 
-  AddLoadBalancingScheme(parser, include_alpha)
+  AddLoadBalancingScheme(
+      parser,
+      include_traffic_director=include_traffic_director,
+      include_l7_ilb=include_l7_internal_load_balancing)
 
 
-def AddLoadBalancingScheme(parser, include_alpha=False):
+def AddLoadBalancingScheme(parser,
+                           include_l7_ilb=False,
+                           include_traffic_director=False):
   """Adds the load-balancing-scheme flag."""
   load_balancing_choices = {
       'EXTERNAL':
@@ -422,11 +472,15 @@ def AddLoadBalancingScheme(parser, include_alpha=False):
       'INTERNAL': 'Internal load balancing or forwarding, used with '
                   '--backend-service.',
   }
-  if include_alpha:
+  if include_traffic_director:
     load_balancing_choices.update({
         'INTERNAL_SELF_MANAGED':
             'Traffic director load balancing or forwarding, used with '
-            '--target-http-proxy, --target-https-proxy.',
+            '--target-http-proxy, --target-https-proxy.'
+    })
+
+  if include_l7_ilb:
+    load_balancing_choices.update({
         'INTERNAL_MANAGED': 'Internal HTTP(S) Load Balancing, used with '
                             '--target-http-proxy, --target-https-proxy.'
     })
@@ -485,14 +539,16 @@ def AddIpVersionGroup(parser):
       """)
 
 
-def AddAddressesAndIPVersions(parser, required=True, include_alpha=False):
+def AddAddressesAndIPVersions(parser, required, include_traffic_director,
+                              include_l7_internal_load_balancing):
   """Adds Addresses and IP versions flag."""
+
+  address_arg = AddressArg(
+      include_l7_internal_load_balancing=include_l7_internal_load_balancing,
+      include_traffic_director=include_traffic_director)
   group = parser.add_mutually_exclusive_group(required=required)
   AddIpVersionGroup(group)
-  if include_alpha:
-    ADDRESS_ARG_ALPHA.AddArgument(parser, mutex_group=group)
-  else:
-    ADDRESS_ARG.AddArgument(parser, mutex_group=group)
+  address_arg.AddArgument(parser, mutex_group=group)
 
 
 def AddDescription(parser):
@@ -503,48 +559,32 @@ def AddDescription(parser):
       help='Optional textual description for the forwarding rule.')
 
 
-def AddPortsAndPortRange(parser, supports_flex_port=False):
+def AddPortsAndPortRange(parser):
   """Adds ports and port range flags."""
 
   ports_scope = parser.add_mutually_exclusive_group()
-  if supports_flex_port:
-    ports_metavar = 'ALL | [PORT | START_PORT-END_PORT],[...]'
-    ports_help = """\
-    List of comma separated ports and/or port ranges or the value `all`.
-    If a list is provided, only packets addressed to ports in the list
-    will be forwarded. If unspecified or `all` for regional forwarding
-    rules, all ports are matched. This flag is required for global
-    forwarding rules and accepts a single set of contiguous ports (i.e.
-    `--ports=80,82` is not valid because 80 and 82 are not contiguous).
+  ports_metavar = 'ALL | [PORT | START_PORT-END_PORT],[...]'
+  ports_help = """\
+  List of comma separated ports and/or port ranges or the value `all`.
+  If a list is provided, only packets addressed to ports in the list
+  will be forwarded. If unspecified or `all` for regional forwarding
+  rules, all ports are matched. This flag is required for global
+  forwarding rules and accepts a single set of contiguous ports (i.e.
+  `--ports=80,82` is not valid because 80 and 82 are not contiguous).
 
-    A list can consist of individual ports and ranges. For example,
-    `--ports 8000-8004` or `--ports 80`.
+  A list can consist of individual ports and ranges. For example,
+  `--ports 8000-8004` or `--ports 80`.
 
-    Some forwarding targets have restriction on acceptable ports, e.g., if
-    --target-http-proxy is specified, the acceptable values for --ports
-    are: 80, 8080. For internal load balancing, the allowed ports can be
-    `all` or a set of at most 5 ports.
-    """
-  else:
-    ports_metavar = '[PORT | START_PORT-END_PORT],[...]'
-    ports_help = """\
-    If specified, only packets addressed to ports in the specified
-    list will be forwarded. If not specified for regional forwarding
-    rules, all ports are matched. This flag is required for global
-    forwarding rules and accepts a single continuous set of ports.
-
-    Some forwarding targets have restriction on acceptable ports, e.g., if
-    --target-http-proxy is specified, the acceptable values for --ports are:
-    80, 8080.
-
-    Individual ports and ranges can be specified,
-    for example (`--ports 8000-8004` or `--ports 80`).
-    """
+  Some forwarding targets have restriction on acceptable ports, e.g., if
+  --target-http-proxy is specified, the acceptable values for --ports
+  are: 80, 8080. For internal load balancing, the allowed ports can be
+  `all` or a set of at most 5 ports.
+  """
 
   ports_scope.add_argument(
       '--ports',
       metavar=ports_metavar,
-      type=PortRangesWithAll.CreateParser(support_all=supports_flex_port),
+      type=PortRangesWithAll.CreateParser(),
       default=None,
       help=ports_help)
 
@@ -588,19 +628,18 @@ def AddNetworkTier(parser, supports_network_tier_flag, for_update):
 
 
 class PortRangesWithAll(object):
-  """particular keyword or Range of integer values"""
+  """Particular keyword 'all' or a range of integer values."""
 
   def __init__(self, all_specified, ranges):
     self.all_specified = all_specified
     self.ranges = ranges
 
   @staticmethod
-  def CreateParser(support_all=False):
+  def CreateParser():
     """Creates parser to parse keyword 'all' first before parse range."""
 
     def _Parse(string_value):
-      lower_string_value = string_value.lower()
-      if support_all and lower_string_value == 'all':
+      if string_value.lower() == 'all':
         return PortRangesWithAll(True, [])
       else:
         type_parse = arg_parsers.ArgList(

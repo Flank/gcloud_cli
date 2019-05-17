@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2013 Google Inc. All Rights Reserved.
+# Copyright 2013 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -67,7 +67,7 @@ class ClientRedirectHandler(tools.ClientRedirectHandler):
     if an error occurred.
     """
     self.send_response(200)
-    self.send_header('Content-type', 'text/html')  # pytype: disable=wrong-arg-types
+    self.send_header('Content-type', 'text/html')
     self.end_headers()
     query = self.path.split('?', 1)[-1]
     query = dict(parse_qsl(query))

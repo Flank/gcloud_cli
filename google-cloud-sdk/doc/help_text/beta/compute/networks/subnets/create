@@ -5,7 +5,10 @@ NAME
 SYNOPSIS
     gcloud beta compute networks subnets create NAME --network=NETWORK
         --range=RANGE [--description=DESCRIPTION] [--enable-flow-logs]
-        [--enable-private-ip-google-access] [--region=REGION]
+        [--enable-private-ip-google-access]
+        [--logging-aggregation-interval=LOGGING_AGGREGATION_INTERVAL]
+        [--logging-flow-sampling=LOGGING_FLOW_SAMPLING]
+        [--logging-metadata=LOGGING_METADATA] [--region=REGION]
         [--secondary-range=PROPERTY=VALUE,[...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -35,6 +38,28 @@ OPTIONAL FLAGS
      --enable-private-ip-google-access
         Enable/disable access to Google Cloud APIs from this subnet for
         instances without a public ip address.
+
+     --logging-aggregation-interval=LOGGING_AGGREGATION_INTERVAL
+        Can only be specified if VPC flow logging for this subnetwork is
+        enabled. Toggles the aggregation interval for collecting flow logs.
+        Increasing the interval time will reduce the amount of generated flow
+        logs for long lasting connections. Default is an interval of 5 seconds
+        per connection. LOGGING_AGGREGATION_INTERVAL must be one of:
+        interval-10-min, interval-15-min, interval-1-min, interval-30-sec,
+        interval-5-min, interval-5-sec.
+
+     --logging-flow-sampling=LOGGING_FLOW_SAMPLING
+        Can only be specified if VPC flow logging for this subnetwork is
+        enabled. The value of the field must be in [0, 1]. Set the sampling
+        rate of VPC flow logs within the subnetwork where 1.0 means all
+        collected logs are reported and 0.0 means no logs are reported. Default
+        is 0.5 which means half of all collected logs are reported.
+
+     --logging-metadata=LOGGING_METADATA
+        Can only be specified if VPC flow logging for this subnetwork is
+        enabled. Configures whether metadata fields should be added to the
+        reported VPC flow logs. Default is to include all metadata.
+        LOGGING_METADATA must be one of: exclude-all, include-all.
 
      --region=REGION
         Region of the subnetwork to create. If not specified, you may be
@@ -66,8 +91,9 @@ OPTIONAL FLAGS
         * RANGE - IP range in CIDR format.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

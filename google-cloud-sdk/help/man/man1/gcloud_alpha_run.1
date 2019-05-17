@@ -24,10 +24,11 @@ Google Cloud Run.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -39,6 +40,10 @@ gcloud help\fR for details.
 .TP 2m
 \fBconfigurations\fR
 \fB(ALPHA)\fR View and manage your Cloud Run configurations.
+
+.TP 2m
+\fBdomain\-mappings\fR
+\fB(ALPHA)\fR View and manage your Cloud Run domain mappings.
 
 .TP 2m
 \fBrevisions\fR
@@ -63,7 +68,7 @@ gcloud help\fR for details.
 .RS 2m
 .TP 2m
 \fBdeploy\fR
-\fB(ALPHA)\fR Deploy an app, function or container to Cloud Run.
+\fB(ALPHA)\fR Deploy a container to Cloud Run.
 
 
 .RE
@@ -90,5 +95,9 @@ This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you will have to apply for early access and have your projects registered on the
 API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+https://cloud.google.com/support/. This variant is also available:
+
+.RS 2m
+$ gcloud beta run
+.RE
 

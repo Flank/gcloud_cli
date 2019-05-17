@@ -37,16 +37,11 @@ class DomainTests(sdk_test_base.BundledBase, e2e_base.WithServiceAuth):
 
   def SetUp(self):
     # Clean up any bad state.
-    self.DeleteMappingIfExists()
+    self.DeleteMapping()
 
   def TearDown(self):
     # Clean up any bad state.
-    self.DeleteMappingIfExists()
-
-  def DeleteMappingIfExists(self):
-    result = self.ListMappings()
-    if DOMAIN in result:
-      self.DeleteMapping()
+    self.DeleteMapping()
 
   def DeleteMapping(self):
     self.Run(['--verbosity=debug', 'app', 'domain-mappings', 'delete', DOMAIN])

@@ -120,7 +120,7 @@ class ExportLogsTest(test_base.BaseTest):
     if hasattr(urllib, 'quote_plus'):
       encoded_signature = urllib.quote_plus(signature_b64)
     else:
-      encoded_signature = urllib.parse.quote_plus(signature_b64)  # pytype: disable=module-attr
+      encoded_signature = urllib.parse.quote_plus(signature_b64)
 
     result = self.Run('alpha compute diagnose export-logs '
                       '--zone us-west1-a instance-1')

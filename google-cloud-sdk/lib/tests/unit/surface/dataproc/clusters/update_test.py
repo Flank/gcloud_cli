@@ -455,6 +455,109 @@ class ClustersUpdateUnitTestBeta(ClustersUpdateUnitTest,
             self.CLUSTER_NAME))
     self.AssertMessagesEqual(expected, result)
 
+  # This tests enabling autoscaling and switching policies, since they have
+  # equivalent client-side behavior.
+  def testUpdateCluster_enableAutoscaling_onlyId(self):
+    specified_policy = 'cool-policy'
+    expected_policy_uri = 'projects/fake-project/regions/global/autoscalingPolicies/cool-policy'
+
+    cluster = self.messages.Cluster(
+        clusterName=self.CLUSTER_NAME,
+        projectId=self.Project(),
+        config=self.messages.ClusterConfig(
+            autoscalingConfig=self.messages.AutoscalingConfig(
+                policyUri=expected_policy_uri)))
+    expected = self.MakeRunningCluster()
+    expected.config.autoscalingConfig = self.messages.AutoscalingConfig(
+        policyUri=expected_policy_uri)
+    changed_fields = [
+        'config.autoscaling_config.policy_uri',
+    ]
+    self.ExpectUpdateCalls(
+        cluster=cluster, field_paths=changed_fields, response=expected)
+    result = self.RunDataproc(
+        ('clusters update {0} --autoscaling-policy {1} ').format(
+            self.CLUSTER_NAME, specified_policy))
+    self.AssertMessagesEqual(expected, result)
+
+  def testUpdateCluster_enableAutoscaling_uriInDifferentProjectAndRegion(self):
+    specified_policy = 'projects/another-project/regions/another-region/autoscalingPolicies/cool-policy'
+
+    cluster = self.messages.Cluster(
+        clusterName=self.CLUSTER_NAME,
+        projectId=self.Project(),
+        config=self.messages.ClusterConfig(
+            autoscalingConfig=self.messages.AutoscalingConfig(
+                policyUri=specified_policy)))
+    expected = self.MakeRunningCluster()
+    expected.config.autoscalingConfig = self.messages.AutoscalingConfig(
+        policyUri=specified_policy)
+    changed_fields = [
+        'config.autoscaling_config.policy_uri',
+    ]
+    self.ExpectUpdateCalls(
+        cluster=cluster, field_paths=changed_fields, response=expected)
+    result = self.RunDataproc(
+        ('clusters update {0} --autoscaling-policy {1} ').format(
+            self.CLUSTER_NAME, specified_policy))
+    self.AssertMessagesEqual(expected, result)
+
+  def testUpdateCluster_enableAutoscaling_fullUrl(self):
+    # Only sends the part starting with projects/
+    specified_policy = 'https://dataproc.googleapis.com/v1beta2/projects/fake-project/regions/global/autoscalingPolicies/cool-policy'
+    expected_policy_uri = 'projects/fake-project/regions/global/autoscalingPolicies/cool-policy'
+
+    cluster = self.messages.Cluster(
+        clusterName=self.CLUSTER_NAME,
+        projectId=self.Project(),
+        config=self.messages.ClusterConfig(
+            autoscalingConfig=self.messages.AutoscalingConfig(
+                policyUri=expected_policy_uri)))
+    expected = self.MakeRunningCluster()
+    expected.config.autoscalingConfig = self.messages.AutoscalingConfig(
+        policyUri=expected_policy_uri)
+    changed_fields = [
+        'config.autoscaling_config.policy_uri',
+    ]
+    self.ExpectUpdateCalls(
+        cluster=cluster, field_paths=changed_fields, response=expected)
+    result = self.RunDataproc(
+        ('clusters update {0} --autoscaling-policy {1} ').format(
+            self.CLUSTER_NAME, specified_policy))
+    self.AssertMessagesEqual(expected, result)
+
+  def testUpdateCluster_disableAutoscaling_emptyPolicy(self):
+    cluster = self.messages.Cluster(
+        clusterName=self.CLUSTER_NAME,
+        projectId=self.Project(),
+        config=self.messages.ClusterConfig(autoscalingConfig=None))
+    expected = self.MakeRunningCluster()
+    expected.config.autoscalingConfig = None
+    changed_fields = [
+        'config.autoscaling_config.policy_uri',
+    ]
+    self.ExpectUpdateCalls(
+        cluster=cluster, field_paths=changed_fields, response=expected)
+    result = self.RunDataproc(
+        ('clusters update {0} --autoscaling-policy=').format(self.CLUSTER_NAME))
+    self.AssertMessagesEqual(expected, result)
+
+  def testUpdateCluster_disableAutoscaling_withDisableFlag(self):
+    cluster = self.messages.Cluster(
+        clusterName=self.CLUSTER_NAME,
+        projectId=self.Project(),
+        config=self.messages.ClusterConfig(autoscalingConfig=None))
+    expected = self.MakeRunningCluster()
+    expected.config.autoscalingConfig = None
+    changed_fields = [
+        'config.autoscaling_config.policy_uri',
+    ]
+    self.ExpectUpdateCalls(
+        cluster=cluster, field_paths=changed_fields, response=expected)
+    result = self.RunDataproc(
+        ('clusters update {0} --disable-autoscaling').format(self.CLUSTER_NAME))
+    self.AssertMessagesEqual(expected, result)
+
   def testUpdateCluster_withExpirationTimeAndMaxAge(self):
     with self.AssertRaisesArgumentErrorMatches(
         'argument --expiration-time: At most one of --expiration-time | '
@@ -488,6 +591,11 @@ class ClustersUpdateUnitTestBeta(ClustersUpdateUnitTest,
       self.RunDataproc(
           ('clusters update {0} --expiration-time=2017-22T13:31:48-08:00'
           ).format(self.CLUSTER_NAME))
+
+
+class ClustersUpdateUnitTestAlpha(
+    ClustersUpdateUnitTestBeta, base.DataprocTestBaseAlpha):
+  pass
 
 
 if __name__ == '__main__':

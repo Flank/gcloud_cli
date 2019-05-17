@@ -1,6 +1,6 @@
 NAME
-    gcloud alpha ml-engine jobs submit prediction - start a Cloud ML Engine
-        batch prediction job
+    gcloud alpha ml-engine jobs submit prediction - start an AI Platform batch
+        prediction job
 
 SYNOPSIS
     gcloud alpha ml-engine jobs submit prediction JOB --data-format=DATA_FORMAT
@@ -14,7 +14,7 @@ SYNOPSIS
           --accelerator-type=ACCELERATOR_TYPE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Start a Cloud ML Engine batch prediction job.
+    (ALPHA) Start an AI Platform batch prediction job.
 
 POSITIONAL ARGUMENTS
      JOB
@@ -83,9 +83,9 @@ OPTIONAL FLAGS
         Defaults to 10 if not specified.
 
      --runtime-version=RUNTIME_VERSION
-        Google Cloud ML Engine runtime version for this job. Defaults to a
-        stable version, which is defined in documentation along with the list
-        of supported versions:
+        AI Platform runtime version for this job. Defaults to a stable version,
+        which is defined in documentation along with the list of supported
+        versions:
         https://cloud.google.com/ml-engine/docs/tensorflow/runtime-version-list
 
      --signature-name=SIGNATURE_NAME
@@ -101,7 +101,7 @@ OPTIONAL FLAGS
         the default version of the model will be used. To list versions for a
         model, run
 
-            $ gcloud ml-engine versions list
+            $ gcloud ai-platform versions list
 
      Accelerator Configuration.
 
@@ -122,8 +122,9 @@ OPTIONAL FLAGS
           group are specified.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

@@ -1,0 +1,96 @@
+title: cloud domains describe test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      domains registrations describe example.com
+  - stdout: |
+      createTime: '2018-11-23T11:15:04.123212416Z'
+      dnsConfig: {}
+      domainName: example.com
+      expireTime: '2019-11-23T11:15:09Z'
+      name: projects/fake-project/locations/global/registrations/example.com
+      state: ACTIVE
+      updateTime: '2018-11-28T12:49:34.888985282Z'
+      whoisConfig:
+        privacy: USE_WHOIS_PRIVACY_PROXY
+        registrantContact:
+          email: testuser@google.com
+          phoneNumber: '+1.1234567890'
+          postalAddress:
+            addressLines:
+            - 1600 Amphitheatre Pkwy
+            administrativeArea: CA
+            locality: Mountain View
+            postalCode: '94043'
+            recipients:
+            - Test User
+            regionCode: US
+actions:
+- execute_command:
+    command: |
+      domains registrations describe example.com
+    events:
+    - api_call:
+        expect_request:
+          uri: https://domains.googleapis.com/v1alpha1/projects/fake-project/locations/global/registrations/example.com?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/global/registrations/example.com",
+              "domainName": "example.com",
+              "createTime": "2018-11-23T11:15:04.123212416Z",
+              "updateTime": "2018-11-28T12:49:34.888985282Z",
+              "expireTime": "2019-11-23T11:15:09Z",
+              "state": "ACTIVE",
+              "dnsConfig": {},
+              "whoisConfig": {
+                "privacy": "USE_WHOIS_PRIVACY_PROXY",
+                "registrantContact": {
+                  "postalAddress": {
+                    "regionCode": "US",
+                    "postalCode": "94043",
+                    "administrativeArea": "CA",
+                    "locality": "Mountain View",
+                    "addressLines": [
+                      "1600 Amphitheatre Pkwy"
+                    ],
+                    "recipients": [
+                      "Test User"
+                    ]
+                  },
+                  "email": "testuser@google.com",
+                  "phoneNumber": "+1.1234567890"
+                }
+              }
+            }
+    - expect_stdout: |
+        createTime: '2018-11-23T11:15:04.123212416Z'
+        dnsConfig: {}
+        domainName: example.com
+        expireTime: '2019-11-23T11:15:09Z'
+        name: projects/fake-project/locations/global/registrations/example.com
+        state: ACTIVE
+        updateTime: '2018-11-28T12:49:34.888985282Z'
+        whoisConfig:
+          privacy: USE_WHOIS_PRIVACY_PROXY
+          registrantContact:
+            email: testuser@google.com
+            phoneNumber: '+1.1234567890'
+            postalAddress:
+              addressLines:
+              - 1600 Amphitheatre Pkwy
+              administrativeArea: CA
+              locality: Mountain View
+              postalCode: '94043'
+              recipients:
+              - Test User
+              regionCode: US
+    - expect_exit:
+        code: 0

@@ -5,7 +5,8 @@ SYNOPSIS
     gcloud beta compute tpus create (TPU : --zone=ZONE) --network=NETWORK
         --range=RANGE --version=VERSION
         [--accelerator-type=ACCELERATOR_TYPE; default="v2-8"] [--async]
-        [--description=DESCRIPTION] [--preemptible] [GCLOUD_WIDE_FLAG ...]
+        [--description=DESCRIPTION] [--preemptible] [--reserved]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Create a new Cloud TPU.
@@ -70,9 +71,19 @@ OPTIONAL FLAGS
 
         Preemptible TPUs cannot be restarted.
 
+     --reserved
+        When specified, will attempt to create the TPU node under reservations
+        made in the current project. The reservations can be made separately
+        but used in aggregated form. i.e., the user can make a reservation of
+        128 V2 TPUs and later on make another reservation of 128 V2 TPUs then
+        creates a v2-256 TPU instance. If there exists no reservation or not
+        sufficient amount of reserved cores under the project, the request will
+        fail due to lack of capacity.
+
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

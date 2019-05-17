@@ -1,18 +1,28 @@
 NAME
-    gcloud alpha ml-engine jobs submit training - submit a Cloud Machine
-        Learning training job
+    gcloud alpha ml-engine jobs submit training - submit an AI Platform
+        training job
 
 SYNOPSIS
     gcloud alpha ml-engine jobs submit training JOB [--config=CONFIG]
         [--job-dir=JOB_DIR] [--labels=[KEY=VALUE,...]]
-        [--module-name=MODULE_NAME] [--package-path=PACKAGE_PATH]
-        [--packages=[PACKAGE,...]] [--python-version=PYTHON_VERSION]
-        [--region=REGION] [--runtime-version=RUNTIME_VERSION]
-        [--scale-tier=SCALE_TIER] [--staging-bucket=STAGING_BUCKET]
-        [--async | --stream-logs] [GCLOUD_WIDE_FLAG ...] [-- USER_ARGS ...]
+        [--master-accelerator=[count=COUNT],[type=TYPE]]
+        [--master-image-uri=MASTER_IMAGE_URI]
+        [--master-machine-type=MASTER_MACHINE_TYPE] [--module-name=MODULE_NAME]
+        [--package-path=PACKAGE_PATH] [--packages=[PACKAGE,...]]
+        [--parameter-server-accelerator=[count=COUNT],[type=TYPE]]
+        [--parameter-server-image-uri=PARAMETER_SERVER_IMAGE_URI]
+        [--python-version=PYTHON_VERSION] [--region=REGION]
+        [--runtime-version=RUNTIME_VERSION] [--scale-tier=SCALE_TIER]
+        [--staging-bucket=STAGING_BUCKET]
+        [--worker-accelerator=[count=COUNT],[type=TYPE]]
+        [--worker-image-uri=WORKER_IMAGE_URI] [--async | --stream-logs]
+        [--parameter-server-count=PARAMETER_SERVER_COUNT
+          --parameter-server-machine-type=PARAMETER_SERVER_MACHINE_TYPE]
+        [--worker-count=WORKER_COUNT --worker-machine-type=WORKER_MACHINE_TYPE]
+        [GCLOUD_WIDE_FLAG ...] [-- USER_ARGS ...]
 
 DESCRIPTION
-    (ALPHA) Submit a Cloud Machine Learning training job.
+    (ALPHA) Submit an AI Platform training job.
 
     This creates temporary files and executes Python code staged by a user on
     Google Cloud Storage. Model code can either be specified with a path, e.g.:
@@ -40,7 +50,7 @@ DESCRIPTION
 
     To follow the progress of your job, pass the --stream-logs flag (note that
     even with the --stream-logs flag, the job will continue to run after this
-    command exits and must be cancelled with gcloud ml-engine jobs cancel
+    command exits and must be cancelled with gcloud ai-platform jobs cancel
     JOB_ID).
 
     For more information, see:
@@ -103,8 +113,8 @@ FLAGS
         data needed for training.
 
         This path will be passed to your TensorFlow program as the --job_dir
-        command-line arg. The benefit of specifying this field is that Cloud ML
-        Engine will validate the path for use in training.
+        command-line arg. The benefit of specifying this field is that AI
+        Platform will validate the path for use in training.
 
         If packages must be uploaded and --staging-bucket is not provided, this
         path will be used instead.
@@ -116,6 +126,30 @@ FLAGS
         (-), underscores (_), lowercase characters, and numbers. Values must
         contain only hyphens (-), underscores (_), lowercase characters, and
         numbers.
+
+     --master-accelerator=[count=COUNT],[type=TYPE]
+        Hardware accelerator config for the master worker. Must specify both
+        the accelerator type (TYPE) for each server and the number of
+        accelerators to attach to each server (COUNT).
+
+         type
+            The type of the accelerator. Choices are
+            nvidia-tesla-k80,nvidia-tesla-p100,nvidia-tesla-p4,nvidia-tesla-t4,nvidia-tesla-v100,tpu-v2
+
+         count
+            The number of accelerators to attach to each machine running the
+            job. Must be greater than 0.
+
+     --master-image-uri=MASTER_IMAGE_URI
+        Docker image to run on each master worker. This image must be in Google
+        Container Registry. Only one of master-image-uri and runtimeVersion
+        must be specified.
+
+     --master-machine-type=MASTER_MACHINE_TYPE
+        Specifies the type of virtual machine to use for training job's master
+        worker.
+
+        You must set this value when scaleTier is set to CUSTOM.
 
      --module-name=MODULE_NAME
         Name of the module to run.
@@ -132,6 +166,24 @@ FLAGS
         (absolute or relative), in which case they will be uploaded to the
         Cloud Storage bucket given by --staging-bucket, or Cloud Storage URLs
         (gs://bucket-name/path/to/package.tar.gz).
+
+     --parameter-server-accelerator=[count=COUNT],[type=TYPE]
+        Hardware accelerator config for the parameter servers. Must specify
+        both the accelerator type (TYPE) for each server and the number of
+        accelerators to attach to each server (COUNT).
+
+         type
+            The type of the accelerator. Choices are
+            nvidia-tesla-k80,nvidia-tesla-p100,nvidia-tesla-p4,nvidia-tesla-t4,nvidia-tesla-v100,tpu-v2
+
+         count
+            The number of accelerators to attach to each machine running the
+            job. Must be greater than 0.
+
+     --parameter-server-image-uri=PARAMETER_SERVER_IMAGE_URI
+        Docker image to run on each parameter server. This image must be in
+        Google Container Registry. If not specified, the value of
+        master-image-uri is used.
 
      --python-version=PYTHON_VERSION
         Version of Python used during training. If not set, the default version
@@ -159,9 +211,9 @@ FLAGS
         CLOUDSDK_COMPUTE_REGION.
 
      --runtime-version=RUNTIME_VERSION
-        Google Cloud ML Engine runtime version for this job. Defaults to a
-        stable version, which is defined in documentation along with the list
-        of supported versions:
+        AI Platform runtime version for this job. Defaults to a stable version,
+        which is defined in documentation along with the list of supported
+        versions:
         https://cloud.google.com/ml-engine/docs/tensorflow/runtime-version-list
 
      --scale-tier=SCALE_TIER
@@ -170,8 +222,8 @@ FLAGS
 
          basic
             Single worker instance. This tier is suitable for learning how to
-            use Cloud ML Engine, and for experimenting with new models using
-            small datasets.
+            use AI Platform, and for experimenting with new models using small
+            datasets.
          basic-gpu
             Single worker instance with a GPU.
          basic-tpu
@@ -210,6 +262,24 @@ FLAGS
         include local paths) and no other flags implicitly specify an upload
         path.
 
+     --worker-accelerator=[count=COUNT],[type=TYPE]
+        Hardware accelerator config for the worker nodes. Must specify both the
+        accelerator type (TYPE) for each server and the number of accelerators
+        to attach to each server (COUNT).
+
+         type
+            The type of the accelerator. Choices are
+            nvidia-tesla-k80,nvidia-tesla-p100,nvidia-tesla-p4,nvidia-tesla-t4,nvidia-tesla-v100,tpu-v2
+
+         count
+            The number of accelerators to attach to each machine running the
+            job. Must be greater than 0.
+
+     --worker-image-uri=WORKER_IMAGE_URI
+        Docker image to run on each worker node. This image must be in Google
+        Container Registry. If not specified, the value of master-image-uri is
+        used.
+
      At most one of these may be specified:
 
        --async
@@ -223,11 +293,38 @@ FLAGS
           Note that even if command execution is halted, the job will still run
           until cancelled with
 
-              $ gcloud ml-engine jobs cancel JOB_ID
+              $ gcloud ai-platform jobs cancel JOB_ID
+
+     Configure parameter server machine type settings.
+
+       --parameter-server-count=PARAMETER_SERVER_COUNT
+          The number of parameter servers to use for the training job. This
+          flag must be specified if any of the other arguments in this group
+          are specified.
+
+       --parameter-server-machine-type=PARAMETER_SERVER_MACHINE_TYPE
+          Type of virtual machine to use for training job'sparameter servers.
+          This flag must be specified if any of the other arguments in this
+          group are specified machine to use for training job's parameter
+          servers. This flag must be specified if any of the other arguments in
+          this group are specified.
+
+     Configure worker node machine type settings.
+
+       --worker-count=WORKER_COUNT
+          The number of worker nodes to use for the training job. This flag
+          must be specified if any of the other arguments in this group are
+          specified.
+
+       --worker-machine-type=WORKER_MACHINE_TYPE
+          Type of virtual machine to use for training job's worker nodes. This
+          flag must be specified if any of the other arguments in this group
+          are specified.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

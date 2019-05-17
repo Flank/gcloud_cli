@@ -668,5 +668,27 @@ class BundleTest(
         })
 
 
+class ClusterUtilTest(test_case.Base):
+
+  def testCalculateMaxNodeNumberByPodRange(self):
+    testcases = [
+        # cluster_ipv4_cidr, expected return
+        ('bad', -1),
+        (None, 1008),
+        ('10.0.0.0/20', -1),
+        ('10.0.0.0/19', 16),
+        ('10.0.0.0/-1', -1),
+        ('10.0.0.0/bad', -1),
+        ('10.0.0.0/10', 16368),
+    ]
+    for (cluster_ipv4_cidr, want_return) in testcases:
+      got_return = c_util.CalculateMaxNodeNumberByPodRange(cluster_ipv4_cidr)
+      self.assertEqual(
+          got_return, want_return,
+          'CalculateMaxNodeNumberByPodRange(%s) = %d; want %d' %
+          ('None' if cluster_ipv4_cidr is None else cluster_ipv4_cidr,
+           got_return, want_return))
+
+
 if __name__ == '__main__':
   test_case.main()

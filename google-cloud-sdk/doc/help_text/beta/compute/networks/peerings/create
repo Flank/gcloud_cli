@@ -5,6 +5,7 @@ NAME
 SYNOPSIS
     gcloud beta compute networks peerings create NAME --network=NETWORK
         --peer-network=PEER_NETWORK [--async] [--auto-create-routes]
+        [--export-custom-routes] [--import-custom-routes]
         [--peer-project=PEER_PROJECT] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -28,16 +29,29 @@ OPTIONAL FLAGS
         for the operation to complete.
 
      --auto-create-routes
-        If set, will automatically create routes for the network peering. Note
-        that a backend error will be returned if this is not set.
+        (DEPRECATED) If set, will automatically create routes for the network
+        peering. Flag auto-create-routes is deprecated. Peer network subnet
+        routes are always created in a network when peered.
+
+        Flag --auto-create-routes is deprecated and will be removed in a future
+        release.
+
+     --export-custom-routes
+        If set, the network will export custom routes to peer network. Use
+        --no-export-custom-routes to disable it.
+
+     --import-custom-routes
+        If set, the network will import custom routes from peer network. Use
+        --no-import-custom-routes to disable it.
 
      --peer-project=PEER_PROJECT
         The name of the project for the peer network. If not specified,
         defaults to current project.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

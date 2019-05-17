@@ -1,6 +1,5 @@
 title: test internal forwarding rules
-release_tracks:
-- BETA
+release_tracks: [BETA]
 
 summary:
 # This summary is generated automatically on update and should not be edited.
@@ -110,6 +109,9 @@ summary:
   - stderr: |
       Deleted [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
 actions:
+- define_reference:
+    reference: compute-uri
+    value: www.googleapis.com/compute
 # Set up
 - generate_resource_id:
     reference: instance
@@ -176,7 +178,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules?alt=json
+          uri: https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules?alt=json
           method: POST
           headers: {}
           body:
@@ -208,7 +210,7 @@ actions:
         Created [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$forwarding-rule$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$forwarding-rule$$?alt=json
+          uri: https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$forwarding-rule$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -246,7 +248,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$forwarding-rule$$?alt=json
+          uri: https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$forwarding-rule$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -286,7 +288,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$forwarding-rule$$/setTarget?alt=json
+          uri: https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$forwarding-rule$$/setTarget?alt=json
           method: POST
           headers: {}
           body:
@@ -316,7 +318,7 @@ actions:
         Updated [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$forwarding-rule$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$forwarding-rule$$?alt=json
+          uri: https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$forwarding-rule$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -363,7 +365,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$forwarding-rule$$/setTarget?alt=json
+          uri: https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$forwarding-rule$$/setTarget?alt=json
           method: POST
           headers: {}
           body:
@@ -393,7 +395,7 @@ actions:
         Updated [https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$forwarding-rule$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$forwarding-rule$$?alt=json
+          uri: https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$forwarding-rule$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -442,7 +444,7 @@ actions:
         user_input: y
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$forwarding-rule$$?alt=json
+          uri: https://$$compute-uri$$/beta/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$forwarding-rule$$?alt=json
           method: DELETE
           headers: {}
           body: null

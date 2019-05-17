@@ -19,15 +19,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import time
 
 from apitools.base.py import encoding
 from apitools.base.py.testing import mock as apitools_mock
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.api_lib.util import waiter
 from googlecloudsdk.calliope import base as calliope_base
-from googlecloudsdk.calliope import cli as calliope_cli
-from googlecloudsdk.calliope import command_loading
 from googlecloudsdk.calliope import exceptions as gcloud_exceptions
 from googlecloudsdk.command_lib.iam import iam_util
 from googlecloudsdk.command_lib.util.apis import arg_marshalling
@@ -36,9 +33,9 @@ from googlecloudsdk.command_lib.util.apis import yaml_command_schema
 from googlecloudsdk.command_lib.util.apis import yaml_command_translator
 from googlecloudsdk.core import resources
 from tests.lib import parameterized
-from tests.lib import sdk_test_base
-from tests.lib import test_case
 from tests.lib.command_lib.util.apis import base
+from tests.lib.command_lib.util.apis import yaml_command_base
+
 
 import mock
 from six.moves import range  # pylint: disable=redefined-builtin
@@ -116,240 +113,7 @@ class CommandBuilderTests(base.Base):
       cb.Generate()
 
 
-class MockTranslator(command_loading.YamlCommandTranslator):
-  """A sub that lets us run the generator without having to write command files.
-  """
-
-  def __init__(self, spec, name='describe'):
-    self.spec = spec
-    self.name = name
-
-  def Translate(self, path, command_data):
-    return yaml_command_translator.CommandBuilder(
-        self.spec, ['abc', 'xyz', self.name]).Generate()
-
-
-class CommandTestsBase(sdk_test_base.WithFakeAuth,
-                       sdk_test_base.WithOutputCapture, test_case.WithInput):
-
-  def SetUp(self):
-    self.StartObjectPatch(time, 'sleep')
-    client = apis.GetClientClass('compute', 'v1')
-    self.mocked_client = apitools_mock.Client(client)
-    self.messages = client.MESSAGES_MODULE
-    self.mocked_client.Mock()
-    self.addCleanup(self.mocked_client.Unmock)
-
-    functions_client = apis.GetClientClass('cloudfunctions', 'v1')
-    self.mocked_functions_client = apitools_mock.Client(functions_client)
-    self.functions_messages = functions_client.MESSAGES_MODULE
-    self.mocked_functions_client.Mock()
-    self.addCleanup(self.mocked_functions_client.Unmock)
-
-  def TearDown(self):
-    # Wait for the ProgressTracker ticker thread to end.
-    self.JoinAllThreads(timeout=2)
-
-  def MakeCommandData(self,
-                      collection='compute.instances',
-                      is_create=False,
-                      is_list=False,
-                      is_async=None,
-                      brief=None,
-                      description=None):
-    if is_list:
-      spec = {'name': 'zone', 'collection': 'compute.zones', 'attributes': [
-          {'parameter_name': 'zone',
-           'attribute_name': 'zone',
-           'help': 'the zone'}]}
-    else:
-      spec = {'name': 'instance', 'collection': 'compute.instances',
-              'request_id_field': 'instance.name', 'attributes': [
-                  {'parameter_name': 'zone',
-                   'attribute_name': 'zone',
-                   'help': 'the zone'},
-                  {'parameter_name': 'instance',
-                   'attribute_name': 'instance',
-                   'help': 'the instance'}]}
-    data = {
-        'help_text': {
-            'brief': brief or 'brief help'
-        },
-        'request': {
-            'collection': collection
-        },
-        'arguments': {
-            'resource': {
-                'help_text': 'help',
-                'spec': spec
-            }
-        }
-    }
-    if is_async:
-      data['async'] = {
-          'collection':
-          '.'.join(collection.split('.')[:-1]) + '.zoneOperations'}
-    return data
-
-  @classmethod
-  def _GetIoTSpec(cls):
-    return {
-        'name':
-            'registry',
-        'collection':
-            'cloudiot.projects.locations.registries',
-        'attributes': [
-            {
-                'parameter_name': 'locationsId',
-                'attribute_name': 'region',
-                'help': 'The name of the Cloud IoT region.',
-            },
-            {
-                'parameter_name': 'registriesId',
-                'attribute_name': 'registry',
-                'help': 'The name of the Cloud IoT registry.',
-            },
-        ],
-    }
-
-  @classmethod
-  def _GetMLSpec(cls):
-    return {
-        'name':
-            'model',
-        'collection':
-            'ml.projects.models',
-        'attributes': [{
-            'parameter_name': 'projectsId',
-            'attribute_name': 'project',
-            'help': 'The name of the Project.',
-        }, {
-            'parameter_name': 'modelsId',
-            'attribute_name': 'model',
-            'help': 'The name of the Model.',
-        }],
-    }
-
-  @classmethod
-  def MakeIAMCommandData(cls,
-                         help_text,
-                         brief=None,
-                         description=None,
-                         notes=None,
-                         params=None,
-                         another_collection=False):
-    spec = cls._GetIoTSpec()
-    collection = 'cloudiot.projects.locations.registries'
-    if another_collection:
-      collection = 'ml.projects.models'
-      spec = cls._GetMLSpec()
-    data = {
-        'help_text': {
-            'brief': brief or '<brief>',
-            'DESCRIPTION': description or '<DESCRIPTION>',
-            'NOTES': notes,
-        },
-        'request': {
-            'collection': collection,
-        },
-        'arguments': {
-            'resource': {
-                'help_text': 'The {resource} for which ' + help_text,
-                'spec': spec,
-            },
-        },
-    }
-    if params is not None:
-      data['arguments']['params'] = params
-
-    return data
-
-  def MakeCLI(self, spec, name='describe'):
-    """Creates a  CLI with one command that implements the given spec."""
-    test_cli_dir = self.Resource('tests', 'unit', 'command_lib', 'util', 'apis',
-                                 'testdata', 'sdk1')
-    loader = calliope_cli.CLILoader(
-        name='gcloud',
-        command_root_directory=test_cli_dir,
-        allow_non_existing_modules=True,
-        yaml_command_translator=MockTranslator(spec, name=name))
-    return loader.Generate()
-
-  def OperationResponses(self):
-    running_response = self.messages.Operation(
-        id=12345, name='operation-12345',
-        selfLink='https://www.googleapis.com/compute/v1/projects/p/zones/z/'
-                 'operations/operation-12345',
-        error=None,
-        status=self.messages.Operation.StatusValueValuesEnum.RUNNING)
-    done_response = self.messages.Operation(
-        id=12345, name='operation-12345',
-        selfLink='https://www.googleapis.com/compute/v1/projects/p'
-                 '/zones/z/operations/operation-12345',
-        error=None,
-        status=self.messages.Operation.StatusValueValuesEnum.DONE)
-    return running_response, done_response
-
-  def ExpectOperation(self):
-    running_response, done_response = self.OperationResponses()
-    self.mocked_client.zoneOperations.Get.Expect(
-        self.messages.ComputeZoneOperationsGetRequest(
-            operation='operation-12345', project='p', zone='z'),
-        response=running_response)
-    self.mocked_client.zoneOperations.Get.Expect(
-        self.messages.ComputeZoneOperationsGetRequest(
-            operation='operation-12345', project='p', zone='z'),
-        response=done_response)
-
-  def AssertArgs(self, cli, *args):
-    positionals = {a for a in args if not a.startswith('-')}
-    flags = {a for a in args if a.startswith('-')}
-    # These are just always here so check for them automatically.
-    flags.add('--document')
-    flags.add('--help')
-    flags.add('-h')
-
-    c = cli.top_element.LoadSubElement('command')
-    actual_positionals = {a.metavar for a in c.ai.positional_args}
-    actual_flags = {a.option_strings[0] for a in c.ai.flag_args}
-    self.assertEqual(actual_positionals, positionals)
-    self.assertEqual(actual_flags, flags)
-
-  def AssertErrorHandlingWithResponse(self,
-                                      expect_func,
-                                      command_data,
-                                      execute_params=None):
-
-    class Good(object):
-      c = 2
-      d = 3
-
-    class Error(object):
-      code = 10
-      message = 'message'
-
-    class Bad(object):
-      error = Error
-
-    class Response(object):
-      a = 1
-      b = [Good, Bad]
-
-    expect_func(response=Response)
-    command_data.response = yaml_command_schema.Response({
-        'error': {
-            'field': 'b.error',
-            'code': 'code',
-            'message': 'message'
-        }
-    })
-    cli = self.MakeCLI(command_data)
-    with self.assertRaises(SystemExit):
-      cli.Execute(execute_params or [])
-    self.AssertErrContains('Code: [10] Message: [message]')
-
-
-class DescribeCommandTests(CommandTestsBase,
+class DescribeCommandTests(yaml_command_base.CommandTestsBase,
                            parameterized.TestCase):
 
   def Expect(self, instance='i', response=None):
@@ -741,7 +505,7 @@ class DescribeCommandTests(CommandTestsBase,
     self.AssertOutputEquals('foo: bar\n')
 
 
-class ListCommandTests(CommandTestsBase):
+class ListCommandTests(yaml_command_base.CommandTestsBase):
 
   def Expect(self):
     response = self.messages.InstanceList(
@@ -791,7 +555,7 @@ https://www.googleapis.com/compute/v1/projects/p/zones/z/instances/instance-2
 """.lstrip('\n'), normalize_space=True)
 
 
-class DeleteCommandTests(CommandTestsBase):
+class DeleteCommandTests(yaml_command_base.CommandTestsBase):
 
   def Expect(self, is_async=False):
     running_response, done_response = self.OperationResponses()
@@ -881,7 +645,7 @@ class DeleteCommandTests(CommandTestsBase):
     self.AssertErrContains('Deleted instance [display name]')
 
 
-class CreateCommandTests(CommandTestsBase):
+class CreateCommandTests(yaml_command_base.CommandTestsBase):
 
   def Expect(self, is_async=False):
     running_response, _ = self.OperationResponses()
@@ -1067,7 +831,11 @@ class CreateCommandTests(CommandTestsBase):
 
   def testWithParentResource(self):
     m = self.functions_messages
-    done_response = m.Operation(done=True)
+    expected_function = m.CloudFunction(name='myfunction')
+    expected_result = encoding.DictToMessage(
+        encoding.MessageToDict(expected_function),
+        m.Operation.ResponseValue)
+    done_response = m.Operation(done=True, response=expected_result)
     self.mocked_functions_client.projects_locations_functions.Create.Expect(
         m.CloudfunctionsProjectsLocationsFunctionsCreateRequest(
             location='projects/p/locations/l'),
@@ -1095,13 +863,15 @@ class CreateCommandTests(CommandTestsBase):
         'create', command_data)
 
     d.request.method = 'create'
+    d.request.display_resource_type = 'function'
 
     cli = self.MakeCLI(d)
     self.AssertArgs(cli, 'LOCATION')
     result = cli.Execute(
         ['command', '--project', 'p', 'l'])
     self.assertEqual(done_response, result)
-    self.AssertErrNotContains('Created')
+    self.AssertErrContains('Created {} [{}].'.format(
+        d.request.display_resource_type, expected_function.name))
     self.AssertErrNotContains('issued for')
 
   def testWithParentResourceAsync(self):
@@ -1128,8 +898,7 @@ class CreateCommandTests(CommandTestsBase):
         collection='cloudfunctions.projects.locations.functions')
     command_data['async'] = {
         'collection': 'cloudfunctions.operations',
-        'extract_resource_result': False,
-        'result_attribute': 'response'}
+        'extract_resource_result': False}
     command_data['arguments']['resource'] = {
         'arg_name': 'location',
         'help_text': 'group help',
@@ -1149,6 +918,8 @@ class CreateCommandTests(CommandTestsBase):
         'create', command_data)
 
     d.request.method = 'create'
+    d.request.display_resource_type = 'function'
+    d.response.result_attribute = 'response'
 
     cli = self.MakeCLI(d)
     self.AssertArgs(cli, 'LOCATION', '--async', '--no-async')
@@ -1158,13 +929,13 @@ class CreateCommandTests(CommandTestsBase):
         encoding.MessageToDict(result),
         m.CloudFunction)
     self.assertEqual(expected_function, result_function)
-    self.AssertErrContains('Create')
-    self.AssertErrContains('issued')
-    self.AssertErrNotContains('Created')
+    self.AssertErrContains('Create request issued')
+    self.AssertErrContains('Created {} [{}].'.format(
+        d.request.display_resource_type, expected_function.name))
     self.AssertErrNotContains('issued for')
 
 
-class WaitCommandTests(CommandTestsBase):
+class WaitCommandTests(yaml_command_base.CommandTestsBase):
 
   def Expect(self, is_async=False):
     running_response, done_response = self.OperationResponses()
@@ -1213,7 +984,7 @@ status: DONE
     self.assertEqual(result, done_response)
 
 
-class GenericCommandTests(CommandTestsBase):
+class GenericCommandTests(yaml_command_base.CommandTestsBase):
 
   def Expect(self, is_async=False):
     running_response, _ = self.OperationResponses()
@@ -1312,7 +1083,7 @@ status: RUNNING
     self.assertEqual(result, running_response)
 
 
-class AsyncPollerTests(CommandTestsBase):
+class AsyncPollerTests(yaml_command_base.CommandTestsBase):
 
   def testIsDone(self):
     d = yaml_command_schema.CommandData(
@@ -1329,7 +1100,7 @@ class AsyncPollerTests(CommandTestsBase):
         self.error = None
 
     op = Op()
-    poller = yaml_command_translator.AsyncOperationPoller(d, None)
+    poller = yaml_command_translator.AsyncOperationPoller(d, None, None)
     self.assertFalse(poller.IsDone(op))
     op.status = 'FOO'
     self.assertFalse(poller.IsDone(op))
@@ -1371,14 +1142,14 @@ class AsyncPollerTests(CommandTestsBase):
     op_ref = resources.REGISTRY.Parse(
         'operation-12345', params={'project': 'p', 'zone': 'z'},
         collection='compute.zoneOperations')
-    poller = yaml_command_translator.AsyncOperationPoller(d, None)
+    poller = yaml_command_translator.AsyncOperationPoller(d, None, None)
     result = poller.Poll(op_ref)
     self.assertEqual(result, running_response)
 
     # Test operations api version override.
     d.request.api_version = 'v2'
     d.async.api_version = 'v1'
-    poller = yaml_command_translator.AsyncOperationPoller(d, None)
+    poller = yaml_command_translator.AsyncOperationPoller(d, None, None)
     result = poller.Poll(op_ref)
     self.assertEqual(result, running_response)
 
@@ -1390,7 +1161,7 @@ class AsyncPollerTests(CommandTestsBase):
     op_ref = resources.REGISTRY.Parse(
         'operation-12345', params={'project': 'z', 'zone': 'p'},
         collection='compute.zoneOperations')
-    poller = yaml_command_translator.AsyncOperationPoller(d, None)
+    poller = yaml_command_translator.AsyncOperationPoller(d, None, None)
     result = poller.Poll(op_ref)
     self.assertEqual(result, running_response)
 
@@ -1404,18 +1175,18 @@ class AsyncPollerTests(CommandTestsBase):
 
     o = Result()
 
-    poller = yaml_command_translator.AsyncOperationPoller(d, None)
+    poller = yaml_command_translator.AsyncOperationPoller(d, None, None)
     self.assertEqual(o, poller.GetResult(o))
 
     # Doesn't return result when explicitly disabled even if resource ref is
     # valid.
     d.async.extract_resource_result = False
-    poller = yaml_command_translator.AsyncOperationPoller(d, object())
+    poller = yaml_command_translator.AsyncOperationPoller(d, object(), None)
     self.assertEqual(o, poller.GetResult(o))
 
     # Test extracting a specific attribute from the operation.
     d.async.result_attribute = 'name'
-    poller = yaml_command_translator.AsyncOperationPoller(d, None)
+    poller = yaml_command_translator.AsyncOperationPoller(d, None, None)
     self.assertEqual(o.name, poller.GetResult(o))
 
   def testGetResult(self):
@@ -1441,17 +1212,17 @@ class AsyncPollerTests(CommandTestsBase):
     resource_ref = resources.REGISTRY.Parse(
         'i', params={'zone': 'z', 'project': 'p'},
         collection='compute.instances')
-    poller = yaml_command_translator.AsyncOperationPoller(d, resource_ref)
+    poller = yaml_command_translator.AsyncOperationPoller(d, resource_ref, None)
     self.assertEqual(response, poller.GetResult(None))
 
     # Test extracting a specific attribute from the result.
     d.async.result_attribute = 'foo.name'
-    poller = yaml_command_translator.AsyncOperationPoller(d, resource_ref)
+    poller = yaml_command_translator.AsyncOperationPoller(d, resource_ref, None)
     self.assertEqual('bar', poller.GetResult(None))
 
     # Test invalid attribute on the result.
     d.async.result_attribute = 'foo.junk'
-    poller = yaml_command_translator.AsyncOperationPoller(d, resource_ref)
+    poller = yaml_command_translator.AsyncOperationPoller(d, resource_ref, None)
     with self.assertRaisesRegex(AttributeError,
                                 r'Attribute path \[foo.junk\] not found'):
       poller.GetResult(None)
@@ -1511,23 +1282,23 @@ class AsyncPollerTests(CommandTestsBase):
     resource_ref = resources.REGISTRY.Parse(
         'f', params={'locationsId': 'l', 'projectsId': 'p'},
         collection='cloudfunctions.projects.locations.functions')
-    poller = yaml_command_translator.AsyncOperationPoller(d, resource_ref)
+    poller = yaml_command_translator.AsyncOperationPoller(d, resource_ref, None)
     self.assertEqual(response, poller.GetResult(None))
 
     # Test extracting a specific attribute from the result.
     d.async.result_attribute = 'foo.name'
-    poller = yaml_command_translator.AsyncOperationPoller(d, resource_ref)
+    poller = yaml_command_translator.AsyncOperationPoller(d, resource_ref, None)
     self.assertEqual('bar', poller.GetResult(None))
 
     # Test invalid attribute on the result.
     d.async.result_attribute = 'foo.junk'
-    poller = yaml_command_translator.AsyncOperationPoller(d, resource_ref)
+    poller = yaml_command_translator.AsyncOperationPoller(d, resource_ref, None)
     with self.assertRaisesRegex(AttributeError,
                                 r'Attribute path \[foo.junk\] not found'):
       poller.GetResult(None)
 
 
-class GetIamPolicyCommandTests(CommandTestsBase):
+class GetIamPolicyCommandTests(yaml_command_base.CommandTestsBase):
 
   def GetIamPolicyCLI(self):
     command_data = yaml_command_schema.CommandData(
@@ -1598,7 +1369,7 @@ class GetIamPolicyCommandTests(CommandTestsBase):
                                          execute_params)
 
 
-class SetIamPolicyCommandTests(CommandTestsBase):
+class SetIamPolicyCommandTests(yaml_command_base.CommandTestsBase):
 
   def _MakePolicy(self, bindings=None, etag=b'ACAB', messages=None):
     m = messages or self.messages
@@ -1871,7 +1642,7 @@ class SetIamPolicyCommandTests(CommandTestsBase):
                                          execute_params)
 
 
-class AddIamPolicyBindingCommandTests(CommandTestsBase):
+class AddIamPolicyBindingCommandTests(yaml_command_base.CommandTestsBase):
 
   def _MakePolicy(self, bindings=None, etag=b'ACAB', messages=None):
     m = messages or self.messages
@@ -2043,7 +1814,7 @@ class AddIamPolicyBindingCommandTests(CommandTestsBase):
                                          execute_params)
 
 
-class RemoveIamPolicyBindingCommandTests(CommandTestsBase):
+class RemoveIamPolicyBindingCommandTests(yaml_command_base.CommandTestsBase):
 
   def _MakePolicy(self, bindings=None, etag=b'ACAB', messages=None):
     msgs = messages or self.messages
@@ -2212,7 +1983,7 @@ class RemoveIamPolicyBindingCommandTests(CommandTestsBase):
                                          execute_params)
 
 
-class UpdateCommandTests(CommandTestsBase):
+class UpdateCommandTests(yaml_command_base.CommandTestsBase):
 
   def SetUp(self):
     self.client = apis.GetClientClass('spanner', 'v1')
@@ -2404,7 +2175,6 @@ name: projects/p/instances/i/operations/o
         'arg_name': 'nodes',
         'help_text': 'the number of the nodes of the instance to update'
     }]
-    data['update']['mask_field'] = 'updateInstanceRequest.fieldMask'
     data['update']['read_modify_update'] = True
     d = yaml_command_schema.CommandData('update', data)
     d.request.method = 'patch'
@@ -2423,6 +2193,59 @@ name: projects/p/instances/i/operations/o
     self.AssertErrContains('Request issued for: [i]')
     self.AssertErrContains('Check operation [o] for status.')
     self.AssertErrContains('Updated instance [i].\n')
+
+  def testRunDisableAutoFieldMask(self):
+    self._ExpectUpdate(field_mask='', is_async=True)
+    data = self._MakeUpdateCommandData()
+    data['async'] = {'collection': 'spanner.projects.instances.operations'}
+    data['request']['method'] = 'patch'
+    data['arguments']['params'] = [{
+        'api_field': 'updateInstanceRequest.instance.nodeCount',
+        'arg_name': 'nodes',
+        'help_text': 'the number of the nodes of the instance to update'
+    }]
+    data['update']['disable_auto_field_mask'] = True
+    d = yaml_command_schema.CommandData('update', data)
+    d.request.method = 'patch'
+    d.async.state.field = 'done'
+    d.async.state.success_values = [True]
+    cli = self.MakeCLI(d)
+    self.AssertArgs(cli, 'INSTANCE', '--nodes', '--async', '--no-async')
+    cli.Execute(['command', 'i', '--project', 'p', '--async', '--nodes', '2'])
+
+    self.AssertOutputEquals(
+        """
+done: false
+name: projects/p/instances/i/operations/o
+""".lstrip('\n'),
+        normalize_space=True)
+    self.AssertErrContains('Request issued for: [i]')
+    self.AssertErrContains('Check operation [o] for status.')
+    self.AssertErrContains('Updated instance [i].\n')
+
+
+class ModifyMethodHookTests(yaml_command_base.CommandTestsBase):
+
+  def Expect(self, instance='i', response=None):
+    self.mocked_client.instances.Get.Expect(
+        self.messages.ComputeInstancesGetRequest(
+            instance=instance, zone='z', project='p'),
+        response=response or {'foo': 'bar'},
+        enable_type_checking=False)
+
+  def testModifyMethodHook(self):
+    self.Expect()
+    command_data = self.MakeCommandData()
+    d = yaml_command_schema.CommandData('describe', command_data)
+    modify_method_hook = mock.MagicMock()
+    modify_method_hook.return_value = 'get'
+    d.request.modify_method_hook = modify_method_hook
+    cli = self.MakeCLI(d)
+    self.AssertArgs(cli, 'INSTANCE', '--zone')
+    result = cli.Execute(['command', '--project', 'p', '--zone', 'z', 'i'])
+    self.assertEqual(result, {'foo': 'bar'})
+    self.AssertOutputEquals('foo: bar\n')
+    modify_method_hook.assert_called_once()
 
 
 if __name__ == '__main__':

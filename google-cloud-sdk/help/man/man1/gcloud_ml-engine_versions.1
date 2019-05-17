@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud ml\-engine versions \- cloud ML Engine Versions commands
+gcloud ml\-engine versions \- AI Platform Versions commands
 
 
 
@@ -20,18 +20,19 @@ gcloud ml\-engine versions \- cloud ML Engine Versions commands
 A version is an implementation of a model, represented as a serialized
 TensorFlow graph with trained parameters.
 
-When you communicate with Cloud ML Engine services, you use the combination of
-the model, version, and current project to identify a specific model
-implementation that is deployed in the cloud.
+When you communicate with AI Platform services, you use the combination of the
+model, version, and current project to identify a specific model implementation
+that is deployed in the cloud.
 
 
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -42,27 +43,27 @@ gcloud help\fR for details.
 .RS 2m
 .TP 2m
 \fBcreate\fR
-Create a new Cloud ML Engine version.
+Create a new AI Platform version.
 
 .TP 2m
 \fBdelete\fR
-Delete an existing Cloud ML Engine version.
+Delete an existing AI Platform version.
 
 .TP 2m
 \fBdescribe\fR
-Describe an existing Cloud ML Engine version.
+Describe an existing AI Platform version.
 
 .TP 2m
 \fBlist\fR
-List existing Cloud ML Engine versions.
+List existing AI Platform versions.
 
 .TP 2m
 \fBset\-default\fR
-Sets an existing Cloud ML Engine version as the default for its model.
+Sets an existing AI Platform version as the default for its model.
 
 .TP 2m
 \fBupdate\fR
-Update a Cloud ML Engine version.
+Update an AI Platform version.
 
 
 .RE

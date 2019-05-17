@@ -1,0 +1,235 @@
+title: Data Catalog create crawler scenario test.
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - label: Project-scoped, manual crawler
+  - command: data-catalog crawlers create crawler1 --crawl-scope=project --run-option=manual
+  - stderr: |
+      Created crawler [crawler1].
+- execute:
+  - label: Organization-scoped, manual crawler
+  - command: data-catalog crawlers create crawler1 --crawl-scope=organization --run-option=manual
+  - stderr: |
+      Created crawler [crawler1].
+- execute:
+  - label: Bucket-scoped, manual crawler
+  - command: data-catalog crawlers create crawler1 --crawl-scope=bucket --buckets=gs://bucket1,gs://bucket2
+      --run-option=manual
+  - stderr: |
+      Created crawler [crawler1].
+- execute:
+  - label: All flags
+  - command: data-catalog crawlers create crawler1 --crawl-scope=bucket --buckets=gs://bucket1
+      --run-option=scheduled --run-schedule=daily --display-name=display1 --description=description1
+      --bundle-specs=a/b/c
+  - stderr: |
+      Created crawler [crawler1].
+- execute:
+  - label: Buckets provided for crawler with non-bucket scope
+  - command: data-catalog crawlers create crawler1 --crawl-scope=project --buckets=gs://bucket1
+      --run-option=manual
+  - error: '1: Argument `--buckets` is only valid for bucket-scoped crawlers. Use
+      `--crawl-scope=bucket` to specify a bucket-scoped crawler.'
+- execute:
+  - label: Missing --buckets for bucket-scoped crawler
+  - command: data-catalog crawlers create crawler1 --crawl-scope=bucket --run-option=manual
+  - error: '1: Argument `--buckets` must be provided when creating a bucket-scoped
+      crawler.'
+- execute:
+  - label: Run schedule provided for manual run crawler
+  - command: data-catalog crawlers create crawler1 --crawl-scope=project --run-option=manual
+      --run-schedule=daily
+  - error: '1: Argument `--run-schedule` can only be provided for scheduled crawlers.
+      Use `--run-option=scheduled` to specify a scheduled crawler.'
+- execute:
+  - label: Missing --run-schedule for scheduled crawler
+  - command: data-catalog crawlers create crawler1 --crawl-scope=project --run-option=scheduled
+  - error: '1: Argument `--run-schedule` must be provided if `--run-option=scheduled`
+      was specified.'
+actions:
+- execute_command:
+    label: Project-scoped, manual crawler
+    command: data-catalog crawlers create crawler1 --crawl-scope=project --run-option=manual
+    events:
+    - api_call:
+        expect_request:
+          uri: https://datacatalog.googleapis.com/v1alpha3/projects/fake-project/crawlers?alt=json&crawlerId=crawler1
+          method: POST
+          headers: {}
+          body:
+            json:
+              config:
+                adHocRun: {}
+                projectScope: {}
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/crawlers/crawler1",
+              "config": {
+                "projectScope": {},
+                "adHocRun": {}
+              }
+            }
+    - expect_stderr: |
+        Created crawler [crawler1].
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: Organization-scoped, manual crawler
+    command: data-catalog crawlers create crawler1 --crawl-scope=organization --run-option=manual
+    events:
+    - api_call:
+        expect_request:
+          uri: https://datacatalog.googleapis.com/v1alpha3/projects/fake-project/crawlers?alt=json&crawlerId=crawler1
+          method: POST
+          headers: {}
+          body:
+            json:
+              config:
+                adHocRun: {}
+                organizationScope: {}
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/crawlers/crawler1",
+              "config": {
+                "organizationScope": {},
+                "adHocRun": {}
+              }
+            }
+    - expect_stderr: |
+        Created crawler [crawler1].
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: Bucket-scoped, manual crawler
+    command: data-catalog crawlers create crawler1 --crawl-scope=bucket --buckets=gs://bucket1,gs://bucket2
+      --run-option=manual
+    events:
+    - api_call:
+        expect_request:
+          uri: https://datacatalog.googleapis.com/v1alpha3/projects/fake-project/crawlers?alt=json&crawlerId=crawler1
+          method: POST
+          headers: {}
+          body:
+            json:
+              config:
+                adHocRun: {}
+                bucketScope:
+                  buckets:
+                  - bucket: gs://bucket1
+                  - bucket: gs://bucket2
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/crawlers/crawler1",
+              "config": {
+                "bucketScope": {
+                  "buckets": [
+                    {
+                      "bucket": "gs://bucket1"
+                    },
+                    {
+                      "bucket": "gs://bucket2"
+                    }
+                  ]
+                },
+                "adHocRun": {}
+              }
+            }
+    - expect_stderr: |
+        Created crawler [crawler1].
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: All flags
+    command: data-catalog crawlers create crawler1 --crawl-scope=bucket --buckets=gs://bucket1
+      --run-option=scheduled --run-schedule=daily --display-name=display1 --description=description1
+      --bundle-specs=a/b/c
+    events:
+    - api_call:
+        expect_request:
+          uri: https://datacatalog.googleapis.com/v1alpha3/projects/fake-project/crawlers?alt=json&crawlerId=crawler1
+          method: POST
+          headers: {}
+          body:
+            json:
+              config:
+                bucketScope:
+                  buckets:
+                  - bucket: gs://bucket1
+                bundleSpecs:
+                - a/b/c
+                scheduledRun:
+                  scheduledRunOption: DAILY
+              description: description1
+              displayName: display1
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/crawlers/crawler1",
+              "displayName": "display1",
+              "description": "description1",
+              "config": {
+                "bucketScope": {
+                  "buckets": [
+                    {
+                      "bucket": "gs://bucket1"
+                    }
+                  ]
+                },
+                "scheduledRun": {
+                  "scheduledRunOption": "DAILY"
+                },
+                "bundleSpecs": [
+                  "a/b/c"
+                ]
+              }
+            }
+    - expect_stderr: |
+        Created crawler [crawler1].
+    - expect_exit:
+        code: 0
+- execute_command:
+    label: Buckets provided for crawler with non-bucket scope
+    command: data-catalog crawlers create crawler1 --crawl-scope=project --buckets=gs://bucket1
+      --run-option=manual
+    events:
+    - expect_exit:
+        code: 1
+        message: Argument `--buckets` is only valid for bucket-scoped crawlers. Use
+          `--crawl-scope=bucket` to specify a bucket-scoped crawler.
+- execute_command:
+    label: Missing --buckets for bucket-scoped crawler
+    command: data-catalog crawlers create crawler1 --crawl-scope=bucket --run-option=manual
+    events:
+    - expect_exit:
+        code: 1
+        message: Argument `--buckets` must be provided when creating a bucket-scoped
+          crawler.
+- execute_command:
+    label: Run schedule provided for manual run crawler
+    command: data-catalog crawlers create crawler1 --crawl-scope=project --run-option=manual
+      --run-schedule=daily
+    events:
+    - expect_exit:
+        code: 1
+        message: Argument `--run-schedule` can only be provided for scheduled crawlers.
+          Use `--run-option=scheduled` to specify a scheduled crawler.
+- execute_command:
+    label: Missing --run-schedule for scheduled crawler
+    command: data-catalog crawlers create crawler1 --crawl-scope=project --run-option=scheduled
+    events:
+    - expect_exit:
+        code: 1
+        message: Argument `--run-schedule` must be provided if `--run-option=scheduled`
+          was specified.

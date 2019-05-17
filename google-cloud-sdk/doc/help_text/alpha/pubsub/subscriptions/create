@@ -8,6 +8,8 @@ SYNOPSIS
         [--ack-deadline=ACK_DEADLINE] [--expiration-period=EXPIRATION_PERIOD]
         [--labels=[KEY=VALUE,...]]
         [--message-retention-duration=MESSAGE_RETENTION_DURATION]
+        [--push-auth-service-account=SERVICE_ACCOUNT_EMAIL]
+        [--push-auth-token-audience=OPTIONAL_AUDIENCE_OVERRIDE]
         [--push-endpoint=PUSH_ENDPOINT] [--retain-acked-messages]
         [GCLOUD_WIDE_FLAG ...]
 
@@ -70,8 +72,16 @@ OPTIONAL FLAGS
         acknowledged messages. The default value is 7 days, the minimum is 10
         minutes, and the maximum is 7 days. Valid values are strings of the
         form INTEGER[UNIT], where UNIT is one of "s", "m", "h", and "d" for
-        seconds, seconds, minutes, hours, and days, respectively. If the unit
-        is omitted, seconds is assumed.
+        seconds, minutes, hours, and days, respectively. If the unit is
+        omitted, seconds is assumed.
+
+     --push-auth-service-account=SERVICE_ACCOUNT_EMAIL
+        Service account email used as the identity for the generated Open ID
+        Connect token for authenticated push.
+
+     --push-auth-token-audience=OPTIONAL_AUDIENCE_OVERRIDE
+        Audience used in the generated Open ID Connect token for authenticated
+        push. If not specified, it will be set to the push-endpoint.
 
      --push-endpoint=PUSH_ENDPOINT
         A URL to use as the endpoint for this subscription. This will also
@@ -83,8 +93,9 @@ OPTIONAL FLAGS
         --message-retention-duration window.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

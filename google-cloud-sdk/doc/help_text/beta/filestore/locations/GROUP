@@ -6,11 +6,15 @@ SYNOPSIS
     gcloud beta filestore locations COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) List locations where Cloud Filestore is available.
+    (BETA) (DEPRECATED) List locations where Cloud Filestore is available.
+
+    gcloud filestore locations is deprecated. Use gcloud filestore zones or
+    gcloud filestore regions instead.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -18,14 +22,15 @@ COMMANDS
     COMMAND is one of the following:
 
      describe
-        (BETA) Describe a Cloud Filestore location.
+        (BETA) (DEPRECATED) Describe a Cloud Filestore location.
 
      list
-        (BETA) List all Cloud Filestore locations.
+        (BETA) (DEPRECATED) List all Cloud Filestore locations.
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud filestore locations
         $ gcloud alpha filestore locations
 

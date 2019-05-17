@@ -11,7 +11,7 @@ gcloud compute instances update\-container \- updates Google Compute engine virt
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute instances update\-container\fR \fIINSTANCE_NAME\fR [\fB\-\-container\-image\fR=\fICONTAINER_IMAGE\fR] [\fB\-\-container\-privileged\fR] [\fB\-\-container\-restart\-policy\fR=\fIPOLICY\fR] [\fB\-\-container\-stdin\fR] [\fB\-\-container\-tty\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-clear\-container\-args\fR\ |\ \fB\-\-container\-arg\fR=\fICONTAINER_ARG\fR] [\fB\-\-clear\-container\-command\fR\ |\ \fB\-\-container\-command\fR=\fICONTAINER_COMMAND\fR] [\fB\-\-container\-env\fR=[\fIKEY\fR=\fIVALUE\fR,\ ...,...]\ \fB\-\-container\-env\-file\fR=\fICONTAINER_ENV_FILE\fR\ \fB\-\-remove\-container\-env\fR=[\fIKEY\fR,...]] [\fB\-\-container\-mount\-host\-path\fR=[\fIhost\-path\fR=\fIHOSTPATH\fR,\fImount\-path\fR=\fIMOUNTPATH\fR[,\fImode\fR=\fIMODE\fR],...]\ \fB\-\-container\-mount\-tmpfs\fR=[\fImount\-path\fR=\fIMOUNTPATH\fR,...]\ \fB\-\-remove\-container\-mounts\fR=[\fIMOUNTPATH\fR[,\fIMOUNTPATH\fR,...],...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute instances update\-container\fR \fIINSTANCE_NAME\fR [\fB\-\-container\-image\fR=\fICONTAINER_IMAGE\fR] [\fB\-\-container\-mount\-disk\fR=[\fImode\fR=\fIMODE\fR],[\fImount\-path\fR=\fIMOUNT\-PATH\fR],[\fIname\fR=\fINAME\fR],[\fIpartition\fR=\fIPARTITION\fR]] [\fB\-\-container\-privileged\fR] [\fB\-\-container\-restart\-policy\fR=\fIPOLICY\fR] [\fB\-\-container\-stdin\fR] [\fB\-\-container\-tty\fR] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-clear\-container\-args\fR\ |\ \fB\-\-container\-arg\fR=\fICONTAINER_ARG\fR] [\fB\-\-clear\-container\-command\fR\ |\ \fB\-\-container\-command\fR=\fICONTAINER_COMMAND\fR] [\fB\-\-container\-env\fR=[\fIKEY\fR=\fIVALUE\fR,\ ...,...]\ \fB\-\-container\-env\-file\fR=\fICONTAINER_ENV_FILE\fR\ \fB\-\-remove\-container\-env\fR=[\fIKEY\fR,...]] [\fB\-\-container\-mount\-host\-path\fR=[\fIhost\-path\fR=\fIHOSTPATH\fR,\fImount\-path\fR=\fIMOUNTPATH\fR[,\fImode\fR=\fIMODE\fR],...]\ \fB\-\-container\-mount\-tmpfs\fR=[\fImount\-path\fR=\fIMOUNTPATH\fR,...]\ \fB\-\-remove\-container\-mounts\fR=[\fIMOUNTPATH\fR[,\fIMOUNTPATH\fR,...],...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -53,6 +53,38 @@ Sets container image in the declaration to the specified value.
 
 Empty string is not allowed.
 
+.TP 2m
+\fB\-\-container\-mount\-disk\fR=[\fImode\fR=\fIMODE\fR],[\fImount\-path\fR=\fIMOUNT\-PATH\fR],[\fIname\fR=\fINAME\fR],[\fIpartition\fR=\fIPARTITION\fR]
+Mounts a disk to the container by using mount\-path or updates how the volume is
+mounted if the same mount path has already been declared. The disk must already
+be attached to the instance with a device\-name that matches the disk name.
+Multiple flags are allowed.
+
+
+.RS 2m
+.TP 2m
+\fBname\fR
+Name of the disk. Can be omitted if exactly one additional disk is attached to
+the instance. The name of the single additional disk will be used by default.
+
+
+.TP 2m
+\fBmount\-path\fR
+Path on container to mount to. Mount paths with spaces and commas (and other
+special characters) are not supported by this command.
+
+.TP 2m
+\fBpartition\fR
+Optional. The partition of the disk to mount. Multiple partitions of a disk may
+be mounted.
+
+.TP 2m
+\fBmode\fR
+Volume mount mode: \f5rw\fR (read/write) or \f5ro\fR (read\-only). Defaults to
+\f5rw\fR. Fails if the disk mode is \f5ro\fR and volume mount mode is \f5rw\fR.
+
+.RE
+.sp
 .TP 2m
 \fB\-\-container\-privileged\fR
 Sets permission to run container to the specified value.
@@ -243,8 +275,8 @@ special characters) are not supported by this command.
 .TP 2m
 \fB\-\-remove\-container\-mounts\fR=[\fIMOUNTPATH\fR[,\fIMOUNTPATH\fR,...],...]
 
-Removes volume mounts (\f5host\-path\fR, \f5tmpfs\fR) with \f5mountPath:
-MOUNTPATH\fR from container declaration.
+Removes volume mounts (\f5host\-path\fR, \f5tmpfs\fR, \f5disk\fR) with
+\f5mountPath: MOUNTPATH\fR from container declaration.
 
 Does nothing, if a volume mount is not declared.
 
@@ -254,10 +286,11 @@ Does nothing, if a volume mount is not declared.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

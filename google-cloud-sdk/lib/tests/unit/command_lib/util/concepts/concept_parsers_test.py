@@ -48,7 +48,7 @@ class ConceptParsersTest(concepts_test_base.ConceptsTestBase,
 
     concept_parser.AddToParser(self.parser)
 
-    self.assertTrue(hasattr(concept_parser._runtime_handler, 'book'))
+    self.assertTrue(hasattr(self.parser.data.concept_handler, 'book'))
 
   def testTwoResourcesInRuntimeHandler(self):
     """Tests that a runtime handler has two concepts registered."""
@@ -66,8 +66,8 @@ class ConceptParsersTest(concepts_test_base.ConceptsTestBase,
     concept_parser = concept_parsers.ConceptParser([resource, other_resource])
     concept_parser.AddToParser(self.parser)
 
-    self.assertTrue(hasattr(concept_parser._runtime_handler, 'book'))
-    self.assertTrue(hasattr(concept_parser._runtime_handler, 'other_book'))
+    self.assertTrue(hasattr(self.parser.data.concept_handler, 'book'))
+    self.assertTrue(hasattr(self.parser.data.concept_handler, 'other_book'))
 
   def testGetInfoError(self):
     concept_parser = concept_parsers.ConceptParser.ForResource(
@@ -299,6 +299,37 @@ class ParsingTests(concepts_test_base.MultitypeTestBase,
     self.assertEqual(
         'projects/example-project/shelves/exampleshelf/books/example',
         namespace.CONCEPTS.book.Parse().RelativeName())
+
+  def testConceptParserForResourceMultipleResources(self):
+    """Test the ForResource method."""
+    concept_parsers.ConceptParser.ForResource(
+        '--book',
+        self.resource_spec,
+        'The book to act upon.',
+        flag_name_overrides={'project': '--book-project'}
+    ).AddToParser(self.parser)
+
+    concept_parsers.ConceptParser.ForResource(
+        '--other-book',
+        self.resource_spec,
+        'The other book to act upon.',
+        flag_name_overrides={
+            'book': '--other-book',
+            'project': '--other-book-project',
+            'shelf': '--other-book-shelf',
+        }
+    ).AddToParser(self.parser)
+
+    namespace = self.parser.parser.parse_args(
+        ['--book', 'example', '--shelf', 'exampleshelf', '--book-project',
+         'example-project', '--other-book', 'example2', '--other-book-shelf',
+         'exampleshelf2', '--other-book-project', 'example-project2'])
+    self.assertEqual(
+        'projects/example-project/shelves/exampleshelf/books/example',
+        namespace.CONCEPTS.book.Parse().RelativeName())
+    self.assertEqual(
+        'projects/example-project2/shelves/exampleshelf2/books/example2',
+        namespace.CONCEPTS.other_book.Parse().RelativeName())
 
   def testConceptParserForResourceRequiredPositional(self):
     """Test the ForResource method parses a required positional correctly.

@@ -10,8 +10,13 @@ SYNOPSIS
         [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) gcloud beta compute instance-groups managed set-autohealing updates
-    the autohealing policy for an existing managed instance group.
+    (BETA) (DEPRECATED) Set autohealing policy for managed instance group.
+
+    This command is deprecated and will not be promoted to GA. Please use
+    gcloud beta instance-groups managed update instead.
+
+    gcloud beta compute instance-groups managed set-autohealing updates the
+    autohealing policy for an existing managed instance group.
 
     If health check is specified, the resulting autohealing policy will be
     triggered by the health-check signal i.e. the autohealing action (RECREATE)
@@ -27,9 +32,9 @@ POSITIONAL ARGUMENTS
 
 FLAGS
      --initial-delay=INITIAL_DELAY
-        Specifies the length of the period during which the instance is known
-        to be initializing and should not be autohealed even if unhealthy. This
-        value cannot be greater than 1 hour. See $ gcloud topic datetimes for
+        Specifies the length of time during which the instance is known to be
+        initializing and should not be autohealed even if unhealthy. This value
+        cannot be greater than 1 hour. See $ gcloud topic datetimes for
         information on duration formats.
 
      At most one of these may be specified:
@@ -38,14 +43,14 @@ FLAGS
           Name of the health check to operate on.
 
        --http-health-check=HTTP_HEALTH_CHECK
-          (DEPRECATED) Specifies the HTTP health check object used for
-          autohealing instances in this group.
+          (DEPRECATED) HTTP health check object used for autohealing instances
+          in this group.
 
           HttpHealthCheck is deprecated. Use --health-check instead.
 
        --https-health-check=HTTPS_HEALTH_CHECK
-          (DEPRECATED) Specifies the HTTPS health check object used for
-          autohealing instances in this group.
+          (DEPRECATED) HTTPS health check object used for autohealing instances
+          in this group.
 
           HttpsHealthCheck is deprecated. Use --health-check instead.
 
@@ -74,8 +79,9 @@ FLAGS
           invocation.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

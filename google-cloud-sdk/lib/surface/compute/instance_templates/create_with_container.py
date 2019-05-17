@@ -46,6 +46,7 @@ def _Args(parser, release_track, container_mount_enabled=False):
   if release_track != base.ReleaseTrack.GA:
     instances_flags.AddLocalSsdArgsWithSize(parser)
   instances_flags.AddCanIpForwardArgs(parser)
+  instances_flags.AddContainerMountDiskFlag(parser)
   instances_flags.AddAddressArgs(parser, instances=False)
   instances_flags.AddMachineTypeArgs(parser)
   deprecate_maintenance_policy = release_track in [base.ReleaseTrack.ALPHA]
@@ -85,12 +86,13 @@ class CreateWithContainer(base.CreateCommand):
 
   @staticmethod
   def Args(parser):
-    _Args(parser, base.ReleaseTrack.GA)
+    _Args(parser, base.ReleaseTrack.GA, container_mount_enabled=True)
 
   def _ValidateArgs(self, args):
     instances_flags.ValidateKonletArgs(args)
     instances_flags.ValidateDiskCommonFlags(args)
     instances_flags.ValidateServiceAccountAndScopeArgs(args)
+    instances_flags.ValidateNicFlags(args)
     if instance_utils.UseExistingBootDisk(args.disk or []):
       raise exceptions.InvalidArgumentException(
           '--disk',
@@ -113,8 +115,15 @@ class CreateWithContainer(base.CreateCommand):
         client.messages, args, instance_template_ref.Name(), user_metadata,
         container_mount_disk_enabled, container_mount_disk)
 
-  def _GetNetworkInterface(self, args, client, holder):
-    return instance_template_utils.CreateNetworkInterfaceMessage(
+  def _GetNetworkInterfaces(self, args, client, holder):
+    if args.network_interface:
+      return instance_template_utils.CreateNetworkInterfaceMessages(
+          resources=holder.resources,
+          scope_lister=flags.GetDefaultScopeLister(client),
+          messages=client.messages,
+          network_interface_arg=args.network_interface,
+          region=args.region)
+    return [instance_template_utils.CreateNetworkInterfaceMessage(
         resources=holder.resources,
         scope_lister=flags.GetDefaultScopeLister(client),
         messages=client.messages,
@@ -123,7 +132,7 @@ class CreateWithContainer(base.CreateCommand):
         subnet=args.subnet,
         address=(instance_template_utils.EPHEMERAL_ADDRESS
                  if not args.no_address and not args.address else args.address),
-        network_tier=getattr(args, 'network_tier', None))
+        network_tier=getattr(args, 'network_tier', None))]
 
   def _GetScheduling(self, args, client):
     return instance_utils.CreateSchedulingMessage(
@@ -187,6 +196,12 @@ class CreateWithContainer(base.CreateCommand):
     instances_flags.ValidateNetworkTierArgs(args)
 
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
+    container_mount_disk = instances_flags.GetValidatedContainerMountDisk(
+        holder,
+        args.container_mount_disk,
+        args.disk,
+        args.create_disk)
+
     client = holder.client
     instance_template_ref = self._GetInstanceTemplateRef(args, holder)
     image_uri = self._GetImageUri(args, client, holder, instance_template_ref)
@@ -196,14 +211,16 @@ class CreateWithContainer(base.CreateCommand):
         args, client.messages.InstanceProperties.LabelsValue)
     if argument_labels:
       labels.additionalProperties.extend(argument_labels.additionalProperties)
-
-    metadata = self._GetUserMetadata(args, client, instance_template_ref)
-    network_interface = self._GetNetworkInterface(args, client, holder)
+    metadata = self._GetUserMetadata(args, client, instance_template_ref,
+                                     container_mount_disk_enabled=True,
+                                     container_mount_disk=container_mount_disk)
+    network_interfaces = self._GetNetworkInterfaces(args, client, holder)
     scheduling = self._GetScheduling(args, client)
     service_accounts = self._GetServiceAccounts(args, client)
     machine_type = self._GetMachineType(args)
     disks = self._GetDisks(
-        args, client, holder, instance_template_ref, image_uri)
+        args, client, holder, instance_template_ref, image_uri,
+        match_container_mount_disks=True)
 
     request = client.messages.ComputeInstanceTemplatesInsertRequest(
         instanceTemplate=client.messages.InstanceTemplate(
@@ -214,7 +231,7 @@ class CreateWithContainer(base.CreateCommand):
                 labels=labels,
                 metadata=metadata,
                 minCpuPlatform=args.min_cpu_platform,
-                networkInterfaces=[network_interface],
+                networkInterfaces=network_interfaces,
                 serviceAccounts=service_accounts,
                 scheduling=scheduling,
                 tags=containers_utils.CreateTagsMessage(
@@ -271,17 +288,10 @@ class CreateWithContainerBeta(CreateWithContainer):
   @staticmethod
   def Args(parser):
     _Args(parser, base.ReleaseTrack.BETA, container_mount_enabled=True)
-    instances_flags.AddContainerMountDiskFlag(parser)
 
-  def _ValidateBetaArgs(self, args):
-    instances_flags.ValidateKonletArgs(args)
-    instances_flags.ValidateDiskCommonFlags(args)
+  def _ValidateArgs(self, args):
+    super(CreateWithContainerBeta, self)._ValidateArgs(args)
     instances_flags.ValidateLocalSsdFlags(args)
-    instances_flags.ValidateServiceAccountAndScopeArgs(args)
-    if instance_utils.UseExistingBootDisk(args.disk or []):
-      raise exceptions.InvalidArgumentException(
-          '--disk',
-          'Boot disk specified for containerized VM.')
 
   def Run(self, args):
     """Issues an InstanceTemplates.Insert request.
@@ -292,7 +302,7 @@ class CreateWithContainerBeta(CreateWithContainer):
     Returns:
       an InstanceTemplate message object
     """
-    self._ValidateBetaArgs(args)
+    self._ValidateArgs(args)
     instances_flags.ValidateNetworkTierArgs(args)
 
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
@@ -314,7 +324,7 @@ class CreateWithContainerBeta(CreateWithContainer):
     metadata = self._GetUserMetadata(args, client, instance_template_ref,
                                      container_mount_disk_enabled=True,
                                      container_mount_disk=container_mount_disk)
-    network_interface = self._GetNetworkInterface(args, client, holder)
+    network_interfaces = self._GetNetworkInterfaces(args, client, holder)
     scheduling = self._GetScheduling(args, client)
     service_accounts = self._GetServiceAccounts(args, client)
     machine_type = self._GetMachineType(args)
@@ -331,7 +341,7 @@ class CreateWithContainerBeta(CreateWithContainer):
                 labels=labels,
                 metadata=metadata,
                 minCpuPlatform=args.min_cpu_platform,
-                networkInterfaces=[network_interface],
+                networkInterfaces=network_interfaces,
                 serviceAccounts=service_accounts,
                 scheduling=scheduling,
                 tags=containers_utils.CreateTagsMessage(
@@ -353,7 +363,6 @@ class CreateWithContainerAlpha(CreateWithContainerBeta):
   @staticmethod
   def Args(parser):
     _Args(parser, base.ReleaseTrack.ALPHA, container_mount_enabled=True)
-    instances_flags.AddContainerMountDiskFlag(parser)
     instances_flags.AddLocalNvdimmArgs(parser)
 
   def Run(self, args):
@@ -365,7 +374,7 @@ class CreateWithContainerAlpha(CreateWithContainerBeta):
     Returns:
       an InstanceTemplate message object
     """
-    self._ValidateBetaArgs(args)
+    self._ValidateArgs(args)
     instances_flags.ValidateNetworkTierArgs(args)
 
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
@@ -388,7 +397,7 @@ class CreateWithContainerAlpha(CreateWithContainerBeta):
     metadata = self._GetUserMetadata(args, client, instance_template_ref,
                                      container_mount_disk_enabled=True,
                                      container_mount_disk=container_mount_disk)
-    network_interface = self._GetNetworkInterface(args, client, holder)
+    network_interfaces = self._GetNetworkInterfaces(args, client, holder)
     scheduling = self._GetScheduling(args, client)
     service_accounts = self._GetServiceAccounts(args, client)
     machine_type = self._GetMachineType(args)
@@ -405,7 +414,7 @@ class CreateWithContainerAlpha(CreateWithContainerBeta):
                 labels=labels,
                 metadata=metadata,
                 minCpuPlatform=args.min_cpu_platform,
-                networkInterfaces=[network_interface],
+                networkInterfaces=network_interfaces,
                 serviceAccounts=service_accounts,
                 scheduling=scheduling,
                 tags=containers_utils.CreateTagsMessage(

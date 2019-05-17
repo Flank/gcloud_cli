@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud ml\-engine models \- cloud ML Engine Models commands
+gcloud ml\-engine models \- AI Platform Models commands
 
 
 
@@ -17,9 +17,9 @@ gcloud ml\-engine models \- cloud ML Engine Models commands
 
 .SH "DESCRIPTION"
 
-A Cloud ML Engine model is a container representing an ML application or
-service. A model may contain multiple versions which act as the implementation
-of the service. See also:
+An AI Platform model is a container representing an ML application or service. A
+model may contain multiple versions which act as the implementation of the
+service. See also:
 
 .RS 2m
 $ gcloud ml\-engine versions \-\-help.
@@ -32,10 +32,11 @@ https://cloud.google.com/ml/docs/concepts/technical\-overview#model
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -50,15 +51,15 @@ Add IAM policy binding to a model.
 
 .TP 2m
 \fBcreate\fR
-Create a new Cloud ML Engine model.
+Create a new AI Platform model.
 
 .TP 2m
 \fBdelete\fR
-Delete an existing Cloud ML Engine model.
+Delete an existing AI Platform model.
 
 .TP 2m
 \fBdescribe\fR
-Describe an existing Cloud ML Engine model.
+Describe an existing AI Platform model.
 
 .TP 2m
 \fBget\-iam\-policy\fR
@@ -66,7 +67,7 @@ Get the IAM policy for a model.
 
 .TP 2m
 \fBlist\fR
-List existing Cloud ML Engine models.
+List existing AI Platform models.
 
 .TP 2m
 \fBremove\-iam\-policy\-binding\fR
@@ -78,7 +79,7 @@ Set the IAM policy for a model.
 
 .TP 2m
 \fBupdate\fR
-Update an existing Cloud ML Engine model.
+Update an existing AI Platform model.
 
 
 .RE

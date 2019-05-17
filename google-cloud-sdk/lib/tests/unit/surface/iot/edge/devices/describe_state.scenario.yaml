@@ -1,0 +1,35 @@
+title: Edge device state describe test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - label: Base Case
+  - command: iot edge devices describe-state my-device --registry my-registry --region
+      us-central1
+  - stdout: |
+      systemState:
+        cpuArch: x86_64
+        totalMemoryMb: 128909
+actions:
+- execute_command:
+    label: Base Case
+    command: iot edge devices describe-state my-device --registry my-registry --region
+      us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://edge.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/registries/my-registry/devices/my-device/state?alt=json
+          method: GET
+          headers: {}
+          body: None
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {"systemState":{"cpuArch":"x86_64","totalMemoryMb":128909}}
+    - expect_stdout: |
+        systemState:
+          cpuArch: x86_64
+          totalMemoryMb: 128909
+    - expect_exit:
+        code: 0

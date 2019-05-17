@@ -1,0 +1,139 @@
+skip:
+  reason: Failing
+  bug: b/132375552
+title: Create, describe, list, and delete a crawler.
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: data-catalog crawlers create $$my-crawler$$ --run-option=manual --crawl-scope=project
+  - stderr: |
+      Created crawler [$$my-crawler$$].
+- execute:
+  - command: data-catalog crawlers describe $$my-crawler$$
+  - stdout: |
+      config:
+        adHocRun: {}
+        projectScope: {}
+      name: projects/cloud-sdk-integration-testing/crawlers/$$my-crawler$$
+- execute:
+  - command: data-catalog crawlers list --filter='name:$$my-crawler$$' --uri
+  - stdout: |
+      https://datacatalog.googleapis.com/v1alpha3/projects/cloud-sdk-integration-testing/crawlers/$$my-crawler$$
+- execute:
+  - command: data-catalog crawlers delete $$my-crawler$$
+  - prompt:
+    - message: You are about to delete crawler [$$my-crawler$$]
+    - input: y
+  - stderr: |
+      Deleted crawler [$$my-crawler$$].
+# This summary is generated automatically on update and should not be edited.
+actions:
+- generate_resource_id:
+    reference: my-crawler
+    prefix: crawler
+- execute_command:
+    command: data-catalog crawlers create $$my-crawler$$ --run-option=manual --crawl-scope=project
+    events:
+    - api_call:
+        expect_request:
+          uri: https://datacatalog.googleapis.com/v1alpha3/projects/cloud-sdk-integration-testing/crawlers?alt=json&crawlerId=$$my-crawler$$
+          method: POST
+          headers: {}
+          body:
+            json:
+              config:
+                adHocRun: {}
+                projectScope: {}
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '155'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/crawlers/$$my-crawler$$
+            config:
+              projectScope: {}
+              adHocRun: {}
+    - expect_stderr: |
+        Created crawler [$$my-crawler$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: data-catalog crawlers describe $$my-crawler$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://datacatalog.googleapis.com/v1alpha3/projects/cloud-sdk-integration-testing/crawlers/$$my-crawler$$?alt=json
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '155'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/crawlers/$$my-crawler$$
+            config:
+              projectScope: {}
+              adHocRun: {}
+    - expect_stdout: |
+        config:
+          adHocRun: {}
+          projectScope: {}
+        name: projects/cloud-sdk-integration-testing/crawlers/$$my-crawler$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: data-catalog crawlers list --filter='name:$$my-crawler$$' --uri
+    events:
+    - api_call:
+        expect_request:
+          uri: https://datacatalog.googleapis.com/v1alpha3/projects/cloud-sdk-integration-testing/crawlers?alt=json
+          method: GET
+          headers: {}
+          body:
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '207'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            crawlers:
+            - name: projects/cloud-sdk-integration-testing/crawlers/$$my-crawler$$
+              config:
+                projectScope: {}
+                adHocRun: {}
+    - expect_stdout: |
+        https://datacatalog.googleapis.com/v1alpha3/projects/cloud-sdk-integration-testing/crawlers/$$my-crawler$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: data-catalog crawlers delete $$my-crawler$$
+    cleanup_for: my-crawler
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete crawler [$$my-crawler$$]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://datacatalog.googleapis.com/v1alpha3/projects/cloud-sdk-integration-testing/crawlers/$$my-crawler$$?alt=json
+          method: DELETE
+          headers: {}
+          body:
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '3'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body: |
+            {}
+    - expect_stderr: |
+        Deleted crawler [$$my-crawler$$].
+    - expect_exit:
+        code: 0

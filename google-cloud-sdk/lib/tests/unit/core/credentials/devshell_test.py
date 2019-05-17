@@ -87,6 +87,24 @@ class ProxiedAuthTests(sdk_test_base.SdkBase):
             access_token='sometoken',
             expires_in=1800))
 
+  def testRequestResponseWithIdToken(self):
+    self.devshell_proxy.response = devshell.CredentialInfoResponse(
+        user_email='joe@example.com',
+        project_id='fooproj',
+        access_token='sometoken',
+        id_token='idtoken',
+        expires_in=1800)
+    request = devshell.CredentialInfoRequest()
+    response = devshell._SendRecv(request)
+    self.assertEqual(
+        response,
+        devshell.CredentialInfoResponse(
+            user_email='joe@example.com',
+            project_id='fooproj',
+            access_token='sometoken',
+            id_token='idtoken',
+            expires_in=1800))
+
   def testProperties(self):
     self.assertEqual(
         properties.VALUES.core.account.Get(),
@@ -136,7 +154,7 @@ class EncodingTests(sdk_test_base.SdkBase):
     self.doEncodeRecode(
         devshell.CredentialInfoResponse(
             user_email='joe@example.com'),
-        ['joe@example.com', None, None, None])
+        ['joe@example.com', None, None, None, None])
 
 
 if __name__ == '__main__':

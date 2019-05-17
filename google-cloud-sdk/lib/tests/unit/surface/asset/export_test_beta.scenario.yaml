@@ -1,0 +1,50 @@
+title: surface unit tests for asset export
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: asset export --project test-project --snapshot-time 2018-10-05T00:00:00Z
+      --output-path-prefix=gs://bucket-name/object-name
+  - stderr: |
+      Export in progress for root asset [projects/test-project].
+      Use [gcloud asset operations describe projects/19809800890/operations/ExportAssets/CONTENT_TYPE_UNSPECIFIED/10801893675377458834] to check the status of the operation.
+actions:
+- execute_command:
+    command: asset export --project test-project --snapshot-time 2018-10-05T00:00:00Z
+      --output-path-prefix=gs://bucket-name/object-name
+    events:
+    - api_call:
+        expect_request:
+          uri: https://cloudasset.googleapis.com/v1/projects/test-project:exportAssets?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              contentType: CONTENT_TYPE_UNSPECIFIED
+              outputConfig:
+                gcsDestination:
+                  uriPrefix: gs://bucket-name/object-name
+              readTime: '2018-10-05T00:00:00.000Z'
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/19809800890/operations/ExportAssets/CONTENT_TYPE_UNSPECIFIED/10801893675377458834",
+              "metadata": {
+                "@type": "type.googleapis.com/google.cloud.asset.v1.ExportAssetsRequest",
+                "parent": "projects/19809800890",
+                "readTime": "2018-10-05T00:00:00Z",
+                "contentType": "CONTENT_TYPE_UNSPECIFIED",
+                "outputConfig": {
+                  "gcsDestination": {
+                    "uriPrefix": "gs://bucket-name/object-name"
+                  }
+                }
+              }
+            }
+    - expect_stderr: |
+        Export in progress for root asset [projects/test-project].
+        Use [gcloud asset operations describe projects/19809800890/operations/ExportAssets/CONTENT_TYPE_UNSPECIFIED/10801893675377458834] to check the status of the operation.
+    - expect_exit:
+        code: 0

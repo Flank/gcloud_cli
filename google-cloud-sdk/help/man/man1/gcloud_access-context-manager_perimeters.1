@@ -1,0 +1,74 @@
+
+.TH "GCLOUD_ACCESS\-CONTEXT\-MANAGER_PERIMETERS" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud access\-context\-manager perimeters \- manage Access Context Manager service perimeters
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud access\-context\-manager perimeters\fR \fICOMMAND\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+A service perimeter describes a set of Google Cloud Platform resources which can
+freely import and export data amongst themselves, but not externally.
+
+Currently, the only allowed members of a service perimeter are projects.
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "COMMANDS"
+
+\f5\fICOMMAND\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBcreate\fR
+Create a new service perimeter.
+
+.TP 2m
+\fBdelete\fR
+Delete a service perimeter.
+
+.TP 2m
+\fBdescribe\fR
+Show details about a service perimeter.
+
+.TP 2m
+\fBlist\fR
+List service perimeters.
+
+.TP 2m
+\fBupdate\fR
+Update an existing access zone.
+
+
+.RE
+.sp
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha access\-context\-manager perimeters
+$ gcloud beta access\-context\-manager perimeters
+.RE
+

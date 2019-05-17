@@ -18,8 +18,9 @@ DESCRIPTION
     here: https://cloud.google.com/compute/docs/
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -46,6 +47,9 @@ GROUPS
 
      disks
         (BETA) Read and manipulate Google Compute Engine disks.
+
+     external-vpn-gateways
+        (BETA) Read and manipulate Google Compute Engine External VPN Gateways.
 
      firewall-rules
         (BETA) List, create, update, and delete Google Compute Engine firewall
@@ -104,6 +108,12 @@ GROUPS
      regions
         (BETA) List Google Compute Engine regions.
 
+     reservations
+        (BETA) Manage Compute Engine reservations.
+
+     resource-policies
+        (BETA) Manage Google Compute Engine Resource Policies.
+
      routers
         (BETA) List, create, and delete Google Compute Engine routers.
 
@@ -151,13 +161,17 @@ GROUPS
         (BETA) List, create, and delete target TCP proxies.
 
      target-vpn-gateways
-        (BETA) Read and manipulate Google Compute Engine VPN Gateways.
+        (BETA) read and manipulate Google Compute Engine Classic VPN Gateways.
 
      tpus
         (BETA) List, create, and delete Cloud TPUs.
 
      url-maps
         (BETA) List, create, and delete URL maps.
+
+     vpn-gateways
+        (BETA) read and manipulate Google Compute Engine Highly Available VPN
+        Gateways.
 
      vpn-tunnels
         (BETA) Read and manipulate Google Compute Engine VPN Tunnels.
@@ -192,7 +206,7 @@ COMMANDS
         (BETA) SSH into a virtual machine instance.
 
      start-iap-tunnel
-        (BETA) Starts an IAP TCP Fordwarding tunnel over WebSocket connection.
+        (BETA) Starts an IAP TCP forwarding tunnel over WebSocket connection.
 
 NOTES
     This command is currently in BETA and may change without notice. These

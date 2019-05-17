@@ -1,0 +1,103 @@
+NAME
+    gcloud alpha iot edge ml create - create an Edge ML Model
+
+SYNOPSIS
+    gcloud alpha iot edge ml create
+        (MLMODEL : --device=DEVICE --region=REGION --registry=REGISTRY)
+        --model-uri=MODEL_URI [--accelerator=ACCELERATOR]
+        [--description=DESCRIPTION] [--framework=FRAMEWORK; default="tflite"]
+        [--input-topic=[INPUT_TOPIC,...]]
+        [--num-tflite-threads=NUM_TFLITE_THREADS]
+        [--output-topic=[OUTPUT_TOPIC,...]]
+        [--request-timeout=REQUEST_TIMEOUT; default="0s"]
+        [--sampling-config=SAMPLING_CONFIG] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Create an Edge Machine Learning Model.
+
+POSITIONAL ARGUMENTS
+     ML Model resource - The Edge ML Model you want to create. The arguments in
+     this group can be used to specify the attributes of this resource. (NOTE)
+     Some attributes are not given arguments in this group but can be set in
+     other ways. To set the [project] attribute: provide the argument [mlmodel]
+     on the command line with a fully specified name; provide the argument
+     [--project] on the command line; set the property [core/project]. This
+     must be specified.
+
+       MLMODEL
+          ID of the ML Model or fully qualified identifier for the ML Model.
+          This positional must be specified if any of the other arguments in
+          this group are specified.
+
+       --device=DEVICE
+          The name of the Cloud IoT Edge device.
+
+       --region=REGION
+          The name of the Cloud IoT region.
+
+       --registry=REGISTRY
+          The name of the Cloud IoT registry.
+
+REQUIRED FLAGS
+     --model-uri=MODEL_URI
+        The location of the ML Model in Google Cloud Storage. The model can be
+        a folder of Tensorflow SavedModel or gzipped scikit-learn model, or a
+        single .tflite file.
+
+OPTIONAL FLAGS
+     --accelerator=ACCELERATOR
+        Accelerator for machine learning inference. ACCELERATOR must be one of:
+        cpu, gpu, tpu.
+
+     --description=DESCRIPTION
+        Description for the Edge ML Model.
+
+     --framework=FRAMEWORK; default="tflite"
+        Framework to run the model. The framework is immutable. FRAMEWORK must
+        be one of: scikit-learn, sklearn, tflite.
+
+     --input-topic=[INPUT_TOPIC,...]
+        Input topic(s) for this component. The input topics feed information or
+        trigger actions in each components. Multiple topics can be specified by
+        using a comma-separated list of topics. Each topic can be specified in
+        [NAME:]TOPIC format, which means that an abstract name can optionally
+        be given to a topic. The NAME and TOPIC part must not contain any
+        colons.
+
+     --num-tflite-threads=NUM_TFLITE_THREADS
+        Number of TFLite threads to use, when using CPU for inference.
+
+     --output-topic=[OUTPUT_TOPIC,...]
+        Output topic(s) for this component. The output topics are used to post
+        result from component logic execution. Multiple topics can be specified
+        by using a comma-separated list of topics. Each topic can be specified
+        in [NAME:]TOPIC format, which means that an abstract name can
+        optionally be given to a topic. The NAME and TOPIC part must not
+        contain any colons.
+
+     --request-timeout=REQUEST_TIMEOUT; default="0s"
+        Timeout threshold for requests, i.e. 0.0000001s for 100ns. Provide 0s
+        to disable timeout.
+
+     --sampling-config=SAMPLING_CONFIG
+        Path to YAML/JSON file that contains Edge ML sampling config.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+API REFERENCE
+    This command uses the edge/v1alpha1 API. The full documentation for this
+    API can be found at: https://cloud.google.com/iot-edge/
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you will have to apply for early access and
+    have your projects registered on the API whitelist to use it. To do so,
+    contact Support at https://cloud.google.com/support/.
+

@@ -11,7 +11,7 @@ gcloud compute instances detach\-disk \- detach disks from Compute Engine virtua
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute instances detach\-disk\fR \fIINSTANCE_NAME\fR (\fB\-\-device\-name\fR=\fIDEVICE_NAME\fR\ |\ \fB\-\-disk\fR=\fIDISK\fR) [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute instances detach\-disk\fR \fIINSTANCE_NAME\fR (\fB\-\-device\-name\fR=\fIDEVICE_NAME\fR\ |\ \fB\-\-disk\fR=\fIDISK\fR) [\fB\-\-disk\-scope\fR=\fIDISK_SCOPE\fR;\ default="zonal"] [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -72,6 +72,24 @@ by persistent disk name, then you must not specify its device name using the
 
 .RS 2m
 .TP 2m
+\fB\-\-disk\-scope\fR=\fIDISK_SCOPE\fR; default="zonal"
+The scope of the disk. \fIDISK_SCOPE\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBregional\fR
+The disk specified in \-\-disk is interpreted as a regional disk in the same
+region as the instance. Ignored if a full URI is provided to the \f5\-\-disk\fR
+flag.
+.TP 2m
+\fBzonal\fR
+The disk specified in \-\-disk is interpreted as a zonal disk in the same zone
+as the instance. Ignored if a full URI is provided to the \f5\-\-disk\fR flag.
+.RE
+.sp
+
+
+.TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
 Zone of the instance to operate on. If not specified, you may be prompted to
 select a zone. \f5gcloud\fR will attempt to identify the zone by searching for
@@ -106,10 +124,11 @@ Alternatively, the zone can be stored in the environment variable
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

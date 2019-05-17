@@ -1265,6 +1265,75 @@ class WithHealthcheckApiTest(BackendServiceCreateTestBase):
               region='alaska',
           ))],)
 
+  def testGlobalCustomRequestHeader(self):
+    messages = self.messages
+    self.Run("""
+          compute backend-services create my-backend-service
+          --global
+          --health-checks my-health-check-1,my-health-check-2
+          --description "My backend service"
+          --custom-request-header 'Test-Header:'
+          --custom-request-header 'Test-Header2: {CLIENT_REGION}'
+        """)
+
+    self.CheckRequests([(
+        self.compute.backendServices, 'Insert',
+        messages.ComputeBackendServicesInsertRequest(
+            backendService=messages.BackendService(
+                backends=[],
+                description='My backend service',
+                healthChecks=[
+                    (self.compute_uri + '/projects/'
+                     'my-project/global/healthChecks/my-health-check-1'),
+                    (self.compute_uri + '/projects/'
+                     'my-project/global/healthChecks/my-health-check-2')
+                ],
+                name='my-backend-service',
+                portName='http',
+                protocol=(messages.BackendService.ProtocolValueValuesEnum.HTTP),
+                timeoutSec=30,
+                customRequestHeaders=[
+                    'Test-Header:', 'Test-Header2: {CLIENT_REGION}'
+                ]),
+            project='my-project'))],)
+
+  def testRegionalCustomRequestHeader(self):
+    messages = self.messages
+    self.Run("""
+          compute backend-services create my-backend-service
+          --region=alaska
+          --health-checks my-health-check-1,my-health-check-2
+          --description "My backend service"
+          --custom-request-header 'Test-Header:'
+          --custom-request-header 'Test-Header2: {CLIENT_REGION}'
+        """)
+
+    self.CheckRequests([
+        (self.compute.regionBackendServices, 'Insert',
+         messages.ComputeRegionBackendServicesInsertRequest(
+             backendService=messages.BackendService(
+                 backends=[],
+                 description='My backend service',
+                 healthChecks=[
+                     (self.compute_uri + '/projects/'
+                      'my-project/global/healthChecks/my-health-check-1'),
+                     (self.compute_uri + '/projects/'
+                      'my-project/global/healthChecks/my-health-check-2')
+                 ],
+                 name='my-backend-service',
+                 loadBalancingScheme=(
+                     messages.BackendService.LoadBalancingSchemeValueValuesEnum
+                     .EXTERNAL),
+                 protocol=(messages.BackendService.ProtocolValueValuesEnum.TCP),
+                 timeoutSec=30,
+                 customRequestHeaders=[
+                     'Test-Header:', 'Test-Header2: {CLIENT_REGION}'
+                 ]),
+             project='my-project',
+             region='alaska',
+         ))
+    ],)
+
 
 class WithCustomCacheKeyApiTest(BackendServiceCreateTestBase):
 

@@ -13,8 +13,9 @@ DESCRIPTION
     terms of vCPU, memory, and localSSD.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -41,7 +42,7 @@ COMMANDS
         (ALPHA) List Google Compute Engine node templates.
 
      remove-iam-policy-binding
-        (ALPHA) Remove IAM policy binding of a Google Compute Engine node
+        (ALPHA) Remove IAM policy binding from a Google Compute Engine node
         template.
 
      set-iam-policy

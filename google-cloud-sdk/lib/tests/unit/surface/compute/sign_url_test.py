@@ -26,6 +26,7 @@ import time
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.compute import sign_url_utils
+from googlecloudsdk.core import http
 from googlecloudsdk.core.util import files
 from tests.lib import cli_test_base
 from tests.lib import test_case
@@ -334,8 +335,8 @@ class ValidationTestsGA(SignUrlTestsBase):
 
   def SetUp(self):
     super(ValidationTestsGA, self).SetUp()
-    self.http_request_mock = self.StartObjectPatch(
-        httplib2.Http, 'request', autospec=True)
+    http_mock = self.StartObjectPatch(http, 'HttpClient')
+    self.http_request_mock = http_mock.return_value.request
     self.http_response_mock = self.StartObjectPatch(
         httplib2, 'Response', autospec=True)
 
@@ -353,7 +354,7 @@ class ValidationTestsGA(SignUrlTestsBase):
     """Verifies the HEAD request was sent for the specified Signed URL."""
     self.http_request_mock.assert_called_once()
     args, kwargs = self.http_request_mock.call_args
-    self.assertEqual(args[1], expected_signed_url)
+    self.assertEqual(args[0], expected_signed_url)
     self.assertEqual(kwargs['method'], 'HEAD')
 
   def testValidationSuccess(self):

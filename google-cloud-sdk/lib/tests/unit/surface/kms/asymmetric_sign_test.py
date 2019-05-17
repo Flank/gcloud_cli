@@ -65,30 +65,34 @@ class AsymmetricSignTest(base.KmsMockTest):
   def testAsymmetricSignMissingCryptoKeyVersion(self):
     input_path = self.Touch(
         self.temp_path, name='input_data', contents=r'Hello 2018\o/\o/\o/')
+    signature_path = self.Touch(self.temp_path, name='signature')
 
     with self.assertRaisesRegexp(resources.RequiredFieldOmittedException,
                                  'value for.*is required but was not provided'):
       self.Run('kms asymmetric-sign --location={location} '
                '--keyring={keyring} --key={key} --digest-algorithm=sha512 '
-               '--input-file={file}'.format(
+               '--signature-file={signature} --input-file={file}'.format(
                    location=self.version_name.location_id,
                    keyring=self.version_name.key_ring_id,
                    key=self.version_name.crypto_key_id,
-                   file=input_path))
+                   file=input_path,
+                   signature=signature_path))
 
   def testAsymmetricSignMissingInputFile(self):
     input_path = os.path.join(self.temp_path, 'file-that-does-not-exist')
+    signature_path = self.Touch(self.temp_path, name='signature')
 
     with self.assertRaisesRegexp(files.MissingFileError,
                                  'Unable to read file.*No such file'):
       self.Run('kms asymmetric-sign --location={location} --keyring={keyring} '
                '--key={key} --version={version} --digest-algorithm=sha512 '
-               '--input-file={file}'.format(
+               '--signature-file={signature} --input-file={file}'.format(
                    location=self.version_name.location_id,
                    keyring=self.version_name.key_ring_id,
                    key=self.version_name.crypto_key_id,
                    version=self.version_name.version_id,
-                   file=input_path))
+                   file=input_path,
+                   signature=signature_path))
 
 
 if __name__ == '__main__':

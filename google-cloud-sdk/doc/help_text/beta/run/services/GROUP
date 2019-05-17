@@ -1,0 +1,58 @@
+NAME
+    gcloud beta run services - view and manage your Cloud Run services
+
+SYNOPSIS
+    gcloud beta run services COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) This set of commands can be used to view and manage your existing
+    Cloud Run services.
+
+    To create new deployments, use gcloud beta run deploy.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     add-iam-policy-binding
+        (BETA) Add IAM policy binding to a Cloud Run service.
+
+     delete
+        (BETA) Delete a service.
+
+     describe
+        (BETA) Obtain details about a given service.
+
+     get-iam-policy
+        (BETA) Get the IAM policy for a Cloud Run service.
+
+     list
+        (BETA) List available services.
+
+     remove-iam-policy-binding
+        (BETA) Remove IAM policy binding of a Cloud Run service.
+
+     set-iam-policy
+        (BETA) Set the IAM policy for a service.
+
+     update
+        (BETA) Update Cloud Run environment variables and other configuration
+        settings.
+
+EXAMPLES
+    To list your deployed services, run:
+
+        $ gcloud beta run services list
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha run services
+

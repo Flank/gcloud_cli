@@ -220,6 +220,15 @@ class Node(_messages.Message):
     ipAddress: Output only. DEPRECATED! Use network_endpoints instead. The
       network address for the TPU Node as visible to Compute Engine instances.
     labels: Resource labels to represent user-provided metadata.
+    modelBasePath: Inference Mode: Base path to exported saved model. This
+      field can be used instead of model_config_file directly to specify the
+      exported saved model's base path (excluding timestamp), whereas
+      model_config_file points to a GCS path to a ModelServerConfig proto.
+    modelConfigFile: Inference Mode: GCS path to model configuration file for
+      models to serve The contents of the model_config.pbtxt is a
+      ModelServerConfig proto.
+    modelName: Inference Mode: Model name for tensorflow serving to serve to
+      incoming requests. If none is provided, "serving_default" will be used.
     name: Output only. The immutable name of the TPU
     network: The name of a network they wish to peer the TPU node to. It must
       be a preexisting Compute Engine network inside of the project on which
@@ -228,6 +237,9 @@ class Node(_messages.Message):
     networkEndpoints: Output only. The network endpoints where TPU workers can
       be accessed and sent work. It is recommended that Tensorflow clients of
       the node reach out to the 0th entry in this map first.
+    platformConfigFile: Inference Mode: GCS path to configuration file for
+      platform requirements The contents of the platform_config.pbtxt is a
+      PlatformConfigMap proto.
     port: Output only. DEPRECATED! Use network_endpoints instead. The network
       port for the TPU Node as visible to Compute Engine instances.
     schedulingConfig: A SchedulingConfig attribute.
@@ -253,13 +265,18 @@ class Node(_messages.Message):
       HEALTH_UNSPECIFIED: Health status is unknown: not initialized or failed
         to retrieve.
       HEALTHY: The resource is healthy.
-      UNHEALTHY: The resource is unhealthy.
+      DEPRECATED_UNHEALTHY: The resource is unhealthy.
       TIMEOUT: The resource is unresponsive.
+      UNHEALTHY_TENSORFLOW: The in-guest ML stack is unhealthy.
+      UNHEALTHY_MAINTENANCE: The node is under maintenance/priority boost
+        caused rescheduling and will resume running once rescheduled.
     """
     HEALTH_UNSPECIFIED = 0
     HEALTHY = 1
-    UNHEALTHY = 2
+    DEPRECATED_UNHEALTHY = 2
     TIMEOUT = 3
+    UNHEALTHY_TENSORFLOW = 4
+    UNHEALTHY_MAINTENANCE = 5
 
   class StateValueValuesEnum(_messages.Enum):
     r"""Output only. The current state for the TPU Node.
@@ -273,13 +290,16 @@ class Node(_messages.Message):
       DELETING: TPU node is being deleted.
       REPAIRING: TPU node is being repaired and may be unusable. Details can
         be found in the `help_description` field.
-      STOPPED: 7 - Reserved. Was SUSPENDED. TPU node is stopped.
+      STOPPED: TPU node is stopped.
       STOPPING: TPU node is currently stopping.
       STARTING: TPU node is currently starting.
       PREEMPTED: TPU node has been preempted. Only applies to Preemptible TPU
         Nodes.
       TERMINATED: TPU node has been terminated due to maintenance or has
         reached the end of its life cycle (for preemptible nodes).
+      HIDING: TPU node is currently hiding.
+      HIDDEN: TPU node has been hidden.
+      UNHIDING: TPU node is currently unhiding.
     """
     STATE_UNSPECIFIED = 0
     CREATING = 1
@@ -293,6 +313,9 @@ class Node(_messages.Message):
     STARTING = 9
     PREEMPTED = 10
     TERMINATED = 11
+    HIDING = 12
+    HIDDEN = 13
+    UNHIDING = 14
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
@@ -326,15 +349,19 @@ class Node(_messages.Message):
   healthDescription = _messages.StringField(6)
   ipAddress = _messages.StringField(7)
   labels = _messages.MessageField('LabelsValue', 8)
-  name = _messages.StringField(9)
-  network = _messages.StringField(10)
-  networkEndpoints = _messages.MessageField('NetworkEndpoint', 11, repeated=True)
-  port = _messages.StringField(12)
-  schedulingConfig = _messages.MessageField('SchedulingConfig', 13)
-  serviceAccount = _messages.StringField(14)
-  state = _messages.EnumField('StateValueValuesEnum', 15)
-  tensorflowVersion = _messages.StringField(16)
-  useServiceNetworking = _messages.BooleanField(17)
+  modelBasePath = _messages.StringField(9)
+  modelConfigFile = _messages.StringField(10)
+  modelName = _messages.StringField(11)
+  name = _messages.StringField(12)
+  network = _messages.StringField(13)
+  networkEndpoints = _messages.MessageField('NetworkEndpoint', 14, repeated=True)
+  platformConfigFile = _messages.StringField(15)
+  port = _messages.StringField(16)
+  schedulingConfig = _messages.MessageField('SchedulingConfig', 17)
+  serviceAccount = _messages.StringField(18)
+  state = _messages.EnumField('StateValueValuesEnum', 19)
+  tensorflowVersion = _messages.StringField(20)
+  useServiceNetworking = _messages.BooleanField(21)
 
 
 class Operation(_messages.Message):
@@ -368,7 +395,8 @@ class Operation(_messages.Message):
       if any.
     name: The server-assigned name, which is only unique within the same
       service that originally returns it. If you use the default HTTP mapping,
-      the `name` should have the format of `operations/some/unique/name`.
+      the `name` should be a resource name ending with
+      `operations/{unique_id}`.
     response: The normal response of the operation in case of success.  If the
       original method returns no data on success, such as `Delete`, the
       response is `google.protobuf.Empty`.  If the original method is standard
@@ -486,9 +514,11 @@ class SchedulingConfig(_messages.Message):
 
   Fields:
     preemptible: A boolean attribute.
+    reserved: Whether the node is created under a reservation.
   """
 
   preemptible = _messages.BooleanField(1)
+  reserved = _messages.BooleanField(2)
 
 
 class StandardQueryParameters(_messages.Message):

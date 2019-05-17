@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2014 Google Inc. All Rights Reserved.
+# Copyright 2014 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -74,7 +74,7 @@ class DiffPrinter(resource_printer_base.ResourcePrinter):
     # Send these two buffers to the unified_diff() function for printing.
     lines_old = buf_old.getvalue().split('\n')
     lines_new = buf_new.getvalue().split('\n')
-    lines_diff = difflib.unified_diff(lines_old, lines_new)  # pytype: disable=wrong-arg-types
+    lines_diff = difflib.unified_diff(lines_old, lines_new)
     for line in lines_diff:
       self._out.Print(line)
 

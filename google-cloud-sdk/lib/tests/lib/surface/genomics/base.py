@@ -44,24 +44,6 @@ class _Base(cli_test_base.CliTestBase):
 class GenomicsIntegrationTest(_Base, e2e_base.WithServiceAuth):
   """Base class for all genomics integration tests."""
 
-  def CleanUpDatasets(self, dataset_ids):
-    """Delete the datasets given in the list."""
-    return self.cleanUpGeneric('datasets', dataset_ids)
-
-  def CleanUpVariantSets(self, variant_set_ids):
-    """Delete the variant sets given in the list."""
-    return self.cleanUpGeneric('variantsets', variant_set_ids)
-
-  def cleanUpGeneric(self, whichset, ids):
-    failed_cleanup_list = []
-    for delete_id in ids:
-      try:
-        self.RunGenomics([whichset, 'delete', delete_id])
-      # pylint:disable=bare-except
-      except:
-        failed_cleanup_list.append(delete_id)
-    return failed_cleanup_list
-
 
 class GenomicsUnitTest(sdk_test_base.WithFakeAuth, _Base):
   """Base class for Genomics unit tests."""

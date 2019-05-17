@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.tasks import app
 from googlecloudsdk.command_lib.tasks import parsers
 from googlecloudsdk.core import properties
@@ -41,7 +42,6 @@ class QueuesListTest(test_base.CloudTasksTestBase):
       queue_name = '{}/queues/q{}'.format(self.location_name, i)
       q = self.messages.Queue(
           name=queue_name,
-          appEngineHttpQueue=self.messages.AppEngineHttpQueue(),
           state=self.messages.Queue.StateValueValuesEnum.RUNNING,
           rateLimits=self.messages.RateLimits(
               maxConcurrentDispatches=10, maxDispatchesPerSecond=500))
@@ -71,9 +71,9 @@ class QueuesListTest(test_base.CloudTasksTestBase):
     self.Run('tasks queues list --uri')
 
     self.AssertOutputEquals("""\
-        https://cloudtasks.googleapis.com/v2beta2/{0}/queues/q0
-        https://cloudtasks.googleapis.com/v2beta2/{0}/queues/q1
-        https://cloudtasks.googleapis.com/v2beta2/{0}/queues/q2
+        https://cloudtasks.googleapis.com/v2/{0}/queues/q0
+        https://cloudtasks.googleapis.com/v2/{0}/queues/q1
+        https://cloudtasks.googleapis.com/v2/{0}/queues/q2
         """.format(self.location_name), normalize_space=True)
 
   def testList_Location(self):
@@ -103,11 +103,58 @@ class QueuesListTest(test_base.CloudTasksTestBase):
     self.Run('tasks queues list')
 
     self.AssertOutputEquals("""\
-        QUEUE_NAME  TYPE        STATE    MAX_NUM_OF_TASKS  MAX_RATE (/sec)  MAX_ATTEMPTS
-        q0          app-engine  RUNNING  10                500.0            unlimited
-        q1          app-engine  RUNNING  10                500.0            unlimited
-        q2          app-engine  RUNNING  10                500.0            unlimited
+        QUEUE_NAME  STATE    MAX_NUM_OF_TASKS  MAX_RATE (/sec)  MAX_ATTEMPTS
+        q0          RUNNING  10                500.0            unlimited
+        q1          RUNNING  10                500.0            unlimited
+        q2          RUNNING  10                500.0            unlimited
         """, normalize_space=True)
+
+
+class QueuesListTestBeta(QueuesListTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class QueuesAlphaListTest(test_base.CloudTasksAlphaTestBase):
+
+  def SetUp(self):
+    self.location_name = 'projects/{}/locations/us-central1'.format(
+        self.Project())
+    resolve_loc_mock = self.StartObjectPatch(app, 'ResolveAppLocation')
+    resolve_loc_mock.return_value = (
+        parsers.ParseLocation(self.location_name).SelfLink())
+
+  def _MakeQueues(self, n=10):
+    queues = []
+    for i in range(n):
+      queue_name = '{}/queues/q{}'.format(self.location_name, i)
+      q = self.messages.Queue(
+          name=queue_name,
+          appEngineHttpTarget=self.messages.AppEngineHttpTarget(),
+          state=self.messages.Queue.StateValueValuesEnum.RUNNING,
+          rateLimits=self.messages.RateLimits(
+              maxConcurrentTasks=10, maxTasksDispatchedPerSecond=500))
+      queues.append(q)
+    return queues
+
+  def testList_CheckFormat(self):
+    properties.VALUES.core.user_output_enabled.Set(True)
+    queues = self._MakeQueues(n=3)
+    self.queues_service.List.Expect(
+        self.messages.CloudtasksProjectsLocationsQueuesListRequest(
+            parent=self.location_name),
+        response=self.messages.ListQueuesResponse(queues=queues))
+
+    self.Run('tasks queues list')
+
+    self.AssertOutputEquals("""\
+        QUEUE_NAME  TYPE  STATE    MAX_NUM_OF_TASKS  MAX_RATE (/sec)  MAX_ATTEMPTS
+        q0          push  RUNNING  10                500.0            unlimited
+        q1          push  RUNNING  10                500.0            unlimited
+        q2          push  RUNNING  10                500.0            unlimited
+        """, normalize_space=True)
+
 
 if __name__ == '__main__':
   test_case.main()

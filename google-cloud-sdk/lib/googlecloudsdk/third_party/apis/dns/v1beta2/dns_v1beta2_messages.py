@@ -12,7 +12,13 @@ package = 'dns'
 
 
 class Change(_messages.Message):
-  r"""An atomic update to a collection of ResourceRecordSets.
+  r"""A Change represents a set of ResourceRecordSet additions and deletions
+  applied atomically to a ManagedZone. ResourceRecordSets within a ManagedZone
+  are modified by creating a new Change element in the Changes collection. In
+  turn the Changes collection also records the past modifications to the
+  ResourceRecordSets in a ManagedZone. The current state of the ManagedZone is
+  the sum effect of applying all Change elements in the Changes collection in
+  sequence.
 
   Enums:
     StatusValueValuesEnum: Status of the operation (output only). A status of
@@ -754,6 +760,9 @@ class ManagedZone(_messages.Message):
       the same ManagedZones. Most users will leave this field unset.
     nameServers: Delegate your managed_zone to these virtual name servers;
       defined by the server (output only)
+    peeringConfig: The presence of this field indicates that DNS Peering is
+      enabled for this zone. The value of this field contains the network to
+      peer with.
     privateVisibilityConfig: For privately visible zones, the set of Virtual
       Private Cloud resources that the zone is visible from.
     visibility: The zone's visibility: public zones are exposed to the
@@ -807,8 +816,9 @@ class ManagedZone(_messages.Message):
   name = _messages.StringField(9)
   nameServerSet = _messages.StringField(10)
   nameServers = _messages.StringField(11, repeated=True)
-  privateVisibilityConfig = _messages.MessageField('ManagedZonePrivateVisibilityConfig', 12)
-  visibility = _messages.EnumField('VisibilityValueValuesEnum', 13)
+  peeringConfig = _messages.MessageField('ManagedZonePeeringConfig', 12)
+  privateVisibilityConfig = _messages.MessageField('ManagedZonePrivateVisibilityConfig', 13)
+  visibility = _messages.EnumField('VisibilityValueValuesEnum', 14)
 
 
 class ManagedZoneDnsSecConfig(_messages.Message):
@@ -911,6 +921,40 @@ class ManagedZoneOperationsListResponse(_messages.Message):
   kind = _messages.StringField(2, default=u'dns#managedZoneOperationsListResponse')
   nextPageToken = _messages.StringField(3)
   operations = _messages.MessageField('Operation', 4, repeated=True)
+
+
+class ManagedZonePeeringConfig(_messages.Message):
+  r"""A ManagedZonePeeringConfig object.
+
+  Fields:
+    kind: Identifies what kind of resource this is. Value: the fixed string
+      "dns#managedZonePeeringConfig".
+    targetNetwork: The network with which to peer.
+  """
+
+  kind = _messages.StringField(1, default=u'dns#managedZonePeeringConfig')
+  targetNetwork = _messages.MessageField('ManagedZonePeeringConfigTargetNetwork', 2)
+
+
+class ManagedZonePeeringConfigTargetNetwork(_messages.Message):
+  r"""A ManagedZonePeeringConfigTargetNetwork object.
+
+  Fields:
+    deactivateTime: If this zone has been deactivated due to a problem with
+      the network it targeted, the time at which it was deactivated. The zone
+      can be deactivated if, for instance, the network it targeted was
+      deleted. If the targeted network is still present, this will be the
+      empty string. This is in RFC3339 text format. Output only.
+    kind: Identifies what kind of resource this is. Value: the fixed string
+      "dns#managedZonePeeringConfigTargetNetwork".
+    networkUrl: The fully qualified URL of the VPC network to forward queries
+      to. This should be formatted like https://www.googleapis.com/compute/v1/
+      projects/{project}/global/networks/{network}
+  """
+
+  deactivateTime = _messages.StringField(1)
+  kind = _messages.StringField(2, default=u'dns#managedZonePeeringConfigTargetNetwork')
+  networkUrl = _messages.StringField(3)
 
 
 class ManagedZonePrivateVisibilityConfig(_messages.Message):
@@ -1112,6 +1156,8 @@ class Policy(_messages.Message):
       DNS queries sent by VMs or applications over VPN connections. When
       enabled, a virtual IP address will be allocated from each of the sub-
       networks that are bound to this policy.
+    enableLogging: Controls whether logging is enabled for the networks bound
+      to this policy. Defaults to no logging if not set.
     id: Unique identifier for the resource; defined by the server (output
       only).
     kind: Identifies what kind of resource this is. Value: the fixed string
@@ -1124,10 +1170,11 @@ class Policy(_messages.Message):
   alternativeNameServerConfig = _messages.MessageField('PolicyAlternativeNameServerConfig', 1)
   description = _messages.StringField(2)
   enableInboundForwarding = _messages.BooleanField(3)
-  id = _messages.IntegerField(4, variant=_messages.Variant.UINT64)
-  kind = _messages.StringField(5, default=u'dns#policy')
-  name = _messages.StringField(6)
-  networks = _messages.MessageField('PolicyNetwork', 7, repeated=True)
+  enableLogging = _messages.BooleanField(4)
+  id = _messages.IntegerField(5, variant=_messages.Variant.UINT64)
+  kind = _messages.StringField(6, default=u'dns#policy')
+  name = _messages.StringField(7)
+  networks = _messages.MessageField('PolicyNetwork', 8, repeated=True)
 
 
 class PolicyAlternativeNameServerConfig(_messages.Message):
@@ -1250,12 +1297,13 @@ class ResourceRecordSet(_messages.Message):
     kind: Identifies what kind of resource this is. Value: the fixed string
       "dns#resourceRecordSet".
     name: For example, www.example.com.
-    rrdatas: As defined in RFC 1035 (section 5) and RFC 1034 (section 3.6.1).
+    rrdatas: As defined in RFC 1035 (section 5) and RFC 1034 (section 3.6.1)
+      -- see examples.
     signatureRrdatas: As defined in RFC 4034 (section 3.2).
     ttl: Number of seconds that this ResourceRecordSet can be cached by
       resolvers.
-    type: The identifier of a supported record type, for example, A, AAAA, MX,
-      TXT, and so on.
+    type: The identifier of a supported record type. See the list of Supported
+      DNS record types.
   """
 
   kind = _messages.StringField(1, default=u'dns#resourceRecordSet')

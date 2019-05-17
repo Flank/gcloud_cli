@@ -1,6 +1,5 @@
 NAME
-    gcloud alpha access-context-manager levels update - update an existing
-        access level
+    gcloud alpha access-context-manager levels update -
 
 SYNOPSIS
     gcloud alpha access-context-manager levels update (LEVEL : --policy=POLICY)
@@ -9,7 +8,7 @@ SYNOPSIS
         [--title=TITLE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (ALPHA) Update an existing access level.
+    (ALPHA)
 
 POSITIONAL ARGUMENTS
      Level resource - The access level to update. The arguments in this group
@@ -49,19 +48,19 @@ FLAGS
         Short human-readable title of the access level.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
 NOTES
-    This command is an internal implementation detail and may change or
-    disappear without notice. This command is currently in ALPHA and may change
-    without notice. If this command fails with API permission errors despite
-    specifying the right project, you will have to apply for early access and
-    have your projects registered on the API whitelist to use it. To do so,
-    contact Support at https://cloud.google.com/support/. This variant is also
-    available:
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
 
+        $ gcloud access-context-manager levels update
         $ gcloud beta access-context-manager levels update
 

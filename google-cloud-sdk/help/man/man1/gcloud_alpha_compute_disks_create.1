@@ -11,7 +11,7 @@ gcloud alpha compute disks create \- create Google Compute Engine persistent dis
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute disks create\fR \fIDISK_NAME\fR [\fIDISK_NAME\fR\ ...] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-guest\-os\-features\fR=[\fIGUEST_OS_FEATURE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-licenses\fR=[\fILICENSE\fR,...]] [\fB\-\-replica\-zones\fR=\fIZONE\fR,\fIZONE\fR] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-resource\-policies\fR=[\fIRESOURCE_POLICY\fR,...]] [\fB\-\-size\fR=\fISIZE\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR] [\fB\-\-kms\-key\fR=\fIKMS_KEY\fR\ :\ \fB\-\-kms\-keyring\fR=\fIKMS_KEYRING\fR\ \fB\-\-kms\-location\fR=\fIKMS_LOCATION\fR\ \fB\-\-kms\-project\fR=\fIKMS_PROJECT\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute disks create\fR \fIDISK_NAME\fR [\fIDISK_NAME\fR\ ...] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-guest\-os\-features\fR=[\fIGUEST_OS_FEATURE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-licenses\fR=[\fILICENSE\fR,...]] [\fB\-\-multi\-writer\fR] [\fB\-\-physical\-block\-size\fR=\fIPHYSICAL_BLOCK_SIZE\fR;\ default="4096"] [\fB\-\-replica\-zones\fR=\fIZONE\fR,\fIZONE\fR] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-resource\-policies\fR=[\fIRESOURCE_POLICY\fR,...]] [\fB\-\-size\fR=\fISIZE\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR\ |\ \fB\-\-source\-snapshot\fR=\fISOURCE_SNAPSHOT\fR] [\fB\-\-kms\-key\fR=\fIKMS_KEY\fR\ :\ \fB\-\-kms\-keyring\fR=\fIKMS_KEYRING\fR\ \fB\-\-kms\-location\fR=\fIKMS_LOCATION\fR\ \fB\-\-kms\-project\fR=\fIKMS_PROJECT\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -106,7 +106,7 @@ server include the WINDOWS parameter to indicate that it is a Windows image.
 .RE
 .sp
 \fIGUEST_OS_FEATURE\fR must be one of: \fBMULTI_IP_SUBNET\fR, \fBSECURE_BOOT\fR,
-\fBUEFI_COMPATIBLE\fR, \fBVIRTIO_SCSI_MULTIQUEUE\fR, \fBWINDOWS\fR.
+\fBUEFI_COMPATIBLE\fR, \fBVIRTIO_SCSI_MULTIQUEUE\fR, \fBWINDOWS\fR, \fBGVNIC\fR.
 
 .RS 2m
 .TP 2m
@@ -122,6 +122,19 @@ numbers.
 \fB\-\-licenses\fR=[\fILICENSE\fR,...]
 A list of URIs to license resources. The provided licenses will be added onto
 the created disks to indicate the licensing and billing policies.
+
+.TP 2m
+\fB\-\-multi\-writer\fR
+Create the disk in shared mode so that it can be attached with read\-write
+access to multiple VMs. Available only for zonal disks. Cannot be used with
+regional disks. Shared disk is exposed only as an NVMe device. Shared PD does
+not yet support resize and snapshot operations.
+
+.TP 2m
+\fB\-\-physical\-block\-size\fR=\fIPHYSICAL_BLOCK_SIZE\fR; default="4096"
+Physical block size of the persistent disk in bytes. Valid values are
+4096(default) and 16384. \fIPHYSICAL_BLOCK_SIZE\fR must be one of: \fB4096\fR,
+\fB16384\fR.
 
 .TP 2m
 \fB\-\-replica\-zones\fR=\fIZONE\fR,\fIZONE\fR
@@ -306,10 +319,11 @@ Alternatively, the zone can be stored in the environment variable
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

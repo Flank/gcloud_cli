@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud pubsub \- manage Cloud Pub/Sub topics and subscriptions
+gcloud pubsub \- manage Cloud Pub/Sub topics, subscriptions, and snapshots
 
 
 
@@ -17,16 +17,17 @@ gcloud pubsub \- manage Cloud Pub/Sub topics and subscriptions
 
 .SH "DESCRIPTION"
 
-Manage Cloud Pub/Sub topics and subscriptions.
+Manage Cloud Pub/Sub topics, subscriptions, and snapshots.
 
 
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -36,12 +37,16 @@ gcloud help\fR for details.
 
 .RS 2m
 .TP 2m
+\fBsnapshots\fR
+Manage Cloud Pub/Sub snapshots.
+
+.TP 2m
 \fBsubscriptions\fR
-Manage Cloud Pubsub subscriptions.
+Manage Cloud Pub/Sub subscriptions.
 
 .TP 2m
 \fBtopics\fR
-Manage Cloud Pubsub topics.
+Manage Cloud Pub/Sub topics.
 
 
 .RE

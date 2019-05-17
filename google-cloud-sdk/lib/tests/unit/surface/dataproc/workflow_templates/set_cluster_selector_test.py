@@ -99,5 +99,12 @@ class WorkflowTemplateSetClusterSelectorUnitTest(
 class WorkflowTemplateSetClusterSelectorUnitTestBeta(
     WorkflowTemplateSetClusterSelectorUnitTest):
 
-  def SetUp(self):
-    self.SetupForReleaseTrack(calliope.base.ReleaseTrack.BETA)
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.BETA
+
+
+class WorkflowTemplateSetClusterSelectorUnitTestAlpha(
+    WorkflowTemplateSetClusterSelectorUnitTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.ALPHA

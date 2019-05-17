@@ -5,20 +5,19 @@
 
 .SH "NAME"
 .HP
-gcloud alpha compute instances set\-iam\-policy \- set IAM policy for an instance
+gcloud alpha compute instances set\-iam\-policy \- set IAM policy for a Google Compute Engine instance
 
 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute instances set\-iam\-policy\fR \fIINSTANCE_NAME\fR \fIPOLICY_FILE\fR [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute instances set\-iam\-policy\fR (\fIINSTANCE\fR\ :\ \fB\-\-zone\fR=\fIZONE\fR) \fIPOLICY_FILE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR \fBgcloud alpha compute instances set\-iam\-policy\fR sets the IAM
-Policy associated with a Google Compute Engine instance in a project.
+\fB(ALPHA)\fR Set IAM policy for a Google Compute Engine instance.
 
 
 
@@ -26,48 +25,36 @@ Policy associated with a Google Compute Engine instance in a project.
 
 .RS 2m
 .TP 2m
-\fIINSTANCE_NAME\fR
-Name of the instance to set the IAM policy of.
+
+Instance resource \- Instance resource \- The instance to set the IAM policy of.
+The arguments in this group can be used to specify the attributes of this
+resource. The arguments in this group can be used to specify the attributes of
+this resource. (NOTE) Some attributes are not given arguments in this group but
+can be set in other ways. To set the [project] attribute: provide the argument
+[instance] on the command line with a fully specified name; set the property
+[core/project]; provide the argument [\-\-project] on the command line. This
+must be specified.
+
+.RS 2m
+.TP 2m
+\fIINSTANCE\fR
+ID of the instance or fully qualified identifier for the instance. This
+positional must be specified if any of the other arguments in this group are
+specified.
 
 .TP 2m
-\fIPOLICY_FILE\fR
-JSON or YAML file containing the IAM policy.
-
+\fB\-\-zone\fR=\fIZONE\fR
+The name of the Google Compute Engine zone.
 
 .RE
 .sp
-
-.SH "FLAGS"
-
-.RS 2m
 .TP 2m
-\fB\-\-zone\fR=\fIZONE\fR
-Zone of the instance to set the IAM policy of. If not specified, you may be
-prompted to select a zone. \f5gcloud\fR will attempt to identify the zone by
-searching for resources in your project. If the zone cannot be determined, you
-will then be prompted with all Google Cloud Platform zones.
+\fIPOLICY_FILE\fR
+Path to a local JSON or YAML formatted file containing a valid policy.
 
-To avoid prompting when this flag is omitted, you can set the
-\f5\fIcompute/zone\fR\fR property:
-
-.RS 2m
-$ gcloud config set compute/zone ZONE
-.RE
-
-A list of zones can be fetched by running:
-
-.RS 2m
-$ gcloud compute zones list
-.RE
-
-To unset the property, run:
-
-.RS 2m
-$ gcloud config unset compute/zone
-.RE
-
-Alternatively, the zone can be stored in the environment variable
-\f5\fICLOUDSDK_COMPUTE_ZONE\fR\fR.
+The output of the \f5get\-iam\-policy\fR command is a valid file, as is any JSON
+or YAML file conforming to the structure of a Policy
+(https://cloud.google.com/iam/reference/rest/v1/Policy).
 
 
 .RE
@@ -75,26 +62,32 @@ Alternatively, the zone can be stored in the environment variable
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBcompute/alpha\fR API. The full documentation for this
+API can be found at:
+https://developers.google.com/compute/docs/reference/latest/
 
 
 
 .SH "EXAMPLES"
 
-The following command will read an IAM policy defined in a JSON file
-\'policy.json' and set it for an instance with identifier 'my\-instance'
-
-.RS 2m
+The following command reads an IAM policy defined in a JSON file
+\f5policy.json\fR and sets it for the instance 'my\-instance' and zone 'ZONE':.RS 2m
 $ gcloud alpha compute instances set\-iam\-policy my\-instance \e
-    policy.json
+    \-\-zone=ZONE policy.json
+
+See https://cloud.google.com/iam/docs/managing\-policies for details of policy
+role and member types.
 .RE
-
-
-See https://cloud.google.com/iam/docs/managing\-policies for details of the
-policy file format and contents.
 
 
 
@@ -104,9 +97,10 @@ This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you will have to apply for early access and have your projects registered on the
 API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. This variant is also available:
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
+$ gcloud compute instances set\-iam\-policy
 $ gcloud beta compute instances set\-iam\-policy
 .RE
 

@@ -26,10 +26,10 @@ from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
 
 
-class PerimetersDeleteTestBeta(accesscontextmanager.Base):
+class PerimetersDeleteTestGA(accesscontextmanager.Base):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(True)
@@ -80,10 +80,17 @@ class PerimetersDeleteTestBeta(accesscontextmanager.Base):
     self.AssertOutputEquals('')
 
 
-class PerimetersDeleteTestAlpha(PerimetersDeleteTestBeta):
+class PerimetersDeleteTestBeta(PerimetersDeleteTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class PerimetersDeleteTestAlpha(PerimetersDeleteTestGA):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
+
 
 if __name__ == '__main__':
   test_case.main()

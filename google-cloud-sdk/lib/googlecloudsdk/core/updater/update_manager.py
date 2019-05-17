@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2013 Google Inc. All Rights Reserved.
+# Copyright 2013 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -1248,7 +1248,7 @@ To revert your SDK to the previously installed version, you may run:
 
     backup_has_bundled_python = (
         BUNDLED_PYTHON_COMPONENT in
-        install_state.BackupInstallationState().InstalledComponents())  # pytype: disable=attribute-error
+        install_state.BackupInstallationState().InstalledComponents())
     if self.IsPythonBundled() and not backup_has_bundled_python:
       log.warning(BUNDLED_PYTHON_REMOVAL_WARNING)
 
@@ -1346,7 +1346,7 @@ To revert your SDK to the previously installed version, you may run:
 
     # shell out to install script
     installed_component_ids = sorted(install_state.InstalledComponents().keys())
-    env = dict(os.environ)
+    env = encoding.EncodeEnv(dict(os.environ))
     encoding.SetEncodedValue(env, 'CLOUDSDK_REINSTALL_COMPONENTS',
                              ','.join(installed_component_ids))
     installer_path = os.path.join(staging_state.sdk_root,

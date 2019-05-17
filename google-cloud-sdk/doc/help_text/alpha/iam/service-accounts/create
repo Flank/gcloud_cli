@@ -3,8 +3,8 @@ NAME
         project
 
 SYNOPSIS
-    gcloud alpha iam service-accounts create NAME [--display-name=DISPLAY_NAME]
-        [GCLOUD_WIDE_FLAG ...]
+    gcloud alpha iam service-accounts create NAME [--description=DESCRIPTION]
+        [--display-name=DISPLAY_NAME] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) This command creates a service account with the provided name. For
@@ -18,12 +18,16 @@ POSITIONAL ARGUMENTS
         service account), which must be passed to subsequent commands.
 
 FLAGS
+     --description=DESCRIPTION
+        A textual description for the account.
+
      --display-name=DISPLAY_NAME
         A textual name to display for the account.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

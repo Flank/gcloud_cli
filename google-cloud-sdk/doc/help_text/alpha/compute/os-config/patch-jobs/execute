@@ -1,0 +1,137 @@
+NAME
+    gcloud alpha compute os-config patch-jobs execute - execute an OS patch on
+        the specified VM instances
+
+SYNOPSIS
+    gcloud alpha compute os-config patch-jobs execute
+        --instance-filter=INSTANCE_FILTER [--apt-dist] [--async]
+        [--description=DESCRIPTION] [--dry-run] [--duration=DURATION]
+        [--reboot-config=REBOOT_CONFIG] [--retry]
+        [--windows-classifications=[WINDOWS_CLASSIFICATIONS,...]
+          --windows-excludes=[WINDOWS_EXCLUDES,...]]
+        [--yum-excludes=[YUM_EXCLUDES,...] --yum-minimal --yum-security]
+        [GCLOUD_WIDE_FLAG ...]
+
+REQUIRED FLAGS
+     --instance-filter=INSTANCE_FILTER
+        Filter for selecting the instances to patch. Patching supports the same
+        filter mechanisms as gcloud compute instances list, allowing one to
+        patch specific instances by name, zone, label, or other criteria.
+
+OPTIONAL FLAGS
+     Settings for machines running Apt:
+
+       --apt-dist
+          If specified, machines running Apt will patch using the command
+          apt-get dist-upgrade; otherwise the patch will run apt-get upgrade.
+
+     --async
+        Display information about the patch job that was started without
+        waiting for it to complete.
+
+     --description=DESCRIPTION
+        Textual description of the patch job.
+
+     --dry-run
+        Whether to execute this patch job as a dry run. If this patch job is a
+        dry run, instances will be contacted, but they will do nothing.
+
+     --duration=DURATION
+        Total duration in which the patch job must complete. If the patch does
+        not complete in this time, it will time out, and while some instances
+        may still be running the patch, they will not continue to work after
+        they complete their current step. See $ gcloud topic datetimes for
+        information on specifying absolute time durations.
+
+        If unspecified, the job will stay active until all instances complete
+        the patch.
+
+     --reboot-config=REBOOT_CONFIG
+        Post-patch reboot settings. REBOOT_CONFIG must be one of:
+
+         always
+            Always reboot the machine after the update has completed.
+         default
+            The agent will decide if a reboot is necessary by checking well
+            known signals such as registry keys or '/var/run/reboot-required'.
+         never
+            Never reboot the machine after the update has completed.
+
+     --retry
+        Whether to attempt to retry during the duration window if patching
+        fails. If omitted, the agent will use its default retry strategy.
+
+     Settings for machines running Windows:
+
+       --windows-classifications=[WINDOWS_CLASSIFICATIONS,...]
+          List of classifications to use to restrict the Windows update. Only
+          patches of the given classifications will be applied. If omitted, a
+          default Windows update will be performed. For more information on
+          classifications, see: https://support.microsoft.com/en-us/help/824684
+
+          WINDOWS_CLASSIFICATIONS must be one of: critical, security,
+          definition, driver, feature-pack, service-pack, tool, update-rollup,
+          update.
+
+       --windows-excludes=[WINDOWS_EXCLUDES,...]
+          Optional list of KBs to exclude from the update operation.
+
+     Settings for machines running Yum:
+
+       --yum-excludes=[YUM_EXCLUDES,...]
+          Optional list of packages to exclude from updating. If this argument
+          is specified, machines running Yum will exclude the given list of
+          packages using the Yum --exclude flag.
+
+       --yum-minimal
+          If specified, machines running Yum will patch using the command yum
+          update-minimal; otherwise the patch will run yum-update.
+
+       --yum-security
+          If specified, machines running Yum will append the --security flag to
+          the patch command.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+EXAMPLES
+    To patch all instances in the current project, use --instance-filter="" (or
+    equivalently, --instance-filter="id="):
+
+        $ gcloud alpha compute os-config patch-jobs execute \
+        --instance-filter=""
+
+    To patch the instances named 'my-instance1' and 'my-instance2', run:
+
+        $ gcloud alpha compute os-config patch-jobs execute \
+        --instance-filter="name=my-instance-1 OR name=my-instance-2"
+
+    To patch all instances in the 'us-central1-b' and 'europe-west1-d' zones,
+    run:
+
+        $ gcloud alpha compute os-config patch-jobs execute \
+        --instance-filter="zone:(us-central1-b europe-west1-d)"
+
+    To patch all instances where their 'env' label is 'test', run:
+
+        $ gcloud alpha compute os-config patch-jobs execute \
+        --instance-filter="labels.env=test"
+
+    To apply security and critical patches to a Windows instance named
+    'my-instance', run:
+
+        $ gcloud alpha compute os-config patch-jobs execute \
+        --instance-filter="name=my-instance" \
+        --windows-classifications=SECURITY,CRITICAL
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/.
+

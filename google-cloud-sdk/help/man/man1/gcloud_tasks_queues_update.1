@@ -1,0 +1,221 @@
+
+.TH "GCLOUD_TASKS_QUEUES_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud tasks queues update \- update a Cloud Tasks queue
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud tasks queues update\fR \fIQUEUE\fR [\fB\-\-clear\-max\-attempts\fR\ |\ \fB\-\-max\-attempts\fR=\fIMAX_ATTEMPTS\fR] [\fB\-\-clear\-max\-backoff\fR\ |\ \fB\-\-max\-backoff\fR=\fIMAX_BACKOFF\fR] [\fB\-\-clear\-max\-concurrent\-dispatches\fR\ |\ \fB\-\-max\-concurrent\-dispatches\fR=\fIMAX_CONCURRENT_DISPATCHES\fR] [\fB\-\-clear\-max\-dispatches\-per\-second\fR\ |\ \fB\-\-max\-dispatches\-per\-second\fR=\fIMAX_DISPATCHES_PER_SECOND\fR] [\fB\-\-clear\-max\-doublings\fR\ |\ \fB\-\-max\-doublings\fR=\fIMAX_DOUBLINGS\fR] [\fB\-\-clear\-max\-retry\-duration\fR\ |\ \fB\-\-max\-retry\-duration\fR=\fIMAX_RETRY_DURATION\fR] [\fB\-\-clear\-min\-backoff\fR\ |\ \fB\-\-min\-backoff\fR=\fIMIN_BACKOFF\fR] [\fB\-\-clear\-routing\-override\fR\ |\ \fB\-\-routing\-override\fR=\fIKEY\fR:\fIVALUE\fR,[...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+The flags available to this command represent the fields of a queue that are
+mutable.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIQUEUE\fR
+The queue to update.
+
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-max\-attempts\fR
+Clear the field corresponding to \f5\-\-max\-attempts\fR.
+
+.TP 2m
+\fB\-\-max\-attempts\fR=\fIMAX_ATTEMPTS\fR
+The maximum number of attempts per task in the queue.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-max\-backoff\fR
+Clear the field corresponding to \f5\-\-max\-backoff\fR.
+
+.TP 2m
+\fB\-\-max\-backoff\fR=\fIMAX_BACKOFF\fR
+The maximum amount of time to wait before retrying a task after it fails. Must
+be a string that ends in 's', such as "5s".
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-max\-concurrent\-dispatches\fR
+Clear the field corresponding to \f5\-\-max\-concurrent\-dispatches\fR.
+
+.TP 2m
+\fB\-\-max\-concurrent\-dispatches\fR=\fIMAX_CONCURRENT_DISPATCHES\fR
+The maximum number of concurrent tasks that Cloud Tasks allows to be dispatched
+for this queue. After this threshold has been reached, Cloud Tasks stops
+dispatching tasks until the number of outstanding requests decreases.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-max\-dispatches\-per\-second\fR
+Clear the field corresponding to \f5\-\-max\-dispatches\-per\-second\fR.
+
+.TP 2m
+\fB\-\-max\-dispatches\-per\-second\fR=\fIMAX_DISPATCHES_PER_SECOND\fR
+The maximum rate at which tasks are dispatched from this queue.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-max\-doublings\fR
+Clear the field corresponding to \f5\-\-max\-doublings\fR.
+
+.TP 2m
+\fB\-\-max\-doublings\fR=\fIMAX_DOUBLINGS\fR
+The time between retries will double maxDoublings times.
+
+A tasks retry interval starts at minBackoff, then doubles maxDoublings times,
+then increases linearly, and finally retries retries at intervals of maxBackoff
+up to maxAttempts times.
+
+For example, if minBackoff is 10s, maxBackoff is 300s, and maxDoublings is 3,
+then the a task will first be retried in 10s. The retry interval will double
+three times, and then increase linearly by 2^3 * 10s. Finally, the task will
+retry at intervals of maxBackoff until the task has been attempted maxAttempts
+times. Thus, the requests will retry at 10s, 20s, 40s, 80s, 160s, 240s, 300s,
+300s.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-max\-retry\-duration\fR
+Clear the field corresponding to \f5\-\-max\-retry\-duration\fR.
+
+.TP 2m
+\fB\-\-max\-retry\-duration\fR=\fIMAX_RETRY_DURATION\fR
+The time limit for retrying a failed task, measured from when the task was first
+run. Once the \f5\-\-max\-retry\-duration\fR time has passed and the task has
+been attempted \-\-max\-attempts times, no further attempts will be made and the
+task will be deleted.
+
+Must be a string that ends in 's', such as "5s".
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-min\-backoff\fR
+Clear the field corresponding to \f5\-\-min\-backoff\fR.
+
+.TP 2m
+\fB\-\-min\-backoff\fR=\fIMIN_BACKOFF\fR
+The minimum amount of time to wait before retrying a task after it fails. Must
+be a string that ends in 's', such as "5s".
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-routing\-override\fR
+Clear the field corresponding to \f5\-\-routing\-override\fR.
+
+.TP 2m
+\fB\-\-routing\-override\fR=\fIKEY\fR:\fIVALUE\fR,[...]
+If provided, the specified route is used for all tasks in the queue, no matter
+what is set is at the task\-level.
+
+KEY must be at least one of: [service, version, instance]. Any missing keys will
+use the default.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To update a Cloud Tasks queue:
+
+.RS 2m
+$ gcloud tasks queues update my\-queue
+  \-\-clear\-max\-attempts \-\-clear\-max\-retry\-duration
+  \-\-clear\-max\-doublings \-\-clear\-min\-backoff
+  \-\-clear\-max\-backoff
+  \-\-clear\-max\-dispatches\-per\-second
+  \-\-clear\-max\-concurrent\-dispatches
+  \-\-clear\-routing\-override
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha tasks queues update
+$ gcloud beta tasks queues update
+.RE
+

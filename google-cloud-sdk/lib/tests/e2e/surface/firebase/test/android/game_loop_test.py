@@ -26,18 +26,6 @@ from tests.lib.surface.firebase.test.android import commands
 class GameLoopRunTest(e2e_base.TestIntegrationTestBase):
   """Integration test for test type game-loop."""
 
-  @test_case.Filters.skip('Failing', 'b/68211846')
-  def testGameLoopTestType(self):
-    self.Run('{cmd} --type=game-loop --app={app} --async '
-             '--device model=shamu,version=23 '
-             '--scenario-numbers=3 --scenario-labels=compatibility '.format(
-                 cmd=commands.ANDROID_BETA_TEST_RUN, app=e2e_base.FTLGAME_APP))
-
-    self.AssertErrMatches(r'Uploading.*ftlgame.apk')
-    self.AssertErrContains('execute your game-loop test on 1 device')
-    self.AssertOutputMatches(r'available at.*\[https://console.firebase')
-
-  @test_case.Filters.skip('Failing', 'b/68211846')
   def testGameLoopTestType_InvalidScenarioNumber(self):
     # ftlgame.apk only supports scenarios from 1 to 5.
     with self.assertRaises(exceptions.BadMatrixError):
@@ -45,7 +33,6 @@ class GameLoopRunTest(e2e_base.TestIntegrationTestBase):
           '{cmd} --type=game-loop --app={app} --scenario-numbers=2,6 '.format(
               cmd=commands.ANDROID_BETA_TEST_RUN, app=e2e_base.FTLGAME_APP))
 
-  @test_case.Filters.skip('Failing', 'b/68211846')
   def testGameLoopTestType_InvalidScenarioLabel(self):
     with self.assertRaises(exceptions.BadMatrixError):
       self.Run('{cmd} --type=game-loop --app={app} --scenario-labels=bad-label '

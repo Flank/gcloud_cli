@@ -251,6 +251,16 @@ class DurationTest(subtests.Base):
     self.Run(60, '1m', upper_bound='1h1s')
     self.Run(60, '1m', lower_bound='59s', upper_bound='1m1s')
 
+  def testDurationWithParsedUnitInput(self):
+    self.Run(100000, '100', parsed_unit='ms')
+    self.Run(100, '100ms', parsed_unit='ms')
+    self.Run(100000000, '100', parsed_unit='us')
+    self.Run(100000, '100ms', parsed_unit='us')
+    self.Run(0, '0s', parsed_unit='ms')
+    self.Run(0, '0d', parsed_unit='us')
+    self.Run(60000, '1m', parsed_unit='ms')
+    self.Run(60000000, '1m', parsed_unit='us')
+
   def testMalformedInput(self):
     self.Run(None, '1x', exception=arg_parsers.ArgumentTypeError(
         "Failed to parse duration: Unknown character 'X' in duration"))
@@ -771,8 +781,9 @@ class ArgDictTest(subtests.Base):
     self.Run(None, 'x=1,y', spec={'x': str, 'y': str},
              exception=arg_parsers.ArgumentTypeError(
                  'Bad syntax for dict arg: [y]. Please see `gcloud topic '
-                 'escaping` if you would like information on escaping list or '
-                 'dictionary flag values.'))
+                 'flags-file` or `gcloud topic escaping` for information on '
+                 'providing list or dictionary flag values with special '
+                 'characters.'))
     self.Run(None, 'x=1,z=2', spec={'x': int, 'z': None},
              allow_key_only=True,
              exception=arg_parsers.ArgumentTypeError(
@@ -785,8 +796,9 @@ class ArgDictTest(subtests.Base):
              allow_key_only=False,
              exception=arg_parsers.ArgumentTypeError(
                  'Bad syntax for dict arg: [z]. Please see `gcloud topic '
-                 'escaping` if you would like information on escaping list or '
-                 'dictionary flag values.'))
+                 'flags-file` or `gcloud topic escaping` for information on '
+                 'providing list or dictionary flag values with special '
+                 'characters.'))
     self.Run(None, 'x=1,z=a', spec={'x': int, 'z': None},
              allow_key_only=False,
              exception=arg_parsers.ArgumentTypeError(
@@ -865,12 +877,14 @@ class ArgListTest(subtests.Base):
     self.Run([], '^foo^')
     self.Run(None, '^^',
              exception=arg_parsers.ArgumentTypeError(
-                 'Invalid delimiter. Please see `gcloud topic escaping` for '
-                 'information on escaping list or dictionary flag values.'))
+                 'Invalid delimeter. Please see `gcloud topic flags-file` or '
+                 '`gcloud topic escaping` for information on providing list or '
+                 'dictionary flag values with special characters.'))
     self.Run(None, '^^foo',
              exception=arg_parsers.ArgumentTypeError(
-                 'Invalid delimiter. Please see `gcloud topic escaping` for '
-                 'information on escaping list or dictionary flag values.'))
+                 'Invalid delimeter. Please see `gcloud topic flags-file` or '
+                 '`gcloud topic escaping` for information on providing list or '
+                 'dictionary flag values with special characters.'))
 
 
 # We need to break this out separately because parameterized and subtests don't

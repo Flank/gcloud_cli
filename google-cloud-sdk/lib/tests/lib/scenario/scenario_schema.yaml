@@ -422,6 +422,10 @@ definitions:
       stdout: {$ref: "#/definitions/value_types/complex"}
       # If given, the stderr of the command must match this value to continue.
       stderr: {$ref: "#/definitions/value_types/complex"}
+      # If given, the exponential factor to use on subsequent retries.
+      exponential_sleep_multiplier: {type: string}
+      # If given, the maximum wait time between retries in seconds.
+      wait_ceiling: {type: integer}
 
   # Execute a system binary.
   # Binaries are executed as a black box (as opposed to `execute_command` which
@@ -603,6 +607,12 @@ properties:
     required: [reason, bug]
     properties:
       reason: {type: string}
+      # If false, test will be run with failures ignored in periodic jobs. If
+      # true, test will never be run, until unskipped.
+      always: {type: boolean}
+      # If false, test will still be run when running in local mode. If true,
+      # test will be skipped when running in local mode.
+      locally: {type: boolean}
       bug:
         type: string
         pattern: "b/\\d+"

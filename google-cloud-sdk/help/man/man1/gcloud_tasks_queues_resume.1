@@ -1,0 +1,64 @@
+
+.TH "GCLOUD_TASKS_QUEUES_RESUME" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud tasks queues resume \- request to resume a paused or disabled queue
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud tasks queues resume\fR \fIQUEUE\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Request to resume a paused or disabled queue.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIQUEUE\fR
+The queue to resume.
+
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To resume a queue:
+
+.RS 2m
+$ gcloud tasks queues resume my\-queue
+.RE
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha tasks queues resume
+$ gcloud beta tasks queues resume
+.RE
+

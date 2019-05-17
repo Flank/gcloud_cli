@@ -22,23 +22,22 @@ import copy
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.compute.routers import router_utils
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import router_test_base
 from tests.lib.surface.compute import router_test_utils
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'),
-                          (calliope_base.ReleaseTrack.BETA, 'beta'),
-                          (calliope_base.ReleaseTrack.GA, 'v1'))
-class CreateTest(parameterized.TestCase, router_test_base.RouterTestBase):
+class CreateTestGA(router_test_base.RouterTestBase):
 
-  def testCreateBasic_success(self, track, api_version):
-    self.SelectApi(track, api_version)
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+    self.api_version = 'v1'
+
+  def testCreateBasic_success(self):
+    self.SelectApi(self.track, self.api_version)
 
     expected = router_test_utils.CreateMinimalRouterMessage(
-        self.messages, api_version)
+        self.messages, self.api_version)
     expected.description = 'my-desc'
     result = copy.deepcopy(expected)
     result.region = 'us-central1'
@@ -61,13 +60,13 @@ class CreateTest(parameterized.TestCase, router_test_base.RouterTestBase):
         normalize_space=True)
     self.AssertErrContains('Creating router [my-router]')
 
-  def testCreate_async(self, track, api_version):
+  def testCreate_async(self):
     """Test command with --async flag."""
 
-    self.SelectApi(track, api_version)
+    self.SelectApi(self.track, self.api_version)
 
     expected = router_test_utils.CreateMinimalRouterMessage(
-        self.messages, api_version)
+        self.messages, self.api_version)
 
     self.ExpectInsert(expected)
 
@@ -85,11 +84,11 @@ class CreateTest(parameterized.TestCase, router_test_base.RouterTestBase):
         'Run the [gcloud compute operations describe] command to check the '
         'status of this operation.\n')
 
-  def testCreateWithAdvertisements_default(self, track, api_version):
-    self.SelectApi(track, api_version)
+  def testCreateWithAdvertisements_default(self):
+    self.SelectApi(self.track, self.api_version)
 
     expected = router_test_utils.CreateMinimalRouterMessage(
-        self.messages, api_version)
+        self.messages, self.api_version)
     mode = self.messages.RouterBgp.AdvertiseModeValueValuesEnum.DEFAULT
     expected.bgp.advertiseMode = mode
 
@@ -114,11 +113,11 @@ class CreateTest(parameterized.TestCase, router_test_base.RouterTestBase):
         normalize_space=True)
     self.AssertErrContains('Creating router [my-router]')
 
-  def testCreateWithAdvertisements_custom(self, track, api_version):
-    self.SelectApi(track, api_version)
+  def testCreateWithAdvertisements_custom(self):
+    self.SelectApi(self.track, self.api_version)
 
     expected = router_test_utils.CreateMinimalRouterMessage(
-        self.messages, api_version)
+        self.messages, self.api_version)
     mode = self.messages.RouterBgp.AdvertiseModeValueValuesEnum.CUSTOM
     groups = [(self.messages.RouterBgp.AdvertisedGroupsValueListEntryValuesEnum.
                ALL_SUBNETS)]
@@ -155,9 +154,8 @@ class CreateTest(parameterized.TestCase, router_test_base.RouterTestBase):
         normalize_space=True)
     self.AssertErrContains('Creating router [my-router]')
 
-  def testCreateWithAdvertisements_customWithDefaultError(
-      self, track, api_version):
-    self.SelectApi(track, api_version)
+  def testCreateWithAdvertisements_customWithDefaultError(self):
+    self.SelectApi(self.track, self.api_version)
 
     error_msg = ('Cannot specify custom advertisements for a router with '
                  'default mode.')
@@ -173,15 +171,16 @@ class CreateTest(parameterized.TestCase, router_test_base.RouterTestBase):
           """)
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'),
-                          (calliope_base.ReleaseTrack.BETA, 'beta'))
-class CreateTestAlphaBeta(CreateTest):
+class CreateTestBeta(CreateTestGA):
 
-  def testCreateEmptyRouter(self, track, api_version):
-    self.SelectApi(track, api_version)
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
+
+  def testCreateEmptyRouter(self):
+    self.SelectApi(self.track, self.api_version)
     expected = router_test_utils.CreateEmptyRouterMessage(
-        self.messages, api_version)
+        self.messages, self.api_version)
     expected.description = 'my-desc'
     result = copy.deepcopy(expected)
     result.region = 'us-central1'
@@ -203,10 +202,10 @@ class CreateTestAlphaBeta(CreateTest):
         normalize_space=True)
     self.AssertErrContains('Creating router [my-router]')
 
-  def testCreateWithAdvertisements_noAsn(self, track, api_version):
-    self.SelectApi(track, api_version)
+  def testCreateWithAdvertisements_noAsn(self):
+    self.SelectApi(self.track, self.api_version)
     expected = router_test_utils.CreateEmptyRouterMessage(
-        self.messages, api_version)
+        self.messages, self.api_version)
     mode = self.messages.RouterBgp.AdvertiseModeValueValuesEnum.DEFAULT
     expected.bgp = self.messages.RouterBgp()
     expected.bgp.advertiseMode = mode
@@ -221,6 +220,41 @@ class CreateTestAlphaBeta(CreateTest):
     self.Run("""
         compute routers create my-router --network default --region us-central1
         --advertisement-mode=DEFAULT
+        """)
+
+    self.AssertOutputEquals(
+        """\
+        NAME       REGION       NETWORK
+        my-router  us-central1  default
+        """,
+        normalize_space=True)
+    self.AssertErrContains('Creating router [my-router]')
+
+
+class CreateTestAlpha(CreateTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
+
+  def testCreateWithKeepaliveInterval(self):
+    self.SelectApi(self.track, self.api_version)
+
+    expected = router_test_utils.CreateMinimalRouterMessage(
+        self.messages, self.api_version)
+    expected.description = 'my-desc'
+    expected.bgp.keepaliveInterval = 40
+    result = copy.deepcopy(expected)
+    result.region = 'us-central1'
+
+    self.ExpectInsert(expected)
+    self.ExpectOperationsGet()
+    self.ExpectGet(result)
+
+    self.Run("""
+        compute routers create my-router --network default --region us-central1
+        --asn 65000 --keepalive-interval 40
+        --description my-desc
         """)
 
     self.AssertOutputEquals(

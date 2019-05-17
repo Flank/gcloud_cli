@@ -3,9 +3,9 @@ NAME
         running containers
 
 SYNOPSIS
-    gcloud beta container clusters resize NAME --size=SIZE [--async]
-        [--node-pool=NODE_POOL] [--region=REGION | --zone=ZONE, -z ZONE]
-        [GCLOUD_WIDE_FLAG ...]
+    gcloud beta container clusters resize NAME --num-nodes=NUM_NODES,
+        --size=NUM_NODES [--async] [--node-pool=NODE_POOL]
+        [--region=REGION | --zone=ZONE, -z ZONE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (BETA) Resize an existing cluster to a provided size.
@@ -33,7 +33,7 @@ POSITIONAL ARGUMENTS
         The name of this cluster.
 
 REQUIRED FLAGS
-     --size=SIZE
+     --num-nodes=NUM_NODES, --size=NUM_NODES
         Target number of nodes in the cluster.
 
 OPTIONAL FLAGS
@@ -53,8 +53,9 @@ OPTIONAL FLAGS
           default compute/zone property value for this command invocation.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

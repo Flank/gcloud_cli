@@ -29,6 +29,6 @@ class ServerlessApiBase(cli_test_base.CliTestBase):
   def SetUp(self):
     self.mock_serverless_client = mock.Mock()
     self.serverless_messages = core_apis.GetMessagesModule(
-        'serverless', 'v1alpha1')
+        'run', 'v1alpha1')
     self.mock_serverless_client._VERSION = 'v1alpha1'  # pylint: disable=protected-access
     self.mock_serverless_client.MESSAGES_MODULE = self.serverless_messages

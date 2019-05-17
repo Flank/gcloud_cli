@@ -1,17 +1,17 @@
 NAME
-    gcloud alpha ml-engine locations - query Cloud ML Engine location
-        capabilities
+    gcloud alpha ml-engine locations - query AI Platform location capabilities
 
 SYNOPSIS
     gcloud alpha ml-engine locations COMMAND [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) The gcloud alpha ml-engine locations command group lets you query
-    Google Cloud ML Engine locations.
+    AI Platform locations.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -19,10 +19,10 @@ COMMANDS
     COMMAND is one of the following:
 
      describe
-        (ALPHA) Display CMLE capabilities in a location.
+        (ALPHA) Display AI Platform capabilities in a location.
 
      list
-        (ALPHA) List CMLE Locations.
+        (ALPHA) List AI Platform Locations.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

@@ -23,8 +23,8 @@ POSITIONAL ARGUMENTS
           this group are specified.
 
        --region=REGION
-          The Cloud DataProc region for the template. Each Cloud Dataproc
-          region constitutes an independent resource namespace constrained to
+          Cloud Dataproc region for the template. Each Cloud Dataproc region
+          constitutes an independent resource namespace constrained to
           deploying instances into Google Compute Engine zones inside the
           region. The default value of global is a special multi-region
           namespace which is capable of deploying instances into all Google
@@ -33,13 +33,15 @@ POSITIONAL ARGUMENTS
           value for this command invocation.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha dataproc workflow-templates delete
         $ gcloud beta dataproc workflow-templates delete
 

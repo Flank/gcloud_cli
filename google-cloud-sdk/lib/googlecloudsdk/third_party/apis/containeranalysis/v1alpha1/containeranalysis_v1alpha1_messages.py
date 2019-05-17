@@ -180,10 +180,10 @@ class Binding(_messages.Message):
   r"""Associates `members` with a `role`.
 
   Fields:
-    condition: Unimplemented. The condition that is associated with this
-      binding. NOTE: an unsatisfied condition will not allow user access via
-      current binding. Different bindings, including their conditions, are
-      examined independently.
+    condition: The condition that is associated with this binding. NOTE: An
+      unsatisfied condition will not allow user access via current binding.
+      Different bindings, including their conditions, are examined
+      independently.
     members: Specifies the identities requesting access for a Cloud Platform
       resource. `members` can have the following values:  * `allUsers`: A
       special identifier that represents anyone who is    on the internet;
@@ -195,8 +195,8 @@ class Binding(_messages.Message):
       service    account. For example, `my-other-
       app@appspot.gserviceaccount.com`.  * `group:{emailid}`: An email address
       that represents a Google group.    For example, `admins@example.com`.
-      * `domain:{domain}`: A Google Apps domain name that represents all the
-      users of that domain. For example, `google.com` or `example.com`.
+      * `domain:{domain}`: The G Suite domain (primary) that represents all
+      the    users of that domain. For example, `google.com` or `example.com`.
     role: Role that is assigned to `members`. For example, `roles/viewer`,
       `roles/editor`, or `roles/owner`.
   """
@@ -1453,23 +1453,23 @@ class Layer(_messages.Message):
 
     Values:
       DIRECTIVE_UNSPECIFIED: Default value for unsupported/missing directive
-      MAINTAINER: https://docs.docker.com/reference/builder/#maintainer
-      RUN: https://docs.docker.com/reference/builder/#run
-      CMD: https://docs.docker.com/reference/builder/#cmd
-      LABEL: https://docs.docker.com/reference/builder/#label
-      EXPOSE: https://docs.docker.com/reference/builder/#expose
-      ENV: https://docs.docker.com/reference/builder/#env
-      ADD: https://docs.docker.com/reference/builder/#add
+      MAINTAINER: https://docs.docker.com/engine/reference/builder/
+      RUN: https://docs.docker.com/engine/reference/builder/
+      CMD: https://docs.docker.com/engine/reference/builder/
+      LABEL: https://docs.docker.com/engine/reference/builder/
+      EXPOSE: https://docs.docker.com/engine/reference/builder/
+      ENV: https://docs.docker.com/engine/reference/builder/
+      ADD: https://docs.docker.com/engine/reference/builder/
       COPY: https://docs.docker.com/reference/builder/#copy
-      ENTRYPOINT: https://docs.docker.com/reference/builder/#entrypoint
-      VOLUME: https://docs.docker.com/reference/builder/#volume
-      USER: https://docs.docker.com/reference/builder/#user
-      WORKDIR: https://docs.docker.com/reference/builder/#workdir
-      ARG: https://docs.docker.com/reference/builder/#arg
-      ONBUILD: https://docs.docker.com/reference/builder/#onbuild
-      STOPSIGNAL: https://docs.docker.com/reference/builder/#stopsignal
-      HEALTHCHECK: https://docs.docker.com/reference/builder/#healthcheck
-      SHELL: https://docs.docker.com/reference/builder/#shell
+      ENTRYPOINT: https://docs.docker.com/engine/reference/builder/
+      VOLUME: https://docs.docker.com/engine/reference/builder/
+      USER: https://docs.docker.com/engine/reference/builder/
+      WORKDIR: https://docs.docker.com/engine/reference/builder/
+      ARG: https://docs.docker.com/engine/reference/builder/
+      ONBUILD: https://docs.docker.com/engine/reference/builder/
+      STOPSIGNAL: https://docs.docker.com/engine/reference/builder/
+      HEALTHCHECK: https://docs.docker.com/engine/reference/builder/
+      SHELL: https://docs.docker.com/engine/reference/builder/
     """
     DIRECTIVE_UNSPECIFIED = 0
     MAINTAINER = 1
@@ -1750,7 +1750,8 @@ class Operation(_messages.Message):
       if any.
     name: The server-assigned name, which is only unique within the same
       service that originally returns it. If you use the default HTTP mapping,
-      the `name` should have the format of `operations/some/unique/name`.
+      the `name` should be a resource name ending with
+      `operations/{unique_id}`.
     response: The normal response of the operation in case of success.  If the
       original method returns no data on success, such as `Delete`, the
       response is `google.protobuf.Empty`.  If the original method is standard
@@ -1847,8 +1848,7 @@ class PackageIssue(_messages.Message):
   Fields:
     affectedLocation: The location of the vulnerability.
     fixedLocation: The location of the available fix for vulnerability.
-    severityName: The severity (eg: distro assigned severity) for this
-      vulnerability.
+    severityName: A string attribute.
   """
 
   affectedLocation = _messages.MessageField('VulnerabilityLocation', 1)
@@ -2386,6 +2386,9 @@ class VulnerabilityDetails(_messages.Message):
   fix it.
 
   Enums:
+    EffectiveSeverityValueValuesEnum: The distro assigned severity for this
+      vulnerability when that is available and note provider assigned severity
+      when distro has not yet assigned a severity for this vulnerability.
     SeverityValueValuesEnum: Output only. The note provider assigned Severity
       of the vulnerability.
 
@@ -2393,6 +2396,9 @@ class VulnerabilityDetails(_messages.Message):
     cvssScore: Output only. The CVSS score of this vulnerability. CVSS score
       is on a scale of 0-10 where 0 indicates low severity and 10 indicates
       high severity.
+    effectiveSeverity: The distro assigned severity for this vulnerability
+      when that is available and note provider assigned severity when distro
+      has not yet assigned a severity for this vulnerability.
     packageIssue: The set of affected locations and their fixes (if available)
       within the associated resource.
     severity: Output only. The note provider assigned Severity of the
@@ -2400,6 +2406,26 @@ class VulnerabilityDetails(_messages.Message):
     type: The type of package; whether native or non native(ruby gems, node.js
       packages etc)
   """
+
+  class EffectiveSeverityValueValuesEnum(_messages.Enum):
+    r"""The distro assigned severity for this vulnerability when that is
+    available and note provider assigned severity when distro has not yet
+    assigned a severity for this vulnerability.
+
+    Values:
+      SEVERITY_UNSPECIFIED: Unknown Impact
+      MINIMAL: Minimal Impact
+      LOW: Low Impact
+      MEDIUM: Medium Impact
+      HIGH: High Impact
+      CRITICAL: Critical Impact
+    """
+    SEVERITY_UNSPECIFIED = 0
+    MINIMAL = 1
+    LOW = 2
+    MEDIUM = 3
+    HIGH = 4
+    CRITICAL = 5
 
   class SeverityValueValuesEnum(_messages.Enum):
     r"""Output only. The note provider assigned Severity of the vulnerability.
@@ -2420,9 +2446,10 @@ class VulnerabilityDetails(_messages.Message):
     CRITICAL = 5
 
   cvssScore = _messages.FloatField(1, variant=_messages.Variant.FLOAT)
-  packageIssue = _messages.MessageField('PackageIssue', 2, repeated=True)
-  severity = _messages.EnumField('SeverityValueValuesEnum', 3)
-  type = _messages.StringField(4)
+  effectiveSeverity = _messages.EnumField('EffectiveSeverityValueValuesEnum', 2)
+  packageIssue = _messages.MessageField('PackageIssue', 3, repeated=True)
+  severity = _messages.EnumField('SeverityValueValuesEnum', 4)
+  type = _messages.StringField(5)
 
 
 class VulnerabilityLocation(_messages.Message):

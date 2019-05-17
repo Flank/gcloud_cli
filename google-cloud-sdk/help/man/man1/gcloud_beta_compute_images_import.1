@@ -74,8 +74,10 @@ without making it bootable or installing Google tools on it.
 Specifies the OS of the image being imported. \fIOS\fR must be one of:
 \fBcentos\-6\fR, \fBcentos\-7\fR, \fBdebian\-8\fR, \fBdebian\-9\fR,
 \fBrhel\-6\fR, \fBrhel\-6\-byol\fR, \fBrhel\-7\fR, \fBrhel\-7\-byol\fR,
-\fBubuntu\-1404\fR, \fBubuntu\-1604\fR, \fBwindows\-2008r2\fR,
-\fBwindows\-2012r2\fR, \fBwindows\-2016\fR.
+\fBubuntu\-1404\fR, \fBubuntu\-1604\fR, \fBwindows\-10\-byol\fR,
+\fBwindows\-2008r2\fR, \fBwindows\-2008r2\-byol\fR, \fBwindows\-2012\fR,
+\fBwindows\-2012\-byol\fR, \fBwindows\-2012r2\fR, \fBwindows\-2012r2\-byol\fR,
+\fBwindows\-2016\fR, \fBwindows\-2016\-byol\fR, \fBwindows\-7\-byol\fR.
 
 .RE
 .sp
@@ -108,8 +110,9 @@ Display information about the operation in progress, without waiting for the
 operation to complete.
 
 .TP 2m
-\fB\-\-no\-guest\-environment\fR
-Google Guest Environment will not be installed on the image.
+\fB\-\-guest\-environment\fR
+Google Guest Environment will be installed on the image. Enabled by default, use
+\fB\-\-no\-guest\-environment\fR to disable.
 
 .TP 2m
 \fB\-\-log\-location\fR=\fILOG_LOCATION\fR
@@ -149,10 +152,11 @@ invocation.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

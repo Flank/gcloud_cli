@@ -23,10 +23,11 @@ gcloud beta tasks \- manage Cloud Tasks queues and tasks
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -54,7 +55,7 @@ gcloud help\fR for details.
 .RS 2m
 .TP 2m
 \fBcreate\-app\-engine\-task\fR
-\fB(BETA)\fR Create and add a task to an App Engine queue.
+\fB(BETA)\fR Create and add a task that targets App Engine.
 
 .TP 2m
 \fBdelete\fR
@@ -78,10 +79,11 @@ gcloud help\fR for details.
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
+$ gcloud tasks
 $ gcloud alpha tasks
 .RE
 

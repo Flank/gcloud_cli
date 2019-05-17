@@ -11,7 +11,7 @@ gcloud alpha compute disks snapshot \- create snapshots of Google Compute Engine
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute disks snapshot\fR \fIDISK_NAME\fR [\fIDISK_NAME\fR\ ...] [\fB\-\-async\fR] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-guest\-flush\fR] [\fB\-\-snapshot\-names\fR=\fISNAPSHOT_NAME\fR,[...]] [\fB\-\-storage\-location\fR=\fILOCATION\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute disks snapshot\fR \fIDISK_NAME\fR [\fIDISK_NAME\fR\ ...] [\fB\-\-async\fR] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-guest\-flush\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-snapshot\-names\fR=\fISNAPSHOT_NAME\fR,[...]] [\fB\-\-storage\-location\fR=\fILOCATION\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -24,8 +24,8 @@ persistent disks even while they are attached to running instances. Once
 created, snapshots may be managed (listed, deleted, resized etc.) via \f5gcloud
 compute snapshots\fR.
 
-For best practices regarding managing snapshots, refer to this guide:
-https://cloud.google.com/compute/docs/disks/create\-snapshots#best_practices.
+Refer to the Snapshot best practices guide.
+https://cloud.google.com/compute/docs/disks/snapshot\-best\-practices
 
 gcloud alpha compute disks snapshot waits until the operation returns a status
 of \f5READY\fR or \f5FAILED\fR, or reaches the maximum timeout, and returns the
@@ -68,9 +68,18 @@ Text to describe the snapshots being created.
 
 .TP 2m
 \fB\-\-guest\-flush\fR
-Create an application consistent snapshot by informing the OS to prepare for the
-snapshot process. Currently only supported on Windows instances using the Volume
-Shadow Copy Service (VSS).
+Create an application\-consistent snapshot by informing the OS to prepare for
+the snapshot process. Currently only supported on Windows instances using the
+Volume Shadow Copy Service (VSS).
+
+.TP 2m
+\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of label KEY=VALUE pairs to add.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
 
 .TP 2m
 \fB\-\-snapshot\-names\fR=\fISNAPSHOT_NAME\fR,[...]
@@ -159,10 +168,11 @@ Alternatively, the zone can be stored in the environment variable
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

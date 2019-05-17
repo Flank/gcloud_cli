@@ -19,20 +19,28 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import datetime
+import functools
 import random
 import uuid
 
 from apitools.base.py.testing import mock
-from googlecloudsdk.api_lib.container.binauthz import containeranalysis
 from googlecloudsdk.api_lib.util import apis
-from googlecloudsdk.calliope import base as calliope_base
-from googlecloudsdk.core import properties
 from tests.lib import cli_test_base
-from tests.lib import e2e_utils
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 
 import six
+
+ARTIFACT_URL_TEMPLATE = (
+    'https://gcr.io/{project}/{image_name}@sha256:{random_sha256}')
+
+
+def GenerateValidBogusLookingRandomSha256(size=2**64):
+  # Create a valid sha256 that is all 0's followed by a random decimal number.
+  # This should make it obvious to any casual observer that the sha256 is
+  # bogus and not from a real image.
+  random_int = random.randint(0, size)
+  return '{:0>64d}'.format(random_int)
 
 
 def GetNoteRelativeName(project_id, note_id):
@@ -63,140 +71,67 @@ class WithEarlyCleanup(test_case.TestCase):
   """
 
   def SetUp(self):
-    self._cleanup_calls = []
+    self._cleanup_callbacks = []
 
   def TearDown(self):
-    while self._cleanup_calls:
-      func, args, kwargs = self._cleanup_calls.pop()
-      func(*args, **kwargs)
+    while self._cleanup_callbacks:
+      self._cleanup_callbacks.pop()()
 
   def AddEarlyCleanup(self, func, *args, **kwargs):
-    self._cleanup_calls.append((func, args, kwargs))
+    self._cleanup_callbacks.append(functools.partial(func, *args, **kwargs))
 
 
-class BinauthzUnitTestBase(sdk_test_base.SdkBase):
+class BinauthzTestBase(cli_test_base.CliTestBase):
   """Base class for BinAuthz unit tests with common setup and helpers."""
 
-  ARTIFACT_URL_TEMPLATE = (
-      'https://gcr.io/{project}/{image_name}@sha256:{random_sha256}')
-
-  def GenerateValidBogusLookingRandomSha256(self, size=2**64):
-    # Create a valid sha256 that is all 0's followed by a random decimal number.
-    # This should make it obvious to any casual observer that the sha256 is
-    # bogus and not from a real image.
-    random_int = random.randint(0, size)
-    return '{:0>64d}'.format(random_int)
-
-  def GenerateArtifactUrl(self,
-                          project='cloud-sdk-integration-testing',
-                          image_name='fake_image'):
-    return self.ARTIFACT_URL_TEMPLATE.format(
+  def GenerateArtifactUrl(self, project=None, image_name='fake_image'):
+    if project is None:
+      project = self.Project()
+    return ARTIFACT_URL_TEMPLATE.format(
         project=project,
         image_name=image_name,
-        random_sha256=self.GenerateValidBogusLookingRandomSha256())
+        random_sha256=GenerateValidBogusLookingRandomSha256())
 
-  def RunBinauthz(self, cmd):
+  def RunBinauthz(self, cmd, track=None):
     prefix = ['container', 'binauthz']
     if isinstance(cmd, six.string_types):
-      return self.Run(' '.join(prefix + [cmd]))
-    return self.Run(prefix + cmd)
-
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.containeranalysis_messages = apis.GetMessagesModule(
-        containeranalysis.API_NAME,
-        containeranalysis.DEFAULT_VERSION)
-    self.note_id_generator = e2e_utils.GetResourceNameGenerator(
-        prefix='test-aa-note')
-    # Convenience aliases for commonly used messages.
-    # pylint: disable=invalid-name
-    self.Note = self.containeranalysis_messages.Note
-    self.Authority = self.containeranalysis_messages.Authority
-    self.Attestation = self.containeranalysis_messages.Attestation
-    self.PgpSignedAttestation = (
-        self.containeranalysis_messages.PgpSignedAttestation)
-    self.SIMPLE_SIGNING_JSON = (
-        self.PgpSignedAttestation.ContentTypeValueValuesEnum.SIMPLE_SIGNING_JSON
-    )
-    self.ProjectsNotesCreateRequest = (
-        self.containeranalysis_messages.
-        ContaineranalysisProjectsNotesCreateRequest)
-    self.ProjectsOccurrencesCreateRequest = (
-        self.containeranalysis_messages.
-        ContaineranalysisProjectsOccurrencesCreateRequest)
-    self.Occurrence = self.containeranalysis_messages.Occurrence
-    self.ProjectsOccurrencesListRequest = (
-        self.containeranalysis_messages.
-        ContaineranalysisProjectsOccurrencesListRequest)
-    self.ListOccurrencesResponse = (
-        self.containeranalysis_messages.ListOccurrencesResponse)
-    self.ProjectsOccurrencesGetNotesRequest = (
-        self.containeranalysis_messages.
-        ContaineranalysisProjectsOccurrencesGetNotesRequest)
-    self.ListNoteOccurrencesRequest = (
-        self.containeranalysis_messages.
-        ContaineranalysisProjectsNotesOccurrencesListRequest)
-    self.ListNoteOccurrencesResponse = (
-        self.containeranalysis_messages.ListNoteOccurrencesResponse)
-    # pylint: enable=invalid-name
+      return self.Run(' '.join(prefix + [cmd]), track=track)
+    return self.Run(prefix + cmd, track=track)
 
 
-class BinauthzMockedPolicyClientUnitTest(sdk_test_base.WithFakeAuth,
-                                         BinauthzUnitTestBase,
-                                         cli_test_base.CliTestBase):
+class _MockClientMixin(sdk_test_base.WithFakeAuth):
+
+  def CreateMockClient(self, api_name, api_version):
+    client = mock.Client(
+        apis.GetClientClass(api_name, api_version),
+        real_client=apis.GetClientInstance(api_name, api_version, no_http=True))
+    client.Mock()
+    self.addCleanup(client.Unmock)
+    return client
+
+
+class WithMockAlphaBinauthz(_MockClientMixin):
   """Base class for BinAuthz unit tests with mocked policy service."""
 
-  def SetUp(self):
-    self.client = mock.Client(
-        apis.GetClientClass('binaryauthorization', 'v1alpha2'),
-        real_client=apis.GetClientInstance(
-            'binaryauthorization', 'v1alpha2', no_http=True),
-    )
-    self.client.Mock()
-    self.addCleanup(self.client.Unmock)
-
-    self.messages = self.client.MESSAGES_MODULE
+  def PreSetUp(self):
+    self.mock_client = self.CreateMockClient('binaryauthorization', 'v1alpha2')
+    self.messages = self.mock_client.MESSAGES_MODULE
 
 
-class BinauthzMockedBetaPolicyClientUnitTest(sdk_test_base.WithFakeAuth,
-                                             BinauthzUnitTestBase,
-                                             cli_test_base.CliTestBase):
+class WithMockBetaBinauthz(_MockClientMixin):
   """Base class for BinAuthz unit tests with mocked beta policy service."""
 
-  def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.client = mock.Client(
-        apis.GetClientClass('binaryauthorization', 'v1beta1'),
-        real_client=apis.GetClientInstance(
-            'binaryauthorization', 'v1beta1', no_http=True),
-    )
-    self.client.Mock()
-    self.addCleanup(self.client.Unmock)
-
-    self.messages = self.client.MESSAGES_MODULE
+  def PreSetUp(self):
+    self.mock_client = self.CreateMockClient('binaryauthorization', 'v1beta1')
+    self.messages = self.mock_client.MESSAGES_MODULE
 
 
-class BinauthzMockedCAClientTestBase(sdk_test_base.WithFakeAuth,
-                                     BinauthzUnitTestBase):
+class WithMockBetaContaineranalysis(_MockClientMixin):
   """Base class for BinAuthz unit tests with mocked service dependencies."""
 
-  def Project(self):
-    return 'fake-project'
-
-  def SetUp(self):
-    properties.VALUES.core.project.Set(self.Project())
-    # We could also pass the mocked containeranalysis client explicitly
-    # to the ContainerAnalysisClient constructor, but in CLI tests we rely
-    # on a non-explicitly constructed client still being mocked even though
-    # it gets its underlying client in the normal way using
-    # apis.GetClientInstance.
-    self.mocked_containeranalysis_client = mock.Client(
-        apis.GetClientClass('containeranalysis', 'v1beta1'),
-        real_client=apis.GetClientInstance(
-            'containeranalysis', 'v1beta1', no_http=True))
-    self.mocked_containeranalysis_client.Mock()
-    self.addCleanup(self.mocked_containeranalysis_client.Unmock)
-    self.artifact_url = self.GenerateArtifactUrl()
+  def PreSetUp(self):
+    self.mock_ca_client = self.CreateMockClient('containeranalysis', 'v1beta1')
+    self.ca_messages = apis.GetMessagesModule('containeranalysis', 'v1beta1')
 
   def CreateGenericResponseOccurrence(self, kind, note_name, resource_url,
                                       project_ref, **kwargs):
@@ -230,14 +165,14 @@ class BinauthzMockedCAClientTestBase(sdk_test_base.WithFakeAuth,
         occurrence_id=uuid.uuid4(),
     )
     now_timestamp = CreateUtcIsoNowTimestamp()
-    return self.Occurrence(
+    return self.ca_messages.Occurrence(
         name=expected_name,
         createTime=now_timestamp,
         updateTime=now_timestamp,
         # The rest is identical to the passed arguments.
         kind=kind,
         noteName=note_name,
-        resource=self.containeranalysis_messages.Resource(uri=resource_url),
+        resource=self.ca_messages.Resource(uri=resource_url),
         **kwargs)
 
   def ExpectProjectsOccurrencesCreate(self, request_occurrence, project_ref):
@@ -246,7 +181,7 @@ class BinauthzMockedCAClientTestBase(sdk_test_base.WithFakeAuth,
     Args:
       request_occurrence: The Occurrence (as returned by
         `CreateRequestOccurrence`) to expect as an argument to
-        projects_occurrences.Create. (containeranalysis_messages.Occurrence)
+        projects_occurrences.Create. (ca_messages.Occurrence)
       project_ref: Project where to expect created Occurrence.
         (cloudresourcemanager.projects Resource)
 
@@ -258,55 +193,15 @@ class BinauthzMockedCAClientTestBase(sdk_test_base.WithFakeAuth,
         request_occurrence=request_occurrence,
         project_ref=project_ref,
     )
-    self.mocked_containeranalysis_client.projects_occurrences.Create.Expect(
-        request=self.ProjectsOccurrencesCreateRequest(
+    self.mock_ca_client.projects_occurrences.Create.Expect(
+        request=self.ca_messages
+        .ContaineranalysisProjectsOccurrencesCreateRequest(
             occurrence=request_occurrence,
             parent=parent,
         ),
         response=response_occurrence,
     )
     return response_occurrence
-
-  def ExpectProjectsOccurrencesList(
-      self,
-      project_ref,
-      expected_filter_content=None,
-      occurrences_to_return=None,
-  ):
-    """Call projects_occurrences.List.Expect with the provided params.
-
-    Args:
-      project_ref: Project where to expect listed Occurrences, as passed to
-        `ProjectsOccurrencesListRequest`.
-        (cloudresourcemanager.projects Resource)
-      expected_filter_content: The expected value of `filter`, as passed to
-        `ProjectsOccurrencesListRequest`. (string)
-      occurrences_to_return: The mocked response.  If it is not passed,
-        the response will be an empty list. (List of Occurrence)
-    """
-    occurrences_to_return = occurrences_to_return or []
-    self.mocked_containeranalysis_client.projects_occurrences.List.Expect(
-        request=self.ProjectsOccurrencesListRequest(
-            parent=project_ref.RelativeName(),
-            filter=expected_filter_content,
-            pageSize=100,
-        ),
-        response=self.ListOccurrencesResponse(
-            occurrences=occurrences_to_return),
-    )
-
-  def ExpectProjectsOccurrencesGetNotes(self, occurrence_name, expected_note):
-    self.mocked_containeranalysis_client.projects_occurrences.GetNotes.Expect(
-        request=self.ProjectsOccurrencesGetNotesRequest(name=occurrence_name),
-        response=expected_note,
-    )
-
-
-class BinauthzMockedClientTestBase(BinauthzMockedCAClientTestBase):
-  """Base class for BinAuthz unit tests with mocked CA client."""
-
-  def SetUp(self):
-    self.ca_client = containeranalysis.Client()
 
   def CreateRequestOccurrence(
       self,
@@ -337,20 +232,18 @@ class BinauthzMockedClientTestBase(BinauthzMockedCAClientTestBase):
       Occurrence. This is linked to the appropriate Note, but does not
         have an ID set.
     """
-    attestation = self.Attestation(
-        pgpSignedAttestation=self.PgpSignedAttestation(
-            contentType=(
-                self.PgpSignedAttestation.ContentTypeValueValuesEnum.
-                SIMPLE_SIGNING_JSON),
+    attestation = self.ca_messages.Attestation(
+        pgpSignedAttestation=self.ca_messages.PgpSignedAttestation(
+            contentType=(self.ca_messages.PgpSignedAttestation
+                         .ContentTypeValueValuesEnum.SIMPLE_SIGNING_JSON),
             signature=signature,
             pgpKeyId=pgp_key_fingerprint,
         ))
-    return self.Occurrence(
-        attestation=self.containeranalysis_messages.Details(
-            attestation=attestation),
-        kind=self.Occurrence.KindValueValuesEnum.ATTESTATION,
+    return self.ca_messages.Occurrence(
+        attestation=self.ca_messages.Details(attestation=attestation),
+        kind=(self.ca_messages.Occurrence.KindValueValuesEnum.ATTESTATION),
         noteName=note_ref.RelativeName(),
-        resource=self.containeranalysis_messages.Resource(uri=artifact_url),
+        resource=self.ca_messages.Resource(uri=artifact_url),
     )
 
   def CreateResponseOccurrence(self, request_occurrence, project_ref):
@@ -359,7 +252,7 @@ class BinauthzMockedClientTestBase(BinauthzMockedCAClientTestBase):
     Args:
       request_occurrence: The Occurrence (as returned by
         `CreateRequestOccurrence`) to expect as an argument to
-        projects_occurrences.Create. (containeranalysis_messages.Occurrence)
+        projects_occurrences.Create. (ca_messages.Occurrence)
       project_ref: Project where to expect created Occurrence.
         (cloudresourcemanager.projects Resource)
 
@@ -393,10 +286,19 @@ class BinauthzMockedClientTestBase(BinauthzMockedCAClientTestBase):
         the response will be an empty list. (List of Occurrence)
     """
     occurrences_to_return = occurrences_to_return or []
-    self.mocked_containeranalysis_client.projects_notes_occurrences.List.Expect(
-        request=self.ListNoteOccurrencesRequest(
+    self.mock_ca_client.projects_notes_occurrences.List.Expect(
+        request=self.ca_messages
+        .ContaineranalysisProjectsNotesOccurrencesListRequest(
             name=note_relative_name,
             filter=expected_filter_content,
             pageSize=100),
-        response=self.ListNoteOccurrencesResponse(
+        response=self.ca_messages.ListNoteOccurrencesResponse(
             occurrences=occurrences_to_return))
+
+
+class WithMockKms(_MockClientMixin):
+  """Base class for BinAuthz unit tests with mocked service dependencies."""
+
+  def PreSetUp(self):
+    self.mock_kms_client = self.CreateMockClient('cloudkms', 'v1')
+    self.kms_messages = apis.GetMessagesModule('cloudkms', 'v1')

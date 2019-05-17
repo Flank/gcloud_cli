@@ -1,0 +1,96 @@
+NAME
+    gcloud alpha dataproc workflow-templates add-job - add Google Cloud
+        Dataproc jobs to workflow template
+
+SYNOPSIS
+    gcloud alpha dataproc workflow-templates add-job COMMAND [--region=REGION]
+        [GCLOUD_WIDE_FLAG ...]
+
+FLAGS
+     --region=REGION
+        Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
+        independent resource namespace constrained to deploying instances into
+        Compute Engine zones inside the region. The default value of global is
+        a special multi-region namespace which is capable of deploying
+        instances into all Compute Engine zones globally, and is disjoint from
+        other Cloud Dataproc regions. Overrides the default dataproc/region
+        property value for this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     hadoop
+        (ALPHA) Add a hadoop job to the workflow template.
+
+     hive
+        (ALPHA) Add a Hive job to the workflow template.
+
+     pig
+        (ALPHA) Add a Pig job to the workflow template.
+
+     presto
+        (ALPHA) Add a Presto job to the workflow template.
+
+     pyspark
+        (ALPHA) Add a PySpark job to the workflow template.
+
+     spark
+        (ALPHA) Add a Spark job to the workflow template.
+
+     spark-r
+        (ALPHA) Add a SparkR job to the workflow template.
+
+     spark-sql
+        (ALPHA) Add a SparkSql job to the workflow template.
+
+EXAMPLES
+    To add a Hadoop MapReduce job, run:
+
+        $ gcloud alpha dataproc workflow-templates add-job hadoop \
+            --workflow-template my_template --jar my_jar.jar \
+            -- arg1 arg2
+
+    To add a Spark Scala or Java job, run:
+
+        $ gcloud alpha dataproc workflow-templates add-job spark \
+            --workflow-template my_template --jar my_jar.jar \
+            -- arg1 arg2
+
+    To add a PySpark job, run:
+
+        $ gcloud alpha dataproc workflow-templates add-job pyspark \
+            --workflow-template my_template my_script.py \
+            -- arg1 arg2
+
+    To add a Spark SQL job, run:
+
+        $ gcloud alpha dataproc workflow-templates add-job spark-sql \
+            --workflow-template my_template --file my_queries.q
+
+    To add a Pig job, run:
+
+        $ gcloud alpha dataproc workflow-templates add-job pig \
+            --workflow-template my_template --file my_script.pig
+
+    To add a Hive job, run:
+
+        $ gcloud alpha dataproc workflow-templates add-job hive \
+            --workflow-template my_template --file my_queries.q
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
+
+        $ gcloud dataproc workflow-templates add-job
+        $ gcloud beta dataproc workflow-templates add-job
+

@@ -1,5 +1,5 @@
 NAME
-    gcloud ml-engine versions - cloud ML Engine Versions commands
+    gcloud ml-engine versions - AI Platform Versions commands
 
 SYNOPSIS
     gcloud ml-engine versions COMMAND [GCLOUD_WIDE_FLAG ...]
@@ -8,13 +8,14 @@ DESCRIPTION
     A version is an implementation of a model, represented as a serialized
     TensorFlow graph with trained parameters.
 
-    When you communicate with Cloud ML Engine services, you use the combination
-    of the model, version, and current project to identify a specific model
+    When you communicate with AI Platform services, you use the combination of
+    the model, version, and current project to identify a specific model
     implementation that is deployed in the cloud.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -22,22 +23,22 @@ COMMANDS
     COMMAND is one of the following:
 
      create
-        Create a new Cloud ML Engine version.
+        Create a new AI Platform version.
 
      delete
-        Delete an existing Cloud ML Engine version.
+        Delete an existing AI Platform version.
 
      describe
-        Describe an existing Cloud ML Engine version.
+        Describe an existing AI Platform version.
 
      list
-        List existing Cloud ML Engine versions.
+        List existing AI Platform versions.
 
      set-default
-        Sets an existing Cloud ML Engine version as the default for its model.
+        Sets an existing AI Platform version as the default for its model.
 
      update
-        Update a Cloud ML Engine version.
+        Update an AI Platform version.
 
 NOTES
     These variants are also available:

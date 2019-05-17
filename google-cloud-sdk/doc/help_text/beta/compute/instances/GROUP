@@ -9,8 +9,9 @@ DESCRIPTION
     (BETA) Read and manipulate Google Compute Engine virtual machine instances.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -72,6 +73,9 @@ COMMANDS
      get-serial-port-output
         (BETA) Read output from a virtual machine instance's serial port.
 
+     get-shielded-identity
+        (BETA) Get the Shielded identity for a Google Compute Engine instance.
+
      list
         (BETA) List Google Compute Engine instances.
 
@@ -80,7 +84,7 @@ COMMANDS
         zones.
 
      remove-iam-policy-binding
-        (BETA) Remove IAM policy binding of a Google Compute Engine instance.
+        (BETA) Remove IAM policy binding from a Google Compute Engine instance.
 
      remove-labels
         (BETA) Remove labels from Google Compute Engine virtual machine
@@ -100,7 +104,7 @@ COMMANDS
         (BETA) Set auto-delete behavior for disks.
 
      set-iam-policy
-        (BETA) Set IAM policy for an instance.
+        (BETA) Set IAM policy for a Google Compute Engine instance.
 
      set-machine-type
         (BETA) Set machine type for Google Compute Engine virtual machines.

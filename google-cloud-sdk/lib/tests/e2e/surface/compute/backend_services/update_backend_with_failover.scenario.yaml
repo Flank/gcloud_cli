@@ -92,6 +92,9 @@ summary:
 
 
 actions:
+- define_reference:
+    reference: compute-uri
+    value: www.googleapis.com/compute
 
 - generate_resource_id:
     reference: instance
@@ -169,7 +172,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -197,7 +200,7 @@ actions:
             kind: compute#backendService
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
           method: PUT
           headers: {}
           body:
@@ -239,7 +242,7 @@ actions:
         Updated [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -284,7 +287,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -315,7 +318,7 @@ actions:
             kind: compute#backendService
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
           method: PUT
           headers: {}
           body:
@@ -359,7 +362,7 @@ actions:
         Updated [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
           method: GET
           headers: {}
           body: null

@@ -9,13 +9,17 @@ DESCRIPTION
     List, describe, and delete Google Compute Engine subnetworks.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
 COMMANDS
     COMMAND is one of the following:
+
+     add-iam-policy-binding
+        Add an IAM policy binding to a Google Compute Engine subnetwork.
 
      create
         Define a subnet for a network in custom subnet mode.
@@ -29,11 +33,20 @@ COMMANDS
      expand-ip-range
         Expand the IP range of a Google Compute Engine subnetwork.
 
+     get-iam-policy
+        Get the IAM policy for a Google Compute Engine subnetwork.
+
      list
         List Google Compute Engine subnetworks.
 
      list-usable
         List Google Compute Engine subnetworks permitted for use.
+
+     remove-iam-policy-binding
+        Remove an IAM policy binding from a Google Compute Engine subnetwork.
+
+     set-iam-policy
+        Set the IAM policy for a Google Compute Engine subnetwork.
 
      update
         Updates properties of an existing Google Compute Engine subnetwork.

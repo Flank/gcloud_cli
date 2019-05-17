@@ -1,0 +1,121 @@
+NAME
+    gcloud alpha dataproc workflow-templates - create and manage Google Cloud
+        Dataproc workflow templates
+
+SYNOPSIS
+    gcloud alpha dataproc workflow-templates GROUP | COMMAND
+        [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Create and manage Google Cloud Dataproc workflow templates.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+GROUPS
+    GROUP is one of the following:
+
+     add-job
+        (ALPHA) Add Google Cloud Dataproc jobs to workflow template.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Create a workflow template.
+
+     delete
+        (ALPHA) Delete a workflow template.
+
+     describe
+        (ALPHA) Describe a workflow template.
+
+     export
+        (ALPHA) Export a workflow template.
+
+     get-iam-policy
+        (ALPHA) Get IAM policy for a workflow template.
+
+     import
+        (ALPHA) Import a workflow template.
+
+     instantiate
+        (ALPHA) Instantiate a workflow template.
+
+     instantiate-from-file
+        (ALPHA) Instantiate a workflow template from a file.
+
+     list
+        (ALPHA) List workflow templates.
+
+     remove-job
+        (ALPHA) Remove a job from workflow template.
+
+     run
+        (ALPHA) (DEPRECATED) Run a workflow template.
+
+     set-cluster-selector
+        (ALPHA) Set cluster selector for the workflow template.
+
+     set-iam-policy
+        (ALPHA) Set IAM policy for a template.
+
+     set-managed-cluster
+        (ALPHA) Set a managed cluster for the workflow template.
+
+EXAMPLES
+    To create a workflow template, run:
+
+        $ gcloud alpha dataproc workflow-templates create my_template
+
+    To instantiate a workflow template, run:
+
+        $ gcloud alpha dataproc workflow-templates instantiate my_template
+
+    To instantiate a workflow template from a file, run:
+
+        $ gcloud alpha dataproc workflow-templates instantiate-from-file \
+            --file template.yaml
+
+    To delete a workflow template, run:
+
+        $ gcloud alpha dataproc workflow-templates delete my_template
+
+    To view the details of a workflow template, run:
+
+        $ gcloud alpha dataproc workflow-templates describe my_template
+
+    To see the list of all workflow templates, run:
+
+        $ gcloud alpha dataproc workflow-templates list
+
+    To remove a job from a workflow template, run:
+
+        $ gcloud alpha dataproc workflow-templates remove-job my_template \
+            --step-id id
+
+    To update managed cluster in a workflow template, run:
+
+        $ gcloud alpha dataproc workflow-templates set-managed-cluster \
+            my_template --num-masters 5
+
+    To update cluster selector in a workflow template, run:
+
+        $ gcloud alpha dataproc workflow-templates set-cluster-selector \
+            my_template \
+            --cluster-labels environment=prod
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
+
+        $ gcloud dataproc workflow-templates
+        $ gcloud beta dataproc workflow-templates
+

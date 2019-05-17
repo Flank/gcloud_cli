@@ -9,13 +9,18 @@ DESCRIPTION
     (ALPHA) Read and manage Google Compute Engine machine image resources.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
 COMMANDS
     COMMAND is one of the following:
+
+     add-iam-policy-binding
+        (ALPHA) Add IAM policy binding to the IAM policy of a Google Compute
+        Engine machine image.
 
      create
         (ALPHA) Create Google Compute Engine machine images.
@@ -26,8 +31,18 @@ COMMANDS
      describe
         (ALPHA) Display detailed information about a machine images.
 
+     get-iam-policy
+        (ALPHA) Get the IAM policy for a Google Compute Engine machine image.
+
      list
         (ALPHA) List Google Compute Engine machine_images.
+
+     remove-iam-policy-binding
+        (ALPHA) Remove IAM policy binding from the IAM policy of a Google
+        Compute Engine machine image.
+
+     set-iam-policy
+        (ALPHA) Set the IAM policy for a Google Compute Engine machine image.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

@@ -9,15 +9,15 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) This command connects a network to a service via VPC peering for a
-    project.
+    (BETA) This command connects a private service connection to a service via
+    a VPC network.
 
 REQUIRED FLAGS
      --network=NETWORK
         The network in the current project to be peered with the service
 
      --ranges=RANGES
-        IP CIDR ranges for service to use.
+        The names of IP CIDR ranges for service to use.
 
 OPTIONAL FLAGS
      --async
@@ -28,29 +28,31 @@ OPTIONAL FLAGS
         The service to connect to
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
 EXAMPLES
     To connect a network called my-network on the current project to a service
-    called your-service with IP CIDR ranges 10.197.0.0/20,10.198.0.0/20 for the
-    service to use, run:
+    called your-service with IP CIDR ranges google-range-1,google-range-2 for
+    the service to use, run:
 
         $ gcloud beta services vpc-peerings connect --network my-network \
             --service your-service \
-            --ranges 10.197.0.0/20,10.198.0.0/20
+            --ranges google-range-1,google-range-2
 
     To run the same command asynchronously (non-blocking), run:
 
         $ gcloud beta services vpc-peerings connect --network my-network \
             --service your-service \
-            --ranges 10.197.0.0/20,10.198.0.0/20 --async
+            --ranges google-range-1,google-range-2 --async
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud services vpc-peerings connect
         $ gcloud alpha services vpc-peerings connect
 

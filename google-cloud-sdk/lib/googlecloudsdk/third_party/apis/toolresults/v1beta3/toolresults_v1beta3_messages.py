@@ -554,6 +554,45 @@ class InconclusiveDetail(_messages.Message):
   infrastructureFailure = _messages.BooleanField(2)
 
 
+class IndividualOutcome(_messages.Message):
+  r"""Step Id and outcome of each individual step that was run as a group with
+  other steps with the same configuration.
+
+  Enums:
+    OutcomeSummaryValueValuesEnum:
+
+  Fields:
+    multistepNumber: Unique int given to each step. Ranges from 0(inclusive)
+      to total number of steps(exclusive). The primary step is 0.
+    outcomeSummary: A OutcomeSummaryValueValuesEnum attribute.
+    runDuration: How long it took for this step to run.
+    stepId: A string attribute.
+  """
+
+  class OutcomeSummaryValueValuesEnum(_messages.Enum):
+    r"""OutcomeSummaryValueValuesEnum enum type.
+
+    Values:
+      failure: <no description>
+      flaky: <no description>
+      inconclusive: <no description>
+      skipped: <no description>
+      success: <no description>
+      unset: <no description>
+    """
+    failure = 0
+    flaky = 1
+    inconclusive = 2
+    skipped = 3
+    success = 4
+    unset = 5
+
+  multistepNumber = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  outcomeSummary = _messages.EnumField('OutcomeSummaryValueValuesEnum', 2)
+  runDuration = _messages.MessageField('Duration', 3)
+  stepId = _messages.StringField(4)
+
+
 class ListExecutionsResponse(_messages.Message):
   r"""A ListExecutionsResponse object.
 
@@ -653,6 +692,18 @@ class ListStepsResponse(_messages.Message):
   steps = _messages.MessageField('Step', 2, repeated=True)
 
 
+class ListTestCasesResponse(_messages.Message):
+  r"""Response message for StepService.ListTestCases.
+
+  Fields:
+    nextPageToken: A string attribute.
+    testCases: List of test cases.
+  """
+
+  nextPageToken = _messages.StringField(1)
+  testCases = _messages.MessageField('TestCase', 2, repeated=True)
+
+
 class MemoryInfo(_messages.Message):
   r"""A MemoryInfo object.
 
@@ -664,6 +715,23 @@ class MemoryInfo(_messages.Message):
 
   memoryCapInKibibyte = _messages.IntegerField(1)
   memoryTotalInKibibyte = _messages.IntegerField(2)
+
+
+class MultiStep(_messages.Message):
+  r"""Details when multiple steps are run with the same configuration as a
+  group.
+
+  Fields:
+    multistepNumber: Unique int given to each step. Ranges from 0(inclusive)
+      to total number of steps(exclusive). The primary step is 0.
+    primaryStep: Present if it is a primary (original) step.
+    primaryStepId: Step Id of the primary (original) step, which might be this
+      step.
+  """
+
+  multistepNumber = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  primaryStep = _messages.MessageField('PrimaryStep', 2)
+  primaryStepId = _messages.StringField(3)
 
 
 class Outcome(_messages.Message):
@@ -693,16 +761,18 @@ class Outcome(_messages.Message):
 
     Values:
       failure: <no description>
+      flaky: <no description>
       inconclusive: <no description>
       skipped: <no description>
       success: <no description>
       unset: <no description>
     """
     failure = 0
-    inconclusive = 1
-    skipped = 2
-    success = 3
-    unset = 4
+    flaky = 1
+    inconclusive = 2
+    skipped = 3
+    success = 4
+    unset = 5
 
   failureDetail = _messages.MessageField('FailureDetail', 1)
   inconclusiveDetail = _messages.MessageField('InconclusiveDetail', 2)
@@ -799,6 +869,43 @@ class PerfSampleSeries(_messages.Message):
   projectId = _messages.StringField(4)
   sampleSeriesId = _messages.StringField(5)
   stepId = _messages.StringField(6)
+
+
+class PrimaryStep(_messages.Message):
+  r"""Stores rollup test status of multiple steps that were run as a group and
+  outcome of each individual step.
+
+  Enums:
+    RollUpValueValuesEnum: Rollup test status of multiple steps that were run
+      with the same configuration as a group.
+
+  Fields:
+    individualOutcome: Step Id and outcome of each individual step.
+    rollUp: Rollup test status of multiple steps that were run with the same
+      configuration as a group.
+  """
+
+  class RollUpValueValuesEnum(_messages.Enum):
+    r"""Rollup test status of multiple steps that were run with the same
+    configuration as a group.
+
+    Values:
+      failure: <no description>
+      flaky: <no description>
+      inconclusive: <no description>
+      skipped: <no description>
+      success: <no description>
+      unset: <no description>
+    """
+    failure = 0
+    flaky = 1
+    inconclusive = 2
+    skipped = 3
+    success = 4
+    unset = 5
+
+  individualOutcome = _messages.MessageField('IndividualOutcome', 1, repeated=True)
+  rollUp = _messages.EnumField('RollUpValueValuesEnum', 2)
 
 
 class ProjectSettings(_messages.Message):
@@ -1063,6 +1170,12 @@ class Step(_messages.Message):
       In create request: optional - In update request: optional; any new
       key/value pair will be added to the map, and any new value for an
       existing key will update that key's value
+    multiStep: Details when multiple steps are run with the same configuration
+      as a group. These details can be used identify which group this step is
+      part of. It also identifies the groups 'primary step' which indexes all
+      the group members.  - In response: present if previously set. - In
+      create request: optional, set iff this step was performed more than
+      once. - In update request: optional
     name: A short human-readable name to display in the UI. Maximum of 100
       characters. For example: Clean build  A PRECONDITION_FAILED will be
       returned upon creating a new step if it shares its name and
@@ -1127,13 +1240,14 @@ class Step(_messages.Message):
   dimensionValue = _messages.MessageField('StepDimensionValueEntry', 5, repeated=True)
   hasImages = _messages.BooleanField(6)
   labels = _messages.MessageField('StepLabelsEntry', 7, repeated=True)
-  name = _messages.StringField(8)
-  outcome = _messages.MessageField('Outcome', 9)
-  runDuration = _messages.MessageField('Duration', 10)
-  state = _messages.EnumField('StateValueValuesEnum', 11)
-  stepId = _messages.StringField(12)
-  testExecutionStep = _messages.MessageField('TestExecutionStep', 13)
-  toolExecutionStep = _messages.MessageField('ToolExecutionStep', 14)
+  multiStep = _messages.MessageField('MultiStep', 8)
+  name = _messages.StringField(9)
+  outcome = _messages.MessageField('Outcome', 10)
+  runDuration = _messages.MessageField('Duration', 11)
+  state = _messages.EnumField('StateValueValuesEnum', 12)
+  stepId = _messages.StringField(13)
+  testExecutionStep = _messages.MessageField('TestExecutionStep', 14)
+  toolExecutionStep = _messages.MessageField('ToolExecutionStep', 15)
 
 
 class StepDimensionValueEntry(_messages.Message):
@@ -1168,6 +1282,53 @@ class SuccessDetail(_messages.Message):
   """
 
   otherNativeCrash = _messages.BooleanField(1)
+
+
+class TestCase(_messages.Message):
+  r"""A TestCase object.
+
+  Enums:
+    StatusValueValuesEnum: The status of the test case.  Required.
+
+  Fields:
+    endTime: The end time of the test case.  Optional.
+    skippedMessage: Why the test case was skipped.  Present only for skipped
+      test case
+    stackTraces: The stack trace details if the test case failed or
+      encountered an error.  The maximum size of the stack traces is 100KiB,
+      beyond which the stack track will be truncated.  Zero if the test case
+      passed.
+    startTime: The start time of the test case.  Optional.
+    status: The status of the test case.  Required.
+    testCaseId: A unique identifier within a Step for this Test Case.
+    testCaseReference: Test case reference, e.g. name, class name and test
+      suite name.  Required.
+    toolOutputs: References to opaque files of any format output by the tool
+      execution.
+  """
+
+  class StatusValueValuesEnum(_messages.Enum):
+    r"""The status of the test case.  Required.
+
+    Values:
+      error: <no description>
+      failed: <no description>
+      passed: <no description>
+      skipped: <no description>
+    """
+    error = 0
+    failed = 1
+    passed = 2
+    skipped = 3
+
+  endTime = _messages.MessageField('Timestamp', 1)
+  skippedMessage = _messages.StringField(2)
+  stackTraces = _messages.MessageField('StackTrace', 3, repeated=True)
+  startTime = _messages.MessageField('Timestamp', 4)
+  status = _messages.EnumField('StatusValueValuesEnum', 5)
+  testCaseId = _messages.StringField(6)
+  testCaseReference = _messages.MessageField('TestCaseReference', 7)
+  toolOutputs = _messages.MessageField('ToolOutputReference', 8, repeated=True)
 
 
 class TestCaseReference(_messages.Message):
@@ -1285,6 +1446,7 @@ class TestIssue(_messages.Message):
       iosException: <no description>
       launcherActivityNotFound: <no description>
       nativeCrash: <no description>
+      nonSdkApiUsageReport: <no description>
       nonSdkApiUsageViolation: <no description>
       performedGoogleLogin: <no description>
       performedMonkeyActions: <no description>
@@ -1292,6 +1454,7 @@ class TestIssue(_messages.Message):
       unspecifiedType: <no description>
       unusedRoboDirective: <no description>
       usedRoboDirective: <no description>
+      usedRoboIgnoreDirective: <no description>
     """
     anr = 0
     availableDeepLinks = 1
@@ -1308,13 +1471,15 @@ class TestIssue(_messages.Message):
     iosException = 12
     launcherActivityNotFound = 13
     nativeCrash = 14
-    nonSdkApiUsageViolation = 15
-    performedGoogleLogin = 16
-    performedMonkeyActions = 17
-    startActivityNotFound = 18
-    unspecifiedType = 19
-    unusedRoboDirective = 20
-    usedRoboDirective = 21
+    nonSdkApiUsageReport = 15
+    nonSdkApiUsageViolation = 16
+    performedGoogleLogin = 17
+    performedMonkeyActions = 18
+    startActivityNotFound = 19
+    unspecifiedType = 20
+    unusedRoboDirective = 21
+    usedRoboDirective = 22
+    usedRoboIgnoreDirective = 23
 
   category = _messages.EnumField('CategoryValueValuesEnum', 1)
   errorMessage = _messages.StringField(2)
@@ -1875,6 +2040,50 @@ class ToolresultsProjectsHistoriesExecutionsStepsPublishXunitXmlFilesRequest(_me
   projectId = _messages.StringField(3, required=True)
   publishXunitXmlFilesRequest = _messages.MessageField('PublishXunitXmlFilesRequest', 4)
   stepId = _messages.StringField(5, required=True)
+
+
+class ToolresultsProjectsHistoriesExecutionsStepsTestCasesGetRequest(_messages.Message):
+  r"""A ToolresultsProjectsHistoriesExecutionsStepsTestCasesGetRequest object.
+
+  Fields:
+    executionId: A Execution id  Required.
+    historyId: A History id.  Required.
+    projectId: A Project id.  Required.
+    stepId: A Step id. Note: This step must include a TestExecutionStep.
+      Required.
+    testCaseId: A Test Case id.  Required.
+  """
+
+  executionId = _messages.StringField(1, required=True)
+  historyId = _messages.StringField(2, required=True)
+  projectId = _messages.StringField(3, required=True)
+  stepId = _messages.StringField(4, required=True)
+  testCaseId = _messages.StringField(5, required=True)
+
+
+class ToolresultsProjectsHistoriesExecutionsStepsTestCasesListRequest(_messages.Message):
+  r"""A ToolresultsProjectsHistoriesExecutionsStepsTestCasesListRequest
+  object.
+
+  Fields:
+    executionId: A Execution id  Required.
+    historyId: A History id.  Required.
+    pageSize: The maximum number of TestCases to fetch.  Default value: 100.
+      The server will use this default if the field is not set or has a value
+      of 0.  Optional.
+    pageToken: A continuation token to resume the query at the next item.
+      Optional.
+    projectId: A Project id.  Required.
+    stepId: A Step id. Note: This step must include a TestExecutionStep.
+      Required.
+  """
+
+  executionId = _messages.StringField(1, required=True)
+  historyId = _messages.StringField(2, required=True)
+  pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(4)
+  projectId = _messages.StringField(5, required=True)
+  stepId = _messages.StringField(6, required=True)
 
 
 class ToolresultsProjectsHistoriesExecutionsStepsThumbnailsListRequest(_messages.Message):

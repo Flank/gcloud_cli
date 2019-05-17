@@ -29,8 +29,8 @@ import mock
 class NetworkEndpointGroupsListTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.SelectApi(self.track.prefix)
+    self.track = calliope_base.ReleaseTrack.GA
+    self.SelectApi('v1')
     list_json_patcher = mock.patch(
         'googlecloudsdk.api_lib.compute.request_helper.ListJson', autospec=True)
     self.addCleanup(list_json_patcher.stop)

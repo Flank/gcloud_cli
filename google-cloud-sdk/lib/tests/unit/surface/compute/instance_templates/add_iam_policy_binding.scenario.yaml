@@ -1,14 +1,38 @@
 title: compute instance-templates add-iam-policy-binding scenario test
-release_tracks: [BETA]
-
+release_tracks: [ALPHA, BETA, GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute instance-templates add-iam-policy-binding my-template --member=user:test@gmail.com
+      --role=roles/non-primitive
+  - stderr: |
+      Updated IAM policy for instance_template [my-template].
+  - stdout: |
+      bindings:
+      - members:
+        - user:owner@gmail.com
+        role: roles/another-non-primitive
+      - members:
+        - user:test@gmail.com
+        role: roles/non-primitive
+      etag: etag
+      version: 1
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1
+      BETA: beta
+      ALPHA: alpha
+
 # add binding without condition to a policy without condition
 - execute_command:
-    command: compute instance-templates add-iam-policy-binding my-template --member=user:test@gmail.com --role=roles/non-primitive
+    command: compute instance-templates add-iam-policy-binding my-template --member=user:test@gmail.com
+      --role=roles/non-primitive
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/beta/projects/fake-project/global/instanceTemplates/projects%2Ffake-project%2Fglobal%2FinstanceTemplates%2Fmy-template/getIamPolicy?alt=json
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/instanceTemplates/my-template/getIamPolicy?alt=json
           method: GET
           body: null
         return_response:
@@ -29,17 +53,17 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/beta/projects/fake-project/global/instanceTemplates/projects%2Ffake-project%2Fglobal%2FinstanceTemplates%2Fmy-template/setIamPolicy?alt=json
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/instanceTemplates/my-template/setIamPolicy?alt=json
           method: POST
           body:
             json:
               policy:
                 bindings:
-                - role: 'roles/another-non-primitive'
-                  members: ['user:owner@gmail.com']
-                - role: 'roles/non-primitive'
-                  members: ['user:test@gmail.com']
-                etag: 'etag'
+                - role: roles/another-non-primitive
+                  members: ["user:owner@gmail.com"]
+                - role: roles/non-primitive
+                  members: ["user:test@gmail.com"]
+                etag: etag
                 version: 1
         return_response:
           headers:

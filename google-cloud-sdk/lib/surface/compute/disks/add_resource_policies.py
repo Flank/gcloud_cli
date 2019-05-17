@@ -26,23 +26,13 @@ from googlecloudsdk.command_lib.compute.resource_policies import flags
 from googlecloudsdk.command_lib.compute.resource_policies import util
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
 class DisksAddResourcePolicies(base.UpdateCommand):
-  """Add resource policies to a Google Compute Engine disk.
-
-    *{command}* adds resource policies to a Google Compute Engine
-    disk. These policies define a schedule for taking snapshots and a retention
-    period for these snapshots.
-
-    For information on how to create resource policies, see:
-
-      $ gcloud alpha compute resource-policies create --help
-
-  """
+  """Add resource policies to a Google Compute Engine disk."""
 
   @staticmethod
   def Args(parser):
-    disks_flags.MakeDiskArgZonalOrRegional(plural=False).AddArgument(
+    disks_flags.MakeDiskArg(plural=False).AddArgument(
         parser, operation_type='add resource policies to')
     flags.AddResourcePoliciesArgs(parser, 'added to', 'disk', required=True)
 
@@ -51,7 +41,7 @@ class DisksAddResourcePolicies(base.UpdateCommand):
     client = holder.client.apitools_client
     messages = holder.client.messages
 
-    disk_ref = disks_flags.MakeDiskArgZonalOrRegional(
+    disk_ref = disks_flags.MakeDiskArg(
         plural=False).ResolveAsResource(args, holder.resources)
     disk_info = api_util.GetDiskInfo(disk_ref, client, messages)
     disk_region = disk_info.GetDiskRegionName()
@@ -67,3 +57,22 @@ class DisksAddResourcePolicies(base.UpdateCommand):
 
     return disk_info.MakeAddResourcePoliciesRequest(resource_policies,
                                                     holder.client)
+
+
+DisksAddResourcePolicies.detailed_help = {
+    'DESCRIPTION':
+        """\
+Add resource policies to a Google Compute Engine disk.
+
+*{command}* adds resource policies to a Google Compute Engine disk. These policies define a schedule for taking snapshots and a retention period for these snapshots.
+
+For information on how to create resource policies, see:
+  $ gcloud beta compute resource-policies create --help
+""",
+    'EXAMPLES':
+        """\
+The following command adds two resource policies to a Google Compute Engine disk.
+
+  $ {command} my-disk --zone=ZONE --resource-policies=policy-1,policy-2
+"""
+}

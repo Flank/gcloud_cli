@@ -91,3 +91,8 @@ class WorkflowTemplatesJobPySparkUnitTestBeta(
         '--jars {1} {2} -- foo --bar baz '.format(
             self.WORKFLOW_TEMPLATE, ','.join(self.JAR_URIS), self.SCRIPT_URI))
     self.AssertMessagesEqual(expected, result)
+
+
+class WorkflowTemplatesJobPySparkUnitTestAlpha(
+    WorkflowTemplatesJobPySparkUnitTestBeta, base.DataprocTestBaseAlpha):
+  pass

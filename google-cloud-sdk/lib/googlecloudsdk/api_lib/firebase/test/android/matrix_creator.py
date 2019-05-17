@@ -106,7 +106,8 @@ class MatrixCreator(object):
     action_types = self._messages.RoboDirective.ActionTypeValueValuesEnum
     action_type_mapping = {
         'click': action_types.SINGLE_CLICK,
-        'text': action_types.ENTER_TEXT
+        'text': action_types.ENTER_TEXT,
+        'ignore': action_types.IGNORE
     }
     for key, value in six.iteritems((robo_directives_dict or {})):
       (action_type, resource_name) = util.ParseRoboDirectiveKey(key)
@@ -140,9 +141,6 @@ class MatrixCreator(object):
         appApk=app_apk,
         appBundle=app_bundle,
         appPackageId=self._args.app_package,
-        maxDepth=self._args.max_depth,
-        maxSteps=self._args.max_steps,
-        appInitialActivity=self._args.app_initial_activity,
         roboDirectives=self._BuildRoboDirectives(self._args.robo_directives))
     if getattr(self._args, 'robo_script', None):
       spec.androidRoboTest.roboScript = self._BuildFileReference(
@@ -261,7 +259,8 @@ class MatrixCreator(object):
                 self._messages.ClientInfoDetail(
                     key='Release Track', value=self._release_track)
             ]),
-        resultStorage=results)
+        resultStorage=results,
+        flakyTestAttempts=self._args.num_flaky_test_attempts or 0)
 
   def _BuildAndroidDevice(self, device_map):
     return self._messages.AndroidDevice(

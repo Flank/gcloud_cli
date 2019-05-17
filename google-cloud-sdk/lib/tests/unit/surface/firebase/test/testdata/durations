@@ -3,6 +3,12 @@
 timeout-200:
   timeout: 200   # 's' units implied
 
+timeout-500000000us:
+  timeout: 500000000us   # 'us' units
+
+timeout-500000ms:
+  timeout: 500000ms   # 'ms' units
+
 timeout-500s:
   timeout: 500s   # 's' units
 
@@ -11,6 +17,18 @@ timeout-10m:
 
 timeout-2h:
   timeout: 2h   # 'h' units
+
+timeout-us-200:
+  timeout_us: 200000000us   # 's' units implied
+
+timeout-us-500000000us:
+  timeout_us: 500000000us   # 'us' units
+
+timeout-us-500000ms:
+  timeout_us: 500000ms   # 'ms' units
+
+timeout-us-500s:
+  timeout_us: 500s   # 's' units
 
 
 # Invalid Duration args

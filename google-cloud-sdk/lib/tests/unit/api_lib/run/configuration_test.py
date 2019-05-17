@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.run import configuration
+from googlecloudsdk.api_lib.run import k8s_object
 from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.api_lib.run import base
@@ -38,6 +39,22 @@ class ConfigurationTest(base.ServerlessApiBase, parameterized.TestCase):
         self.mock_serverless_client, 'us-central1.{}'.format(self.Project()))
     # TODO(b/112662240): Remove once this field is public
     self.is_source_branch = hasattr(self.conf.Message().spec, 'build')
+
+  def testNeverLimitsInMap(self):
+    resource_cls = self.serverless_messages.ResourceRequirements
+    self.conf.container.resources = k8s_object.InitializedInstance(resource_cls)
+    self.conf.resource_limits['memory'] = '512Mi'
+    self.assertIsNone(self.conf.container.resources.limitsInMap)
+    self.assertIsNone(self.conf.container.resources.requestsInMap)
+    self.conf.container.resources.limits = None
+    self.conf.resource_limits['memory'] = '512Mi'
+    self.assertIsNone(self.conf.container.resources.limitsInMap)
+    self.assertIsNone(self.conf.container.resources.requestsInMap)
+
+  def testRevisionLabels(self):
+    self.conf.spec.revisionTemplate.metadata = None
+    self.conf.revision_labels['foo'] = 'bar'
+    self.assertEqual(self.conf.revision_labels['foo'], 'bar')
 
   def testGetMessage(self):
     """Sanity check on exported message object."""

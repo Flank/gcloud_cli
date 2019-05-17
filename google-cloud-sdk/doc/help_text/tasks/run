@@ -1,0 +1,35 @@
+NAME
+    gcloud tasks run - force a task to run now
+
+SYNOPSIS
+    gcloud tasks run TASK [--queue=QUEUE] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Force a task to run now.
+
+POSITIONAL ARGUMENTS
+     TASK
+        The task to run.
+
+FLAGS
+     --queue=QUEUE
+        The queue the task belongs to.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+EXAMPLES
+    To run a task:
+
+        $ gcloud tasks run --queue=my-queue my-task
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha tasks run
+        $ gcloud beta tasks run
+

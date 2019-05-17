@@ -60,7 +60,6 @@ class AndroidArgFileTests(unit_base.AndroidUnitTestBase):
     self.assertEqual(args.type, 'instrumentation')
     self.assertEqual(args.test, 'startrek.apk')
     self.assertEquals(sorted(args.locales), sorted(['klingon', 'romulan']))
-    self.assertEqual(args.max_steps, 333)
     self.assertEqual(args.results_dir, 'my/results/dir')
     self.assertEqual(args.robo_directives, {
         'resource1': 'value1',
@@ -106,69 +105,6 @@ class AndroidArgFileTests(unit_base.AndroidUnitTestBase):
     self.assertIn('Invalid value for [type]:', six.text_type(e.exception))
     self.assertIn("'True' is not a valid test type.",
                   six.text_type(e.exception))
-
-  # Integer arg validation tests
-
-  def testIntegers_ValidNumber(self):
-    args = arg_file.GetArgsFromArgFile(INTEGERS + ':max-depth-1',
-                                       self.android_args_set)
-    self.assertEqual(args['max_depth'], 1)
-
-  def testIntegers_LargeValidNumber(self):
-    args = arg_file.GetArgsFromArgFile(INTEGERS + ':large-steps',
-                                       self.android_args_set)
-    self.assertEqual(args['max_steps'], 1234567890)
-
-  def testIntegers_NumberAsStringNotValid(self):
-    with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
-      arg_file.GetArgsFromArgFile(INTEGERS + ':int-string',
-                                  self.android_args_set)
-    msg = six.text_type(e.exception)
-    self.assertIn('Invalid value for [max-depth]: 2', msg)
-
-  def testIntegers_PositiveParamIsZero(self):
-    with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
-      arg_file.GetArgsFromArgFile(INTEGERS + ':not-positive',
-                                  self.android_args_set)
-    msg = six.text_type(e.exception)
-    self.assertIn('Invalid value for [max-depth]:', msg)
-    self.assertIn('Value must be greater than or equal to 1; received: 0', msg)
-
-  def testIntegers_NonNegativeParamIsNegative(self):
-    with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
-      arg_file.GetArgsFromArgFile(INTEGERS + ':delay-neg1',
-                                  self.android_args_set)
-    msg = six.text_type(e.exception)
-    self.assertIn('Invalid value for [max-steps]:', msg)
-    self.assertIn('Value must be greater than or equal to 0; received: -1', msg)
-
-  def testIntegers_InvalidNumberContainsAlphaChar(self):
-    with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
-      arg_file.GetArgsFromArgFile(INTEGERS + ':max-depth-10x',
-                                  self.android_args_set)
-    self.assertEqual('Invalid value for [max-depth]: 10x',
-                     six.text_type(e.exception))
-
-  def testIntegers_InvalidNumberWithComma(self):
-    with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
-      arg_file.GetArgsFromArgFile(INTEGERS + ':comma-steps',
-                                  self.android_args_set)
-    self.assertEqual('Invalid value for [max-steps]: 123,456',
-                     six.text_type(e.exception))
-
-  def testIntegers_InvalidFloatNumber(self):
-    with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
-      arg_file.GetArgsFromArgFile(INTEGERS + ':float-steps',
-                                  self.android_args_set)
-    self.assertEqual('Invalid value for [max-steps]: 12.34',
-                     six.text_type(e.exception))
-
-  def testIntegers_InvalidNumberList(self):
-    with self.assertRaises(calliope_exceptions.InvalidArgumentException) as e:
-      arg_file.GetArgsFromArgFile(INTEGERS + ':list-steps',
-                                  self.android_args_set)
-    self.assertEqual('Invalid value for [max-steps]: [1234]',
-                     six.text_type(e.exception))
 
   # Various int-list arg validation tests
 

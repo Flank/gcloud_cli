@@ -152,9 +152,30 @@ class JobsSubmitHadoopUnitTest(jobs_unit_base.JobsUnitTestBase):
     job = self.MakeJob(hadoopJob=self.HADOOP_JOB)
     self.ExpectSubmitCalls(job, final_state=self.STATE_ENUM.ERROR)
     with self.AssertRaisesExceptionMatches(
+        exceptions.JobError, 'Job [{0}] failed.'.format(self.JOB_ID)):
+      self.RunDataproc(
+          'jobs submit hadoop --cluster {0} --id {1} '
+          '--driver-log-levels root=INFO,com.example=DEBUG '
+          '--properties foo=bar,some.key=some.value '
+          '--class {2} -- foo --bar baz '
+          .format(self.CLUSTER_NAME, self.JOB_ID, self.CLASS))
+      self.AssertErrContains(textwrap.dedent("""\
+        First line of job output.
+        Next line of job output.
+        Yet another line of job output.
+        Last line of job output."""))
+
+  def testSubmitJobFailureWithDetails(self):
+    job = self.MakeJob(hadoopJob=self.HADOOP_JOB)
+    self.ExpectSubmitCalls(
+        job,
+        final_state=self.STATE_ENUM.ERROR,
+        details='Something bad')
+    with self.AssertRaisesExceptionMatches(
         exceptions.JobError,
-        'Job [{0}] entered state [ERROR] while waiting for [DONE].'.format(
-            self.JOB_ID)):
+        textwrap.dedent("""\
+          Job [{0}] failed with error:
+          Something bad""".format(self.JOB_ID))):
       self.RunDataproc(
           'jobs submit hadoop --cluster {0} --id {1} '
           '--driver-log-levels root=INFO,com.example=DEBUG '
@@ -273,6 +294,11 @@ class JobsSubmitHadoopUnitTestBeta(JobsSubmitHadoopUnitTest,
                        '--class {2} --jar {3} -- foo --bar baz '.format(
                            self.CLUSTER_NAME, self.JOB_ID, self.CLASS,
                            self.JAR_URI))
+
+
+class JobsSubmitHadoopUnitTestAlpha(
+    JobsSubmitHadoopUnitTestBeta, base.DataprocTestBaseAlpha):
+  pass
 
 
 if __name__ == '__main__':

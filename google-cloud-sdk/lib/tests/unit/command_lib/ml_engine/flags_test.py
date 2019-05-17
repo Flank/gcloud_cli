@@ -19,11 +19,29 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+
+from googlecloudsdk.api_lib.ml_engine import jobs
 from googlecloudsdk.command_lib.ml_engine import flags
+from googlecloudsdk.command_lib.util.apis import arg_utils
+from tests.lib import cli_test_base
 from tests.lib import completer_test_base
 from tests.lib import parameterized
+from tests.lib.calliope import util
 from tests.lib.surface.iam import unit_test_base
 from tests.lib.surface.ml_engine import base
+
+
+_ACCELERATOR_TYPE_MAPPER = arg_utils.ChoiceEnumMapper(
+    'generic-accelerator',
+    jobs.GetMessagesModule().GoogleCloudMlV1AcceleratorConfig
+    .TypeValueValuesEnum,
+    help_str='The available types of accelerators.',
+    include_filter=lambda x: x != 'ACCELERATOR_TYPE_UNSPECIFIED',
+    required=False)
+
+_INVALID_ACCELERATOR_MESSAGE = ('Invalid accelerator: bad-type. Valid '
+                                'choices are: [{}]'.format(', '.join(
+                                    _ACCELERATOR_TYPE_MAPPER.choices)))
 
 
 class CompletionTest(unit_test_base.BaseTest,
@@ -76,6 +94,15 @@ class CompletionTest(unit_test_base.BaseTest,
 
 class FlagsTest(base.MlGaPlatformTestBase, parameterized.TestCase):
 
+  def _getAcceleratorTypes(self):
+    accelerator_msg = self.msgs.GoogleCloudMlV1AcceleratorConfig
+    accelerator_types = accelerator_msg.TypeValueValuesEnum
+    return [
+        accelerator_types.NVIDIA_TESLA_K80, accelerator_types.NVIDIA_TESLA_P100,
+        accelerator_types.NVIDIA_TESLA_V100, accelerator_types.NVIDIA_TESLA_P4,
+        accelerator_types.NVIDIA_TESLA_T4, accelerator_types.TPU_V2
+    ]
+
   def testEmptyAccelerator(self):
     self.assertEqual(None, flags.ParseAcceleratorFlag(None))
 
@@ -84,16 +111,11 @@ class FlagsTest(base.MlGaPlatformTestBase, parameterized.TestCase):
       (1, dict([('count', 1), ('type', 'nvidia-tesla-p100')]), 1),
       (2, dict([('count', 2), ('type', 'nvidia-tesla-v100')]), 2),
       (3, dict([('count', 2), ('type', 'nvidia-tesla-p4')]), 2),
-      )
+      (4, dict([('count', 3), ('type', 'nvidia-tesla-t4')]), 3),
+      (5, dict([('count', 4), ('type', 'tpu-v2')]), 4),
+  )
   def testValidateAccelerator(self, index, accelerator, expected_count):
-    accelerator_msg = self.msgs.GoogleCloudMlV1AcceleratorConfig
-    accelerator_types = accelerator_msg.TypeValueValuesEnum
-    accelerator_type_list = [
-        accelerator_types.NVIDIA_TESLA_K80,
-        accelerator_types.NVIDIA_TESLA_P100,
-        accelerator_types.NVIDIA_TESLA_V100,
-        accelerator_types.NVIDIA_TESLA_P4]
-    expected_type = accelerator_type_list[index]
+    expected_type = self._getAcceleratorTypes()[index]
     self.assertEqual(expected_type,
                      flags.ParseAcceleratorFlag(accelerator).type)
     self.assertEqual(expected_count,
@@ -102,8 +124,9 @@ class FlagsTest(base.MlGaPlatformTestBase, parameterized.TestCase):
   def testInvalidAcceleratorType(self):
     with self.AssertRaisesExceptionMatches(
         flags.ArgumentError, """\
-The type of the accelerator can only be one of the following: 'nvidia-tesla-k80', 'nvidia-tesla-p100', 'nvidia-tesla-v100' and 'nvidia-tesla-p4'.
-"""):
+The type of the accelerator can only be one of the following: {}.
+""".format(', '.join(
+    ["'{}'".format(c) for c in _ACCELERATOR_TYPE_MAPPER.choices]))):
       flags.ParseAcceleratorFlag(dict([('count', 1), ('type', 'o')]))
 
   @parameterized.parameters(0, -1)
@@ -114,6 +137,112 @@ The count of the accelerator must be greater than 0.
 """):
       flags.ParseAcceleratorFlag(
           dict([('count', invalid_count), ('type', 'nvidia-tesla-k80')]))
+
+  @parameterized.parameters(
+      (0, dict([('count', 1), ('type', 'nvidia-tesla-k80')]), 1),
+      (1, dict([('count', 1), ('type', 'nvidia-tesla-p100')]), 1),
+      (2, dict([('count', 2), ('type', 'nvidia-tesla-v100')]), 2),
+      (3, dict([('count', 2), ('type', 'nvidia-tesla-p4')]), 2),
+      (4, dict([('count', 3), ('type', 'nvidia-tesla-t4')]), 3),
+      (5, dict([('count', 4), ('type', 'tpu-v2')]), 4),
+  )
+  def testMasterAcceleratorType(self, index, accelerator, expected_count):
+    parser = util.ArgumentParser()
+    expected_type = self._getAcceleratorTypes()[index]
+    flags.GetMasterAccelerator().AddToParser(parser)
+    args = parser.parse_args(['--master-accelerator',
+                              'type={0},count={1}'.format(
+                                  accelerator['type'], accelerator['count'])])
+
+    self.assertEqual(expected_type,
+                     args.master_accelerator['type'])
+    self.assertEqual(expected_count,
+                     args.master_accelerator['count'])
+
+  def testMasterAcceleratorTypeErrors(self):
+    parser = util.ArgumentParser()
+    flags.GetMasterAccelerator().AddToParser(parser)
+    with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
+                                           _INVALID_ACCELERATOR_MESSAGE):
+      parser.parse_args(['--master-accelerator', 'type=bad_type,count=2'])
+
+    with self.AssertRaisesExceptionMatches(
+        cli_test_base.MockArgumentError, 'The count of the accelerator '
+                                         'must be greater than 0.'):
+      parser.parse_args(['--master-accelerator',
+                         'type=nvidia-tesla-p4,count=0'])
+
+  @parameterized.parameters(
+      (0, dict([('count', 1), ('type', 'nvidia-tesla-k80')]), 1),
+      (1, dict([('count', 1), ('type', 'nvidia-tesla-p100')]), 1),
+      (2, dict([('count', 2), ('type', 'nvidia-tesla-v100')]), 2),
+      (3, dict([('count', 2), ('type', 'nvidia-tesla-p4')]), 2),
+      (4, dict([('count', 3), ('type', 'nvidia-tesla-t4')]), 3),
+      (5, dict([('count', 4), ('type', 'tpu-v2')]), 4),
+  )
+  def testParameterServerAcceleratorType(
+      self, index, accelerator, expected_count):
+    parser = util.ArgumentParser()
+    expected_type = self._getAcceleratorTypes()[index]
+    flags.GetParameterServerAccelerator().AddToParser(parser)
+    args = parser.parse_args(['--parameter-server-accelerator',
+                              'type={0},count={1}'.format(
+                                  accelerator['type'], accelerator['count'])])
+
+    self.assertEqual(expected_type,
+                     args.parameter_server_accelerator['type'])
+    self.assertEqual(expected_count,
+                     args.parameter_server_accelerator['count'])
+
+  def testParameterServerTypeErrors(self):
+    parser = util.ArgumentParser()
+    flags.GetParameterServerAccelerator().AddToParser(parser)
+    with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
+                                           _INVALID_ACCELERATOR_MESSAGE):
+      parser.parse_args(['--parameter-server-accelerator',
+                         'type=bad_type,count=2'])
+
+    with self.AssertRaisesExceptionMatches(
+        cli_test_base.MockArgumentError, 'The count of the accelerator '
+                                         'must be greater than 0.'):
+      parser.parse_args(['--parameter-server-accelerator',
+                         'type=nvidia-tesla-p4,count=0'])
+
+  @parameterized.parameters(
+      (0, dict([('count', 1), ('type', 'nvidia-tesla-k80')]), 1),
+      (1, dict([('count', 1), ('type', 'nvidia-tesla-p100')]), 1),
+      (2, dict([('count', 2), ('type', 'nvidia-tesla-v100')]), 2),
+      (3, dict([('count', 2), ('type', 'nvidia-tesla-p4')]), 2),
+      (4, dict([('count', 3), ('type', 'nvidia-tesla-t4')]), 3),
+      (5, dict([('count', 4), ('type', 'tpu-v2')]), 4),
+  )
+  def testWorkerAcceleratorType(self, index, accelerator, expected_count):
+    parser = util.ArgumentParser()
+    expected_type = self._getAcceleratorTypes()[index]
+    flags.GetWorkerAccelerator().AddToParser(parser)
+    args = parser.parse_args(['--worker-accelerator',
+                              'type={0},count={1}'.format(
+                                  accelerator['type'], accelerator['count'])])
+
+    self.assertEqual(expected_type,
+                     args.worker_accelerator['type'])
+    self.assertEqual(expected_count,
+                     args.worker_accelerator['count'])
+
+  def testWorkerAcceleratorTypeErrors(self):
+    parser = util.ArgumentParser()
+    flags.GetWorkerAccelerator().AddToParser(parser)
+    with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
+                                           _INVALID_ACCELERATOR_MESSAGE):
+      parser.parse_args(['--worker-accelerator',
+                         'type=bad_type,count=2'])
+
+    with self.AssertRaisesExceptionMatches(
+        cli_test_base.MockArgumentError, 'The count of the accelerator '
+                                         'must be greater than 0.'):
+      parser.parse_args(['--worker-accelerator',
+                         'type=nvidia-tesla-p4,count=0'])
+
 
 if __name__ == '__main__':
   completer_test_base.main()

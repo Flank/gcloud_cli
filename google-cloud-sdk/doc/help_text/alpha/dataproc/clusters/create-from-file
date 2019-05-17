@@ -1,0 +1,48 @@
+NAME
+    gcloud alpha dataproc clusters create-from-file - create a cluster from a
+        file
+
+SYNOPSIS
+    gcloud alpha dataproc clusters create-from-file --file=FILE [--async]
+        [--region=REGION] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Create a cluster from a file.
+
+REQUIRED FLAGS
+     --file=FILE
+        The path to a YAML file containing a Dataproc Cluster resource.
+
+        For more information, see:
+        https://cloud.google.com/dataproc/docs/reference/rest/v1beta2/projects.regions.clusters#Cluster.
+
+OPTIONAL FLAGS
+     --async
+        Display information about the operation in progress, without waiting
+        for the operation to complete.
+
+     --region=REGION
+        Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
+        independent resource namespace constrained to deploying instances into
+        Compute Engine zones inside the region. The default value of global is
+        a special multi-region namespace which is capable of deploying
+        instances into all Compute Engine zones globally, and is disjoint from
+        other Cloud Dataproc regions. Overrides the default dataproc/region
+        property value for this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. This variant is also available:
+
+        $ gcloud beta dataproc clusters create-from-file
+

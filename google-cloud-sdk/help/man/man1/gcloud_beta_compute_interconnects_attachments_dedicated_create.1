@@ -11,7 +11,7 @@ gcloud beta compute interconnects attachments dedicated create \- create a Googl
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta compute interconnects attachments dedicated create\fR \fINAME\fR \fB\-\-interconnect\fR=\fIINTERCONNECT\fR \fB\-\-router\fR=\fIROUTER\fR [\fB\-\-candidate\-subnets\fR=[\fISUBNET\fR,...]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-admin\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-vlan\fR=\fIVLAN\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta compute interconnects attachments dedicated create\fR \fINAME\fR \fB\-\-interconnect\fR=\fIINTERCONNECT\fR \fB\-\-router\fR=\fIROUTER\fR [\fB\-\-bandwidth\fR=\fIBANDWIDTH\fR] [\fB\-\-candidate\-subnets\fR=[\fISUBNET\fR,...]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-admin\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-vlan\fR=\fIVLAN\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -53,6 +53,45 @@ The Google Cloud Router to use for dynamic routing.
 .SH "OPTIONAL FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-bandwidth\fR=\fIBANDWIDTH\fR
+Provisioned capacity of the attachment. \fIBANDWIDTH\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fB50m\fR
+50 Mbit/s
+.TP 2m
+\fB100m\fR
+100 Mbit/s
+.TP 2m
+\fB200m\fR
+200 Mbit/s
+.TP 2m
+\fB300m\fR
+300 Mbit/s
+.TP 2m
+\fB400m\fR
+400 Mbit/s
+.TP 2m
+\fB500m\fR
+500 Mbit/s
+.TP 2m
+\fB1g\fR
+1 Gbit/s
+.TP 2m
+\fB2g\fR
+2 Gbit/s
+.TP 2m
+\fB5g\fR
+5 Gbit/s
+.TP 2m
+\fB10g\fR
+10 Gbit/s
+.RE
+.sp
+
+
 .TP 2m
 \fB\-\-candidate\-subnets\fR=[\fISUBNET\fR,...]
 Up to 16 candidate prefixes that can be used to restrict the allocation of
@@ -112,10 +151,11 @@ will automatically select a VLAN.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

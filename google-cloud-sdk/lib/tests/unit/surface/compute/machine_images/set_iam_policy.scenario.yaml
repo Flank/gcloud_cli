@@ -1,0 +1,72 @@
+title: compute machine-images get-iam-policy scenario test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      compute machine-images set-iam-policy my-image policy.json
+  - stderr: |
+      Updated IAM policy for machine_image [my-image].
+  - stdout: |
+      bindings:
+      - members:
+        - user:zjn@google.com
+        role: roles/compute.admin
+      etag: BwWG4uduM3w=
+actions:
+- write_file:
+    path: policy.json
+    contents: |
+      {
+        "bindings": [
+        {
+          "members": [
+          "user:zjn@google.com"
+          ],
+          "role": "roles/compute.admin"
+        }
+        ],
+        "etag": "BwWG4uFaEX0="
+      }
+- execute_command:
+    command: |
+      compute machine-images set-iam-policy my-image policy.json
+    events:
+    - api_call:
+        expect_request:
+          uri: https://www.googleapis.com/compute/alpha/projects/fake-project/global/machineImages/my-image/setIamPolicy?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              policy:
+                bindings:
+                - members:
+                  - user:zjn@google.com
+                  role: roles/compute.admin
+                etag: BwWG4uFaEX0=
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "etag": "BwWG4uduM3w=",
+              "bindings": [
+                {
+                  "role": "roles/compute.admin",
+                  "members": [
+                    "user:zjn@google.com"
+                  ]
+                }
+              ]
+            }
+    - expect_stderr: |
+        Updated IAM policy for machine_image [my-image].
+    - expect_stdout: |
+        bindings:
+        - members:
+          - user:zjn@google.com
+          role: roles/compute.admin
+        etag: BwWG4uduM3w=
+    - expect_exit:
+        code: 0

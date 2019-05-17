@@ -5,7 +5,8 @@ NAME
 SYNOPSIS
     gcloud alpha compute instance-groups managed instance-configs create NAME
         --instance=INSTANCE [--force-instance-update]
-        [--stateful-disk=[device-name=DEVICE-NAME],[mode=MODE],[source=SOURCE]]
+        [--stateful-disk=[auto-delete=AUTO-DELETE],
+          [device-name=DEVICE-NAME],[mode=MODE],[source=SOURCE]]
         [--stateful-metadata=KEY=VALUE,[KEY=VALUE,...]]
         [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
 
@@ -64,7 +65,7 @@ OPTIONAL FLAGS
         overrides changes applied until it gets restarted or recreated either
         manually or by autohealer or updater.
 
-     --stateful-disk=[device-name=DEVICE-NAME],[mode=MODE],[source=SOURCE]
+     --stateful-disk=[auto-delete=AUTO-DELETE],[device-name=DEVICE-NAME],[mode=MODE],[source=SOURCE]
         Disks considered stateful by the instance group. Usually, the managed
         instance group deletes disks when deleting instances; however, in the
         case of stateful disks, these disks are detached from the deleted
@@ -91,6 +92,14 @@ OPTIONAL FLAGS
             Specifies the mode of the disk to attach. Supported options are ro
             for read-only and rw for read-write. If omitted when source is
             specified, rw is used as a default.
+
+         auto-delete
+            (Optional) Specifies the auto deletion policy of the stateful disk.
+            Supported values are 'never' (never delete this disk) and
+            'on-permanent-instance-deletion' (delete the stateful disk when the
+            given instance is permanently deleted from the instance group; for
+            example when the group is resized down). If omitted, 'never' is
+            used as the default.
 
      --stateful-metadata=KEY=VALUE,[KEY=VALUE,...]
         Additional metadata to be made available to the guest operating system
@@ -134,8 +143,9 @@ OPTIONAL FLAGS
           invocation.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

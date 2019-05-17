@@ -58,26 +58,31 @@ class ManagedStatefulTestBase(e2e_managers_test_base.ManagedTestBase):
                                          stateful_names=False,
                                          stateful_disks=None):
     name = next(e2e_utils.GetResourceNameGenerator(prefix=self.prefix))
+    instance_redistribution_flag = ''
     if self.scope == e2e_test_base.ZONAL:
       self.instance_group_manager_names.append(name)
     elif self.scope == e2e_test_base.REGIONAL:
       self.region_instance_group_manager_names.append(name)
+      instance_redistribution_flag = '--instance-redistribution-type NONE'
     command = """\
       compute instance-groups managed create {group_name} \
         {scope_flag} \
         --base-instance-name {group_name} \
         --size {size} \
+        {instance_redistribution_flag} \
         --template {template}""".format(
             group_name=name,
             scope_flag=self.GetScopeFlag(),
             size=size,
+            instance_redistribution_flag=instance_redistribution_flag,
             template=instance_template_name)
     if stateful_names:
       command += """\
         --stateful-names"""
     if stateful_disks:
-      command += """\
-        --stateful-disks {0}""".format(','.join(stateful_disks))
+      for device_name in stateful_disks:
+        command += """\
+          --stateful-disk device-name={0}""".format(device_name)
     self.Run(command)
     self.AssertNewOutputContains(name)
     return name
@@ -99,8 +104,9 @@ class ManagedStatefulTestBase(e2e_managers_test_base.ManagedTestBase):
       command += """\
         --no-stateful-names"""
     if add_stateful_disks:
-      command += """\
-        --add-stateful-disks {0}""".format(','.join(add_stateful_disks))
+      for device_name in add_stateful_disks:
+        command += """\
+          --update-stateful-disk device-name={0}""".format(device_name)
     if remove_stateful_disks:
       command += """\
         --remove-stateful-disks {0}""".format(','.join(remove_stateful_disks))

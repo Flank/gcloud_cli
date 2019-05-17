@@ -735,12 +735,13 @@ class Markdown(DocumentRendererTestBase):
     console_attr.GetConsoleAttr(encoding='ascii', reset=True)
 
   def Run(self, style, markdown, expected=None, exception=None, notes=None,
-          title=None):
+          title=None, command_metadata=None):
     fin = io.StringIO(markdown)
     err = None
     try:
       render_document.RenderDocument(style=style, fin=fin, notes=notes,
-                                     title=title)
+                                     title=title,
+                                     command_metadata=command_metadata)
     except Exception as e:  # pylint: disable=broad-except
       err = six.text_type(e)
     if err != exception:

@@ -6,8 +6,10 @@ SYNOPSIS
     gcloud beta compute disks create DISK_NAME [DISK_NAME ...]
         [--csek-key-file=FILE] [--description=DESCRIPTION]
         [--guest-os-features=[GUEST_OS_FEATURE,...]] [--labels=[KEY=VALUE,...]]
-        [--licenses=[LICENSE,...]] [--replica-zones=ZONE,ZONE]
-        [--no-require-csek-key-create] [--size=SIZE] [--type=TYPE]
+        [--licenses=[LICENSE,...]]
+        [--physical-block-size=PHYSICAL_BLOCK_SIZE; default="4096"]
+        [--replica-zones=ZONE,ZONE] [--no-require-csek-key-create]
+        [--resource-policies=[RESOURCE_POLICY,...]] [--size=SIZE] [--type=TYPE]
         [--image-project=IMAGE_PROJECT --image=IMAGE
           | --image-family=IMAGE_FAMILY | --source-snapshot=SOURCE_SNAPSHOT]
         [--kms-key=KMS_KEY : --kms-keyring=KMS_KEYRING
@@ -94,6 +96,11 @@ FLAGS
         added onto the created disks to indicate the licensing and billing
         policies.
 
+     --physical-block-size=PHYSICAL_BLOCK_SIZE; default="4096"
+        Physical block size of the persistent disk in bytes. Valid values are
+        4096(default) and 16384. PHYSICAL_BLOCK_SIZE must be one of: 4096,
+        16384.
+
      --replica-zones=ZONE,ZONE
         A comma-separated list of exactly 2 zones that a regional disk will be
         replicated to. Required when creating regional disk. The zones must be
@@ -110,6 +117,10 @@ FLAGS
         https://cloud.google.com/compute/docs/disks/customer-supplied-encryption
         for more details. Enabled by default, use --no-require-csek-key-create
         to disable.
+
+     --resource-policies=[RESOURCE_POLICY,...]
+        A list of resource policy names to be added to the disk. The policies
+        must exist in the same region as the disk.
 
      --size=SIZE
         Size of the disks. The value must be a whole number followed by a size
@@ -225,8 +236,9 @@ FLAGS
           CLOUDSDK_COMPUTE_ZONE.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

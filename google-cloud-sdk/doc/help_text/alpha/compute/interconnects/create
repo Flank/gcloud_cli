@@ -41,9 +41,10 @@ REQUIRED FLAGS
             Partner interconnect. Only available to approved partners.
 
      --link-type=LINK_TYPE
-        Type of the link for the interconnect. LINK_TYPE must be (currently
-        only one value is supported):
+        Type of the link for the interconnect. LINK_TYPE must be one of:
 
+         LINK_TYPE_ETHERNET_100G_LR
+            100Gbps Ethernet, LR Optics.
          LINK_TYPE_ETHERNET_10G_LR
             10Gbps Ethernet, LR Optics.
 
@@ -70,8 +71,9 @@ OPTIONAL FLAGS
         maintenance notifications regarding this interconnect.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

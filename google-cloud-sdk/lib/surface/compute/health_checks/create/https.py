@@ -25,17 +25,15 @@ from googlecloudsdk.command_lib.compute import completers
 from googlecloudsdk.command_lib.compute.health_checks import flags
 
 
-def _Run(args,
-         holder,
-         supports_port_specification=False,
-         include_alpha=False):
+def _Run(args, holder, include_l7_internal_load_balancing=False):
   """Issues the request necessary for adding the health check."""
   client = holder.client
   messages = client.messages
 
   health_check_ref = flags.HealthCheckArgument(
-      'HTTPS', include_alpha=include_alpha).ResolveAsResource(
-          args, holder.resources)
+      'HTTPS',
+      include_l7_internal_load_balancing=include_l7_internal_load_balancing
+  ).ResolveAsResource(args, holder.resources)
   proxy_header = messages.HTTPSHealthCheck.ProxyHeaderValueValuesEnum(
       args.proxy_header)
 
@@ -48,7 +46,7 @@ def _Run(args,
       response=args.response)
 
   health_checks_utils.ValidateAndAddPortSpecificationToHealthCheck(
-      args, https_health_check, supports_port_specification)
+      args, https_health_check)
 
   if health_checks_utils.IsRegionalHealthCheckRef(health_check_ref):
     request = messages.ComputeRegionHealthChecksInsertRequest(
@@ -81,22 +79,19 @@ def _Run(args,
   return client.MakeRequests([(collection, 'Insert', request)])
 
 
-@base.ReleaseTracks(base.ReleaseTrack.GA)
+@base.ReleaseTracks(base.ReleaseTrack.GA, base.ReleaseTrack.BETA)
 class Create(base.CreateCommand):
   """Create HTTPS non-legacy health check to monitor load balanced instances."""
 
   @classmethod
   def Args(cls,
            parser,
-           supports_use_serving_port=False,
            regionalized=False):
     parser.display_info.AddFormat(flags.DEFAULT_LIST_FORMAT)
     flags.HealthCheckArgument(
-        'HTTPS', include_alpha=regionalized).AddArgument(
+        'HTTPS', include_l7_internal_load_balancing=regionalized).AddArgument(
             parser, operation_type='create')
-    health_checks_utils.AddHttpRelatedCreationArgs(
-        parser,
-        use_serving_port=supports_use_serving_port)
+    health_checks_utils.AddHttpRelatedCreationArgs(parser)
     health_checks_utils.AddProtocolAgnosticCreationArgs(parser, 'HTTPS')
     health_checks_utils.AddHttpRelatedResponseArg(parser)
     parser.display_info.AddCacheUpdater(completers.HealthChecksCompleterAlpha
@@ -109,41 +104,18 @@ class Create(base.CreateCommand):
     return _Run(args, holder)
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA)
-class CreateBeta(Create):
-  """Create HTTPS non-legacy health check to monitor load balanced instances."""
-
-  @staticmethod
-  def Args(parser,
-           supports_use_serving_port=True,
-           regionalized=False):
-    Create.Args(
-        parser,
-        supports_use_serving_port=supports_use_serving_port,
-        regionalized=regionalized)
-
-  def Run(self, args):
-    """Issues the request necessary for adding the health check."""
-    holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
-    return _Run(args, holder, supports_port_specification=True)
-
-
 @base.ReleaseTracks(base.ReleaseTrack.ALPHA)
-class CreateAlpha(CreateBeta):
+class CreateAlpha(Create):
   """Create HTTPS non-legacy health check to monitor load balanced instances."""
 
   @staticmethod
   def Args(parser):
-    CreateBeta.Args(parser, regionalized=True)
+    Create.Args(parser, regionalized=True)
 
   def Run(self, args):
     """Issues the request necessary for adding the health check."""
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
-    return _Run(
-        args,
-        holder,
-        supports_port_specification=True,
-        include_alpha=True)
+    return _Run(args, holder, include_l7_internal_load_balancing=True)
 
 
 Create.detailed_help = {

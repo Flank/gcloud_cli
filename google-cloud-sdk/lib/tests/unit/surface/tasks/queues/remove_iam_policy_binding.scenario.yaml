@@ -1,5 +1,5 @@
 title: tasks queues remove-iam-policy-binding scenario test
-release_tracks: [ALPHA, BETA]
+release_tracks: [ALPHA, BETA, GA]
 
 actions:
 - execute_command:
@@ -8,7 +8,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudtasks.googleapis.com/v2beta2/projects/fake-project/locations/my-location/queues/my-queue:getIamPolicy?alt=json
+          uri: https://cloudtasks.googleapis.com/v2/projects/fake-project/locations/my-location/queues/my-queue:getIamPolicy?alt=json
           method: POST
           body: null
         return_response:
@@ -30,7 +30,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://cloudtasks.googleapis.com/v2beta2/projects/fake-project/locations/my-location/queues/my-queue:setIamPolicy?alt=json
+          uri: https://cloudtasks.googleapis.com/v2/projects/fake-project/locations/my-location/queues/my-queue:setIamPolicy?alt=json
           method: POST
           body:
             json:
@@ -74,7 +74,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudtasks.googleapis.com/v2beta2/projects/fake-project/locations/my-location/queues/my-queue:getIamPolicy?alt=json
+          uri: https://cloudtasks.googleapis.com/v2/projects/fake-project/locations/my-location/queues/my-queue:getIamPolicy?alt=json
           method: POST
           body: null
         return_response:
@@ -96,7 +96,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://cloudtasks.googleapis.com/v2beta2/projects/fake-project/locations/my-location/queues/my-queue:setIamPolicy?alt=json
+          uri: https://cloudtasks.googleapis.com/v2/projects/fake-project/locations/my-location/queues/my-queue:setIamPolicy?alt=json
           method: POST
           body:
             json:

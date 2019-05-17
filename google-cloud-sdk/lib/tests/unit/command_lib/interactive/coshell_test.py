@@ -29,6 +29,8 @@ from googlecloudsdk.command_lib.interactive import coshell
 from googlecloudsdk.core.util import files
 from tests.lib import sdk_test_base
 from tests.lib import test_case
+
+import mock
 import six
 from six.moves import range
 
@@ -255,7 +257,8 @@ class UnixCoshellTest(_CoshellTestBase):
       self.coshell.Run('exit 0')
     self.assertEqual(0, self.coshell.Close())
 
-  @test_case.Filters.skip('rare annoying exit 0 flakes', 'b/65456434')
+  @test_case.Filters.RunOnlyInKokoro(
+      'Sometimes exits 0 in TAP, which does not affect actual usage.')
   def testUnixCoshellExit1(self):
     with self.assertRaises(coshell.CoshellExitError):
       self.coshell.Run('exit 1')
@@ -487,7 +490,8 @@ class UnixCoshellInteractiveTest(_CoshellTestBase):
     ])
     self.assertEqual(1, status)
 
-  @test_case.Filters.skip('rare annoying exit 0 flakes', 'b/65456434')
+  @test_case.Filters.RunOnlyInKokoro(
+      'Sometimes exits 0 in TAP, which does not affect actual usage.')
   def testUnixCoshellInteractiveExit(self):
     status = self.Interactive([
         'exit 123',
@@ -735,6 +739,28 @@ class WindowsCoshellTest(_CoshellTestBase):
 
   # No output tests yet because cmd.exe is entwined with the terminal and
   # we don't know how to intercept that.
+
+
+@test_case.Filters.DoNotRunOnWindows  # UNIX specific tests.
+@test_case.Filters.DoNotRunOnMac  # Config based output capture flakes?
+@sdk_test_base.Filters.DoNotRunOnGCE  # Config based output capture flakes?
+@test_case.Filters.SkipOnPy3('test framework fd 0 interaction', 'b/80533542')
+class AlternatCoshellTest(_CoshellTestBase):
+  """COSHELL alternate coshell env var tests."""
+
+  def SetUp(self):
+    os.environ[coshell.COSHELL_ENV] = coshell._UnixCoshell.SHELL_PATH + ' -s'
+    self.mock_popen = self.StartObjectPatch(
+        subprocess, 'Popen', side_effect=subprocess.Popen)
+
+  def TearDown(self):
+    del os.environ[coshell.COSHELL_ENV]
+
+  def testAlternateCoshell(self):
+    self.CoOpen()
+    self.mock_popen.assert_called_once_with(
+        [coshell._UnixCoshell.SHELL_PATH, '-s'], close_fds=False, env=mock.ANY,
+        stderr=2, stdin=subprocess.PIPE, stdout=1)
 
 
 if __name__ == '__main__':

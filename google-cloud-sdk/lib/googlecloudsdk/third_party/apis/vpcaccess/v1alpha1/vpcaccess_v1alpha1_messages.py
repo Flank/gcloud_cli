@@ -37,15 +37,17 @@ class Connector(_messages.Message):
     Values:
       STATUS_UNSPECIFIED: Invalid state.
       READY: Connector is deployed and ready to receive traffic.
-      CREATING: An Insert operation is in progress. Transient condition.
-      DELETING: A Delete operation is in progress. Transient condition.
+      CREATING: An Insert operation is in progress.
+      DELETING: A Delete operation is in progress.
       ERROR: Connector is in a bad state, manual deletion recommended.
+      UPDATING: The connector is being updated.
     """
     STATUS_UNSPECIFIED = 0
     READY = 1
     CREATING = 2
     DELETING = 3
     ERROR = 4
+    UPDATING = 5
 
   class TypeValueValuesEnum(_messages.Enum):
     r"""Type of the VPC access connector.
@@ -216,7 +218,8 @@ class Operation(_messages.Message):
       if any.
     name: The server-assigned name, which is only unique within the same
       service that originally returns it. If you use the default HTTP mapping,
-      the `name` should have the format of `operations/some/unique/name`.
+      the `name` should be a resource name ending with
+      `operations/{unique_id}`.
     response: The normal response of the operation in case of success.  If the
       original method returns no data on success, such as `Delete`, the
       response is `google.protobuf.Empty`.  If the original method is standard
@@ -306,6 +309,24 @@ class OperationMetadata(_messages.Message):
 
   endTime = _messages.StringField(1)
   insertTime = _messages.StringField(2)
+  method = _messages.StringField(3)
+  target = _messages.StringField(4)
+
+
+class OperationMetadataV1Beta1(_messages.Message):
+  r"""Metadata for google.longrunning.Operation.
+
+  Fields:
+    createTime: Output only. Time when the operation was created.
+    endTime: Output only. Time when the operation completed.
+    method: Output only. Method that initiated the operation e.g.
+      google.cloud.vpcaccess.v1beta1.Connectors.CreateConnector.
+    target: Output only. Name of the resource that this operation is acting on
+      e.g. projects/my-project/locations/us-central1/connectors/v1.
+  """
+
+  createTime = _messages.StringField(1)
+  endTime = _messages.StringField(2)
   method = _messages.StringField(3)
   target = _messages.StringField(4)
 

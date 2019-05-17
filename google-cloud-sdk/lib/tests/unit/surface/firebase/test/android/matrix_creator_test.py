@@ -70,6 +70,7 @@ class MatrixCreatorTests(unit_base.AndroidMockClientTest):
             'gs://sea/file1': '/sdcard/dir1',
             'r/file2': '/sdcard/dir2'
         },
+        num_flaky_test_attempts=1,
     )
     creator = self.CreateMatrixCreator(args)
     req = creator._BuildTestMatrixRequest('id-3')
@@ -79,6 +80,7 @@ class MatrixCreatorTests(unit_base.AndroidMockClientTest):
     self.assertEqual(matrix.clientInfo.name, 'gcloud')
     self.assertEqual(matrix.resultStorage.googleCloudStorage.gcsPath,
                      'gs://gatorade/2015-02-24/')
+    self.assertEqual(matrix.flakyTestAttempts, 1)
 
     spec = matrix.testSpecification
     self.assertEqual(spec.testTimeout, '321s')
@@ -149,14 +151,12 @@ class MatrixCreatorTests(unit_base.AndroidMockClientTest):
         }],
         results_bucket='tin',
         results_dir='pail',
-        max_depth=42,
-        max_steps=4242,
-        app_initial_activity='activity1',
         obb_files=['/foo/bar.obb'],
         robo_directives={
             'click:resource1': '',
             'resource2': 'val2',
-            'text:resource3': 'val3'
+            'text:resource3': 'val3',
+            'ignore:resource4': ''
         },
         robo_script='sea/HawksActivity_robo_script.json',
         timeout=321)
@@ -175,13 +175,9 @@ class MatrixCreatorTests(unit_base.AndroidMockClientTest):
     self.assertEqual(spec.testTimeout, '321s')
 
     test = spec.androidRoboTest
-    self.assertEqual(test.maxDepth, 42)
-    self.assertEqual(test.maxSteps, 4242)
-    self.assertEqual(test.appInitialActivity, 'activity1')
-
     robo_directives = test.roboDirectives
     action_types = TESTING_V1_MESSAGES.RoboDirective.ActionTypeValueValuesEnum
-    self.assertEqual(len(robo_directives), 3)
+    self.assertEqual(len(robo_directives), 4)
     self.assertIn(
         TESTING_V1_MESSAGES.RoboDirective(
             resourceName='resource1',
@@ -197,6 +193,11 @@ class MatrixCreatorTests(unit_base.AndroidMockClientTest):
             resourceName='resource3',
             inputText='val3',
             actionType=action_types.ENTER_TEXT), robo_directives)
+    self.assertIn(
+        TESTING_V1_MESSAGES.RoboDirective(
+            resourceName='resource4',
+            inputText='',
+            actionType=action_types.IGNORE), robo_directives)
 
     self.assertEqual(test.roboScript.gcsPath,
                      'gs://tin/pail/HawksActivity_robo_script.json')

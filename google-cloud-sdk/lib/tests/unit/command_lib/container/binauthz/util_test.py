@@ -24,12 +24,12 @@ from tests.lib import test_case
 from tests.lib.surface.container.binauthz import base as binauthz_test_base
 
 
-class ReplaceImageUrlSchemeTest(binauthz_test_base.BinauthzUnitTestBase,
+class ReplaceImageUrlSchemeTest(binauthz_test_base.BinauthzTestBase,
                                 parameterized.TestCase):
 
   def SetUp(self):
     self.digest = 'sha256:{}'.format(
-        self.GenerateValidBogusLookingRandomSha256())
+        binauthz_test_base.GenerateValidBogusLookingRandomSha256())
 
   @parameterized.parameters(
       ('https://docker.io/some_repo', 'https://docker.io/some_repo'),
@@ -63,11 +63,11 @@ class ReplaceImageUrlSchemeTest(binauthz_test_base.BinauthzUnitTestBase,
       binauthz_command_util._ReplaceImageUrlScheme(bad_url, scheme='')
 
 
-class NormalizeArtifactUrlTest(binauthz_test_base.BinauthzUnitTestBase):
+class NormalizeArtifactUrlTest(binauthz_test_base.BinauthzTestBase):
 
   def SetUp(self):
     self.digest = 'sha256:{}'.format(
-        self.GenerateValidBogusLookingRandomSha256())
+        binauthz_test_base.GenerateValidBogusLookingRandomSha256())
     self.bad_digest = 'sha256:123'
 
   def testAlreadyNormalized(self):
@@ -94,12 +94,12 @@ class NormalizeArtifactUrlTest(binauthz_test_base.BinauthzUnitTestBase):
                                                  + self.bad_digest)
 
 
-class MakeSignaturePayloadTest(binauthz_test_base.BinauthzUnitTestBase):
+class MakeSignaturePayloadTest(binauthz_test_base.BinauthzTestBase):
 
   def SetUp(self):
     self.repository = 'docker.io/nginblah'
     self.digest = 'sha256:{}'.format(
-        self.GenerateValidBogusLookingRandomSha256())
+        binauthz_test_base.GenerateValidBogusLookingRandomSha256())
 
   def testGoodUrl(self):
     sig = binauthz_command_util.MakeSignaturePayload(

@@ -11,7 +11,7 @@ gcloud alpha compute routers get\-nat\-mapping\-info \- display NAT Mapping info
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute routers get\-nat\-mapping\-info\fR \fINAME\fR [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute routers get\-nat\-mapping\-info\fR \fINAME\fR [\fB\-\-nat\-name\fR=\fINAT_NAME\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -38,6 +38,10 @@ Name of the router to get NAT mapping info.
 .SH "FLAGS"
 
 .RS 2m
+.TP 2m
+\fB\-\-nat\-name\fR=\fINAT_NAME\fR
+The NAT name to filter out NAT mapping information
+
 .TP 2m
 \fB\-\-region\fR=\fIREGION\fR
 Region of the router to get NAT mapping info. If not specified, you may be
@@ -107,10 +111,11 @@ flag interacts with other flags that are applied in this order:
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

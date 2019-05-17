@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ from googlecloudsdk.core import properties
 from googlecloudsdk.core.console.style import mappings
 from googlecloudsdk.core.console.style import text
 from googlecloudsdk.core.util import platforms
+
+import six
 
 
 class _StyleContext(object):
@@ -104,6 +106,9 @@ class TypedTextParser(object):
     Returns:
       str, the parsed text.
     """
+    if isinstance(typed_text, six.string_types):
+      return typed_text
+
     # TODO(b/113600762): Reset more selectively.
     stylize = stylize and self.style_enabled
 

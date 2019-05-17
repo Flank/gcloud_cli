@@ -8,16 +8,19 @@ SYNOPSIS
         [--cluster-ipv4-cidr=CLUSTER_IPV4_CIDR]
         [--cluster-secondary-range-name=NAME]
         [--cluster-version=CLUSTER_VERSION]
-        [--create-subnetwork=[KEY=VALUE,...]] [--disk-size=DISK_SIZE]
-        [--disk-type=DISK_TYPE] [--enable-autorepair] [--enable-autoupgrade]
-        [--no-enable-cloud-logging] [--no-enable-cloud-monitoring]
-        [--enable-ip-alias] [--enable-kubernetes-alpha]
-        [--enable-legacy-authorization] [--enable-network-policy]
-        [--image-type=IMAGE_TYPE] [--issue-client-certificate]
-        [--labels=[KEY=VALUE,...]] [--local-ssd-count=LOCAL_SSD_COUNT]
+        [--create-subnetwork=[KEY=VALUE,...]]
+        [--default-max-pods-per-node=DEFAULT_MAX_PODS_PER_NODE]
+        [--disk-size=DISK_SIZE] [--disk-type=DISK_TYPE] [--enable-autorepair]
+        [--enable-autoupgrade] [--no-enable-cloud-logging]
+        [--no-enable-cloud-monitoring] [--enable-ip-alias]
+        [--enable-kubernetes-alpha] [--enable-legacy-authorization]
+        [--enable-network-policy] [--image-type=IMAGE_TYPE]
+        [--issue-client-certificate] [--labels=[KEY=VALUE,...]]
+        [--local-ssd-count=LOCAL_SSD_COUNT]
         [--machine-type=MACHINE_TYPE, -m MACHINE_TYPE]
         [--maintenance-window=MAINTENANCE_WINDOW]
         [--max-nodes-per-pool=MAX_NODES_PER_POOL]
+        [--max-pods-per-node=MAX_PODS_PER_NODE]
         [--metadata=KEY=VALUE,[KEY=VALUE,...]]
         [--metadata-from-file=KEY=LOCAL_FILE_PATH,[...]]
         [--min-cpu-platform=PLATFORM] [--network=NETWORK]
@@ -31,11 +34,13 @@ SYNOPSIS
           --master-authorized-networks=NETWORK,[NETWORK,...]]
         [--enable-private-endpoint
           --enable-private-nodes --master-ipv4-cidr=MASTER_IPV4_CIDR]
+        [--enable-tpu --tpu-ipv4-cidr=CIDR]
         [--password=PASSWORD --enable-basic-auth
           | --username=USERNAME, -u USERNAME]
         [--region=REGION | --zone=ZONE, -z ZONE]
-        [--service-account=SERVICE_ACCOUNT | --no-enable-cloud-endpoints
-          --scopes=[SCOPE,...]; default="gke-default"] [GCLOUD_WIDE_FLAG ...]
+        [--scopes=[SCOPE,...];
+          default="gke-default" --service-account=SERVICE_ACCOUNT]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     Create a cluster for running containers.
@@ -152,6 +157,15 @@ FLAGS
         Can not be specified unless '--enable-ip-alias' is also specified. Can
         not be used in conjunction with the '--subnetwork' option.
 
+     --default-max-pods-per-node=DEFAULT_MAX_PODS_PER_NODE
+        The default max number of pods per node for node pools in the cluster.
+
+        This flag sets the default max-pods-per-node for node pools in the
+        cluster. If --max-pods-per-node is not specified explicitly for a node
+        pool, this flag value will be used.
+
+        Must be used in conjunction with '--enable-ip-alias'.
+
      --disk-size=DISK_SIZE
         Size for node VM boot disks. Defaults to 100GB.
 
@@ -178,8 +192,8 @@ FLAGS
             $ gcloud container clusters create example-cluster \
                 --enable-autoupgrade
 
-        See https://cloud.google.com/kubernetes-engine/docs/node-management for
-        more info.
+        See https://cloud.google.com/kubernetes-engine/docs/node-auto-upgrades
+        for more info.
 
      --enable-cloud-logging
         Automatically send logs from the cluster to the Google Cloud Logging
@@ -290,6 +304,15 @@ FLAGS
         that each node pool contains less than --max-nodes-per-pool nodes.
         Defaults to 1000 nodes, but can be set as low as 100 nodes per pool on
         initial create.
+
+     --max-pods-per-node=MAX_PODS_PER_NODE
+        The max number of pods per node for this node pool.
+
+        This flag sets the maximum number of pods that can be run at the same
+        time on a node. This will override the value given with
+        --default-max-pods-per-node flag set at the cluster level.
+
+        Must be used in conjunction with '--enable-ip-alias'.
 
      --metadata=KEY=VALUE,[KEY=VALUE,...]
         Compute Engine metadata to be made available to the guest operating
@@ -499,7 +522,7 @@ FLAGS
           master through HTTPS.
 
        --master-authorized-networks=NETWORK,[NETWORK,...]
-          The list of CIDR blocks (up to 20) that are allowed to connect to
+          The list of CIDR blocks (up to 50) that are allowed to connect to
           Kubernetes master through HTTPS. Specified in CIDR notation (e.g.
           1.2.3.4/30). Can not be specified unless
           --enable-master-authorized-networks is also specified.
@@ -517,6 +540,25 @@ FLAGS
           IPv4 CIDR range to use for the master network. This should have a
           netmask of size /28 and should be used in conjunction with the
           --enable-private-nodes flag.
+
+     Flags relating to Cloud TPUs:
+
+       --enable-tpu
+          Enable Cloud TPUs for this cluster.
+
+          Can not be specified unless --enable-ip-alias is also specified.
+
+       --tpu-ipv4-cidr=CIDR
+          Set the IP range for the Cloud TPUs.
+
+          Can be specified as a netmask size (e.g. '/20') or as in CIDR notion
+          (e.g. '10.100.0.0/20'). If given as a netmask size, the IP range will
+          be chosen automatically from the available space in the network.
+
+          If unspecified, the TPU CIDR range will use automatic default '/20'.
+
+          Can not be specified unless '--enable-tpu' and '--enable-ip-alias'
+          are also specified.
 
      Basic auth
 
@@ -550,35 +592,9 @@ FLAGS
           Compute zone (e.g. us-central1-a) for the cluster. Overrides the
           default compute/zone property value for this command invocation.
 
-     Options to specify the node identity. At most one of these may be
-     specified:
-
-       --service-account=SERVICE_ACCOUNT
-          The Google Cloud Platform Service Account to be used by the node VMs.
-          If a service account is specified, the cloud-platform and
-          userinfo.email scopes are used. If no Service Account is specified,
-          the project default service account is used.
+     Options to specify the node identity.
 
        Scopes options.
-
-         --enable-cloud-endpoints
-            (DEPRECATED) Automatically enable Google Cloud Endpoints to take
-            advantage of API management features by adding service-control and
-            service-management scopes.
-
-            If --no-enable-cloud-endpoints is set, remove service-control and
-            service-management scopes, even if they are implicitly (via
-            default) or explicitly set via --scopes.
-
-            --[no-]enable-cloud-endpoints is not allowed if
-            container/new_scopes_behavior property is set to true.
-
-            Flag --[no-]enable-cloud-endpoints is deprecated and will be
-            removed in a future release. Scopes necessary for Google Cloud
-            Endpoints are now included in the default set and may be excluded
-            using --scopes.
-
-            Enabled by default, use --no-enable-cloud-endpoints to disable.
 
          --scopes=[SCOPE,...]; default="gke-default"
             Specifies scopes for the node instances. Examples:
@@ -592,10 +608,9 @@ FLAGS
             Multiple SCOPEs can be specified, separated by commas.
             logging-write and/or monitoring are added unless Cloud Logging
             and/or Cloud Monitoring are disabled (see --enable-cloud-logging
-            and --enable-cloud-monitoring for more information).
-
-            SCOPE can be either the full URI of the scope or an alias. default
-            scopes are assigned to all instances. Available aliases are:
+            and --enable-cloud-monitoring for more information). SCOPE can be
+            either the full URI of the scope or an alias. default scopes are
+            assigned to all instances. Available aliases are:
 
               Alias                  URI
               bigquery               https://www.googleapis.com/auth/bigquery
@@ -639,9 +654,16 @@ FLAGS
             https://www.googleapis.com/auth/sqlservice.admin or sql-admin to
             manage your Google SQL Service instances.
 
+       --service-account=SERVICE_ACCOUNT
+          The Google Cloud Platform Service Account to be used by the node VMs.
+          If a service account is specified, the cloud-platform and
+          userinfo.email scopes are used. If no Service Account is specified,
+          the project default service account is used.
+
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

@@ -30,16 +30,25 @@ from tests.lib import sdk_test_base
 class CloudTasksTestBase(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
   """Base class for Cloud Tasks unit tests."""
 
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    if self.track == calliope_base.ReleaseTrack.BETA:
+      api_version = cloudtasks_api.BETA_API_VERSION
+    else:
+      api_version = cloudtasks_api.GA_API_VERSION
 
     self.apitools_mock_client = mock.Client(
-        client_class=apis.GetClientClass(cloudtasks_api.API_NAME,
-                                         cloudtasks_api.BETA_API_VERSION))
+        client_class=apis.GetClientClass(cloudtasks_api.API_NAME, api_version))
     self.apitools_mock_client.Mock()
     self.addCleanup(self.apitools_mock_client.Unmock)
 
-    api_adapter = cloudtasks_api.BetaApiAdapter()
+    if self.track == calliope_base.ReleaseTrack.BETA:
+      api_adapter = cloudtasks_api.BetaApiAdapter()
+    else:
+      api_adapter = cloudtasks_api.GaApiAdapter()
+
     self.queues_client = api_adapter.queues
     self.tasks_client = api_adapter.tasks
     self.locations_client = api_adapter.locations

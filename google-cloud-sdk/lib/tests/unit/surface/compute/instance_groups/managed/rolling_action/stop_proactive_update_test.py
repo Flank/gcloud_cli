@@ -44,14 +44,17 @@ def SetUp(test_obj, api_version):
                 .TypeValueValuesEnum.OPPORTUNISTIC)))
 
 
-class InstanceGroupManagersRollingActionStopProactiveUpdateBetaZonalTest(
+class InstanceGroupManagersRollingActionStopProactiveUpdateZonalTest(
     test_base.BaseTest):
 
+  def PreSetUp(self):
+    self.api_version = 'v1'
+    self.track = calliope_base.ReleaseTrack.GA
+
   def SetUp(self):
-    SetUp(self, 'beta')
-    self.track = calliope_base.ReleaseTrack.BETA
+    SetUp(self, self.api_version)
     self.igms = test_resources.MakeInstanceGroupManagersWithVersions(
-        'beta', self.ZONE)
+        self.api_version, self.ZONE)
 
   def generateUpdateRequestStub(self, igm_name):
     return self.messages.ComputeInstanceGroupManagersPatchRequest(
@@ -99,14 +102,17 @@ class InstanceGroupManagersRollingActionStopProactiveUpdateBetaZonalTest(
                    self.IGM_NAME_C, self.ZONE))
 
 
-class InstanceGroupManagersRollingActionStopProactiveUpdateBetaRegionalTest(
+class InstanceGroupManagersRollingActionStopProactiveUpdateRegionalTest(
     test_base.BaseTest):
 
+  def PreSetUp(self):
+    self.api_version = 'v1'
+    self.track = calliope_base.ReleaseTrack.GA
+
   def SetUp(self):
-    SetUp(self, 'beta')
-    self.track = calliope_base.ReleaseTrack.BETA
+    SetUp(self, self.api_version)
     self.igms = test_resources.MakeInstanceGroupManagersWithVersions(
-        'beta', self.ZONE)
+        self.api_version, self.ZONE)
 
   def generateUpdateRequestStub(self, igm_name):
     return self.messages.ComputeRegionInstanceGroupManagersPatchRequest(
@@ -145,24 +151,36 @@ class InstanceGroupManagersRollingActionStopProactiveUpdateBetaRegionalTest(
     self.checkStopUpdateRequest(self.generateUpdateRequestStub(self.IGM_NAME_C))
 
 
+class InstanceGroupManagersRollingActionStopProactiveUpdateBetaZonalTest(
+    InstanceGroupManagersRollingActionStopProactiveUpdateZonalTest):
+
+  def PreSetUp(self):
+    self.api_version = 'beta'
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class InstanceGroupManagersRollingActionStopProactiveUpdateBetaRegionalTest(
+    InstanceGroupManagersRollingActionStopProactiveUpdateRegionalTest):
+
+  def PreSetUp(self):
+    self.api_version = 'beta'
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
 class InstanceGroupManagersRollingActionStopProactiveUpdateAlphaZonalTest(
     InstanceGroupManagersRollingActionStopProactiveUpdateBetaZonalTest):
 
-  def SetUp(self):
-    SetUp(self, 'alpha')
+  def PreSetUp(self):
+    self.api_version = 'alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
-    self.igms = test_resources.MakeInstanceGroupManagersWithVersions(
-        'alpha', self.ZONE)
 
 
 class InstanceGroupManagersRollingActionStopProactiveUpdateAlphaRegionalTest(
     InstanceGroupManagersRollingActionStopProactiveUpdateBetaRegionalTest):
 
-  def SetUp(self):
-    SetUp(self, 'alpha')
+  def PreSetUp(self):
+    self.api_version = 'alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
-    self.igms = test_resources.MakeInstanceGroupManagersWithVersions(
-        'alpha', self.ZONE)
 
 
 if __name__ == '__main__':

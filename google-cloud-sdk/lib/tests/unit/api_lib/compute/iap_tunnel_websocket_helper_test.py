@@ -37,8 +37,7 @@ import websocket
 TEST_URL = (
     'wss://tunnel.cloudproxy.app/v4/connect?project=iap-test-admin-proxy&'
     'instance=instance-1&zone=us-west1-b&interface=nic0&port=22')
-TEST_HEADERS = ['User-Agent: test-agent',
-                'Sec-WebSocket-Protocol: 13']
+TEST_HEADERS = ['User-Agent: test-agent']
 
 
 class IapTunnelWebSocketHelperTest(cli_test_base.CliTestBase,
@@ -65,7 +64,7 @@ class IapTunnelWebSocketHelperTest(cli_test_base.CliTestBase,
     self.assertListEqual(sorted(self.helper._sslopt.keys()),
                          ['ca_certs', 'cert_reqs', 'check_hostname'])
     self.assertTrue(self.helper._sslopt['ca_certs'].endswith('cacerts.txt'))
-    self.assertEqual(self.helper._sslopt['cert_reqs'], ssl.CERT_OPTIONAL)
+    self.assertEqual(self.helper._sslopt['cert_reqs'], ssl.CERT_NONE)
     self.assertFalse(self.helper._sslopt['check_hostname'])
     self.assertFalse(self.helper._is_closed)
 
@@ -189,7 +188,8 @@ class IapTunnelWebSocketHelperTest(cli_test_base.CliTestBase,
     websocket_app_cls_mock.assert_called_once()
     websocket_app_cls_mock.assert_called_with(
         TEST_URL, header=TEST_HEADERS, on_error=new_helper._OnError,
-        on_close=new_helper._OnClose, on_data=new_helper._OnData)
+        on_close=new_helper._OnClose, on_data=new_helper._OnData,
+        subprotocols=[utils.SUBPROTOCOL_NAME])
     self.assertIs(new_helper._websocket, websocket_app_mock)
 
     new_helper.StartReceivingThread()
@@ -202,16 +202,22 @@ class IapTunnelWebSocketHelperTest(cli_test_base.CliTestBase,
   @mock.patch.object(log, 'info', autospec=True)
   def testOnClose(self, log_info_mock):
     log_info_mock.side_effect = lambda *args, **kwargs: args[0] % args[1:]
-    self.helper._OnClose(None)
+    self.helper._OnClose(None, None)
     self.assertTrue(self.helper.IsClosed())
+    self.assertFalse(self.helper.ErrorMsg())
     self.assertEqual(log_info_mock.call_count, 0)
 
-    self.helper._OnClose(None, 'close message from server')
+  @mock.patch.object(log, 'info', autospec=True)
+  def testOnCloseServerCloseValidData(self, log_info_mock):
+    log_info_mock.side_effect = lambda *args, **kwargs: args[0] % args[1:]
+    self.helper._OnClose(4010, 'destination_read_failed')
     self.assertTrue(self.helper.IsClosed())
+    self.assertEqual(self.helper.ErrorMsg(),
+                     '4010: %r' % 'destination_read_failed')
     self.assertEqual(log_info_mock.call_count, 1)
     log_info_mock.assert_has_calls(
-        [mock.call(u'Received WebSocket Close message [%r].',
-                   u'close message from server')])
+        [mock.call(u'Received WebSocket Close message [%s].',
+                   self.helper.ErrorMsg())])
     self.assertTrue(self._close_received)
 
   @mock.patch.object(log, 'info', autospec=True)
@@ -219,7 +225,7 @@ class IapTunnelWebSocketHelperTest(cli_test_base.CliTestBase,
   def testOnData(self, log_debug_mock, log_info_mock):
     log.SetVerbosity(logging.DEBUG)
     log_debug_mock.side_effect = lambda *args, **kwargs: args[0] % args[1:]
-    self.helper._OnData(None, b'456', 2, True)
+    self.helper._OnData(b'456', 2, True)
     self.assertListEqual(self._received_data, [b'456'])
     self.assertEqual(log_debug_mock.call_count, 1)
     self.assertEqual(log_info_mock.call_count, 0)
@@ -230,7 +236,7 @@ class IapTunnelWebSocketHelperTest(cli_test_base.CliTestBase,
 
     log.SetVerbosity(logging.WARNING)
     self.assertRaises(iap_tunnel_websocket_helper.WebSocketInvalidOpcodeError,
-                      self.helper._OnData, None, b'789', 1, None)
+                      self.helper._OnData, b'789', 1, None)
     self.assertEqual(log_debug_mock.call_count, 2)
     self.assertEqual(log_info_mock.call_count, 1)
     self.assertEqual(log_info_mock.call_args[0][0],
@@ -238,7 +244,7 @@ class IapTunnelWebSocketHelperTest(cli_test_base.CliTestBase,
     self.assertTrue(self.helper.IsClosed())
 
     self.helper._is_closed = False
-    self.helper._OnData(None, b'abcd', 0, True)
+    self.helper._OnData(b'abcd', 0, True)
     self.assertListEqual(self._received_data, [b'456', b'abcd'])
     self.assertEqual(log_debug_mock.call_count, 3)
     self.assertEqual(log_info_mock.call_count, 1)
@@ -247,14 +253,15 @@ class IapTunnelWebSocketHelperTest(cli_test_base.CliTestBase,
   @mock.patch.object(log, 'info', autospec=True)
   def testOnError(self, log_info_mock):
     log_info_mock.side_effect = lambda *args, **kwargs: args[0] % args[1:]
-    self.helper._OnError(None, Exception('some error'))
+    self.helper._OnError(Exception('some error'))
+    self.assertEqual(self.helper.ErrorMsg(), 'some error')
     self.assertEqual(log_info_mock.call_count, 1)
     log_info_mock.assert_has_calls(
-        [mock.call('Error during WebSocket processing\n'
+        [mock.call('Error during WebSocket processing:\n'
                    'Exception: some error\n')])
 
   @mock.patch.object(log, 'info', autospec=True)
-  def testReceiveFromWebSocket(self, log_info_mock):
+  def testReceiveFromWebSocketNormal(self, log_info_mock):
     log_info_mock.side_effect = lambda *args, **kwargs: args[0] % args[1:]
     self.helper._ReceiveFromWebSocket()
     self.assertEqual(self.helper._websocket.run_forever.call_count, 1)
@@ -263,12 +270,14 @@ class IapTunnelWebSocketHelperTest(cli_test_base.CliTestBase,
     self.assertEqual(log_info_mock.call_count, 0)
     self.assertTrue(self.helper.IsClosed())
 
-    self.helper._is_closed = False
+  @mock.patch.object(log, 'info', autospec=True)
+  def testReceiveFromWebSocketWithProxyAndError(self, log_info_mock):
+    log_info_mock.side_effect = lambda *args, **kwargs: args[0] % args[1:]
     self.helper._proxy_info = httplib2.ProxyInfo(
         socks.PROXY_TYPE_HTTP, '10.4.3.2', '80', '', 'userA', 'passB')
     self.helper._websocket.run_forever.side_effect = EnvironmentError
     self.helper._ReceiveFromWebSocket()
-    self.assertEqual(self.helper._websocket.run_forever.call_count, 2)
+    self.assertEqual(self.helper._websocket.run_forever.call_count, 1)
     self.helper._websocket.run_forever.assert_has_calls(
         [mock.call(origin='bot:iap-tunneler', sslopt=self.helper._sslopt,
                    http_proxy_host='10.4.3.2', http_proxy_port='80',

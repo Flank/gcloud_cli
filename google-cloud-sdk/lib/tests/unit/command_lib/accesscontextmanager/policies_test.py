@@ -33,7 +33,7 @@ from tests.lib.surface import accesscontextmanager
 class GetDefaultPolicyTest(parameterized.TestCase, accesscontextmanager.Base):
 
   def SetUp(self):
-    self.SetUpForTrack(calliope_base.ReleaseTrack.ALPHA)
+    self.SetUpForTrack(calliope_base.ReleaseTrack.GA)
 
     self.organizations = [
         self.resource_manager_messages.Organization(

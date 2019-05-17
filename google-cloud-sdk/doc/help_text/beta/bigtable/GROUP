@@ -8,8 +8,9 @@ DESCRIPTION
     (BETA) Manage your Cloud Bigtable storage.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -17,7 +18,7 @@ GROUPS
     GROUP is one of the following:
 
      app-profiles
-        (BETA) Manage Cloud Bigtable app_profiles.
+        (BETA) Manage Cloud Bigtable app profiles.
 
      clusters
         (BETA) Manage Cloud Bigtable clusters.

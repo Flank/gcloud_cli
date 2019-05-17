@@ -10,6 +10,7 @@ SYNOPSIS
         [--machine-type=MACHINE_TYPE] [--node-count=NODE_COUNT]
         [--oauth-scopes=[SCOPE,...]] [--python-version=PYTHON_VERSION]
         [--service-account=SERVICE_ACCOUNT] [--tags=[TAG,...]] [--zone=ZONE]
+        [--airflow-version=AIRFLOW_VERSION | --image-version=IMAGE_VERSION]
         [--network=NETWORK : --subnetwork=SUBNETWORK] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -104,6 +105,30 @@ FLAGS
         The Compute Engine zone in which the environment will be created. For
         example --zone=us-central1-a.
 
+     At most one of these may be specified:
+
+       --airflow-version=AIRFLOW_VERSION
+          Version of Airflow to run in the environment.
+
+              Must be of the form `X.Y[.Z]`.
+
+              The latest supported Cloud Composer version will be used within
+              the created environment.
+
+       --image-version=IMAGE_VERSION
+          Version of the image to run in the environment.
+
+              The image version encapsulates the versions of both Cloud Composer
+              and Apache Airflow. Must be of the form `composer-A.B.C-airflow-X.Y[.Z]`.
+
+              The Cloud Composer and Airflow versions are semantic versions.
+              `latest` can be provided instead of an explicit Cloud Composer
+              version number indicating that the server will replace `latest`
+              with the current Cloud Composer version. For the Apache Airflow
+              portion, the patch version can be omitted and the current
+              version will be selected. The version numbers that are used will
+              be stored.
+
      Virtual Private Cloud networking
 
        --network=NETWORK
@@ -118,8 +143,9 @@ FLAGS
           environment will be connected.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

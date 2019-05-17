@@ -18,18 +18,16 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-import textwrap
-
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import resources
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.container.binauthz import base as binauthz_test_base
 
 
-class BinauthzAttestationsSurfaceTest(
+class BaseAttestationsTest(
     sdk_test_base.WithTempCWD,
-    binauthz_test_base.BinauthzMockedClientTestBase,
-    binauthz_test_base.BinauthzMockedBetaPolicyClientUnitTest,
+    binauthz_test_base.BinauthzTestBase,
 ):
 
   def SetUp(self):
@@ -37,6 +35,7 @@ class BinauthzAttestationsSurfaceTest(
         self.Project(),
         collection='cloudresourcemanager.projects',
     )
+    self.artifact_url = self.GenerateArtifactUrl()
     self.pgp_key_fingerprint = 'AAAABBBB'
     self.signature = b'fake-signature'
     self.note_id = 'my-aa-note'
@@ -67,7 +66,14 @@ class BinauthzAttestationsSurfaceTest(
     )
 
 
-class BinauthzAttestationsCreateSurfaceTest(BinauthzAttestationsSurfaceTest):
+class CreateTest(
+    binauthz_test_base.WithMockBetaContaineranalysis,
+    binauthz_test_base.WithMockBetaBinauthz,
+    BaseAttestationsTest,
+):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testCreateWithAttestor(self):
     response_occurrence = self.ExpectProjectsOccurrencesCreate(
@@ -78,8 +84,7 @@ class BinauthzAttestationsCreateSurfaceTest(BinauthzAttestationsSurfaceTest):
     req = self.messages.BinaryauthorizationProjectsAttestorsGetRequest(  # pylint: disable=line-too-long
         name=self.attestor_relative_name,
     )
-    self.client.projects_attestors.Get.Expect(
-        req, response=self.attestor)
+    self.mock_client.projects_attestors.Get.Expect(req, response=self.attestor)
 
     sig_path = self.Touch(directory=self.cwd_path, contents=self.signature)
     self.assertEqual(
@@ -107,8 +112,7 @@ class BinauthzAttestationsCreateSurfaceTest(BinauthzAttestationsSurfaceTest):
     req = self.messages.BinaryauthorizationProjectsAttestorsGetRequest(  # pylint: disable=line-too-long
         name=self.attestor_relative_name,
     )
-    self.client.projects_attestors.Get.Expect(
-        req, response=self.attestor)
+    self.mock_client.projects_attestors.Get.Expect(req, response=self.attestor)
 
     sig_path = self.Touch(directory=self.cwd_path, contents=self.signature)
     self.assertEqual(
@@ -130,29 +134,26 @@ class BinauthzAttestationsCreateSurfaceTest(BinauthzAttestationsSurfaceTest):
     )
 
 
-class BinauthzAttestationsListSurfaceTest(BinauthzAttestationsSurfaceTest):
+class ListTest(
+    binauthz_test_base.WithMockBetaContaineranalysis,
+    binauthz_test_base.WithMockBetaBinauthz,
+    BaseAttestationsTest,
+):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     self.response_occurrence = self.CreateResponseOccurrence(
         request_occurrence=self.request_occurrence,
         project_ref=self.project_ref,
     )
-    self.expected_list_output = textwrap.dedent(
-        '''
-         PGP_KEY_ID ARTIFACT_URL
-         {} {}
-         '''.format(
-             self.pgp_key_fingerprint,
-             self.artifact_url,
-         )
-    ).lstrip()
 
   def testAllAttestations(self):
     req = self.messages.BinaryauthorizationProjectsAttestorsGetRequest(
         name=self.attestor_relative_name,
     )
-    self.client.projects_attestors.Get.Expect(
-        req, response=self.attestor)
+    self.mock_client.projects_attestors.Get.Expect(req, response=self.attestor)
     self.ExpectProjectsNotesOccurrencesList(
         note_relative_name=self.note_relative_name,
         expected_filter_content='',
@@ -166,14 +167,14 @@ class BinauthzAttestationsListSurfaceTest(BinauthzAttestationsSurfaceTest):
         self.attestor_relative_name,
     ])
 
-    self.AssertOutputEquals(self.expected_list_output, normalize_space=True)
+    self.AssertOutputContains(self.pgp_key_fingerprint)
+    self.AssertOutputContains(self.artifact_url)
 
   def testArtifactUrl(self):
     req = self.messages.BinaryauthorizationProjectsAttestorsGetRequest(
         name=self.attestor_relative_name,
     )
-    self.client.projects_attestors.Get.Expect(
-        req, response=self.attestor)
+    self.mock_client.projects_attestors.Get.Expect(req, response=self.attestor)
     self.ExpectProjectsNotesOccurrencesList(
         note_relative_name=self.note_relative_name,
         expected_filter_content='resourceUrl="{}"'.format(self.artifact_url),
@@ -188,14 +189,14 @@ class BinauthzAttestationsListSurfaceTest(BinauthzAttestationsSurfaceTest):
         self.artifact_url,
     ])
 
-    self.AssertOutputEquals(self.expected_list_output, normalize_space=True)
+    self.AssertOutputContains(self.pgp_key_fingerprint)
+    self.AssertOutputContains(self.artifact_url)
 
   def testArtifactUrl_AttestorWithProject(self):
     req = self.messages.BinaryauthorizationProjectsAttestorsGetRequest(
         name=self.attestor_relative_name,
     )
-    self.client.projects_attestors.Get.Expect(
-        req, response=self.attestor)
+    self.mock_client.projects_attestors.Get.Expect(req, response=self.attestor)
     self.ExpectProjectsNotesOccurrencesList(
         note_relative_name=self.note_relative_name,
         expected_filter_content='resourceUrl="{}"'.format(self.artifact_url),
@@ -213,7 +214,18 @@ class BinauthzAttestationsListSurfaceTest(BinauthzAttestationsSurfaceTest):
         self.artifact_url,
     ])
 
-    self.AssertOutputEquals(self.expected_list_output, normalize_space=True)
+    self.AssertOutputContains(self.pgp_key_fingerprint)
+    self.AssertOutputContains(self.artifact_url)
+
+
+# TODO(b/131112840): CreateAlphaTest.
+
+
+class ListAlphaTest(binauthz_test_base.WithMockAlphaBinauthz, ListTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
 
 if __name__ == '__main__':
   test_case.main()

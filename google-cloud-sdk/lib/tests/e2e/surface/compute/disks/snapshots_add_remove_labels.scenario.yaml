@@ -66,7 +66,9 @@ summary:
   - stderr: |
       Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$].
 actions:
-
+- define_reference:
+    reference: compute-uri
+    value: www.googleapis.com/compute
 - generate_resource_id:
     reference: disk
     prefix: gcloud-compute-test-snapshot-labels
@@ -77,7 +79,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f?alt=json
           method: GET
           headers: {}
           body: null
@@ -105,7 +107,7 @@ actions:
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks?alt=json&sourceImage=https%3A%2F%2Fwww.googleapis.com%2Fcompute%2Fv1%2Fprojects%2Fdebian-cloud%2Fglobal%2Fimages%2Ffamily%2Fdebian-9
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks?alt=json&sourceImage=https%3A%2F%2Fwww.googleapis.com%2Fcompute%2Fv1%2Fprojects%2Fdebian-cloud%2Fglobal%2Fimages%2Ffamily%2Fdebian-9
           method: POST
           headers: {}
           body:
@@ -134,7 +136,7 @@ actions:
         Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -183,7 +185,7 @@ actions:
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$/createSnapshot?alt=json&guestFlush=False
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$/createSnapshot?alt=json&guestFlush=False
           method: POST
           headers: {}
           body:
@@ -213,7 +215,7 @@ actions:
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -249,7 +251,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -279,7 +281,7 @@ actions:
             - '1000205'
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$/setLabels?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$/setLabels?alt=json
           method: POST
           headers: {}
           body:
@@ -315,7 +317,7 @@ actions:
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -354,7 +356,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -387,7 +389,7 @@ actions:
             - '1000205'
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$/setLabels?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$/setLabels?alt=json
           method: POST
           headers: {}
           body:
@@ -425,7 +427,7 @@ actions:
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -466,7 +468,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -509,7 +511,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -544,7 +546,7 @@ actions:
             - '1000205'
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$/setLabels?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$/setLabels?alt=json
           method: POST
           headers: {}
           body:
@@ -581,7 +583,7 @@ actions:
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -622,7 +624,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -656,7 +658,7 @@ actions:
             - '1000205'
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$/setLabels?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$/setLabels?alt=json
           method: POST
           headers: {}
           body:
@@ -692,7 +694,7 @@ actions:
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -731,7 +733,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -772,7 +774,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -805,7 +807,7 @@ actions:
             - '1000205'
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$/setLabels?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$/setLabels?alt=json
           method: POST
           headers: {}
           body:
@@ -839,7 +841,7 @@ actions:
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -875,7 +877,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -916,7 +918,7 @@ actions:
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -950,7 +952,7 @@ actions:
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$?alt=json
           method: DELETE
           headers: {}
           body: null

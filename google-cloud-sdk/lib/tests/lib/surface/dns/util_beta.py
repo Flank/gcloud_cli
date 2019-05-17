@@ -65,7 +65,20 @@ def ParseManagedZoneForwardingConfig(target_servers=None):
   return messages.ManagedZoneForwardingConfig(targetNameServers=target_servers)
 
 
-def GetPolicies(num=3, name_server_config=None, forwarding=False,
+def PeeringConfig(target_project, target_network):
+  """Returns ManagedZonePeeringConfig."""
+  messages = GetMessages()
+
+  peering_network = ("https://www.googleapis.com/compute/v1/projects/{}/global"
+                     "/networks/{}".format(target_project, target_network))
+  target_network = messages.ManagedZonePeeringConfigTargetNetwork(
+      networkUrl=peering_network)
+  peering_config = messages.ManagedZonePeeringConfig(
+      targetNetwork=target_network)
+  return peering_config
+
+
+def GetPolicies(num=3, name_server_config=None, forwarding=False, logging=False,
                 networks=None):
   m = GetMessages()
   return [
@@ -73,6 +86,7 @@ def GetPolicies(num=3, name_server_config=None, forwarding=False,
           alternativeNameServerConfig=name_server_config,
           description="My policy {}".format(i),
           enableInboundForwarding=forwarding,
+          enableLogging=logging,
           name="mypolicy{}".format(i),
           networks=GetPolicyNetworks(networks)) for i in range(num)
   ]
@@ -122,6 +136,7 @@ def GetManagedZones():
           id=67371891,
           kind="dns#managedZone",
           name="mz",
+          visibility=m.ManagedZone.VisibilityValueValuesEnum.public,
           nameServers=[
               "ns-cloud-e1.googledomains.com.",
               "ns-cloud-e2.googledomains.com.",
@@ -134,6 +149,7 @@ def GetManagedZones():
           id=67671341,
           kind="dns#managedZone",
           name="mz1",
+          visibility=m.ManagedZone.VisibilityValueValuesEnum.public,
           nameServers=[
               "ns-cloud-e2.googledomains.com.",
               "ns-cloud-e1.googledomains.com.",
@@ -145,7 +161,8 @@ def GetManagedZones():
 def GetManagedZoneBeforeCreation(messages,
                                  dns_sec_config=False,
                                  visibility_dict=None,
-                                 forwarding_config=None):
+                                 forwarding_config=None,
+                                 peering_config=None):
   """Generate a create message for a managed zone."""
   m = messages
   mzone = m.ManagedZone(
@@ -154,7 +171,8 @@ def GetManagedZoneBeforeCreation(messages,
       dnsName="zone.com.",
       kind=u"dns#managedZone",
       name="mz",
-      forwardingConfig=forwarding_config)
+      forwardingConfig=forwarding_config,
+      peeringConfig=peering_config)
 
   if dns_sec_config:
     nonexistence = m.ManagedZoneDnsSecConfig.NonExistenceValueValuesEnum.nsec3

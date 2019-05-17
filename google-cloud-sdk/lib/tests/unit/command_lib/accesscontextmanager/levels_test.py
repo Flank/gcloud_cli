@@ -33,7 +33,7 @@ class LevelsTest(test_case.TestCase):
     temp_dir = files.TemporaryDirectory()
     self.temp_path = temp_dir.path
     self.addCleanup(temp_dir.Close)
-    self.messages = apis.GetMessagesModule('accesscontextmanager', 'v1beta')
+    self.messages = apis.GetMessagesModule('accesscontextmanager', 'v1')
 
   def _MakeFile(self, contents):
     filename = 'test.yaml'

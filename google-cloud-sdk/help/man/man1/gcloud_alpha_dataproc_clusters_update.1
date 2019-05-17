@@ -1,0 +1,245 @@
+
+.TH "GCLOUD_ALPHA_DATAPROC_CLUSTERS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha dataproc clusters update \- update labels and/or the number of worker nodes in a cluster
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha dataproc clusters update\fR \fINAME\fR [\fB\-\-async\fR] [\fB\-\-graceful\-decommission\-timeout\fR=\fIGRACEFUL_DECOMMISSION_TIMEOUT\fR] [\fB\-\-num\-preemptible\-workers\fR=\fINUM_PREEMPTIBLE_WORKERS\fR] [\fB\-\-num\-workers\fR=\fINUM_WORKERS\fR] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-autoscaling\-policy\fR=\fIAUTOSCALING_POLICY\fR\ :\ \fB\-\-disable\-autoscaling\fR] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fB\-\-expiration\-time\fR=\fIEXPIRATION_TIME\fR\ |\ \fB\-\-max\-age\fR=\fIMAX_AGE\fR\ |\ \fB\-\-no\-max\-age\fR] [\fB\-\-max\-idle\fR=\fIMAX_IDLE\fR\ |\ \fB\-\-no\-max\-idle\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Update the number of worker nodes and/or the labels in a cluster.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+The name of the cluster to update.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Display information about the operation in progress, without waiting for the
+operation to complete.
+
+.TP 2m
+\fB\-\-graceful\-decommission\-timeout\fR=\fIGRACEFUL_DECOMMISSION_TIMEOUT\fR
+The graceful decommission timeout for decommissioning Node Managers in the
+cluster, used when removing nodes. Graceful decommissioning allows removing
+nodes from the cluster without interrupting jobs in progress. Timeout specifies
+how long to wait for jobs in progress to finish before forcefully removing nodes
+(and potentially interrupting jobs). Timeout defaults to 0 if not set (for
+forceful decommission), and the maximum allowed timeout is 1 day. See $ gcloud
+topic datetimes for information on duration formats.
+
+.TP 2m
+\fB\-\-num\-preemptible\-workers\fR=\fINUM_PREEMPTIBLE_WORKERS\fR
+The new number of preemptible worker nodes in the cluster.
+
+.TP 2m
+\fB\-\-num\-workers\fR=\fINUM_WORKERS\fR
+The new number of worker nodes in the cluster.
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
+independent resource namespace constrained to deploying instances into Compute
+Engine zones inside the region. The default value of \f5global\fR is a special
+multi\-region namespace which is capable of deploying instances into all Compute
+Engine zones globally, and is disjoint from other Cloud Dataproc regions.
+Overrides the default \fBdataproc/region\fR property value for this command
+invocation.
+
+.TP 2m
+\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of label KEY=VALUE pairs to update. If a label exists its value is
+modified, otherwise a new label is created.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+
+Autoscaling policy resource \- The autoscaling policy to use. This represents a
+Cloud resource. (NOTE) Some attributes are not given arguments in this group but
+can be set in other ways. To set the [project] attribute: provide the argument
+[\-\-autoscaling\-policy] on the command line with a fully specified name;
+provide the argument [\-\-project] on the command line; set the property
+[core/project]. To set the [region] attribute: provide the argument
+[\-\-autoscaling\-policy] on the command line with a fully specified name;
+provide the argument [\-\-region] on the command line; set the property
+[dataproc/region].
+
+.RS 2m
+.TP 2m
+\fB\-\-autoscaling\-policy\fR=\fIAUTOSCALING_POLICY\fR
+ID of the autoscaling policy or fully qualified identifier for the autoscaling
+policy.
+
+.RE
+.sp
+.TP 2m
+\fB\-\-disable\-autoscaling\fR
+Disable autoscaling, if it is enabled. This is an alias for passing the empty
+string to \-\-autoscaling\-policy',
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-labels\fR
+Remove all labels. If \f5\-\-update\-labels\fR is also specified then
+\f5\-\-clear\-labels\fR is applied first.
+
+For example, to remove all labels:
+
+.RS 2m
+$ gcloud alpha dataproc clusters update \-\-clear\-labels
+.RE
+
+To set the labels to exactly "foo" and "baz":
+
+.RS 2m
+$ gcloud alpha dataproc clusters update \-\-clear\-labels \e
+  \-\-update\-labels foo=bar,baz=qux
+.RE
+
+.TP 2m
+\fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
+List of label keys to remove. If a label does not exist it is silently ignored.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-expiration\-time\fR=\fIEXPIRATION_TIME\fR
+The time when cluster will be auto\-deleted, such as
+"2017\-08\-29T18:52:51.142Z". See $ gcloud topic datetimes for information on
+time formats.
+
+.TP 2m
+\fB\-\-max\-age\fR=\fIMAX_AGE\fR
+The lifespan of the cluster before it is auto\-deleted, such as "2h" or "1d".
+See $ gcloud topic datetimes for information on duration formats.
+
+.TP 2m
+\fB\-\-no\-max\-age\fR
+Cancels the cluster auto\-deletion by maximum cluster age (configured by
+\-\-max\-age or \-\-expiration\-time flags)
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-max\-idle\fR=\fIMAX_IDLE\fR
+The duration before cluster is auto\-deleted after last job finished, such as
+"2h" or "1d". See $ gcloud topic datetimes for information on duration formats.
+
+.TP 2m
+\fB\-\-no\-max\-idle\fR
+Cancels the cluster auto\-deletion by cluster idle duration (configured by
+\-\-max\-idle flag)
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To resize a cluster, run:
+
+.RS 2m
+$ gcloud alpha dataproc clusters update my_cluster \-\-num\-workers 5
+.RE
+
+To change the number preemptible workers in a cluster, run:
+
+.RS 2m
+$ gcloud alpha dataproc clusters update my_cluster \e
+    \-\-num\-preemptible\-workers 5
+.RE
+
+To add the label 'customer=acme' to a cluster, run:
+
+.RS 2m
+$ gcloud alpha dataproc clusters update my_cluster \e
+    \-\-update\-labels=customer=acme
+.RE
+
+To update the label 'customer=ackme' to 'customer=acme', run:
+
+.RS 2m
+$ gcloud alpha dataproc clusters update my_cluster \e
+    \-\-update\-labels=customer=acme
+.RE
+
+To remove the label whose key is 'customer', run:
+
+.RS 2m
+$ gcloud alpha dataproc clusters update my_cluster \e
+    \-\-remove\-labels=customer
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
+
+.RS 2m
+$ gcloud dataproc clusters update
+$ gcloud beta dataproc clusters update
+.RE
+

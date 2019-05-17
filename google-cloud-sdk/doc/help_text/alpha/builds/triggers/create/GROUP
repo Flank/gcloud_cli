@@ -1,0 +1,33 @@
+NAME
+    gcloud alpha builds triggers create - create build triggers for Google
+        Cloud Build
+
+SYNOPSIS
+    gcloud alpha builds triggers create COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Create build triggers for Google Cloud Build.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     cloud-source-repositories
+        (ALPHA) Create a build trigger from a Cloud Source Repository.
+
+     github
+        (ALPHA) Create a build trigger for a GitHub repository.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/.
+

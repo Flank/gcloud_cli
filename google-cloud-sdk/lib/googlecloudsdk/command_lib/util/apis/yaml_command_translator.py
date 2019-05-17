@@ -26,6 +26,8 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from apitools.base.protorpclite import messages as apitools_messages
+from apitools.base.py import encoding
+from apitools.base.py.exceptions import HttpBadRequestError
 from googlecloudsdk.api_lib.util import waiter
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import command_loading
@@ -40,6 +42,7 @@ from googlecloudsdk.core import exceptions
 from googlecloudsdk.core import log
 from googlecloudsdk.core import resources
 from googlecloudsdk.core.console import console_io
+from googlecloudsdk.core.resource import resource_transform
 
 
 class Translator(command_loading.YamlCommandTranslator):
@@ -99,7 +102,10 @@ class CommandBuilder(object):
         self.method,
         self.spec.arguments.params,
         resource_arg)
-    self.resource_type = resource_arg.name if resource_arg else None
+    self.display_resource_type = self.spec.request.display_resource_type
+    if (not self.display_resource_type
+        and resource_arg and not resource_arg.is_parent_resource):
+      self.display_resource_type = resource_arg.name if resource_arg else None
 
   def Generate(self):
     """Generates a calliope command from the yaml spec.
@@ -245,7 +251,7 @@ class CommandBuilder(object):
 
         response = self._HandleResponse(response, args)
         log.DeletedResource(self._GetDisplayName(ref, args),
-                            kind=self.resource_type)
+                            kind=self.display_resource_type)
         return response
 
     return Command
@@ -292,10 +298,20 @@ class CommandBuilder(object):
           if args.async:
             return self._HandleResponse(response, args)
 
+        if is_parent_resource:
+          # Data on responses from operation polling is stored in
+          # additionalProperties, so convert to dict for consistent behavior.
+          response_obj = encoding.MessageToDict(response)
+          # If the response is an operation that has a 'response' property that
+          # has a name, use that. Otherwise, use the 'name' property.
+          full_name = response_obj.get('response', {}).get('name')
+          if not full_name:
+            full_name = response_obj.get('name')
+          resource_name = resource_transform.TransformBaseName(full_name)
+        else:
+          resource_name = self._GetDisplayName(ref, args)
+        log.CreatedResource(resource_name, kind=self.display_resource_type)
         response = self._HandleResponse(response, args)
-        if not is_parent_resource:
-          log.CreatedResource(self._GetDisplayName(ref, args),
-                              kind=self.resource_type)
         return response
 
     return Command
@@ -415,8 +431,17 @@ class CommandBuilder(object):
 
         self.spec.request.static_fields[policy_field_path] = policy
         self._SetPolicyUpdateMask(update_mask)
-        ref, response = self._CommonRun(args)
-        iam_util.LogSetIamPolicy(ref.Name(), self.resource_type)
+        try:
+          ref, response = self._CommonRun(args)
+        except HttpBadRequestError as ex:
+          log.err.Print(
+              'ERROR: Policy modification failed. For bindings with conditions'
+              ', run "gcloud alpha iam policies lint-condition" to identify '
+              'issues in conditions.'
+          )
+          raise ex
+
+        iam_util.LogSetIamPolicy(ref.Name(), self.display_resource_type)
         return self._HandleResponse(response, args)
 
     return Command
@@ -476,8 +501,17 @@ class CommandBuilder(object):
             args, add_condition=self._add_condition)
         self.spec.request.static_fields[policy_field_path] = policy
 
-        ref, response = self._CommonRun(args)
-        iam_util.LogSetIamPolicy(ref.Name(), self.resource_type)
+        try:
+          ref, response = self._CommonRun(args)
+        except HttpBadRequestError as ex:
+          log.err.Print(
+              'ERROR: Policy modification failed. For a binding with condition'
+              ', run "gcloud alpha iam policies lint-condition" to identify '
+              'issues in condition.'
+          )
+          raise ex
+
+        iam_util.LogSetIamPolicy(ref.Name(), self.display_resource_type)
         return self._HandleResponse(response, args)
 
     return Command
@@ -525,7 +559,7 @@ class CommandBuilder(object):
         self.spec.request.static_fields[policy_field_path] = policy
 
         ref, response = self._CommonRun(args)
-        iam_util.LogSetIamPolicy(ref.Name(), self.resource_type)
+        iam_util.LogSetIamPolicy(ref.Name(), self.display_resource_type)
         return self._HandleResponse(response, args)
 
     return Command
@@ -596,10 +630,16 @@ class CommandBuilder(object):
           base.ASYNC_FLAG.AddToParser(parser)
 
       def Run(self_, args):
-        # Check if mask is required for an update request.
+        # Check if mask is required for an update request, if required, return
+        # the dotted path, e.g updateRequest.fieldMask.
         mask_path = update.GetMaskFieldPath(self.method)
         if mask_path:
-          mask_string = update.GetMaskString(args, self.spec, mask_path)
+          # If user sets to disable the auto-generated field mask, set the value
+          # to the empty string instead so that custom hooks can be used.
+          if self.spec.update and self.spec.update.disable_auto_field_mask:
+            mask_string = ''
+          else:
+            mask_string = update.GetMaskString(args, self.spec, mask_path)
           self.spec.request.static_fields[mask_path] = mask_string
 
         # Check if the update is full-update, which requires a get request.
@@ -618,7 +658,7 @@ class CommandBuilder(object):
               args, ref, response, request_string=request_string)
 
         log.UpdatedResource(
-            self._GetDisplayName(ref, args), kind=self.resource_type)
+            self._GetDisplayName(ref, args), kind=self.display_resource_type)
         return self._HandleResponse(response, args)
 
     return Command
@@ -663,6 +703,12 @@ class CommandBuilder(object):
                        self._GetDisplayName(ref, args)),
           throw_if_unattended=True, cancel_on_no=True)
 
+    if self.spec.request.modify_method_hook:
+      self.spec.request.method = self.spec.request.modify_method_hook(ref, args)
+      self.method = registry.GetMethod(
+          self.spec.request.collection, self.spec.request.method,
+          self.spec.request.api_version)
+
     if self.spec.request.issue_request_hook:
       # Making the request is overridden, just call into the custom code.
       return ref, self.spec.request.issue_request_hook(ref, args)
@@ -678,7 +724,8 @@ class CommandBuilder(object):
           self.spec.request.resource_method_params,
           use_relative_name=self.spec.request.use_relative_name,
           parse_resource_into_request=parse_resource,
-          existing_message=existing_message)
+          existing_message=existing_message,
+          override_method=self.method)
       for hook in self.spec.request.modify_request_hooks:
         request = hook(ref, args, request)
 
@@ -817,7 +864,7 @@ class CommandBuilder(object):
   def _WaitForOperation(self, operation_ref, resource_ref,
                         extract_resource_result, args=None):
     poller = AsyncOperationPoller(
-        self.spec, resource_ref if extract_resource_result else None)
+        self.spec, resource_ref if extract_resource_result else None, args)
     progress_string = self._Format(
         'Waiting for operation [{{{}}}] to complete'.format(
             yaml_command_schema.NAME_FORMAT_KEY),
@@ -910,7 +957,7 @@ class CommandBuilder(object):
       d[yaml_command_schema.REL_NAME_FORMAT_KEY] = resource_ref.RelativeName()
     else:
       d = {yaml_command_schema.NAME_FORMAT_KEY: display_name}
-    d[yaml_command_schema.RESOURCE_TYPE_FORMAT_KEY] = self.resource_type
+    d[yaml_command_schema.RESOURCE_TYPE_FORMAT_KEY] = self.display_resource_type
     return format_string.format(**d)
 
   def _RegisterURIFunc(self, args):
@@ -941,7 +988,12 @@ class CommandBuilder(object):
     if self.spec.release_tracks:
       command = base.ReleaseTracks(*self.spec.release_tracks)(command)
     if not hasattr(command, 'detailed_help'):
-      command.detailed_help = self.spec.help_text
+      key_map = {
+          'description': 'DESCRIPTION',
+          'examples': 'EXAMPLES',
+      }
+      command.detailed_help = {
+          key_map.get(k, k): v for k, v in self.spec.help_text.items()}
     command.detailed_help['API REFERENCE'] = (
         'This command uses the *{}/{}* API. The full documentation for this '
         'API can be found at: {}'.format(
@@ -958,7 +1010,7 @@ class CommandBuilder(object):
 class AsyncOperationPoller(waiter.OperationPoller):
   """An implementation of a operation poller."""
 
-  def __init__(self, spec, resource_ref):
+  def __init__(self, spec, resource_ref, args):
     """Creates the poller.
 
     Args:
@@ -968,6 +1020,7 @@ class AsyncOperationPoller(waiter.OperationPoller):
         being operated on (not the operation itself). If None, the operation
         will just be returned when it is done instead of getting the resulting
         resource.
+      args: Namespace, The args namespace.
     """
     self.spec = spec
     self.resource_ref = resource_ref
@@ -976,6 +1029,7 @@ class AsyncOperationPoller(waiter.OperationPoller):
     self.method = registry.GetMethod(
         spec.async.collection, spec.async.method,
         api_version=spec.async.api_version or spec.request.api_version)
+    self.args = args
 
   def IsDone(self, operation):
     """Overrides."""
@@ -1012,7 +1066,10 @@ class AsyncOperationPoller(waiter.OperationPoller):
             self.spec.async.operation_get_method_params.get(f.name, f.name),
             relative_name)
         for f in request_type.all_fields()}
-    return self.method.Call(request_type(**fields))
+    request = request_type(**fields)
+    for hook in self.spec.async.modify_request_hooks:
+      request = hook(operation_ref, self.args, request)
+    return self.method.Call(request)
 
   def GetResult(self, operation):
     """Overrides.

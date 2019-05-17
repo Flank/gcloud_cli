@@ -8,7 +8,10 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Waits until state of managed instance group is stable.
+    (BETA) (DEPRECATED) Waits until state of managed instance group is stable.
+
+    gcloud wait-until-stable is deprecated. Please use gcloud wait-until
+    --stable instead.
 
 POSITIONAL ARGUMENTS
      NAME
@@ -43,8 +46,9 @@ FLAGS
           invocation.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

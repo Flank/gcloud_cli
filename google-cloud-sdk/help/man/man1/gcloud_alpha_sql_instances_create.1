@@ -11,7 +11,7 @@ gcloud alpha sql instances create \- creates a new Cloud SQL instance
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha sql instances create\fR \fIINSTANCE\fR [\fB\-\-activation\-policy\fR=\fIACTIVATION_POLICY\fR] [\fB\-\-assign\-ip\fR] [\fB\-\-async\fR] [\fB\-\-authorized\-gae\-apps\fR=\fIAPP\fR,[\fIAPP\fR,...]] [\fB\-\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-availability\-type\fR=\fIAVAILABILITY_TYPE\fR] [\fB\-\-no\-backup\fR] [\fB\-\-backup\-start\-time\fR=\fIBACKUP_START_TIME\fR] [\fB\-\-cpu\fR=\fICPU\fR] [\fB\-\-database\-flags\fR=\fIFLAG\fR=\fIVALUE\fR,[\fIFLAG\fR=\fIVALUE\fR,...]] [\fB\-\-database\-version\fR=\fIDATABASE_VERSION\fR] [\fB\-\-enable\-bin\-log\fR] [\fB\-\-failover\-replica\-name\fR=\fIFAILOVER_REPLICA_NAME\fR] [\fB\-\-follow\-gae\-app\fR=\fIFOLLOW_GAE_APP\fR] [\fB\-\-gce\-zone\fR=\fIGCE_ZONE\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-maintenance\-release\-channel\fR=\fIMAINTENANCE_RELEASE_CHANNEL\fR] [\fB\-\-maintenance\-window\-day\fR=\fIMAINTENANCE_WINDOW_DAY\fR] [\fB\-\-maintenance\-window\-hour\fR=\fIMAINTENANCE_WINDOW_HOUR\fR] [\fB\-\-master\-instance\-name\fR=\fIMASTER_INSTANCE_NAME\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-pricing\-plan\fR=\fIPRICING_PLAN\fR,\ \fB\-p\fR\ \fIPRICING_PLAN\fR;\ default="PER_USE"] [\fB\-\-region\fR=\fIREGION\fR;\ default="us\-central"] [\fB\-\-replica\-type\fR=\fIREPLICA_TYPE\fR] [\fB\-\-replication\fR=\fIREPLICATION\fR] [\fB\-\-require\-ssl\fR] [\fB\-\-storage\-auto\-increase\fR] [\fB\-\-storage\-auto\-increase\-limit\fR=\fISTORAGE_AUTO_INCREASE_LIMIT\fR] [\fB\-\-storage\-size\fR=\fISTORAGE_SIZE\fR] [\fB\-\-storage\-type\fR=\fISTORAGE_TYPE\fR] [\fB\-\-tier\fR=\fITIER\fR,\ \fB\-t\fR\ \fITIER\fR] [\fB\-\-master\-dump\-file\-path\fR=\fIMASTER_DUMP_FILE_PATH\fR\ \fB\-\-master\-username\fR=\fIMASTER_USERNAME\fR\ :\ [\fB\-\-master\-ca\-certificate\-path\fR=\fIMASTER_CA_CERTIFICATE_PATH\fR\ :\ \fB\-\-client\-certificate\-path\fR=\fICLIENT_CERTIFICATE_PATH\fR\ \fB\-\-client\-key\-path\fR=\fICLIENT_KEY_PATH\fR]\ \fB\-\-master\-password\fR=\fIMASTER_PASSWORD\fR\ |\ \fB\-\-prompt\-for\-master\-password\fR] [\fB\-\-source\-ip\-address\fR=\fISOURCE_IP_ADDRESS\fR\ :\ \fB\-\-source\-port\fR=\fISOURCE_PORT\fR;\ default=3306] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha sql instances create\fR \fIINSTANCE\fR [\fB\-\-activation\-policy\fR=\fIACTIVATION_POLICY\fR] [\fB\-\-assign\-ip\fR] [\fB\-\-async\fR] [\fB\-\-authorized\-gae\-apps\fR=\fIAPP\fR,[\fIAPP\fR,...]] [\fB\-\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]] [\fB\-\-availability\-type\fR=\fIAVAILABILITY_TYPE\fR] [\fB\-\-no\-backup\fR] [\fB\-\-backup\-start\-time\fR=\fIBACKUP_START_TIME\fR] [\fB\-\-cpu\fR=\fICPU\fR] [\fB\-\-database\-flags\fR=\fIFLAG\fR=\fIVALUE\fR,[\fIFLAG\fR=\fIVALUE\fR,...]] [\fB\-\-database\-version\fR=\fIDATABASE_VERSION\fR] [\fB\-\-enable\-bin\-log\fR] [\fB\-\-failover\-replica\-name\fR=\fIFAILOVER_REPLICA_NAME\fR] [\fB\-\-follow\-gae\-app\fR=\fIFOLLOW_GAE_APP\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-maintenance\-release\-channel\fR=\fIMAINTENANCE_RELEASE_CHANNEL\fR] [\fB\-\-maintenance\-window\-day\fR=\fIMAINTENANCE_WINDOW_DAY\fR] [\fB\-\-maintenance\-window\-hour\fR=\fIMAINTENANCE_WINDOW_HOUR\fR] [\fB\-\-master\-instance\-name\fR=\fIMASTER_INSTANCE_NAME\fR] [\fB\-\-memory\fR=\fIMEMORY\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-pricing\-plan\fR=\fIPRICING_PLAN\fR,\ \fB\-p\fR\ \fIPRICING_PLAN\fR;\ default="PER_USE"] [\fB\-\-replica\-type\fR=\fIREPLICA_TYPE\fR] [\fB\-\-replication\fR=\fIREPLICATION\fR] [\fB\-\-require\-ssl\fR] [\fB\-\-root\-password\fR=\fIROOT_PASSWORD\fR] [\fB\-\-storage\-auto\-increase\fR] [\fB\-\-storage\-auto\-increase\-limit\fR=\fISTORAGE_AUTO_INCREASE_LIMIT\fR] [\fB\-\-storage\-size\fR=\fISTORAGE_SIZE\fR] [\fB\-\-storage\-type\fR=\fISTORAGE_TYPE\fR] [\fB\-\-tier\fR=\fITIER\fR,\ \fB\-t\fR\ \fITIER\fR] [\fB\-\-master\-dump\-file\-path\fR=\fIMASTER_DUMP_FILE_PATH\fR\ \fB\-\-master\-username\fR=\fIMASTER_USERNAME\fR\ :\ [\fB\-\-master\-ca\-certificate\-path\fR=\fIMASTER_CA_CERTIFICATE_PATH\fR\ :\ \fB\-\-client\-certificate\-path\fR=\fICLIENT_CERTIFICATE_PATH\fR\ \fB\-\-client\-key\-path\fR=\fICLIENT_KEY_PATH\fR]\ \fB\-\-master\-password\fR=\fIMASTER_PASSWORD\fR\ |\ \fB\-\-prompt\-for\-master\-password\fR] [\fB\-\-region\fR=\fIREGION\fR;\ default="us\-central"\ |\ \fB\-\-gce\-zone\fR=\fIGCE_ZONE\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-source\-ip\-address\fR=\fISOURCE_IP_ADDRESS\fR\ :\ \fB\-\-source\-port\fR=\fISOURCE_PORT\fR;\ default=3306] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -46,7 +46,9 @@ found here: https://cloud.google.com/sql/faq#activation_policy.
 
 .TP 2m
 \fB\-\-assign\-ip\fR
-If provided, instance must be assigned an IP address.
+Assign an IPv4 external address to this instance. This setting is enabled by
+default. To create an instance which only has a private IP, use
+\-\-no\-assign\-ip and specify a private network.
 
 .TP 2m
 \fB\-\-async\fR
@@ -108,8 +110,8 @@ max_allowed_packet=55555,skip_grant_tables=,log_output=1\fR)
 .TP 2m
 \fB\-\-database\-version\fR=\fIDATABASE_VERSION\fR
 The database engine type and version. If left unspecified, the API defaults will
-be used. \fIDATABASE_VERSION\fR must be one of: \fBMYSQL_5_5\fR,
-\fBMYSQL_5_6\fR, \fBMYSQL_5_7\fR, \fBPOSTGRES_9_6\fR.
+be used. See the list of database versions at
+https://cloud.google.com/sql/docs/mysql/admin\-api/v1beta4/instances#databaseVersion
 
 .TP 2m
 \fB\-\-enable\-bin\-log\fR
@@ -124,10 +126,6 @@ Also create a failover replica with the specified name.
 \fB\-\-follow\-gae\-app\fR=\fIFOLLOW_GAE_APP\fR
 First Generation instances only. The App Engine app this instance should follow.
 It must be in the same region as the instance.
-
-.TP 2m
-\fB\-\-gce\-zone\fR=\fIGCE_ZONE\fR
-The preferred Compute Engine zone (e.g. us\-central1\-a, us\-central1\-b, etc.).
 
 .TP 2m
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
@@ -193,11 +191,6 @@ First Generation instances only. The pricing plan for this instance.
 \fIPRICING_PLAN\fR must be one of: \fBPER_USE\fR, \fBPACKAGE\fR.
 
 .TP 2m
-\fB\-\-region\fR=\fIREGION\fR; default="us\-central"
-The regional location (e.g. asia\-east1, us\-east1). See the full list of
-regions at https://cloud.google.com/sql/docs/instance\-locations.
-
-.TP 2m
 \fB\-\-replica\-type\fR=\fIREPLICA_TYPE\fR
 The type of replica to create. \fIREPLICA_TYPE\fR must be one of: \fBREAD\fR,
 \fBFAILOVER\fR.
@@ -210,6 +203,10 @@ Type of replication this instance uses. The default is synchronous.
 .TP 2m
 \fB\-\-require\-ssl\fR
 Specified if users connecting over IP must use SSL.
+
+.TP 2m
+\fB\-\-root\-password\fR=\fIROOT_PASSWORD\fR
+Root Cloud SQL user's password.
 
 .TP 2m
 \fB\-\-storage\-auto\-increase\fR
@@ -240,9 +237,11 @@ be one of: \fBSSD\fR, \fBHDD\fR.
 \fB\-\-tier\fR=\fITIER\fR, \fB\-t\fR \fITIER\fR
 The tier for this instance. For Second Generation instances, TIER is the
 instance's machine type (e.g., db\-n1\-standard\-1). For PostgreSQL instances,
-only shared\-core machine types (e.g., db\-f1\-micro) apply. The default tier is
-db\-n1\-standard\-1. A complete list of tiers is available here:
-https://cloud.google.com/sql/pricing
+only shared\-core machine types (e.g., db\-f1\-micro) apply. A complete list of
+tiers is available here: https://cloud.google.com/sql/pricing.
+
+IMPORTANT: First Generation instances are deprecated. If you're considering any
+First Generation tiers, we recommend using Second Generation instead.
 
 .TP 2m
 
@@ -313,6 +312,36 @@ key.
 .sp
 .TP 2m
 
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR; default="us\-central"
+Regional location (e.g. asia\-east1, us\-east1). See the full list of regions at
+https://cloud.google.com/sql/docs/instance\-locations.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-gce\-zone\fR=\fIGCE_ZONE\fR
+(DEPRECATED) Preferred Compute Engine zone (e.g. us\-central1\-a,
+us\-central1\-b, etc.).
+
+Flag \f5\-\-gce\-zone\fR is deprecated and will be removed by release 255.0.0.
+Use \f5\-\-zone\fR instead.
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR
+Preferred Compute Engine zone (e.g. us\-central1\-a, us\-central1\-b, etc.).
+
+.RE
+.RE
+.sp
+.TP 2m
+
 Options for creating a wrapper for an external data source.
 
 .RS 2m
@@ -333,10 +362,11 @@ Port number used to connect to and replicate from the external data source.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

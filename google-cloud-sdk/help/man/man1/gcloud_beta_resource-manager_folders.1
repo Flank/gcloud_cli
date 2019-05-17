@@ -23,10 +23,11 @@ gcloud beta resource\-manager folders \- manage Cloud Folders
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -36,8 +37,48 @@ gcloud help\fR for details.
 
 .RS 2m
 .TP 2m
+\fBadd\-iam\-policy\-binding\fR
+\fB(BETA)\fR Add IAM policy binding for a folder.
+
+.TP 2m
+\fBcreate\fR
+\fB(BETA)\fR Create a new folder.
+
+.TP 2m
+\fBdelete\fR
+\fB(BETA)\fR Delete a folder.
+
+.TP 2m
+\fBdescribe\fR
+\fB(BETA)\fR Show metadata for a folder.
+
+.TP 2m
 \fBget\-iam\-policy\fR
 \fB(BETA)\fR Get IAM policy for a folder.
+
+.TP 2m
+\fBlist\fR
+\fB(BETA)\fR List folders accessible by the active account.
+
+.TP 2m
+\fBmove\fR
+\fB(BETA)\fR Move a folder to a new position within the same organization.
+
+.TP 2m
+\fBremove\-iam\-policy\-binding\fR
+\fB(BETA)\fR Remove IAM policy binding for a folder.
+
+.TP 2m
+\fBset\-iam\-policy\fR
+\fB(BETA)\fR Set IAM policy for a folder.
+
+.TP 2m
+\fBundelete\fR
+\fB(BETA)\fR Undelete a folder.
+
+.TP 2m
+\fBupdate\fR
+\fB(BETA)\fR Update the display name of a folder.
 
 
 .RE
@@ -45,10 +86,11 @@ gcloud help\fR for details.
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
+$ gcloud resource\-manager folders
 $ gcloud alpha resource\-manager folders
 .RE
 

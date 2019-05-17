@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha compute target\-vpn\-gateways list \- list Google Compute Engine target VPN gateways
+gcloud alpha compute target\-vpn\-gateways list \- list Google Compute Engine Cloud VPN Classic Target VPN Gateways
 
 
 
@@ -18,10 +18,11 @@ gcloud alpha compute target\-vpn\-gateways list \- list Google Compute Engine ta
 .SH "DESCRIPTION"
 
 \fB(ALPHA)\fR \fBgcloud alpha compute target\-vpn\-gateways list\fR displays all
-Google Compute Engine target VPN gateways in a project.
+Google Compute Engine Cloud VPN Classic Target VPN Gateways in a project.
 
-By default, target VPN gateways from all regions are listed. The results can be
-narrowed down using a filter: \f5\-\-filter="region:( REGION ... )"\fR.
+By default, Cloud VPN Classic Target VPN Gateways from all regions are listed.
+The results can be narrowed down using a filter: \f5\-\-filter="region:( REGION
+... )"\fR.
 
 
 
@@ -105,29 +106,31 @@ Print a list of resource URIs instead of the default output.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-To list all target VPN gateways in a project in table form, run:
+To list all Cloud VPN Classic Target VPN Gateways in a project in table form,
+run:
 
 .RS 2m
 $ gcloud alpha compute target\-vpn\-gateways list
 .RE
 
-To list the URIs of all target VPN gateways in a project, run:
+To list the URIs of all Cloud VPN Classic Target VPN Gateways in a project, run:
 
 .RS 2m
 $ gcloud alpha compute target\-vpn\-gateways list \-\-uri
 .RE
 
-To list all target VPN gateways in the \f5\fIus\-central1\fR\fR and
-\f5\fIeurope\-west1\fR\fR regions, run:
+To list all Cloud VPN Classic Target VPN Gateways in the
+\f5\fIus\-central1\fR\fR and \f5\fIeurope\-west1\fR\fR regions, run:
 
 .RS 2m
 $ gcloud alpha compute target\-vpn\-gateways list \e

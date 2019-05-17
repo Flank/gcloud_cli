@@ -1,13 +1,10 @@
 title: Create, describe, then delete a workerpool
 release_tracks: [ALPHA]
-skip:
-  reason: failing
-  bug: b/121028606
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
   - command: |
-      remote-build-execution worker-pools create $$test-workerpool$$ --instance=default_instance --worker-count=2
+      remote-build-execution worker-pools create $$test-workerpool$$ --instance=default_instance --worker-count=0
   - stderr: |
       Create request issued for: [$$test-workerpool$$]
   - progress_tracker:
@@ -25,18 +22,14 @@ summary:
         diskSizeGb: '200'
         diskType: pd-standard
         machineType: n1-standard-2
-        reserved: true
-      workerCount: '2'
 - execute:
+  # In normal cases, it's advised to not use --async in tests.  However, the delete for worker-pools
+  # can take a long time (5-10 minutes).
   - command: |
-      remote-build-execution worker-pools delete $$test-workerpool$$ --instance=default_instance --quiet
+        remote-build-execution worker-pools delete $$test-workerpool$$ --instance=default_instance --quiet --async
   - stderr: |
       Delete request issued for: [$$test-workerpool$$]
-  - progress_tracker:
-    - message: Waiting for operation [$$operation-basename$$] to complete
-    - status: SUCCESS
-  - stderr: |
-      Deleted workerpool [$$test-workerpool$$].
+      Check operation [$$operation-basename$$] for status.
 actions:
 - generate_resource_id:
     reference: test-workerpool
@@ -44,7 +37,7 @@ actions:
 
 - execute_command:
     command: |
-      remote-build-execution worker-pools create $$test-workerpool$$ --instance=default_instance --worker-count=2
+      remote-build-execution worker-pools create $$test-workerpool$$ --instance=default_instance --worker-count=0
     events:
     - api_call:
         poll_operation: true
@@ -61,17 +54,16 @@ actions:
                   diskSizeGb: '200'
                   diskType: pd-standard
                   machineType: n1-standard-2
-                workerCount: '2'
+                  reserved: false
+                workerCount: '0'
         return_response:
           headers:
             cache-control: private
-            content-length: '389'
+            content-length: '311'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/cloud-sdk-integration-testing/operations/EAMakgFwcm9qZWN0cy9jbG91ZC1zZGstaW50ZWdyYXRpb24tdGVzdGluZy9pbnN0YW5jZXMvZGVmYXVsdF9pbnN0YW5jZS93b3JrZXJwb29scy93b3JrZXJwb29sLTIwMTgxMjA2LTE4NDk0NS0ybnlrIDc1Y2JkZThlLWEwYWUtNGJmMi05MDYzLWZiOGIwOWRjZjQyNSIcV29ya2VyUG9vbHMuQ3JlYXRlV29ya2VyUG9vbA==
-            metadata:
-              '@type': type.googleapis.com/google.protobuf.Empty
+            name: projects/cloud-sdk-integration-testing/operations/EAMakgFwcm9qZWN0cy9jbG91ZC1zZGstaW50ZWdyYXRpb24tdGVzdGluZy9pbnN0YW5jZXMvZGVmYXVsdF9pbnN0YW5jZS93b3JrZXJwb29scy93b3JrZXJwb29sLTIwMTkwMzA1LTIwMTExOC1wcm4wIDg3N2RmNmNiLTYwNDMtNDcwOS1hYzhmLTQ2OTM1MGYxMWM0MyIcV29ya2VyUG9vbHMuQ3JlYXRlV29ya2VyUG9vbA==
     - expect_stderr: |
         Create request issued for: [$$test-workerpool$$]
     - expect_progress_tracker:
@@ -86,7 +78,7 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '308'
+            content-length: '264'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
@@ -95,8 +87,6 @@ actions:
               machineType: n1-standard-2
               diskType: pd-standard
               diskSizeGb: '200'
-              reserved: true
-            workerCount: '2'
             state: RUNNING
         repeatable: true
     - expect_stderr: |
@@ -116,7 +106,7 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '308'
+            content-length: '264'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
@@ -125,8 +115,6 @@ actions:
               machineType: n1-standard-2
               diskType: pd-standard
               diskSizeGb: '200'
-              reserved: true
-            workerCount: '2'
             state: RUNNING
     - expect_stdout: |
         name: projects/cloud-sdk-integration-testing/instances/default_instance/workerpools/$$test-workerpool$$
@@ -135,13 +123,11 @@ actions:
           diskSizeGb: '200'
           diskType: pd-standard
           machineType: n1-standard-2
-          reserved: true
-        workerCount: '2'
     - expect_exit:
         code: 0
 - execute_command:
     command: |
-      remote-build-execution worker-pools delete $$test-workerpool$$ --instance=default_instance --quiet
+      remote-build-execution worker-pools delete $$test-workerpool$$ --instance=default_instance --quiet --async
     cleanup_for: test-workerpool
     events:
     - api_call:
@@ -154,19 +140,13 @@ actions:
         return_response:
           headers:
             cache-control: private
-            content-length: '337'
+            content-length: '259'
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: projects/cloud-sdk-integration-testing/operations/EAMabXByb2plY3RzL2Nsb3VkLXNkay1pbnRlZ3JhdGlvbi10ZXN0aW5nL2luc3RhbmNlcy9kZWZhdWx0X2luc3RhbmNlL3dvcmtlcnBvb2xzL3dvcmtlcnBvb2wtMjAxODEyMDYtMTg0OTQ1LTJueWsiHFdvcmtlclBvb2xzLkRlbGV0ZVdvcmtlclBvb2w=
-            metadata:
-              '@type': type.googleapis.com/google.protobuf.Empty
+            name: projects/cloud-sdk-integration-testing/operations/EAMabXByb2plY3RzL2Nsb3VkLXNkay1pbnRlZ3JhdGlvbi10ZXN0aW5nL2luc3RhbmNlcy9kZWZhdWx0X2luc3RhbmNlL3dvcmtlcnBvb2xzL3dvcmtlcnBvb2wtMjAxOTAzMDUtMjAxMTE4LXBybjAiHFdvcmtlclBvb2xzLkRlbGV0ZVdvcmtlclBvb2w=
     - expect_stderr: |
         Delete request issued for: [$$test-workerpool$$]
-    - expect_progress_tracker:
-        message: Waiting for operation [$$operation-basename$$] to complete
-        status: SUCCESS
-    - expect_stderr: |
-        Deleted workerpool [$$test-workerpool$$].
+        Check operation [$$operation-basename$$] for status.
     - expect_exit:
         code: 0

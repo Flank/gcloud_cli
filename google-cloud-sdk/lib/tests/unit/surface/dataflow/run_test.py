@@ -106,5 +106,35 @@ class RunUnitTest(base.DataflowMockingTestBase,
         '--service-account-email=a@b.com --zone=us-foo1-a --max-workers=5')
     self.assertEqual(JOB_1_ID, result.id)
 
+  def testRunBetaNoParameters(self):
+    self.MockRunJob(
+        job=self.SampleJob(
+            JOB_1_ID, environment=self.fake_environment, job_name='myjob'),
+        job_name='myjob',
+        gcs_location='gs://foo')
+    result = self.Run('beta dataflow jobs run myjob --gcs-location=gs://foo')
+    self.assertEqual(JOB_1_ID, result.id)
+    self.assertEqual('myjob', result.name)
+
+  def testRunBetaWithRuntimeEnvironmentValues(self):
+    self.MockRunJob(
+        job=self.SampleJob(
+            JOB_1_ID, environment=self.fake_environment),
+        gcs_location='gs://foo',
+        service_account_email='a@b.com',
+        zone='us-foo1-a',
+        job_name='myjob',
+        max_workers=5,
+        num_workers=5,
+        worker_machine_type='n1-standard-1',
+        network='network',
+        subnetwork='subnetwork')
+    result = self.Run(
+        'beta dataflow jobs run myjob --gcs-location=gs://foo '
+        '--service-account-email=a@b.com --zone=us-foo1-a --max-workers=5 '
+        '--num-workers=5 --worker-machine-type=n1-standard-1 '
+        '--network=network --subnetwork=subnetwork')
+    self.assertEqual(JOB_1_ID, result.id)
+
 if __name__ == '__main__':
   test_case.main()

@@ -1,0 +1,102 @@
+
+.TH "GCLOUD_ALPHA_AI\-PLATFORM_JOBS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha ai\-platform jobs update \- update an AI Platform job
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha ai\-platform jobs update\fR \fIJOB\fR [\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-clear\-labels\fR\ |\ \fB\-\-remove\-labels\fR=[\fIKEY\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Update an AI Platform job.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIJOB\fR
+Name of the job.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-update\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of label KEY=VALUE pairs to update. If a label exists its value is
+modified, otherwise a new label is created.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-clear\-labels\fR
+Remove all labels. If \f5\-\-update\-labels\fR is also specified then
+\f5\-\-clear\-labels\fR is applied first.
+
+For example, to remove all labels:
+
+.RS 2m
+$ gcloud alpha ai\-platform jobs update \-\-clear\-labels
+.RE
+
+To set the labels to exactly "foo" and "baz":
+
+.RS 2m
+$ gcloud alpha ai\-platform jobs update \-\-clear\-labels \e
+  \-\-update\-labels foo=bar,baz=qux
+.RE
+
+.TP 2m
+\fB\-\-remove\-labels\fR=[\fIKEY\fR,...]
+List of label keys to remove. If a label does not exist it is silently ignored.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
+
+.RS 2m
+$ gcloud ai\-platform jobs update
+$ gcloud beta ai\-platform jobs update
+.RE
+

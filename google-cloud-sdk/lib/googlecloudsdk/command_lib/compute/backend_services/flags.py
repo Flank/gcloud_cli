@@ -184,11 +184,14 @@ def BackendServiceArgumentForTargetTcpProxy(required=True):
         """)
 
 
-def AddLoadBalancingScheme(parser, include_alpha=False):
+def AddLoadBalancingScheme(parser,
+                           include_l7_ilb=False,
+                           include_traffic_director=False):
   parser.add_argument(
       '--load-balancing-scheme',
       choices=['INTERNAL', 'EXTERNAL'] +
-      (['INTERNAL_MANAGED', 'INTERNAL_SELF_MANAGED'] if include_alpha else []),
+      (['INTERNAL_MANAGED'] if include_l7_ilb else []) +
+      (['INTERNAL_SELF_MANAGED'] if include_traffic_director else []),
       type=lambda x: x.replace('-', '_').upper(),
       default='EXTERNAL',
       help='Specifies if this is internal or external load balancer.')
@@ -589,6 +592,33 @@ def AddFailoverRatio(parser):
       If the ratio of the healthy VMs in the primary backend is at or below this
       number, traffic arriving at the load-balanced IP will be directed to the
       failover backend(s). Not compatible with the --global flag.
+      """)
+
+
+def AddEnableLogging(parser, default):
+  """Adds the enable logging argument to the argparse."""
+  parser.add_argument(
+      '--enable-logging',
+      action='store_true',
+      default=default,
+      help="""\
+      The logging options for the load balancer traffic served by this backend
+      service. If logging is enabled, logs will be exported to Stackdriver.
+      Enabled by default.
+      """)
+
+
+def AddLoggingSampleRate(parser):
+  """Adds the logging sample rate argument to the argparse."""
+  parser.add_argument(
+      '--logging-sample-rate',
+      type=arg_parsers.BoundedFloat(lower_bound=0.0, upper_bound=1.0),
+      help="""\
+      This field can only be specified if logging is enabled for the backend
+      service. The value of the field must be a float in the range [0, 1]. This
+      configures the sampling rate of requests to the load balancer where 1.0
+      means all logged requests are reported and 0.0 means no logged requests
+      are reported. The default value is 1.0.
       """)
 
 

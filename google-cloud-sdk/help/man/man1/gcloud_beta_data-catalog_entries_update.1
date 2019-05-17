@@ -1,0 +1,178 @@
+
+.TH "GCLOUD_BETA_DATA\-CATALOG_ENTRIES_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta data\-catalog entries update \- update a Cloud Data Catalog entry
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta data\-catalog entries update\fR [\fIENTRY\fR\ :\ \fB\-\-entry\-group\fR=\fIENTRY_GROUP\fR\ \fB\-\-location\fR=\fILOCATION\fR] (\fB\-\-schema\fR=[\fICOLUMN_NAME\fR=\fICOLUMN_TYPE\fR,...]\ |\ \fB\-\-schema\-from\-file\fR=\fISCHEMA_FROM_FILE\fR) [\fB\-\-lookup\-entry\fR=\fIRESOURCE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Update a Cloud Data Catalog entry. The entry to update can either
+be specified directly, or the \f5\-\-lookup\-entry\fR flag may be used to update
+the entry corresponding to the lookup of the given resource.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Entry resource \- Entry to update. The arguments in this group can be used to
+specify the attributes of this resource. (NOTE) Some attributes are not given
+arguments in this group but can be set in other ways. To set the [project]
+attribute: provide the argument [entry] on the command line with a fully
+specified name; set the property [core/project]; provide the argument
+[\-\-project] on the command line.
+
+.RS 2m
+.TP 2m
+\fIENTRY\fR
+ID of the entry or fully qualified identifier for the entry. This positional
+must be specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-entry\-group\fR=\fIENTRY_GROUP\fR
+Entry group of the entry.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Location of the entry.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+New column schema for the entry. A schema consists of a list of column names
+along with their types, descriptions, modes, and nested subcolumns. For example:
+
+.RS 2m
+\- column: first_name
+  description: First name
+  mode: REQUIRED
+  type: STRING
+\- column: last_name
+  description: Last name
+  mode: REQUIRED
+  type: STRING
+\- column: addresses
+  description: Addresses
+  mode: REPEATED
+  type: RECORD
+  subcolumns:
+  \- column: city
+    description: City
+    mode: NULLABLE
+    type: STRING
+  \- column: state
+    description: State
+    mode: NULLABLE
+    type: STRING
+.RE
+
+Exactly one of these must be specified:
+
+
+.RS 2m
+.TP 2m
+\fB\-\-schema\fR=[\fICOLUMN_NAME\fR=\fICOLUMN_TYPE\fR,...]
+Inline schema for the entry. When specifying a schema via this argument, only
+column names and types should be provided. Column modes will default to
+NULLABLE, and column descriptions and nested subcolumns are not supported.
+
+.TP 2m
+\fB\-\-schema\-from\-file\fR=\fISCHEMA_FROM_FILE\fR
+Path to a JSON or YAML file containing the schema for the entry. This can be
+used to specify schemas with column descriptions, column modes other than
+NULLABLE, and nested subcolumns.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-lookup\-entry\fR=\fIRESOURCE\fR
+The name of the target resource whose entry to update. This can be either the
+Google Cloud Platform resource name or the SQL name of a Google Cloud Platform
+resource. This flag allows one to update the entry corresponding to the lookup
+of the given resource, without needing to specify the entry directly.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBdatacatalog/v1beta1\fR API. The full documentation for
+this API can be found at: https://cloud.google.com/data\-catalog/docs/
+
+
+
+.SH "EXAMPLES"
+
+To update the schema of a Cloud Pub/Sub entry inline, run:
+
+.RS 2m
+$ gcloud beta data\-catalog entries update entry1 \e
+    \-\-location=global \-\-entry\-group=@pubsub \e
+    \-\-schema="column1=type1,column2=type2"
+.RE
+
+To update the schema of a Cloud Pub/Sub entry from a file, run:
+
+.RS 2m
+$ gcloud beta data\-catalog entries update entry1 \e
+    \-\-location=global \-\-entry\-group=@pubsub \e
+    \-\-schema\-from\-file="/tmp/schema.json"
+.RE
+
+To lookup the entry of a Cloud Pub/Sub topic by its SQL name and update its
+schema in one command, run:
+
+.RS 2m
+$ gcloud beta data\-catalog entries update \e
+    \-\-lookup\-entry='pubsub.topic.`my\-project1`.topic1' \e
+    \-\-schema="column1=type1,column2=type2"
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha data\-catalog entries update
+.RE
+

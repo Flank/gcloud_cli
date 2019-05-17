@@ -11,7 +11,7 @@ gcloud beta dns policies update \- update an existing Cloud DNS policy
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta dns policies update\fR \fIPOLICY\fR [\fB\-\-alternative\-name\-servers\fR=[\fINAME_SERVERS\fR,...]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-inbound\-forwarding\fR] [\fB\-\-networks\fR=[\fINETWORKS\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta dns policies update\fR \fIPOLICY\fR [\fB\-\-alternative\-name\-servers\fR=[\fINAME_SERVERS\fR,...]] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-inbound\-forwarding\fR] [\fB\-\-enable\-logging\fR] [\fB\-\-networks\fR=[\fINETWORKS\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -60,6 +60,10 @@ Specifies whether to allow networks bound to this policy to receive DNS queries
 sent by VMs or applications over VPN connections. Defaults to False.
 
 .TP 2m
+\fB\-\-enable\-logging\fR
+Specifies whether to enable query logging. Defaults to False.
+
+.TP 2m
 \fB\-\-networks\fR=[\fINETWORKS\fR,...]
 The comma separated list of network names to associate with the policy.
 
@@ -69,10 +73,11 @@ The comma separated list of network names to associate with the policy.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

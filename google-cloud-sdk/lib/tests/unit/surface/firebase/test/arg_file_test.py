@@ -42,7 +42,8 @@ DURATIONS = os.path.join(unit_base.TEST_DATA_PATH, 'durations')
 BOOLEANS = os.path.join(unit_base.TEST_DATA_PATH, 'booleans')
 INCLUDES = os.path.join(unit_base.TEST_DATA_PATH, 'include_groups')
 
-COMMON_ARGS = set(['test', 'type', 'async', 'results_bucket', 'timeout'])
+COMMON_ARGS = set(
+    ['test', 'type', 'async', 'results_bucket', 'timeout', 'timeout_us'])
 
 
 class CommonArgFileTests(unit_base.TestUnitTestBase):
@@ -157,6 +158,16 @@ class CommonArgFileTests(unit_base.TestUnitTestBase):
     args = arg_file.GetArgsFromArgFile(DURATIONS + ':timeout-200', COMMON_ARGS)
     self.assertEqual(args['timeout'], 200)
 
+  def testDurations_ValidTimeout_MicroSecondUnits(self):
+    args = arg_file.GetArgsFromArgFile(DURATIONS + ':timeout-500000000us',
+                                       COMMON_ARGS)
+    self.assertEqual(args['timeout'], 500)
+
+  def testDurations_ValidTimeout_MilliSecondUnits(self):
+    args = arg_file.GetArgsFromArgFile(DURATIONS + ':timeout-500000ms',
+                                       COMMON_ARGS)
+    self.assertEqual(args['timeout'], 500)
+
   def testDurations_ValidTimeout_SecondUnits(self):
     args = arg_file.GetArgsFromArgFile(DURATIONS + ':timeout-500s', COMMON_ARGS)
     self.assertEqual(args['timeout'], 500)
@@ -202,6 +213,26 @@ class CommonArgFileTests(unit_base.TestUnitTestBase):
       arg_file.GetArgsFromArgFile(DURATIONS + ':timeout-list', COMMON_ARGS)
     self.assertIn("Invalid value for [timeout]: ['15m',",
                   six.text_type(e.exception))
+
+  def testDurationsUs_ValidTimeout_NoUnits(self):
+    args = arg_file.GetArgsFromArgFile(DURATIONS + ':timeout-us-200',
+                                       COMMON_ARGS)
+    self.assertEqual(args['timeout_us'], 200000000)
+
+  def testDurationsUs_ValidTimeout_MicroSecondUnits(self):
+    args = arg_file.GetArgsFromArgFile(DURATIONS + ':timeout-us-500000000us',
+                                       COMMON_ARGS)
+    self.assertEqual(args['timeout_us'], 500000000)
+
+  def testDurationsUs_ValidTimeout_MilliSecondUnits(self):
+    args = arg_file.GetArgsFromArgFile(DURATIONS + ':timeout-us-500000ms',
+                                       COMMON_ARGS)
+    self.assertEqual(args['timeout_us'], 500000000)
+
+  def testDurationsUs_ValidTimeout_SecondUnits(self):
+    args = arg_file.GetArgsFromArgFile(DURATIONS + ':timeout-us-500s',
+                                       COMMON_ARGS)
+    self.assertEqual(args['timeout_us'], 500000000)
 
   # Boolean arg validation tests
 

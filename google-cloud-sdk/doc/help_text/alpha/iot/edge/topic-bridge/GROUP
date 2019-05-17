@@ -1,0 +1,37 @@
+NAME
+    gcloud alpha iot edge topic-bridge - manage topic bridging table for the
+        Edge device
+
+SYNOPSIS
+    gcloud alpha iot edge topic-bridge COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Manage topic bridging table for the Edge device. A topic bridging
+    table is similar to routing table. Each row of the table defines a rule. A
+    rule will route topic from one domain (Edge or cloud) to another domain,
+    and it can also route messages from a topic to another topic.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     describe
+        (ALPHA) List current topic bridging rules of an Edge device.
+
+     update
+        (ALPHA) Update topic bridging table of an Edge device.
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you will have to apply for early access and
+    have your projects registered on the API whitelist to use it. To do so,
+    contact Support at https://cloud.google.com/support/.
+

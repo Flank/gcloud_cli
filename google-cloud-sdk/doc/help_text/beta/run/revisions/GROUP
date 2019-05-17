@@ -1,0 +1,40 @@
+NAME
+    gcloud beta run revisions - view and manage your Cloud Run revisions
+
+SYNOPSIS
+    gcloud beta run revisions COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (BETA) This set of commands can be used to view and manage your existing
+    Cloud Run revisions.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     delete
+        (BETA) Delete a revision.
+
+     describe
+        (BETA) Obtain details about revisions.
+
+     list
+        (BETA) List available revisions.
+
+EXAMPLES
+    To list your existing revisions, run:
+
+        $ gcloud beta run revisions list
+
+NOTES
+    This command is currently in BETA and may change without notice. This
+    variant is also available:
+
+        $ gcloud alpha run revisions
+

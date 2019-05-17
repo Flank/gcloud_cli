@@ -25,10 +25,10 @@ from tests.lib import test_case
 from tests.lib.surface import accesscontextmanager
 
 
-class PerimetersCreateTestBeta(accesscontextmanager.Base):
+class PerimetersCreateTestGA(accesscontextmanager.Base):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)
@@ -51,63 +51,71 @@ class PerimetersCreateTestBeta(accesscontextmanager.Base):
     self.SetUpForTrack(self.track)
     with self.AssertRaisesExceptionMatches(cli_test_base.MockArgumentError,
                                            'Must be specified'):
-      self.Run(
-          'access-context-manager perimeters create my_perimeter '
-          '    --policy MY_POLICY --title "My Title"')
+      self.Run('access-context-manager perimeters create my_perimeter '
+               '    --policy MY_POLICY --title "My Title"')
 
   def testCreate(self):
     self.SetUpForTrack(self.track)
-    perimeter = self._MakePerimeter(
-        'MY_PERIMETER',
-        title='My Perimeter Title',
-        description=None,
-        restricted_services=[],
-        unrestricted_services=[],
-        access_levels=[],
-        type_='PERIMETER_TYPE_REGULAR')
+    perimeter_kwargs = {
+        'title': 'My Perimeter Title',
+        'description': None,
+        'restricted_services': [],
+        'access_levels': [],
+        'type_': 'PERIMETER_TYPE_REGULAR'
+    }
+
+    if self.include_unrestricted_services:
+      perimeter_kwargs['unrestricted_services'] = ['*']
+
+    perimeter = self._MakePerimeter('MY_PERIMETER', **perimeter_kwargs)
     self._ExpectCreate(perimeter, 'MY_POLICY')
 
-    result = self.Run(
-        'access-context-manager perimeters create MY_PERIMETER '
-        '    --policy MY_POLICY --title "My Perimeter Title" '
-        '    --resources projects/12345,projects/67890'
-    )
+    result = self.Run('access-context-manager perimeters create MY_PERIMETER '
+                      '    --policy MY_POLICY --title "My Perimeter Title" '
+                      '    --resources projects/12345,projects/67890')
 
     self.assertEqual(result, perimeter)
 
   def testCreate_PolicyFromProperty(self):
+
     self.SetUpForTrack(self.track)
     policy = 'my_acm_policy'
     properties.VALUES.access_context_manager.policy.Set(policy)
-    perimeter = self._MakePerimeter(
-        'MY_PERIMETER',
-        title='My Perimeter Title',
-        description=None,
-        restricted_services=[],
-        unrestricted_services=[],
-        access_levels=[],
-        type_='PERIMETER_TYPE_REGULAR')
+
+    perimeter_kwargs = {
+        'title': 'My Perimeter Title',
+        'description': None,
+        'restricted_services': [],
+        'access_levels': [],
+        'type_': 'PERIMETER_TYPE_REGULAR'
+    }
+
+    if self.include_unrestricted_services:
+      perimeter_kwargs['unrestricted_services'] = ['*']
+
+    perimeter = self._MakePerimeter('MY_PERIMETER', **perimeter_kwargs)
     perimeter.name = 'accessPolicies/{}/servicePerimeters/MY_PERIMETER'.format(
         policy)
     self._ExpectCreate(perimeter, policy)
 
-    result = self.Run(
-        'access-context-manager perimeters create MY_PERIMETER '
-        '    --title "My Perimeter Title" '
-        '    --resources projects/12345,projects/67890')
+    result = self.Run('access-context-manager perimeters create MY_PERIMETER '
+                      '    --title "My Perimeter Title" '
+                      '    --resources projects/12345,projects/67890')
 
     self.assertEqual(result, perimeter)
 
   def testCreate_AllParamsRestrictedServices(self):
     self.SetUpForTrack(self.track)
-    perimeter = self._MakePerimeter(
-        'MY_PERIMETER',
-        title='My Perimeter Title',
-        description=None,
-        restricted_services=['foo.googleapis.com', 'bar.googleapis.com'],
-        unrestricted_services=['*'],
-        access_levels=['MY_LEVEL', 'MY_LEVEL_2'],
-        type_='PERIMETER_TYPE_BRIDGE')
+    perimeter_kwargs = {
+        'title': 'My Perimeter Title',
+        'description': None,
+        'restricted_services': ['foo.googleapis.com', 'bar.googleapis.com'],
+        'unrestricted_services': [],
+        'access_levels': ['MY_LEVEL', 'MY_LEVEL_2'],
+        'type_': 'PERIMETER_TYPE_BRIDGE'
+    }
+
+    perimeter = self._MakePerimeter('MY_PERIMETER', **perimeter_kwargs)
     self._ExpectCreate(perimeter, 'MY_POLICY')
 
     result = self.Run(
@@ -116,36 +124,18 @@ class PerimetersCreateTestBeta(accesscontextmanager.Base):
         '    --perimeter-type bridge '
         '    --restricted-services foo.googleapis.com,bar.googleapis.com'
         '    --title "My Perimeter Title" '
-        '    --resources projects/12345,projects/67890'
-    )
-
-    self.assertEqual(result, perimeter)
-
-  def testCreate_AllParamsUnrestrictedServices(self):
-    self.SetUpForTrack(self.track)
-    perimeter = self._MakePerimeter(
-        'MY_PERIMETER',
-        title='My Perimeter Title',
-        description=None,
-        restricted_services=['*'],
-        unrestricted_services=['foo.googleapis.com', 'bar.googleapis.com'],
-        access_levels=['MY_LEVEL', 'MY_LEVEL_2'],
-        type_='PERIMETER_TYPE_BRIDGE')
-    self._ExpectCreate(perimeter, 'MY_POLICY')
-
-    result = self.Run(
-        'access-context-manager perimeters create MY_PERIMETER '
-        '    --policy MY_POLICY --access-levels MY_LEVEL,MY_LEVEL_2 '
-        '    --perimeter-type bridge '
-        '    --unrestricted-services foo.googleapis.com,bar.googleapis.com'
-        '    --title "My Perimeter Title" '
-        '    --resources projects/12345,projects/67890'
-    )
+        '    --resources projects/12345,projects/67890')
 
     self.assertEqual(result, perimeter)
 
 
-class PerimetersCreateTestAlpha(PerimetersCreateTestBeta):
+class PerimetersCreateTestBeta(PerimetersCreateTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class PerimetersCreateTestAlpha(PerimetersCreateTestGA):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA

@@ -29,8 +29,8 @@ from tests.lib.surface.compute import test_resources
 class NetworkEndpointGroupsDescribeTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.SelectApi(self.track.prefix)
+    self.track = calliope_base.ReleaseTrack.GA
+    self.SelectApi('v1')
 
   def testSimpleCase(self):
     self.make_requests.side_effect = iter([
@@ -39,27 +39,23 @@ class NetworkEndpointGroupsDescribeTest(test_base.BaseTest):
     result = self.Run('compute network-endpoint-groups describe my-neg1 '
                       '--zone zone-1')
 
-    self.CheckRequests(
-        [(self.compute_beta.networkEndpointGroups,
-          'Get',
-          self.messages.ComputeNetworkEndpointGroupsGetRequest(
-              networkEndpointGroup='my-neg1',
-              project='my-project',
-              zone='zone-1'))],
-    )
+    self.CheckRequests([(self.compute.networkEndpointGroups, 'Get',
+                         self.messages.ComputeNetworkEndpointGroupsGetRequest(
+                             networkEndpointGroup='my-neg1',
+                             project='my-project',
+                             zone='zone-1'))],)
     self.assertEqual(test_resources.NETWORK_ENDPOINT_GROUPS[0], result)
     self.assertMultiLineEqual(
         self.GetOutput(),
         textwrap.dedent("""\
            description: My NEG 1
            kind: compute#networkEndpointGroup
-           loadBalancer:
-             network: https://www.googleapis.com/compute/v1/projects/my-project/global/networks/network-1
-             zone: zone-1
            name: my-neg1
+           network: https://www.googleapis.com/compute/v1/projects/my-project/global/networks/network-1
            networkEndpointType: GCE_VM_IP_PORT
-           selfLink: https://www.googleapis.com/compute/beta/projects/my-project/zones/zone-1/networkEndpointGroups/my-neg1
+           selfLink: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1/networkEndpointGroups/my-neg1
            size: 5
+           zone: zone-1
             """))
 
 

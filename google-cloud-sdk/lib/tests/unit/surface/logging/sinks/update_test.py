@@ -19,6 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core.console import console_io
 from tests.lib import test_case
@@ -38,11 +39,12 @@ class SinksUpdateTest(base.LoggingTestBase):
         test_sink)
     updated_sink = self.msgs.LogSink(
         name=test_sink.name, destination='dest', filter='bar')
-    self.mock_client_v2.projects_sinks.Update.Expect(
-        self.msgs.LoggingProjectsSinksUpdateRequest(
+    self.mock_client_v2.projects_sinks.Patch.Expect(
+        self.msgs.LoggingProjectsSinksPatchRequest(
             sinkName='projects/my-project/sinks/my-sink',
-            logSink=updated_sink, uniqueWriterIdentity=True),
-        updated_sink)
+            logSink=updated_sink,
+            uniqueWriterIdentity=True,
+            updateMask='destination,filter'), updated_sink)
     self.RunLogging(
         'sinks update my-sink dest --log-filter=bar --format=default')
     self.AssertErrContains('Updated')
@@ -58,19 +60,19 @@ class SinksUpdateTest(base.LoggingTestBase):
         self.msgs.LoggingProjectsSinksGetRequest(
             sinkName='projects/my-project/sinks/my-sink'),
         test_sink)
+    expected_sink = self.msgs.LogSink(name=test_sink.name, destination='dest')
     updated_sink = self.msgs.LogSink(
         name=test_sink.name, destination='dest', filter='foo',
         includeChildren=True)
-    self.mock_client_v2.projects_sinks.Update.Expect(
-        self.msgs.LoggingProjectsSinksUpdateRequest(
+    self.mock_client_v2.projects_sinks.Patch.Expect(
+        self.msgs.LoggingProjectsSinksPatchRequest(
             sinkName='projects/my-project/sinks/my-sink',
-            logSink=updated_sink, uniqueWriterIdentity=True),
-        updated_sink)
+            logSink=expected_sink,
+            uniqueWriterIdentity=True,
+            updateMask='destination'), updated_sink)
     self.RunLogging('sinks update my-sink dest --format=default')
     self.AssertErrContains('Updated')
     self.AssertOutputContains('destination: dest')
-    self.AssertOutputContains('filter: foo')
-    self.AssertOutputContains('includeChildren: true')
     self.AssertOutputNotContains(test_sink.destination)
 
   def testUpdateSuccessToEmptyFilter(self):
@@ -81,16 +83,17 @@ class SinksUpdateTest(base.LoggingTestBase):
         self.msgs.LoggingProjectsSinksGetRequest(
             sinkName='projects/my-project/sinks/my-sink'),
         test_sink)
+    expected_sink = self.msgs.LogSink(name=test_sink.name, filter='')
     updated_sink = self.msgs.LogSink(
         name=test_sink.name, destination=test_sink.destination, filter='')
-    self.mock_client_v2.projects_sinks.Update.Expect(
-        self.msgs.LoggingProjectsSinksUpdateRequest(
+    self.mock_client_v2.projects_sinks.Patch.Expect(
+        self.msgs.LoggingProjectsSinksPatchRequest(
             sinkName='projects/my-project/sinks/my-sink',
-            logSink=updated_sink, uniqueWriterIdentity=True),
-        updated_sink)
+            logSink=expected_sink,
+            uniqueWriterIdentity=True,
+            updateMask='filter'), updated_sink)
     self.RunLogging('sinks update my-sink --log-filter="" --format=default')
     self.AssertErrContains('Updated')
-    self.AssertOutputContains('base')
     self.AssertOutputNotContains(test_sink.filter)
 
   def testUpdatePrompt(self):
@@ -110,13 +113,15 @@ class SinksUpdateTest(base.LoggingTestBase):
         self.msgs.LoggingProjectsSinksGetRequest(
             sinkName='projects/my-project/sinks/my-sink'),
         test_sink)
+    expected_sink = self.msgs.LogSink(name=test_sink.name, filter='new')
     updated_sink = self.msgs.LogSink(
         name=test_sink.name, destination=test_sink.destination, filter='new')
-    self.mock_client_v2.projects_sinks.Update.Expect(
-        self.msgs.LoggingProjectsSinksUpdateRequest(
+    self.mock_client_v2.projects_sinks.Patch.Expect(
+        self.msgs.LoggingProjectsSinksPatchRequest(
             sinkName='projects/my-project/sinks/my-sink',
-            logSink=updated_sink, uniqueWriterIdentity=True),
-        updated_sink)
+            logSink=expected_sink,
+            uniqueWriterIdentity=True,
+            updateMask='filter'), updated_sink)
     self.WriteInput('Y')
     self.RunLogging('sinks update my-sink --log-filter=new')
     self.AssertErrContains('Updated')
@@ -147,6 +152,49 @@ class SinksUpdateTest(base.LoggingTestBase):
 
   def testListNoAuth(self):
     self.RunWithoutAuth('sinks update my-sink dest')
+
+
+class SinksUpdateTestAlpha(SinksUpdateTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testUpdateSuccessDlp(self):
+    test_sink = self.msgs.LogSink(
+        name='my-sink',
+        destination='base',
+        filter='foo',
+        writerIdentity='foo@bar.com')
+    self.mock_client_v2.projects_sinks.Get.Expect(
+        self.msgs.LoggingProjectsSinksGetRequest(
+            sinkName='projects/my-project/sinks/my-sink'), test_sink)
+    expected_sink = self.msgs.LogSink(
+        name=test_sink.name,
+        dlpOptions=self.msgs.DlpOptions(
+            inspectTemplateName='my-inspect-template',
+            deidentifyTemplateName='my-deidentify-template'))
+    updated_sink = self.msgs.LogSink(
+        name='my-sink',
+        destination='base',
+        filter='foo',
+        writerIdentity='foo@bar.com',
+        dlpOptions=self.msgs.DlpOptions(
+            inspectTemplateName='my-inspect-template',
+            deidentifyTemplateName='my-deidentify-template'))
+    self.mock_client_v2.projects_sinks.Patch.Expect(
+        self.msgs.LoggingProjectsSinksPatchRequest(
+            sinkName='projects/my-project/sinks/my-sink',
+            logSink=expected_sink,
+            uniqueWriterIdentity=True,
+            updateMask=('dlp_options.inspect_template_name,'
+                        'dlp_options.deidentify_template_name')), updated_sink)
+    self.RunLogging('sinks update my-sink '
+                    '--dlp-inspect-template=my-inspect-template '
+                    '--dlp-deidentify-template=my-deidentify-template '
+                    '--format=default')
+    self.AssertErrContains('Updated')
+    self.AssertOutputContains('inspectTemplateName: my-inspect-template')
+    self.AssertOutputContains('deidentifyTemplateName: my-deidentify-template')
 
 
 if __name__ == '__main__':

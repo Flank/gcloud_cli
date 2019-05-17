@@ -20,6 +20,7 @@ from __future__ import unicode_literals
 
 import os
 
+from apitools.base.py import exceptions as api_exceptions
 from apitools.base.py.testing import mock as api_mock
 
 from googlecloudsdk.api_lib.storage import storage_api
@@ -369,3 +370,156 @@ class GetBucketLocationForFileTest(e2e_base.WithMockHttp):
         format(bucket=self._BUCKET_NAME)):
       client = storage_api.StorageClient()
       client.GetBucketLocationForFile(self._FILE_PATH)
+
+
+class CreateBucketIfNotExistsTest(e2e_base.WithMockHttp):
+
+  _BUCKET_NAME = 'testbucket'
+  _PROJECT_ID = 'project-id'
+  _BUCKET_LOCATION = 'eu'
+
+  def SetUp(self):
+    self.mocked_storage_v1 = api_mock.Client(
+        core_apis.GetClientClass('storage', 'v1'))
+    self.mocked_storage_v1.Mock()
+    self.addCleanup(self.mocked_storage_v1.Unmock)
+    self.storage_v1_messages = core_apis.GetMessagesModule(
+        'storage', 'v1')
+
+  def testAlreadyExists(self):
+    """Bucket already exists."""
+    self.mocked_storage_v1.buckets.Get.Expect(
+        self.storage_v1_messages.StorageBucketsGetRequest(
+            bucket=self._BUCKET_NAME),
+        response=self.storage_v1_messages.Bucket(id=self._BUCKET_NAME))
+    client = storage_api.StorageClient()
+    client.CreateBucketIfNotExists(self._BUCKET_NAME, self._PROJECT_ID)
+
+  def testCreateBucket(self):
+    """Bucket doesn't exist and must be created."""
+    self.mocked_storage_v1.buckets.Get.Expect(
+        self.storage_v1_messages.StorageBucketsGetRequest(
+            bucket=self._BUCKET_NAME),
+        exception=http_error.MakeHttpError(code=404))
+    self.mocked_storage_v1.buckets.Insert.Expect(
+        self.storage_v1_messages.StorageBucketsInsertRequest(
+            bucket=self.storage_v1_messages.Bucket(
+                kind='storage#bucket',
+                name=self._BUCKET_NAME,
+            ),
+            project=self._PROJECT_ID,
+        ),
+        response=self.storage_v1_messages.Bucket(id=self._BUCKET_NAME))
+    client = storage_api.StorageClient()
+    client.CreateBucketIfNotExists(self._BUCKET_NAME, self._PROJECT_ID)
+
+  def testCreateBucketLocation(self):
+    """Bucket doesn't exist and must be created (in specified location)."""
+    self.mocked_storage_v1.buckets.Get.Expect(
+        self.storage_v1_messages.StorageBucketsGetRequest(
+            bucket=self._BUCKET_NAME),
+        exception=http_error.MakeHttpError(code=404))
+    self.mocked_storage_v1.buckets.Insert.Expect(
+        self.storage_v1_messages.StorageBucketsInsertRequest(
+            bucket=self.storage_v1_messages.Bucket(
+                kind='storage#bucket',
+                name=self._BUCKET_NAME,
+                location=self._BUCKET_LOCATION,
+            ),
+            project=self._PROJECT_ID,
+        ),
+        response=self.storage_v1_messages.Bucket(id=self._BUCKET_NAME))
+    client = storage_api.StorageClient()
+    client.CreateBucketIfNotExists(self._BUCKET_NAME, self._PROJECT_ID,
+                                   location=self._BUCKET_LOCATION)
+
+  def testCreateBucketRace(self):
+    """Bucket doesn't exist, but creating it results in conflict due to race."""
+    self.mocked_storage_v1.buckets.Get.Expect(
+        self.storage_v1_messages.StorageBucketsGetRequest(
+            bucket=self._BUCKET_NAME),
+        exception=http_error.MakeHttpError(code=404))
+    self.mocked_storage_v1.buckets.Insert.Expect(
+        self.storage_v1_messages.StorageBucketsInsertRequest(
+            bucket=self.storage_v1_messages.Bucket(
+                kind='storage#bucket',
+                name=self._BUCKET_NAME,
+            ),
+            project=self._PROJECT_ID,
+        ),
+        exception=http_error.MakeHttpError(code=409))
+    self.mocked_storage_v1.buckets.Get.Expect(
+        self.storage_v1_messages.StorageBucketsGetRequest(
+            bucket=self._BUCKET_NAME),
+        response=self.storage_v1_messages.Bucket(id=self._BUCKET_NAME))
+    client = storage_api.StorageClient()
+    client.CreateBucketIfNotExists(self._BUCKET_NAME, self._PROJECT_ID)
+
+  def testCreateBucketRaceNotOwned(self):
+    """Bucket is created by another process, but is not accessible."""
+    self.mocked_storage_v1.buckets.Get.Expect(
+        self.storage_v1_messages.StorageBucketsGetRequest(
+            bucket=self._BUCKET_NAME),
+        exception=http_error.MakeHttpError(code=404))
+    self.mocked_storage_v1.buckets.Insert.Expect(
+        self.storage_v1_messages.StorageBucketsInsertRequest(
+            bucket=self.storage_v1_messages.Bucket(
+                kind='storage#bucket',
+                name=self._BUCKET_NAME,
+            ),
+            project=self._PROJECT_ID,
+        ),
+        exception=http_error.MakeHttpError(code=409))
+    self.mocked_storage_v1.buckets.Get.Expect(
+        self.storage_v1_messages.StorageBucketsGetRequest(
+            bucket=self._BUCKET_NAME),
+        exception=http_error.MakeHttpError(code=403,
+                                           message='Permission denied'))
+    client = storage_api.StorageClient()
+    with self.assertRaisesRegex(api_exceptions.HttpError, 'Permission denied'):
+      client.CreateBucketIfNotExists(self._BUCKET_NAME, self._PROJECT_ID)
+
+  def testCreateBucketInvalidLocation(self):
+    """Bucket doesn't exist and must be created (in bad location)."""
+    self.mocked_storage_v1.buckets.Get.Expect(
+        self.storage_v1_messages.StorageBucketsGetRequest(
+            bucket=self._BUCKET_NAME),
+        exception=http_error.MakeHttpError(code=404))
+    self.mocked_storage_v1.buckets.Insert.Expect(
+        self.storage_v1_messages.StorageBucketsInsertRequest(
+            bucket=self.storage_v1_messages.Bucket(
+                kind='storage#bucket',
+                name=self._BUCKET_NAME,
+                location='bad',
+            ),
+            project=self._PROJECT_ID,
+        ),
+        exception=http_error.MakeHttpError(code=400, message='Invalid value'))
+    client = storage_api.StorageClient()
+    with self.assertRaisesRegex(api_exceptions.HttpError, 'Invalid value'):
+      client.CreateBucketIfNotExists(self._BUCKET_NAME, self._PROJECT_ID,
+                                     location='bad')
+
+  def testCreateBucketDenied(self):
+    """Bucket doesn't exist and we don't have permission to create it."""
+    self.mocked_storage_v1.buckets.Get.Expect(
+        self.storage_v1_messages.StorageBucketsGetRequest(
+            bucket=self._BUCKET_NAME),
+        exception=http_error.MakeHttpError(code=404))
+    self.mocked_storage_v1.buckets.Insert.Expect(
+        self.storage_v1_messages.StorageBucketsInsertRequest(
+            bucket=self.storage_v1_messages.Bucket(
+                kind='storage#bucket',
+                name=self._BUCKET_NAME,
+            ),
+            project=self._PROJECT_ID,
+        ),
+        exception=http_error.MakeHttpError(
+            code=403, message='Permission denied'))
+    client = storage_api.StorageClient()
+    with self.assertRaisesRegex(api_exceptions.HttpError, 'Permission denied'):
+      client.CreateBucketIfNotExists(self._BUCKET_NAME, self._PROJECT_ID)
+
+
+if __name__ == '__main__':
+  test_case.main()

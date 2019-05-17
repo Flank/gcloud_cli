@@ -3,16 +3,16 @@ NAME
 
 SYNOPSIS
     gcloud compute disks list [NAME ...] [--regexp=REGEXP, -r REGEXP]
-        [--zones=ZONE,[ZONE,...]] [--filter=EXPRESSION] [--limit=LIMIT]
-        [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
+        [--regions=[REGION,...] | --zones=[ZONE,...]] [--filter=EXPRESSION]
+        [--limit=LIMIT] [--page-size=PAGE_SIZE] [--sort-by=[FIELD,...]] [--uri]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     gcloud compute disks list displays all Google Compute Engine disks in a
     project.
 
-    By default, disks from all zones are listed. The results can be narrowed
-    down using a filter: --filter="zone:( ZONE ... )".
+    By default, disks from all regions and disks from all zones are listed. The
+    results can be narrowed down by providing the --regions or --zones flag.
 
 POSITIONAL ARGUMENTS
      [NAME ...]
@@ -30,12 +30,23 @@ FLAGS
 
         Flag --regexp is deprecated. Use --filter="name~'REGEXP'" instead.
 
-     --zones=ZONE,[ZONE,...]
-        (DEPRECATED) If provided, only resources from the given zones are
-        queried.
+     At most one of these may be specified:
 
-        Flag --zones is deprecated. Use --filter="zone:( ZONE ... )" instead.
-        For example --filter="zone:( europe-west1-b europe-west1-c )".
+       --regions=[REGION,...]
+          (DEPRECATED) If provided, only regional resources are shown. If
+          arguments are provided, only resources from the given regions are
+          shown.
+
+          Flag --regions is deprecated. Use --filter="region:( REGION ... )"
+          instead. For example --filter="region:( europe-west1 europe-west2 )".
+
+       --zones=[ZONE,...]
+          (DEPRECATED) If provided, only zonal resources are shown. If
+          arguments are provided, only resources from the given zones are
+          shown.
+
+          Flag --zones is deprecated. Use --filter="zone:( ZONE ... )" instead.
+          For example --filter="zone:( europe-west1-b europe-west1-c )".
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -67,8 +78,9 @@ LIST COMMAND FLAGS
         Print a list of resource URIs instead of the default output.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -81,10 +93,17 @@ EXAMPLES
 
         $ gcloud compute disks list --uri
 
-    To list all disks in the us-central1-b and europe-west1-d zones, run:
+    To list all disks in the us-central1 and europe-west1 regions, given they
+    are regional resources, run:
 
         $ gcloud compute disks list \
-            --filter="zone:( us-central1-b europe-west1-d )"
+            --filter="region:( europe-west1 us-central1 )"
+
+    To list all disks in zones us-central1-b and europe-west1-d, given they are
+    zonal resources, run:
+
+        $ gcloud compute disks list \
+            --filter="zone:( europe-west1-d us-central1-b )"
 
 NOTES
     These variants are also available:

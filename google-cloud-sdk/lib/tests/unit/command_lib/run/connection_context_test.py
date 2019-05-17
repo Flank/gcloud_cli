@@ -51,7 +51,6 @@ class ConnectionContextTest(test_case.TestCase):
     self.get_client_instance_internal = self.StartObjectPatch(
         apis_internal, '_GetClientInstance')
 
-  @test_case.Filters.skip('Failing', 'b/118669302')
   def testConnectToCluster(self):
     cluster_ref = mock.Mock()
     with connection_context._GKEConnectionContext(cluster_ref):
@@ -68,7 +67,7 @@ class ConnectionContextTest(test_case.TestCase):
     with connection_context._RegionalConnectionContext('us-central1'):
       self.assertEquals(
           properties.VALUES.api_endpoint_overrides.run.Get(),
-          'https://us-central1-serverless.googleapis.com/')
+          'https://us-central1-run.googleapis.com/')
 
 
 class TLSSupportCheckTest(test_case.TestCase):

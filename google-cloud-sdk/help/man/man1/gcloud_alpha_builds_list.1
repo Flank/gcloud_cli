@@ -11,7 +11,7 @@ gcloud alpha builds list \- list builds
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha builds list\fR [\fB\-\-ongoing\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR;\ default=50] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha builds list\fR [\fB\-\-ongoing\fR] [\fB\-\-filter\fR=\fIEXPRESSION\fR] [\fB\-\-limit\fR=\fILIMIT\fR;\ default=50] [\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR;\ default=20] [\fB\-\-sort\-by\fR=[\fIFIELD\fR,...]] [\fB\-\-uri\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -50,11 +50,10 @@ interacts with other flags that are applied in this order: \fB\-\-flatten\fR,
 \fB\-\-sort\-by\fR, \fB\-\-filter\fR, \fB\-\-limit\fR.
 
 .TP 2m
-\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR
+\fB\-\-page\-size\fR=\fIPAGE_SIZE\fR; default=20
 Some services group resource list output into pages. This flag specifies the
-maximum number of resources per page. The default is determined by the service
-if it supports paging, otherwise it is \fBunlimited\fR (no paging). Paging may
-be applied before or after \fB\-\-filter\fR and \fB\-\-limit\fR depending on the
+maximum number of resources per page. The default is \fB20\fR. Paging may be
+applied before or after \fB\-\-filter\fR and \fB\-\-limit\fR depending on the
 service.
 
 .TP 2m
@@ -74,10 +73,11 @@ Print a list of resource URIs instead of the default output.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

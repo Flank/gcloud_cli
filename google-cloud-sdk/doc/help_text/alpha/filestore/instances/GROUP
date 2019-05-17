@@ -1,5 +1,6 @@
 NAME
-    gcloud alpha filestore instances - manage Cloud Filestore instances
+    gcloud alpha filestore instances - create and manage Cloud Filestore
+        instances
 
 SYNOPSIS
     gcloud alpha filestore instances COMMAND [GCLOUD_WIDE_FLAG ...]
@@ -8,8 +9,9 @@ DESCRIPTION
     (ALPHA) Create and manage Cloud Filestore instances.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -26,14 +28,15 @@ COMMANDS
         (ALPHA) Show metadata for a Cloud Filestore instance.
 
      list
-        (ALPHA) List all Cloud Filestore instances.
+        (ALPHA) List Cloud Filestore instances.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you will have to apply for early access and have your projects
     registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    https://cloud.google.com/support/. These variants are also available:
 
+        $ gcloud filestore instances
         $ gcloud beta filestore instances
 

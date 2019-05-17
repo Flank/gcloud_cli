@@ -21,14 +21,14 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.bigtable import app_profiles
 from googlecloudsdk.api_lib.bigtable import util
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import parameterized
+from tests.lib import test_case
 from tests.lib.surface.bigtable import base
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA)
-class AppProfileListTests(base.BigtableV2TestBase):
+class AppProfileListTestGA(base.BigtableV2TestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.app_profile_list_mock = self.StartObjectPatch(
@@ -52,8 +52,7 @@ class AppProfileListTests(base.BigtableV2TestBase):
                     clusterId='my-cluster-2', allowTransactionalWrites=True)),
         ])
 
-  def testList(self, track):
-    self.track = track
+  def testList(self):
     self.Run('bigtable app-profiles list --instance my-instance')
     self.app_profile_list_mock.assert_called_once_with(
         util.GetInstanceRef('my-instance'))
@@ -65,3 +64,19 @@ app-profile-2 dsp2 my-cluster No
 app-profile-3 dsp3 my-cluster-2 Yes
 """,
         normalize_space=True)
+
+
+class AppProfileListTestBeta(AppProfileListTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class AppProfileListTestAlpha(AppProfileListTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+if __name__ == '__main__':
+  test_case.main()

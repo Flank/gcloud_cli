@@ -288,7 +288,7 @@ class YamlTests(sdk_test_base.SdkBase):
           calliope_base.ReleaseTrack.ALPHA, object())
     with self.assertRaisesRegex(
         command_loading.LayoutException,
-        r'Multiple definitions for release tracks \[.+, .+\] for element: '
+        r'Multiple definitions for release tracks \[.+] for element: '
         r'\[file\]'):
       _FromYaml(
           'file', ['foo', 'bar'],
@@ -344,7 +344,7 @@ class YamlTests(sdk_test_base.SdkBase):
 - release_tracks: [GA, BETA]
 - release_tracks: [ALPHA]""")
     self.assertEqual(
-        (sentinel, ['GA', 'BETA']),
+        (sentinel, ['GA']),
         command_loading.LoadCommonType(
             [os.path.join(self.temp_path, 'bar.yaml')], ['bar'],
             calliope_base.ReleaseTrack.GA, 'id', is_command=True,

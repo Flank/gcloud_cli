@@ -204,6 +204,19 @@ class CommandSchemaUtilTests(test_case.TestCase, parameterized.TestCase):
         [fm.FakeMessage.InnerMessage(string1='a', string2='b'),
          fm.FakeMessage.InnerMessage(string1='c', string2='d')])
 
+  def testChoices(self):
+    data = {'arg_value': 'thing-one',
+            'enum_value': fm.FakeMessage.FakeEnum.THING_ONE}
+    choice = util.Choice(data)
+    self.assertEqual(choice.arg_value, 'thing-one')
+    self.assertEqual(choice.enum_value, fm.FakeMessage.FakeEnum.THING_ONE)
+
+  def testChoice_DefaultEnumValue(self):
+    data = {'arg_value': 'thing-one'}
+    choice = util.Choice(data)
+    self.assertEqual(choice.arg_value, 'thing-one')
+    self.assertEqual(choice.enum_value, 'THING_ONE')
+
 
 if __name__ == '__main__':
   test_case.main()

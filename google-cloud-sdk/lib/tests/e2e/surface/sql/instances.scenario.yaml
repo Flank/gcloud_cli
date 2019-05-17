@@ -7,7 +7,10 @@ summary:
   - command: sql instances create $$instance$$ --tier D1 --backup --enable-bin-log
       --backup-start-time 00:00
   - stderr: |
-      WARNING: Starting with release 218.0.0, you will need to specify either a region or a zone to create an instance.
+      WARNING: Starting with release 233.0.0, you will need to specify either a region or a zone to create an instance.
+      WARNING: First Generation instances will be automatically upgraded to Second Generation starting March 4th, 2020, and First Generation will be fully decommissioned on March 25, 2020. We recommend you create a Second Generation instance.
+  - prompt:
+    - input: y
   - progress_tracker:
     - message: Creating Cloud SQL instance
     - status: SUCCESS
@@ -19,6 +22,8 @@ summary:
 - execute:
   - command: sql instances describe $$instance$$ --format 'yaml(name, selfLink, project,
       region)'
+  - stderr: |
+      WARNING: Upgrade your First Generation instance to Second Generation before we auto-upgrade it on March 4, 2020, ahead of the full decommission of First Generation on March 25, 2020.
   - stdout: |
       name: $$instance$$
       project: cloud-sdk-integration-testing
@@ -45,7 +50,10 @@ actions:
       --backup-start-time 00:00
     events:
     - expect_stderr: |
-        WARNING: Starting with release 218.0.0, you will need to specify either a region or a zone to create an instance.
+        WARNING: Starting with release 233.0.0, you will need to specify either a region or a zone to create an instance.
+        WARNING: First Generation instances will be automatically upgraded to Second Generation starting March 4th, 2020, and First Generation will be fully decommissioned on March 25, 2020. We recommend you create a Second Generation instance.
+    - expect_prompt_continue:
+        user_input: y
     - api_call:
         poll_operation: true
         expect_request:
@@ -243,6 +251,8 @@ actions:
               expirationTime: '2028-08-26T21:57:40.934Z'
             instanceType: CLOUD_SQL_INSTANCE
             ipv6Address: 2001:4860:4864:1:5548:a250:279d:f5c6
+    - expect_stderr: |
+        WARNING: Upgrade your First Generation instance to Second Generation before we auto-upgrade it on March 4, 2020, ahead of the full decommission of First Generation on March 25, 2020.
     - expect_stdout: |
         name: $$instance$$
         project: cloud-sdk-integration-testing

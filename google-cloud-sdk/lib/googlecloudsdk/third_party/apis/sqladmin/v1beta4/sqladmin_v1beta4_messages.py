@@ -220,8 +220,12 @@ class DatabaseInstance(_messages.Message):
     databaseVersion: The database engine type and version. The databaseVersion
       field can not be changed after instance creation. MySQL Second
       Generation instances: MYSQL_5_7 (default) or MYSQL_5_6. PostgreSQL
-      instances: POSTGRES_9_6 MySQL First Generation instances: MYSQL_5_6
-      (default) or MYSQL_5_5
+      instances: POSTGRES_9_6 (default) or POSTGRES_11 Beta. MySQL First
+      Generation instances: MYSQL_5_6 (default) or MYSQL_5_5
+    diskEncryptionConfiguration: Disk encryption configuration specific to an
+      instance. Applies only to Second Generation instances.
+    diskEncryptionStatus: Disk encryption status specific to an instance.
+      Applies only to Second Generation instances.
     etag: This field is deprecated and will be removed from a future version
       of the API. Use the settings.settingsVersion field instead.
     failoverReplica: The name and status of the failover replica. This
@@ -255,6 +259,7 @@ class DatabaseInstance(_messages.Message):
     replicaConfiguration: Configuration specific to failover replicas and read
       replicas.
     replicaNames: The replicas of the instance.
+    rootPassword: Initial root password. Use only on creation.
     selfLink: The URI of this resource.
     serverCaCert: SSL configuration.
     serviceAccountEmailAddress: The service account email address assigned to
@@ -293,27 +298,30 @@ class DatabaseInstance(_messages.Message):
   connectionName = _messages.StringField(2)
   currentDiskSize = _messages.IntegerField(3)
   databaseVersion = _messages.StringField(4)
-  etag = _messages.StringField(5)
-  failoverReplica = _messages.MessageField('FailoverReplicaValue', 6)
-  gceZone = _messages.StringField(7)
-  instanceType = _messages.StringField(8)
-  ipAddresses = _messages.MessageField('IpMapping', 9, repeated=True)
-  ipv6Address = _messages.StringField(10)
-  kind = _messages.StringField(11, default=u'sql#instance')
-  masterInstanceName = _messages.StringField(12)
-  maxDiskSize = _messages.IntegerField(13)
-  name = _messages.StringField(14)
-  onPremisesConfiguration = _messages.MessageField('OnPremisesConfiguration', 15)
-  project = _messages.StringField(16)
-  region = _messages.StringField(17)
-  replicaConfiguration = _messages.MessageField('ReplicaConfiguration', 18)
-  replicaNames = _messages.StringField(19, repeated=True)
-  selfLink = _messages.StringField(20)
-  serverCaCert = _messages.MessageField('SslCert', 21)
-  serviceAccountEmailAddress = _messages.StringField(22)
-  settings = _messages.MessageField('Settings', 23)
-  state = _messages.StringField(24)
-  suspensionReason = _messages.StringField(25, repeated=True)
+  diskEncryptionConfiguration = _messages.MessageField('DiskEncryptionConfiguration', 5)
+  diskEncryptionStatus = _messages.MessageField('DiskEncryptionStatus', 6)
+  etag = _messages.StringField(7)
+  failoverReplica = _messages.MessageField('FailoverReplicaValue', 8)
+  gceZone = _messages.StringField(9)
+  instanceType = _messages.StringField(10)
+  ipAddresses = _messages.MessageField('IpMapping', 11, repeated=True)
+  ipv6Address = _messages.StringField(12)
+  kind = _messages.StringField(13, default=u'sql#instance')
+  masterInstanceName = _messages.StringField(14)
+  maxDiskSize = _messages.IntegerField(15)
+  name = _messages.StringField(16)
+  onPremisesConfiguration = _messages.MessageField('OnPremisesConfiguration', 17)
+  project = _messages.StringField(18)
+  region = _messages.StringField(19)
+  replicaConfiguration = _messages.MessageField('ReplicaConfiguration', 20)
+  replicaNames = _messages.StringField(21, repeated=True)
+  rootPassword = _messages.StringField(22)
+  selfLink = _messages.StringField(23)
+  serverCaCert = _messages.MessageField('SslCert', 24)
+  serviceAccountEmailAddress = _messages.StringField(25)
+  settings = _messages.MessageField('Settings', 26)
+  state = _messages.StringField(27)
+  suspensionReason = _messages.StringField(28, repeated=True)
 
 
 class DatabasesListResponse(_messages.Message):
@@ -389,6 +397,31 @@ class DemoteMasterMySqlReplicaConfiguration(_messages.Message):
   kind = _messages.StringField(4, default=u'sql#demoteMasterMysqlReplicaConfiguration')
   password = _messages.StringField(5)
   username = _messages.StringField(6)
+
+
+class DiskEncryptionConfiguration(_messages.Message):
+  r"""Disk encryption configuration.
+
+  Fields:
+    kind: This is always sql#diskEncryptionConfiguration.
+    kmsKeyName: KMS key resource name
+  """
+
+  kind = _messages.StringField(1, default=u'sql#diskEncryptionConfiguration')
+  kmsKeyName = _messages.StringField(2)
+
+
+class DiskEncryptionStatus(_messages.Message):
+  r"""Disk encryption status.
+
+  Fields:
+    kind: This is always sql#diskEncryptionStatus.
+    kmsKeyVersionName: KMS key version used to encrypt the Cloud SQL instance
+      disk
+  """
+
+  kind = _messages.StringField(1, default=u'sql#diskEncryptionStatus')
+  kmsKeyVersionName = _messages.StringField(2)
 
 
 class ExportContext(_messages.Message):
@@ -490,6 +523,7 @@ class Flag(_messages.Message):
     appliesTo: The database version this flag applies to. Can be MYSQL_5_5,
       MYSQL_5_6, or MYSQL_5_7. MYSQL_5_7 is applicable only to Second
       Generation instances.
+    inBeta: True if the flag is only released in Beta.
     kind: This is always sql#flag.
     maxValue: For INTEGER flags, the maximum allowed value.
     minValue: For INTEGER flags, the minimum allowed value.
@@ -504,12 +538,13 @@ class Flag(_messages.Message):
 
   allowedStringValues = _messages.StringField(1, repeated=True)
   appliesTo = _messages.StringField(2, repeated=True)
-  kind = _messages.StringField(3, default=u'sql#flag')
-  maxValue = _messages.IntegerField(4)
-  minValue = _messages.IntegerField(5)
-  name = _messages.StringField(6)
-  requiresRestart = _messages.BooleanField(7)
-  type = _messages.StringField(8)
+  inBeta = _messages.BooleanField(3)
+  kind = _messages.StringField(4, default=u'sql#flag')
+  maxValue = _messages.IntegerField(5)
+  minValue = _messages.IntegerField(6)
+  name = _messages.StringField(7)
+  requiresRestart = _messages.BooleanField(8)
+  type = _messages.StringField(9)
 
 
 class FlagsListResponse(_messages.Message):

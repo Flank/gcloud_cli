@@ -72,6 +72,15 @@ class ServiceUsageTest(unit_test_base.SUUnitTestBase):
 
     self.assertEqual(got, want)
 
+  def testDisableApiCall_FailedPrecondition(self):
+    """Test DisableApiCall with failed precondition error."""
+    server_error = http_error.MakeDetailedHttpError(code=400, message='Error.')
+    self.ExpectDisableApiCall(None, error=server_error)
+
+    with self.assertRaisesRegex(exceptions.Error, r'Error.'):
+      serviceusage.DisableApiCall(self.PROJECT_NAME, self.DEFAULT_SERVICE_NAME)
+    self.AssertErrContains('--force')
+
   def testListServicesCall(self):
     """Test ListServices returns operation when successful."""
     want = [self.DEFAULT_SERVICE_NAME, self.DEFAULT_SERVICE_NAME_2]

@@ -159,6 +159,14 @@ def AddPassword(parser):
       help='Cloud SQL user\'s password.')
 
 
+def AddRootPassword(parser):
+  """Add the root password field to the parser."""
+  parser.add_argument(
+      '--root-password',
+      required=False,
+      help='Root Cloud SQL user\'s password.')
+
+
 def AddPromptForPassword(parser):
   parser.add_argument(
       '--prompt-for-password',
@@ -189,7 +197,10 @@ def AddAssignIp(parser, show_negated_in_help=False):
   kwargs = _GetKwargsForBoolFlag(show_negated_in_help)
   parser.add_argument(
       '--assign-ip',
-      help='If provided, instance must be assigned an IP address.', **kwargs)
+      help='Assign an IPv4 external address to this instance.  This setting is '
+           'enabled by default.  To create an instance which only has a '
+           'private IP, use --no-assign-ip and specify a private network.',
+      **kwargs)
 
 
 def AddAuthorizedGAEApps(parser, update=False):
@@ -254,6 +265,26 @@ def AddDatabaseFlags(parser, update=False):
       metavar='FLAG=VALUE',
       required=False,
       help=help_)
+
+
+def AddDatabaseVersion(parser, restrict_choices=True):
+  """Adds `--database-version` to the parser with choices restricted or not."""
+  choices = ['MYSQL_5_5', 'MYSQL_5_6', 'MYSQL_5_7', 'POSTGRES_9_6']
+  help_text = (
+      'The database engine type and version. If left unspecified, the API '
+      'defaults will be used.')
+  if not restrict_choices:
+    help_text = ' '.join([
+        help_text,
+        'See the list of database versions at '
+        'https://cloud.google.com/sql/docs/mysql/admin-api/v1beta4/instances'
+        '#databaseVersion'
+    ])
+  parser.add_argument(
+      '--database-version',
+      required=False,
+      choices=choices if restrict_choices else None,
+      help=help_text)
 
 
 def AddCPU(parser):
@@ -474,6 +505,42 @@ def AddStorageSize(parser):
             '10GB.'))
 
 
+def AddTier(parser, is_patch=False):
+  """Adds the '--tier' flag to the parser."""
+  help_text = ('The tier for this instance. For Second Generation instances, '
+               'TIER is the instance\'s machine type (e.g., db-n1-standard-1). '
+               'For PostgreSQL instances, only shared-core machine types '
+               '(e.g., db-f1-micro) apply. A complete list of tiers is '
+               'available here: https://cloud.google.com/sql/pricing.')
+  if is_patch:
+    help_text += ' WARNING: Instance will be restarted.'
+  # TODO(b/122660263): Remove when V1 instances are no longer supported.
+  # V1 deprecation notice.
+  help_text += ('\n\nIMPORTANT: First Generation instances are deprecated. '
+                'If you\'re considering any First Generation tiers, we '
+                'recommend using Second Generation instead.')
+
+  parser.add_argument('--tier', '-t', required=False, help=help_text)
+
+
+def AddZone(parser, help_text):
+  """Adds the mutually exclusive `--gce-zone` and `--zone` to the parser."""
+  zone_group = parser.add_mutually_exclusive_group()
+  zone_group.add_argument(
+      '--gce-zone',
+      required=False,
+      action=actions.DeprecationAction(
+          '--gce-zone',
+          removed=False,
+          warn=('Flag `{flag_name}` is deprecated and will be removed by '
+                'release 255.0.0. Use `--zone` instead.')),
+      help=help_text)
+  zone_group.add_argument(
+      '--zone',
+      required=False,
+      help=help_text)
+
+
 # Database specific flags
 
 
@@ -567,7 +634,7 @@ OPERATION_FORMAT = """
     operationType:label=TYPE,
     startTime.iso():label=START,
     endTime.iso():label=END,
-    error[0].code.yesno(no="-"):label=ERROR,
+    error.errors[0].code.yesno(no="-"):label=ERROR,
     state:label=STATUS
   )
 """
@@ -578,7 +645,7 @@ OPERATION_FORMAT_BETA = """
     operationType:label=TYPE,
     startTime.iso():label=START,
     endTime.iso():label=END,
-    error[0].code.yesno(no="-"):label=ERROR,
+    error.errors[0].code.yesno(no="-"):label=ERROR,
     status:label=STATUS
   )
 """

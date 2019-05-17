@@ -36,6 +36,20 @@ API_VERSION = 'v1'
 LOCATIONS_COLLECTION = API + '.projects.locations'
 
 SEVERITIES = ['DEBUG', 'INFO', 'ERROR']
+EGRESS_SETTINGS = ['UNSPECIFIED', 'PRIVATE', 'ALL']
+INGRESS_SETTINGS = ['UNSPECIFIED', 'ALL', 'INTERNAL-ONLY', 'INTERNAL-AND-GCLB']
+INGRESS_SETTINGS_MAPPING = {
+    'ALLOW_ALL': 'all',
+    'ALLOW_INTERNAL_ONLY': 'internal-only',
+    'ALLOW_INTERNAL_AND_GCLB': 'internal-and-gclb',
+    'INGRESS_SETTINGS_UNSPECIFIED': 'unspecified',
+}
+
+EGRESS_SETTINGS_MAPPING = {
+    'PRIVATE_RANGES_ONLY': 'private',
+    'ALL_TRAFFIC': 'all',
+    'VPC_CONNECTOR_EGRESS_SETTINGS_UNSPECIFIED': 'unspecified',
+}
 
 
 def AddMinLogLevelFlag(parser):
@@ -45,6 +59,26 @@ def AddMinLogLevelFlag(parser):
       help_str='Minimum level of logs to be fetched.'
   )
   min_log_arg.AddToParser(parser)
+
+
+def AddIngressSettingsFlag(parser):
+  ingress_settings_arg = base.ChoiceArgument(
+      '--ingress-settings',
+      choices=[x.lower() for x in INGRESS_SETTINGS],
+      help_str='Ingress settings controls what traffic can reach the function.'
+  )
+  ingress_settings_arg.AddToParser(parser)
+
+
+def AddEgressSettingsFlag(parser):
+  egress_settings_arg = base.ChoiceArgument(
+      '--egress-settings',
+      choices=[x.lower() for x in EGRESS_SETTINGS],
+      help_str='Egress settings controls what traffic is diverted through the '
+               'VPC Access Connector resource. '
+               'By default private_ranges_only will be used.'
+  )
+  egress_settings_arg.AddToParser(parser)
 
 
 def GetLocationsUri(resource):
@@ -95,6 +129,31 @@ def AddFunctionRetryFlag(parser):
   )
 
 
+def AddAllowUnauthenticatedFlag(parser):
+  """Add the --allow-unauthenticated flag."""
+  parser.add_argument(
+      '--allow-unauthenticated',
+      default=False,
+      action='store_true',
+      help=('If set, makes this a public function. This will allow all '
+            'callers, without checking authentication.'))
+
+
+def ShouldEnsureAllUsersInvoke(args):
+  if args.allow_unauthenticated:
+    return True
+  else:
+    return False
+
+
+def ShouldDenyAllUsersInvoke(args):
+  if (args.IsSpecified('allow_unauthenticated')
+      and not args.allow_unauthenticated):
+    return True
+  else:
+    return False
+
+
 def AddSourceFlag(parser):
   """Add flag for specifying function source code to the parser."""
   parser.add_argument(
@@ -107,6 +166,15 @@ def AddSourceFlag(parser):
       * Source code in Google Cloud Storage (must be a `.zip` archive),
       * Reference to source repository or,
       * Local filesystem path (root directory of function source).
+
+      Note that if you do not specify the `--source` flag:
+
+      * Current directory will be used for new function deployments.
+      * If the function is previously deployed using a local filesystem path,
+      then function's source code will be updated using the current directory.
+      * If the function is previously deployed using a Google Cloud Storage
+      location or a source repository, then the function's source code will not
+      be updated.
 
       The value of the flag will be interpreted as a Cloud Storage location, if
       it starts with `gs://`.
@@ -153,9 +221,6 @@ def AddSourceFlag(parser):
       moveable-aliases/alternate-branch/paths/path-to=source
       ```
 
-      If the source location is not explicitly set, new functions will deploy
-      from the current directory. Existing functions keep their old source.
-
       """)
 
 
@@ -165,7 +230,13 @@ def AddStageBucketFlag(parser):
       '--stage-bucket',
       help=('When deploying a function from a local directory, this flag\'s '
             'value is the name of the Google Cloud Storage bucket in which '
-            'source code will be stored.'),
+            'source code will be stored. Note that if you set the '
+            '`--stage-bucket` flag when deploying a function, you will need to '
+            'specify `--source` or `--stage-bucket` in subsequent deployments '
+            'to update your source code. To use this flag successfully, the '
+            'account in use must have permissions to write to this bucket. For '
+            'help granting access, refer to this guide: '
+            'https://cloud.google.com/storage/docs/access-control/'),
       type=api_util.ValidateAndStandarizeBucketUriOrRaise)
 
 
@@ -174,29 +245,32 @@ def AddRuntimeFlag(parser):
   parser.add_argument(
       '--runtime',
       help="""\
-          The runtime in which to run the function. Defaults to Node.js 6.
+          Runtime in which to run the function.
+
+          Required when deploying a new function; optional when updating
+          an existing function.
 
           Choices:
 
-          - `nodejs6`: Node.js 6
           - `nodejs8`: Node.js 8
+          - `nodejs10`: Node.js 10
           - `python37`: Python 3.7
+          - `go111`: Go 1.11
+          - `nodejs6`: Node.js 6 (deprecated)
           """)
 
 
-def AddConnectedVPCMutexGroup(parser):
-  """Add mutex group for --connected-vpc and --vpc-connector."""
-  mutex_group = parser.add_group(mutex=True)
-  mutex_group.add_argument(
-      '--connected-vpc',
-      help='Specifies the VPC network to connect the function to.',
-      hidden=True
-  )
-  mutex_group.add_argument(
+def AddVPCConnectorFlag(parser):
+  """Add flag for specyfying VPC connector to the parser."""
+  parser.add_argument(
       '--vpc-connector',
-      help='The VPC Network Connector that this cloud function can connect to.',
-      hidden=True
-  )
+      help="""\
+        The VPC Access connector that the function can connect to. It
+        should be the fully-qualified URI of the VPC Access connector
+        resource whose format is:
+        `projects/${PROJECT}/locations/${LOCATION}/connectors/${CONNECTOR}`
+        or an empty string to clear the field.
+      """)
 
 
 def AddEntryPointFlag(parser):
@@ -205,12 +279,13 @@ def AddEntryPointFlag(parser):
       '--entry-point',
       type=api_util.ValidateEntryPointNameOrRaise,
       help="""\
-      By default when a Google Cloud Function is triggered, it executes a
-      JavaScript function with the same name. Or, if it cannot find a
-      function with the same name, it executes a function named `function`.
-      You can use this flag to override the default behavior, by specifying
-      the name of a JavaScript function that will be executed when the
-      Google Cloud Function is triggered."""
+      Name of a Google Cloud Function (as defined in source code) that will
+      be executed. Defaults to the resource name suffix, if not specified. For
+      backward compatibility, if function with given name is not found, then
+      the system will try to use function named "function". For Node.js this
+      is name of a function exported by the module specified in
+      `source_location`.
+"""
   )
 
 
@@ -220,23 +295,16 @@ def AddMaxInstancesFlag(parser):
   mutex_group.add_argument(
       '--max-instances',
       type=arg_parsers.BoundedInt(lower_bound=1),
-      hidden=True,
       help="""\
-      Sets the maximum number of instances for the function. There may be
-      per-region and/or per-function upper limits for max-instances. The
-      deploy fails if the upper limit is exceeded.
-
-      A function execution that would exceed max-instances times out.
+        Sets the maximum number of instances for the function. A function
+        execution that would exceed max-instances times out.
       """
   )
   mutex_group.add_argument(
       '--clear-max-instances',
       action='store_true',
-      hidden=True,
       help="""\
-      Sets the maximum number of instances for the function to the Cloud
-      Functions default value. The default value is determined by the Cloud
-      Platform.
+        Clears the maximum instances setting for the function.
       """
   )
 

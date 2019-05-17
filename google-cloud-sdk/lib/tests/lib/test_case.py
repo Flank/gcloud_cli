@@ -64,6 +64,12 @@ import mock
 import portpicker
 import six
 
+try:
+  # Assign import to a variable so it can be mocked consistently.
+  pytest = __import__('pytest')
+except ImportError:
+  pytest = None
+
 
 class Error(BaseException):
   """A base exception for this module."""
@@ -293,7 +299,7 @@ class TestCase(unittest.TestCase, object):
     # Make sure certain things are restored between tests
     self._originals = {
         'working directory': os.getcwd(),
-        'environment': dict(os.environ),
+        'environment': enc.EncodeEnv(dict(os.environ)),
         'system paths': list(sys.path),
         'stdout': sys.stdout,
         'stderr': sys.stderr,
@@ -921,6 +927,7 @@ class Filters(object):
                 platforms.OperatingSystem.MACOSX)
   _IS_IN_DEB = os.environ.get('CLOUDSDK_TEST_PLATFORM', '') == 'deb'
   _IS_IN_RPM = os.environ.get('CLOUDSDK_TEST_PLATFORM', '') == 'rpm'
+  _IS_IN_KOKORO = 'KOKORO_JOB_NAME' in os.environ
 
   @staticmethod
   def IsOnWindows():
@@ -1019,12 +1026,70 @@ class Filters(object):
       return skip_type(skip_condition, reason_or_function)
 
   @staticmethod
+  def _RunSkippedTests():
+    return bool(
+        pytest and Filters._IsEnvSet('CLOUDSDK_RUN_SKIPPED_TESTS'))
+
+  @staticmethod
+  def _Silence(reason=None, condition=True):
+    """A silenced test will run, but will be skipped if it fails.
+
+    Support for silencing tests requires the pytest_silencer_plugin in
+    googlecloudsdk/tests/lib/pytest_silencer_plugin.py.
+
+    Args:
+      reason: A textual description of why the test is silenced.
+      condition: A boolean indicating whether or not to silence the test.
+    Returns:
+      A decorator to silence a test.
+    """
+    def _SilenceDecorator(func):
+      if not condition:
+        return func
+      silence_marker = pytest.mark.silence(reason=reason)
+      try:
+        # Parameterized tests are an iterable of tests.
+        return [silence_marker(f) for f in func]
+      except TypeError:
+        return silence_marker(func)
+    return _SilenceDecorator
+
+  @staticmethod
+  def _SilenceUnless(reason=None, condition=False):
+    return Filters._Silence(reason=reason, condition=not condition)
+
+  @staticmethod
   def skip(reason, issue):  # pylint: disable=invalid-name
     """Unconditionally skips a test.
 
     Note: The skip decorators are for tests that are skipped due to a bug or
       similar issue. If a test is skipped because it tests (e.g.) some OS
       specific code, use the DoNotRun... or RunOnly... decorators instead.
+      Skipped tests will be run in periodic jobs to see if they are still
+      failing. To prevent a skipped test from being run, use skipAlways.
+
+    Args:
+      reason: A textual description of why the test is skipped.
+      issue: A bug number tied to this skip. Must be in the format 'b/####...'
+
+    Returns:
+      A decorator that will skip a test.
+    """
+    if Filters._RunSkippedTests():
+      skip_type = Filters._Silence
+    else:
+      skip_type = Filters._skip
+    return Filters._Skip(skip_type, reason, issue)
+
+  @staticmethod
+  def skipAlways(reason, issue):  # pylint: disable=invalid-name
+    """Unconditionally skips a test. Will not be run until unskipped.
+
+    Note: The skip decorators are for tests that are skipped due to a bug or
+      similar issue. If a test is skipped because it tests (e.g.) some OS
+      specific code, use the DoNotRun... or RunOnly... decorators instead.
+      Tests with this decorator will NOT be run automatically to determine if
+      they are still failing.
 
     Args:
       reason: A textual description of why the test is skipped.
@@ -1052,8 +1117,11 @@ class Filters(object):
     Returns:
       A decorator that will skip a test under the given condition.
     """
-    return Filters._Skip(Filters._skipIf, reason,
-                         issue, condition=condition)
+    if Filters._RunSkippedTests():
+      skip_type = Filters._Silence
+    else:
+      skip_type = Filters._skipIf
+    return Filters._Skip(skip_type, reason, issue, condition=condition)
 
   @staticmethod
   # pylint: disable=invalid-name
@@ -1072,8 +1140,11 @@ class Filters(object):
     Returns:
       A decorator that will skip a test outside of the given condition.
     """
-    return Filters._Skip(Filters._skipUnless, reason,
-                         issue, condition=condition)
+    if Filters._RunSkippedTests():
+      skip_type = Filters._SilenceUnless
+    else:
+      skip_type = Filters._skipUnless
+    return Filters._Skip(skip_type, reason, issue, condition=condition)
 
   @staticmethod
   def DoNotRunIf(condition, reason):
@@ -1145,9 +1216,68 @@ class Filters(object):
       issue: A bug number tied to this skip. Must be in the format 'b/####...'
 
     Returns:
-      A decorator that will skip a test in Windows.
+      A decorator that will skip a test if running under Python 3.
     """
     return Filters.skipIf(six.PY3, reason, issue)
+
+  @staticmethod
+  def SkipOnPy3Always(reason, issue):
+    """A decorator that always skips a test if running under Python 3.
+
+    Note: The skip decorators are for tests that are skipped due to a bug or
+      similar issue. If a test is skipped because it tests (e.g.) some OS
+      specific code, use the DoNotRun... or RunOnly... decorators instead.
+
+    Args:
+      reason: A textual description of why the test is skipped.
+      issue: A bug number tied to this skip. Must be in the format 'b/####...'
+
+    Returns:
+      A decorator that will always skip a test if running under Python 3.
+    """
+    return Filters._Skip(Filters._skipIf, reason, issue, condition=six.PY3)
+
+  @staticmethod
+  def DoNotRunOnPy3(reason_or_function):
+    """A decorator that doesn't run a test if running under Python 3.
+
+    Note: The DoNotRun... decorators are for tests that are not meant to be run
+      under the given condition (e.g. a symlink test on Windows). If the test
+      should run under the given condition, but is skipped due to a bug, use the
+      skip decorators instead.
+
+    Args:
+      reason_or_function: If called without an arguments list, this will be the
+        function to decorate; otherwise, this will be the reason given for the
+        skip.
+
+    Returns:
+      A decorator that will not run a test in Python 3.
+    """
+    return Filters._CannedSkip(
+        Filters._skipIf, six.PY3, reason_or_function,
+        'This test will not be upgraded to run on Python 3.')
+
+  @staticmethod
+  def DoNotRunOnPy2(reason_or_function):
+    """A decorator that doesn't run a test if running under Python 2.
+
+    Note: The DoNotRun... decorators are for tests that are not meant to be run
+      under the given condition (e.g. a symlink test on Windows). If the test
+      should run under the given condition, but is skipped due to a bug, use the
+      skip decorators instead.
+
+    Args:
+      reason_or_function: If called without an arguments list, this will be the
+        function to decorate; otherwise, this will be the reason given for the
+        skip.
+
+    Returns:
+      A decorator that will not run a test in Python 2.
+    """
+    return Filters._CannedSkip(
+        Filters._skipIf, six.PY2, reason_or_function,
+        'This test will not be upgraded to run on Python 2.')
 
   @staticmethod
   def SkipOnWindows(reason, issue):
@@ -1330,6 +1460,64 @@ class Filters(object):
     # Jenkins (underlying Kokoro) sets ENV_VAR to the string 'false' rather than
     # not setting it at all, hence the following string comparison.
     return env and env != 'false'
+
+  @staticmethod
+  def SkipInKokoro(reason, issue):
+    """A decorator that skips a method if running in Kokoro.
+
+    Note: The skip decorators are for tests that are skipped due to a bug or
+      similar issue. If a test is skipped because it tests (e.g.) some OS
+      specific code, use the DoNotRun... or RunOnly... decorators instead.
+
+    Args:
+      reason: A textual description of why the test is skipped.
+      issue: A bug number tied to this skip. Must be in the format 'b/####...'
+
+    Returns:
+      A decorator that will skip a test in a Kokoro job.
+    """
+    return Filters.skipIf(Filters._IS_IN_KOKORO, reason, issue)
+
+  @staticmethod
+  def DoNotRunInKokoro(reason_or_function):
+    """Decorator for tests that should not run in Kokoro jobs.
+
+    Note: The DoNotRun... decorators are for tests that are not meant to be run
+      under the given condition (e.g. a symlink test on Windows). If the test
+      should run under the given condition, but is skipped due to a bug, use the
+      skip decorators instead.
+
+    Args:
+      reason_or_function: If called without an arguments list, this will be the
+        function to decorate; otherwise, this will be the reason given for the
+        skip.
+
+    Returns:
+      A decorator that will skip a test when running in a Kokoro job.
+    """
+    return Filters._CannedSkip(
+        Filters._skipIf, Filters._IS_IN_KOKORO, reason_or_function,
+        'This test does not run in Kokoro.')
+
+  @staticmethod
+  def RunOnlyInKokoro(reason_or_function):
+    """A decorator for tests designed to only run Kokoro jobs.
+
+    Note: The RunOnly... decorators are for tests that are meant to be run only
+      under the given condition. If the test should run outside the given
+      condition, but is skipped due to a bug, use the skip decorators instead.
+
+    Args:
+      reason_or_function: If called without an arguments list, this will be the
+        function to decorate; otherwise, this will be the reason given for the
+        skip.
+
+    Returns:
+      A decorator that will skip a test when not running in a Kokoro job.
+    """
+    return Filters._CannedSkip(
+        Filters._skipUnless, Filters._IS_IN_KOKORO, reason_or_function,
+        'This test only runs in Kokoro.')
 
   @staticmethod
   def SkipInDebPackage(reason, issue):
@@ -1771,9 +1959,14 @@ class WithOutputCapture(WithContentAssertions):
 
   def AssertOutputMatches(self, expected, name=OUT, normalize_space=False,
                           actual_filter=None, success=True):
-    self._AssertMatches(expected, self.GetOutput(), name,
-                        normalize_space=normalize_space,
-                        actual_filter=actual_filter, success=success)
+    output = self.GetOutput()
+    self._AssertMatches(
+        expected,
+        output,
+        name,
+        normalize_space=normalize_space,
+        actual_filter=actual_filter,
+        success=success)
 
   def AssertOutputNotMatches(self, expected, name=OUT, normalize_space=False,
                              actual_filter=None, success=False):

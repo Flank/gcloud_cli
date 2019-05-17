@@ -21,11 +21,19 @@ from __future__ import unicode_literals
 from googlecloudsdk.calliope import base
 
 
-@base.ReleaseTracks(base.ReleaseTrack.BETA, base.ReleaseTrack.GA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class DomainsAlpha(base.Group):
+  """Manage domains for your Google Cloud projects."""
+
+  category = base.NETWORKING_CATEGORY
+
+
+@base.ReleaseTracks(base.ReleaseTrack.BETA,
+                    base.ReleaseTrack.GA)
 class Domains(base.Group):
   """Base class for gcloud domains command group."""
 
-  category = 'Networking'
+  category = base.NETWORKING_CATEGORY
 
   detailed_help = {
       'brief': 'Manage domains for your Google Cloud projects.',

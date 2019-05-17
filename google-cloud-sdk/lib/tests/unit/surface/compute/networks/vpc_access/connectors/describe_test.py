@@ -23,10 +23,13 @@ from tests.lib import test_case
 from tests.lib.surface.compute.networks.vpc_access import base
 
 
-class ConnectorsDescribeTest(base.VpcAccessUnitTestBase):
+class ConnectorsDescribeTestBeta(base.VpcAccessUnitTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'v1beta1'
 
   def testConnectorsDescribe(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
     expected_connector = self.messages.Connector(
         name=self.connector_relative_name)
     self._ExpectDescribe(expected_connector)
@@ -34,11 +37,9 @@ class ConnectorsDescribeTest(base.VpcAccessUnitTestBase):
     actual_connector = self.Run(
         'compute networks vpc-access connectors describe {} --region={}'.format(
             self.connector_id, self.region_id))
-
     self.assertEqual(actual_connector, expected_connector)
 
-  def testOpertionsDescribe_UsingRelativeConnectorName(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+  def testConnectorsDescribe_UsingRelativeConnectorName(self):
     expected_connector = self.messages.Connector(
         name=self.connector_relative_name)
     self._ExpectDescribe(expected_connector)
@@ -46,7 +47,6 @@ class ConnectorsDescribeTest(base.VpcAccessUnitTestBase):
     actual_connector = self.Run(
         'compute networks vpc-access connectors describe {}'.format(
             self.connector_relative_name))
-
     self.assertEqual(actual_connector, expected_connector)
 
   def _ExpectDescribe(self, expected_connector):
@@ -54,6 +54,13 @@ class ConnectorsDescribeTest(base.VpcAccessUnitTestBase):
         request=self.messages.VpcaccessProjectsLocationsConnectorsGetRequest(
             name=expected_connector.name),
         response=expected_connector)
+
+
+class ConnectorsDescribeTestAlpha(ConnectorsDescribeTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'v1alpha1'
 
 
 if __name__ == '__main__':

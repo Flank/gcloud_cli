@@ -135,16 +135,16 @@ class SNUnitTestBase(sdk_test_base.WithFakeAuth, sdk_test_base.WithLogCapture,
 
   def PreSetUp(self):
     self.services_messages = core_apis.GetMessagesModule(
-        'servicenetworking', 'v1beta')
+        'servicenetworking', 'v1')
 
   def SetUp(self):
     properties.VALUES.core.project.Set(self.PROJECT_NAME)
 
     # Mock out the service networking API
     self.mocked_client = mock.Client(
-        core_apis.GetClientClass('servicenetworking', 'v1beta'),
+        core_apis.GetClientClass('servicenetworking', 'v1'),
         real_client=core_apis.GetClientInstance(
-            'servicenetworking', 'v1beta', no_http=True))
+            'servicenetworking', 'v1', no_http=True))
     self.mocked_client.Mock()
     self.addCleanup(self.mocked_client.Unmock)
     self.service = 'service-name.googleapis.com'
@@ -161,6 +161,26 @@ class SNUnitTestBase(sdk_test_base.WithFakeAuth, sdk_test_base.WithLogCapture,
             connection=self.services_messages.Connection(
                 network=NETWORK_URL_FORMAT % (self.PROJECT_NUMBER, network),
                 reservedPeeringRanges=ranges)),
+        op,
+        exception=error)
+
+  def ExpectUpdateConnection(self,
+                             network,
+                             ranges,
+                             operation,
+                             force,
+                             error=None):
+    if error:
+      op = None
+    else:
+      op = self.services_messages.Operation(name=operation, done=False)
+    self.mocked_client.services_connections.Patch.Expect(
+        self.services_messages.ServicenetworkingServicesConnectionsPatchRequest(
+            name='services/%s/connections/-' % self.service,
+            connection=self.services_messages.Connection(
+                network=NETWORK_URL_FORMAT % (self.PROJECT_NUMBER, network),
+                reservedPeeringRanges=ranges),
+            force=force),
         op,
         exception=error)
 

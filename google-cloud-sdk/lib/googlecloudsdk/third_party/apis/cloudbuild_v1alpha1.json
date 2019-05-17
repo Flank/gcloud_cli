@@ -119,7 +119,7 @@
           "type": "string"
         },
         "projectId": {
-          "description": "The project ID of the GCP project in which the `WorkerPool` is created.",
+          "description": "The project ID of the GCP project for which the `WorkerPool` is created.",
           "type": "string"
         },
         "serviceAccountEmail": {
@@ -136,7 +136,7 @@
           "$ref": "WorkerConfig"
         },
         "regions": {
-          "description": "List of regions to create the `WorkerPool`. Regions can\u2019t be empty.\nIf Cloud Build adds a new GCP region in the future, the existing\n`WorkerPool` will not be enabled in the new region automatically;\nyou must add the new region to the `regions` field to enable the\n`WorkerPool` in that region.",
+          "description": "List of regions to create the `WorkerPool`. Regions can't be empty.\nIf Cloud Build adds a new GCP region in the future, the existing\n`WorkerPool` will not be enabled in the new region automatically;\nyou must add the new region to the `regions` field to enable the\n`WorkerPool` in that region.",
           "enumDescriptions": [
             "no region",
             "us-central1 region",
@@ -225,11 +225,11 @@
           "type": "string"
         },
         "network": {
-          "description": "Network on which the workers are created.\n\u201Cdefault\u201D network is used if empty.",
+          "description": "Network on which the workers are created.\n\"default\" network is used if empty.",
           "type": "string"
         },
         "subnetwork": {
-          "description": "Subnetwork on which the workers are created.\n\u201Cdefault\u201D subnetwork is used if empty.",
+          "description": "Subnetwork on which the workers are created.\n\"default\" subnetwork is used if empty.",
           "type": "string"
         }
       }
@@ -631,6 +631,10 @@
             "type": "string",
             "format": "byte"
           }
+        },
+        "artifactTiming": {
+          "description": "Time to push all non-container artifacts.",
+          "$ref": "TimeSpan"
         }
       }
     },
@@ -707,7 +711,7 @@
           "$ref": "RepoSource"
         },
         "fileHashes": {
-          "description": "Output only. Hash(es) of the build source, which can be used to verify that\nthe originalsource integrity was maintained in the build. Note that\n`FileHashes` willonly be populated if `BuildOptions` has requested a\n`SourceProvenanceHash`.\n\nThe keys to this map are file paths used as build source and the values\ncontain the hash values for those files.\n\nIf the build source came in a single package such as a gzipped tarfile\n(`.tar.gz`), the `FileHash` will be for the single path to that file.",
+          "description": "Output only. Hash(es) of the build source, which can be used to verify that\nthe original source integrity was maintained in the build. Note that\n`FileHashes` will only be populated if `BuildOptions` has requested a\n`SourceProvenanceHash`.\n\nThe keys to this map are file paths used as build source and the values\ncontain the hash values for those files.\n\nIf the build source came in a single package such as a gzipped tarfile\n(`.tar.gz`), the `FileHash` will be for the single path to that file.",
           "type": "object",
           "additionalProperties": {
             "$ref": "FileHashes"
@@ -994,7 +998,7 @@
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "description": "Deletes a `WorkerPool` by its project ID and WorkerPool ID.\n\nThis API is experimental."
+              "description": "Deletes a `WorkerPool` by its project ID and WorkerPool name.\n\nThis API is experimental."
             },
             "patch": {
               "id": "cloudbuild.projects.workerPools.patch",

@@ -8,8 +8,9 @@ DESCRIPTION
     Commands for managing Google Cloud IoT Devices.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -24,6 +25,9 @@ GROUPS
 
      credentials
         Manage credentials for Cloud IoT devices.
+
+     gateways
+        Manage Cloud IoT Core Gateway Associations.
 
      states
         Manage states for Cloud IoT devices.

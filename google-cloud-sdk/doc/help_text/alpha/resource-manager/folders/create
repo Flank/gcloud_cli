@@ -11,7 +11,7 @@ DESCRIPTION
 
 REQUIRED FLAGS
      --display-name=DISPLAY_NAME
-        Friendly display name to use for the new folder
+        Friendly display name to use for the new folder.
 
 OPTIONAL FLAGS
      --async
@@ -25,15 +25,32 @@ OPTIONAL FLAGS
         ID for the organization to use as a parent
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
+
+EXAMPLES
+    The following command creates a folder with the name abc into a folder with
+    the ID 2345:
+
+        $ gcloud alpha resource-manager folders create --display-name=abc \
+            --folder=2345
+
+    The following command creates a folder with the name abc into an
+    organization with ID 1234:
+
+        $ gcloud alpha resource-manager folders create --display-name=abc \
+            --organization=1234
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you will have to apply for early access and have your projects
     registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/.
+    https://cloud.google.com/support/. These variants are also available:
+
+        $ gcloud resource-manager folders create
+        $ gcloud beta resource-manager folders create
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2018 Google Inc. All Rights Reserved.
+# Copyright 2018 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Semantic text objects that are used for styled outputting."""
-# pytype: skip-file
 
 from __future__ import absolute_import
 from __future__ import division
@@ -66,6 +65,20 @@ class TypedText(object):
     self.texts = texts
     self.text_type = text_type
 
+  def __len__(self):
+    length = 0
+    for text in self.texts:
+      length += len(text)
+    return length
+
+  def __add__(self, other):
+    texts = [self, other]
+    return TypedText(texts)
+
+  def __radd__(self, other):
+    texts = [other, self]
+    return TypedText(texts)
+
 
 class _TextTypes(enum.Enum):
   """Text types base class that defines base functionality."""
@@ -85,4 +98,6 @@ class TextTypes(_TextTypes):
   INFO = 5
   URI = 6
   OUTPUT = 7
+  PT_SUCCESS = 8
+  PT_FAILURE = 9
 

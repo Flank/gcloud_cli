@@ -25,4 +25,4 @@ class SslPolicies(base.Group):
   """List, create, delete and update Google Compute Engine SSL policies."""
 
 
-SslPolicies.category = 'Load Balancing'
+SslPolicies.category = base.LOAD_BALANCING_CATEGORY

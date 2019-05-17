@@ -49,9 +49,16 @@ FLAGS
 
      --stop-previous-version
         Stop the previously running version when deploying a new version that
-        receives all traffic. Overrides the default app/stop_previous_version
-        property value for this command invocation. Use
-        --no-stop-previous-version to disable.
+        receives all traffic.
+
+        Note that if the version is running on an instance of an auto-scaled
+        service in the App Engine Standard environment, using
+        --stop-previous-version will not work and the previous version will
+        continue to run because auto-scaled service instances are always
+        running.
+
+        Overrides the default app/stop_previous_version property value for this
+        command invocation. Use --no-stop-previous-version to disable.
 
      --version=VERSION, -v VERSION
         The version of the app that will be created or replaced by this
@@ -59,8 +66,9 @@ FLAGS
         you.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

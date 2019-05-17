@@ -23,12 +23,12 @@ from googlecloudsdk.calliope import parser_errors
 from tests.lib.surface.compute import test_base
 
 
-class InterconnectAttachmentsDedicatedCreateAlphaTest(test_base.BaseTest):
+class InterconnectAttachmentsDedicatedCreateGaTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
-    self.SelectApi('alpha')
-    self.message_version = self.compute_alpha
+    self.track = calliope_base.ReleaseTrack.GA
+    self.SelectApi('v1')
+    self.message_version = self.compute_v1
 
   def CheckInterconnectAttachmentRequest(self, **kwargs):
     interconnect_attachment_msg = {}
@@ -60,7 +60,7 @@ class InterconnectAttachmentsDedicatedCreateAlphaTest(test_base.BaseTest):
                 vlanTag8021q=400,
                 candidateSubnets=[
                     '169.254.0.0/29', '169.254.4.0/28', '169.254.8.0/27'
-                ]),
+                ])
         ],
     ])
 
@@ -111,12 +111,12 @@ class InterconnectAttachmentsDedicatedCreateAlphaTest(test_base.BaseTest):
         ],
     ])
 
-    self.Run(
-        'compute interconnects attachments dedicated create ' + self.compute_uri
-        + '/projects/my-project/regions/us-central1/interconnectAttachments/'
-        'my-attachment --interconnect my-interconnect --router my-router '
-        '--description "this is my attachment" --vlan 400 --admin-enabled '
-        '--candidate-subnets 169.254.0.0/29,169.254.4.0/28,169.254.8.0/27')
+    self.Run('compute interconnects attachments dedicated create ' +
+             self.compute_uri +
+             '/projects/my-project/regions/us-central1/interconnectAttachments/'
+             'my-attachment --interconnect my-interconnect --router my-router '
+             '--description "this is my attachment" --vlan 400 --admin-enabled '
+             '--candidate-subnets 169.254.0.0/29,169.254.4.0/28,169.254.8.0/27')
 
     self.CheckInterconnectAttachmentRequest(
         name='my-attachment',
@@ -144,28 +144,30 @@ class InterconnectAttachmentsDedicatedCreateAlphaTest(test_base.BaseTest):
     messages = self.messages
 
     self.WriteInput('2\n')
-    self.make_requests.side_effect = iter([[
-        self.messages.Region(name='region-1'),
-        self.messages.Region(name='region-2'),
-        self.messages.Region(name='region-3'),
-    ], [
-        messages.InterconnectAttachment(
-            name='my-attachment',
-            description='',
-            region='region-2',
-            interconnect=self.compute_uri +
-            '/projects/my-project/global/interconnects/'
-            'my-interconnect',
-            router=self.compute_uri + '/projects/my-project/regions/'
-            'region-2/routers/my-router',
-            type=messages.InterconnectAttachment.TypeValueValuesEnum(
-                'DEDICATED'),
-            adminEnabled=True,
-            vlanTag8021q=400,
-            candidateSubnets=[
-                '169.254.0.0/29', '169.254.4.0/28', '169.254.8.0/27'
-            ]),
-    ]])
+    self.make_requests.side_effect = iter(
+        [[
+            self.messages.Region(name='region-1'),
+            self.messages.Region(name='region-2'),
+            self.messages.Region(name='region-3'),
+        ],
+         [
+             messages.InterconnectAttachment(
+                 name='my-attachment',
+                 description='',
+                 region='region-2',
+                 interconnect=self.compute_uri +
+                 '/projects/my-project/global/interconnects/'
+                 'my-interconnect',
+                 router=self.compute_uri + '/projects/my-project/regions/'
+                 'region-2/routers/my-router',
+                 type=messages.InterconnectAttachment.TypeValueValuesEnum(
+                     'DEDICATED'),
+                 adminEnabled=True,
+                 vlanTag8021q=400,
+                 candidateSubnets=[
+                     '169.254.0.0/29', '169.254.4.0/28', '169.254.8.0/27'
+                 ]),
+         ]])
 
     self.Run(
         'compute interconnects attachments dedicated create my-attachment '
@@ -201,9 +203,60 @@ class InterconnectAttachmentsDedicatedCreateAlphaTest(test_base.BaseTest):
     self.AssertErrContains('"choices": ["region-1", "region-2", "region-3"]')
     self.AssertOutputEquals('')
 
+  def testCreateInterconnectAttachmentWithBandwidth(self):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [
+            messages.InterconnectAttachment(
+                name='my-attachment',
+                description='',
+                region='us-central1',
+                interconnect=self.compute_uri +
+                '/projects/my-project/global/interconnects/'
+                'my-interconnect',
+                router=self.compute_uri + '/projects/my-project/regions/'
+                'us-central1/routers/my-router',
+                type=messages.InterconnectAttachment.TypeValueValuesEnum(
+                    'DEDICATED'),
+                adminEnabled=True,
+                vlanTag8021q=400,
+                candidateSubnets=[
+                    '169.254.0.0/29', '169.254.4.0/28', '169.254.8.0/27'
+                ],
+                bandwidth=messages.InterconnectAttachment
+                .BandwidthValueValuesEnum('BPS_50M')),
+        ],
+    ])
+
+    self.Run('compute interconnects attachments dedicated create my-attachment '
+             '--region us-central1 --interconnect my-interconnect --router '
+             'my-router --description "this is my attachment" --vlan 400 '
+             '--admin-enabled --candidate-subnets '
+             '169.254.0.0/29,169.254.4.0/28,169.254.8.0/27 --bandwidth 50m')
+
+    self.CheckInterconnectAttachmentRequest(
+        name='my-attachment',
+        description='this is my attachment',
+        interconnect=self.compute_uri +
+        '/projects/my-project/global/interconnects/my-interconnect',
+        router=self.compute_uri + '/projects/my-project/regions/us-central1/'
+        'routers/my-router',
+        type=messages.InterconnectAttachment.TypeValueValuesEnum('DEDICATED'),
+        adminEnabled=True,
+        vlanTag8021q=400,
+        candidateSubnets=['169.254.0.0/29', '169.254.4.0/28', '169.254.8.0/27'],
+        bandwidth=messages.InterconnectAttachment.BandwidthValueValuesEnum(
+            'BPS_50M'))
+    self.AssertOutputEquals('')
+    self.AssertErrContains('You must configure your Google Cloud Router with '
+                           'an interface and BGP peer for your created VLAN '
+                           'attachment. See also https://cloud.google.com'
+                           '/interconnect/docs/how-to/dedicated'
+                           '/creating-vlan-attachments for more detailed help.')
+
 
 class InterconnectAttachmentsDedicatedCreateBetaTest(
-    InterconnectAttachmentsDedicatedCreateAlphaTest):
+    InterconnectAttachmentsDedicatedCreateGaTest):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
@@ -211,10 +264,61 @@ class InterconnectAttachmentsDedicatedCreateBetaTest(
     self.message_version = self.compute_beta
 
 
-class InterconnectAttachmentsDedicatedCreateGaTest(
+class InterconnectAttachmentsDedicatedCreateAlphaTest(
     InterconnectAttachmentsDedicatedCreateBetaTest):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.GA
-    self.SelectApi('v1')
-    self.message_version = self.compute_v1
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('alpha')
+    self.message_version = self.compute_alpha
+
+  def testCreateInterconnectAttachmentWithBandwidth(self):
+    messages = self.messages
+    self.make_requests.side_effect = iter([
+        [
+            messages.InterconnectAttachment(
+                name='my-attachment',
+                description='',
+                region='us-central1',
+                interconnect=self.compute_uri +
+                '/projects/my-project/global/interconnects/'
+                'my-interconnect',
+                router=self.compute_uri + '/projects/my-project/regions/'
+                'us-central1/routers/my-router',
+                type=messages.InterconnectAttachment.TypeValueValuesEnum(
+                    'DEDICATED'),
+                adminEnabled=True,
+                vlanTag8021q=400,
+                candidateSubnets=[
+                    '169.254.0.0/29', '169.254.4.0/28', '169.254.8.0/27'
+                ],
+                bandwidth=messages.InterconnectAttachment
+                .BandwidthValueValuesEnum('BPS_50G')),
+        ],
+    ])
+
+    self.Run('compute interconnects attachments dedicated create my-attachment '
+             '--region us-central1 --interconnect my-interconnect --router '
+             'my-router --description "this is my attachment" --vlan 400 '
+             '--admin-enabled --candidate-subnets '
+             '169.254.0.0/29,169.254.4.0/28,169.254.8.0/27 --bandwidth 50g')
+
+    self.CheckInterconnectAttachmentRequest(
+        name='my-attachment',
+        description='this is my attachment',
+        interconnect=self.compute_uri +
+        '/projects/my-project/global/interconnects/my-interconnect',
+        router=self.compute_uri + '/projects/my-project/regions/us-central1/'
+        'routers/my-router',
+        type=messages.InterconnectAttachment.TypeValueValuesEnum('DEDICATED'),
+        adminEnabled=True,
+        vlanTag8021q=400,
+        candidateSubnets=['169.254.0.0/29', '169.254.4.0/28', '169.254.8.0/27'],
+        bandwidth=messages.InterconnectAttachment.BandwidthValueValuesEnum(
+            'BPS_50G'))
+    self.AssertOutputEquals('')
+    self.AssertErrContains('You must configure your Google Cloud Router with '
+                           'an interface and BGP peer for your created VLAN '
+                           'attachment. See also https://cloud.google.com'
+                           '/interconnect/docs/how-to/dedicated'
+                           '/creating-vlan-attachments for more detailed help.')

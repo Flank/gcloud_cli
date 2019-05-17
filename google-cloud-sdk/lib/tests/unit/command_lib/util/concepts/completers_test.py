@@ -23,6 +23,7 @@ from apitools.base.protorpclite import messages
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.api_lib.util import resource as resource_util
 from googlecloudsdk.calliope.concepts import deps
+from googlecloudsdk.command_lib.util.apis import arg_utils
 from googlecloudsdk.command_lib.util.apis import registry
 from googlecloudsdk.command_lib.util.concepts import completers
 from googlecloudsdk.command_lib.util.concepts import concept_parsers
@@ -53,6 +54,7 @@ class CompleterTest(concepts_test_base.ConceptsTestBase,
     self.mock_client = mock.MagicMock()
     self.StartObjectPatch(apis, 'GetClientInstance',
                           return_value=self.mock_client)
+    self.StartObjectPatch(arg_utils, '_GetField')
     self.presentation_spec = presentation_specs.ResourcePresentationSpec(
         '--book',
         self.resource_spec_auto_completers,
@@ -664,6 +666,7 @@ class ProjectCompleterTest(
     # pylint:enable=protected-access
 
     self.mock_client = mock.MagicMock()
+    self.StartObjectPatch(arg_utils, '_GetField')
     self.StartObjectPatch(apis, 'GetClientInstance',
                           return_value=self.mock_client)
     self.presentation_spec = presentation_specs.ResourcePresentationSpec(

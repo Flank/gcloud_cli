@@ -1,0 +1,490 @@
+title: test resource policy
+release_tracks:
+- ALPHA
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute instances create $$instance$$ --zone us-central1-f --format="value(name)"
+  - stderr: |
+      Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+  - stdout: |
+      $$instance$$
+- execute:
+  - command: compute resource-policies create-vm-maintenance $$policy$$ --region us-central1
+      --start-time 04:00Z --daily-window
+  - stderr: |
+      Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$].
+- execute:
+  - command: compute resource-policies list --format="value(name)" --filter="name=$$policy$$"
+  - stdout: |
+      $$policy$$
+- execute:
+  - command: compute instances add-resource-policies $$instance$$ --zone us-central1-f
+      --resource-policies $$policy$$
+  - stderr: |
+      Updated [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+- execute:
+  - command: |
+      compute instances describe $$instance$$ --zone us-central1-f
+      --format="text(name, resourcePolicies)"
+  - stdout: |
+      name:                $$instance$$
+      resourcePolicies[0]: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$
+- execute:
+  - command: compute instances delete $$instance$$ --zone us-central1-f --quiet
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+- execute:
+  - command: compute resource-policies delete $$policy$$ --region us-central1 --quiet
+  - stderr: |
+      Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$].
+actions:
+- define_reference:
+    reference: compute-uri
+    value: www.googleapis.com/compute
+- generate_resource_id:
+    reference: instance
+    prefix: gcloud-compute-test
+- generate_resource_id:
+    reference: policy
+    prefix: gcloud-compute-test
+- execute_command:
+    command: compute instances create $$instance$$ --zone us-central1-f --format="value(name)"
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - expect_stdout: |
+        $$instance$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute resource-policies create-vm-maintenance $$policy$$ --region us-central1
+      --start-time 04:00Z --daily-window
+    events:
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              name: $$policy$$
+              region: us-central1
+              vmMaintenancePolicy:
+                maintenanceWindow:
+                  dailyMaintenanceWindow:
+                    daysInCycle: 1
+                    startTime: 04:00
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            id: '6655694010852448220'
+            name: operation-1545840947080-57def2487ad54-37652928-4fd58133
+            operationType: insert
+            targetLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$
+            targetId: '859715230644443100'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2018-12-26T08:15:47.662-08:00'
+            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1545840947080-57def2487ad54-37652928-4fd58133
+            region: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1
+            kind: compute#operation
+        poll_operation: true
+    - expect_stderr: |
+        Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$].
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            ETag: H0zeng9MACn_rm6I2i3YX20incs=/8KPF9GcE8o46gP70jEb1ehD_w20=
+            status: '200'
+          body:
+            id: '859715230644443100'
+            creationTimestamp: '2018-12-26T08:15:47.658-08:00'
+            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$
+            region: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1
+            name: $$policy$$
+            kind: compute#resourcePolicy
+            vmMaintenancePolicy:
+              maintenanceWindow:
+                dailyMaintenanceWindow:
+                  daysInCycle: 1
+                  startTime: 04:00
+                  duration: PT14400S
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute resource-policies list --format="value(name)" --filter="name=$$policy$$"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/aggregated/resourcePolicies?alt=json&maxResults=500
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            ETag: nRqBrQgCinRqGkZUV-XSyrfb-g8=/iLlketo-3WFsQdbpzedfkFGl41M=
+            status: '200'
+          body:
+            id: projects/cloud-sdk-integration-testing/aggregated/resourcePolicies
+            items:
+              regions/us-central1:
+                resourcePolicies:
+                - id: '2380696822425196166'
+                  creationTimestamp: '2018-12-26T08:12:25.183-08:00'
+                  selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/gcloud-compute-test-20181226-161222-l5re
+                  region: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1
+                  name: gcloud-compute-test-20181226-161222-l5re
+                  kind: compute#resourcePolicy
+                  vmMaintenancePolicy:
+                    maintenanceWindow:
+                      dailyMaintenanceWindow:
+                        daysInCycle: 1
+                        startTime: 04:00
+                        duration: PT14400S
+                - id: '8885122499534001818'
+                  creationTimestamp: '2018-12-26T08:12:37.332-08:00'
+                  selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/gcloud-compute-test-20181226-161235-ab3c
+                  region: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1
+                  name: gcloud-compute-test-20181226-161235-ab3c
+                  kind: compute#resourcePolicy
+                  vmMaintenancePolicy:
+                    maintenanceWindow:
+                      dailyMaintenanceWindow:
+                        daysInCycle: 1
+                        startTime: 04:00
+                        duration: PT14400S
+                - id: '859715230644443100'
+                  creationTimestamp: '2018-12-26T08:15:47.658-08:00'
+                  selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$
+                  region: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1
+                  name: $$policy$$
+                  kind: compute#resourcePolicy
+                  vmMaintenancePolicy:
+                    maintenanceWindow:
+                      dailyMaintenanceWindow:
+                        daysInCycle: 1
+                        startTime: 04:00
+                        duration: PT14400S
+              regions/europe-west1:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/europe-west1' on
+                    this page.
+                  data:
+                  - key: scope
+                    value: regions/europe-west1
+              regions/us-west1:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/us-west1' on this
+                    page.
+                  data:
+                  - key: scope
+                    value: regions/us-west1
+              regions/asia-east1:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/asia-east1' on
+                    this page.
+                  data:
+                  - key: scope
+                    value: regions/asia-east1
+              regions/us-east1:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/us-east1' on this
+                    page.
+                  data:
+                  - key: scope
+                    value: regions/us-east1
+              regions/us-east2:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/us-east2' on this
+                    page.
+                  data:
+                  - key: scope
+                    value: regions/us-east2
+              regions/asia-northeast1:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/asia-northeast1'
+                    on this page.
+                  data:
+                  - key: scope
+                    value: regions/asia-northeast1
+              regions/asia-southeast1:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/asia-southeast1'
+                    on this page.
+                  data:
+                  - key: scope
+                    value: regions/asia-southeast1
+              regions/us-east4:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/us-east4' on this
+                    page.
+                  data:
+                  - key: scope
+                    value: regions/us-east4
+              regions/australia-southeast1:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/australia-southeast1'
+                    on this page.
+                  data:
+                  - key: scope
+                    value: regions/australia-southeast1
+              regions/europe-west2:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/europe-west2' on
+                    this page.
+                  data:
+                  - key: scope
+                    value: regions/europe-west2
+              regions/europe-west3:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/europe-west3' on
+                    this page.
+                  data:
+                  - key: scope
+                    value: regions/europe-west3
+              regions/southamerica-east1:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/southamerica-east1'
+                    on this page.
+                  data:
+                  - key: scope
+                    value: regions/southamerica-east1
+              regions/asia-south1:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/asia-south1' on
+                    this page.
+                  data:
+                  - key: scope
+                    value: regions/asia-south1
+              regions/northamerica-northeast1:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/northamerica-northeast1'
+                    on this page.
+                  data:
+                  - key: scope
+                    value: regions/northamerica-northeast1
+              regions/europe-west4:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/europe-west4' on
+                    this page.
+                  data:
+                  - key: scope
+                    value: regions/europe-west4
+              regions/europe-north1:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/europe-north1'
+                    on this page.
+                  data:
+                  - key: scope
+                    value: regions/europe-north1
+              regions/us-west2:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/us-west2' on this
+                    page.
+                  data:
+                  - key: scope
+                    value: regions/us-west2
+              regions/asia-east2:
+                warning:
+                  code: NO_RESULTS_ON_PAGE
+                  message: There are no results for scope 'regions/asia-east2' on
+                    this page.
+                  data:
+                  - key: scope
+                    value: regions/asia-east2
+            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/aggregated/resourcePolicies
+            etag: nRqBrQgCinRqGkZUV-XSyrfb-g8=/iLlketo-3WFsQdbpzedfkFGl41M=
+            kind: compute#resourcePolicyAggregatedList
+    - expect_stdout: |
+        $$policy$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute instances add-resource-policies $$instance$$ --zone us-central1-f
+      --resource-policies $$policy$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$/addResourcePolicies?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              resourcePolicies:
+              - https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            id: '280295924478908375'
+            name: operation-1545840952094-57def24d430b8-22e1da78-16fba295
+            zone: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            operationType: addResourcePolicies
+            targetLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
+            targetId: '2937901307900336121'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2018-12-26T08:15:52.520-08:00'
+            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1545840952094-57def24d430b8-22e1da78-16fba295
+            kind: compute#operation
+        poll_operation: true
+    - expect_stderr: |
+        Updated [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            ETag: 8GjpOS8bUSgodVWKY1LrVmmkO3w=/p2zf5ZeA9MRMMqE88nWid_xr36A=
+            status: '200'
+          body:
+            id: '2937901307900336121'
+            creationTimestamp: '2018-12-26T08:15:19.497-08:00'
+            name: $$instance$$
+            tags:
+              fingerprint: 42WmSpB8rSM=
+            machineType: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/machineTypes/n1-standard-1
+            status: RUNNING
+            zone: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            canIpForward: false
+            networkInterfaces:
+            - network: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/networks/default
+              networkIP: 10.240.1.22
+              name: nic0
+              accessConfigs:
+              - type: ONE_TO_ONE_NAT
+                name: external-nat
+                natIP: 35.238.150.78
+                networkTier: PREMIUM
+                kind: compute#accessConfig
+              fingerprint: -z3cTRChQBM=
+              kind: compute#networkInterface
+            disks:
+            - type: PERSISTENT
+              mode: READ_WRITE
+              source: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$instance$$
+              deviceName: persistent-disk-0
+              index: 0
+              boot: true
+              autoDelete: true
+              licenses:
+              - https://www.googleapis.com/compute/alpha/projects/debian-cloud/global/licenses/debian-9-stretch
+              interface: SCSI
+              guestOsFeatures:
+              - type: VIRTIO_SCSI_MULTIQUEUE
+              diskSizeGb: '10'
+              kind: compute#attachedDisk
+            metadata:
+              fingerprint: 4_QxQ57NQak=
+              kind: compute#metadata
+            serviceAccounts:
+            - email: 462803083913-compute@developer.gserviceaccount.com
+              scopes:
+              - https://www.googleapis.com/auth/devstorage.read_only
+              - https://www.googleapis.com/auth/logging.write
+              - https://www.googleapis.com/auth/monitoring.write
+              - https://www.googleapis.com/auth/pubsub
+              - https://www.googleapis.com/auth/service.management.readonly
+              - https://www.googleapis.com/auth/servicecontrol
+              - https://www.googleapis.com/auth/trace.append
+            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$
+            scheduling:
+              onHostMaintenance: MIGRATE
+              automaticRestart: true
+              preemptible: false
+            cpuPlatform: Intel Ivy Bridge
+            labelFingerprint: 42WmSpB8rSM=
+            startRestricted: false
+            deletionProtection: false
+            resourcePolicies:
+            - https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$
+            kind: compute#instance
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      compute instances describe $$instance$$ --zone us-central1-f
+      --format="text(name, resourcePolicies)"
+    validation_only: true
+    events:
+    - expect_stdout: |
+        name:                $$instance$$
+        resourcePolicies[0]: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: compute instances delete $$instance$$ --zone us-central1-f --quiet
+    validation_only: true
+    events:
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
+    - expect_exit:
+        code: 0
+    cleanup_for: instance
+- execute_command:
+    command: compute resource-policies delete $$policy$$ --region us-central1 --quiet
+    events:
+    - api_call:
+        expect_request:
+          uri: https://$$compute-uri$$/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            Content-Type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            id: '505175571669325025'
+            name: operation-1545841165626-57def318e6e16-91beda41-d6a7dafb
+            operationType: delete
+            targetLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$
+            targetId: '859715230644443100'
+            status: PENDING
+            user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
+            progress: 0
+            insertTime: '2018-12-26T08:19:26.655-08:00'
+            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/operations/operation-1545841165626-57def318e6e16-91beda41-d6a7dafb
+            region: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1
+            kind: compute#operation
+        poll_operation: true
+    - expect_stderr: |
+        Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1/resourcePolicies/$$policy$$].
+    - expect_exit:
+        code: 0
+    cleanup_for: policy

@@ -69,20 +69,21 @@ Print a list of resource URIs instead of the default output.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
 .SH "EXAMPLES"
 
-The following command lists a maximum of five projects sorted alphabetically by
-name:
+The following command lists the last five created projects, sorted
+alphabetically by project ID:
 
 .RS 2m
-$ gcloud alpha projects list \-\-limit=5
+$ gcloud alpha projects list \-\-sort\-by=projectId \-\-limit=5
 .RE
 
 

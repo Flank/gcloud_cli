@@ -41,10 +41,10 @@ apis:
       default: false
     v1beta:
       discovery_doc: accesscontextmanager_v1beta.json
-      default: true
-  apikeys:
+      default: false
     v1:
-      discovery_doc: apikeys_v1.json
+      discovery_doc: accesscontextmanager_v1.json
+      default: true
   appengine:
     v1alpha:
       discovery_doc: appengine_v1alpha.json
@@ -93,27 +93,12 @@ apis:
     v1:
       discovery_doc: bio_v1.json
       default: true
-  categorymanager:
-    v1alpha1:
-      discovery_doc: categorymanager_v1alpha1.json
-      resources:
-        assets:
-          path: assets/{assetId}
-        assets.tag:
-          path: assets/{assetId}/annotationTag
-    v1alpha2:
-      default: true
-      discovery_doc: categorymanager_v1alpha2.json
-      resources:
-        assets:
-          path: assets/{assetId}
-        assets.tag:
-          path: assets/{assetId}/annotationTag
-        organizations:
-          path: organizations/{organizationId}
   cloudasset:
     v1beta1:
+      default: true
       discovery_doc: cloudasset_v1beta1.json
+    v1:
+      discovery_doc: cloudasset_v1.json
   cloudbilling:
     v1:
       discovery_doc: cloudbilling_v1.json
@@ -186,6 +171,8 @@ apis:
       discovery_doc: cloudresourcemanager_v2alpha1.json
     v2beta1:
       discovery_doc: cloudresourcemanager_v2beta1.json
+    v2:
+      discovery_doc: cloudresourcemanager_v2.json
   cloudresourcesearch:
     v1:
       discovery_doc: cloudresourcesearch_v1.json
@@ -198,9 +185,11 @@ apis:
   cloudtasks:
     v2beta2:
       discovery_doc: cloudtasks_v2beta2.json
-      default: true
     v2beta3:
       discovery_doc: cloudtasks_v2beta3.json
+    v2:
+      discovery_doc: cloudtasks_v2.json
+      default: true
   cloudscheduler:
     v1alpha1:
       discovery_doc: cloudscheduler_v1alpha1.json
@@ -264,9 +253,14 @@ apis:
     v1beta1:
       discovery_doc: containeranalysis_v1beta1.json
   datacatalog:
+    v1alpha3:
+      discovery_doc: datacatalog_v1alpha3.json
     v1beta1:
       discovery_doc: datacatalog_v1beta1.json
       default: true
+      resources:
+        entries:
+          path: entries
   dataflow:
     v1b3:
       discovery_doc: dataflow_v1b3.json
@@ -306,6 +300,12 @@ apis:
       default: true
     v2beta:
       discovery_doc: deploymentmanager_v2beta.json
+  dialogflow:
+    v2:
+      discovery_doc: dialogflow_v2.json
+      resources:
+        projects.agent:
+          path: projects/{projectsId}/agent
   discovery:
     v1:
       discovery_doc: discovery_v1.json
@@ -318,12 +318,22 @@ apis:
       default: true
     v1beta2:
       discovery_doc: dns_v1beta2.json
+  domains:
+    v1alpha1:
+      discovery_doc: domains_v1alpha1.json
+      default: true
+  edge:
+    v1alpha1:
+      discovery_doc: edge_v1alpha1.json
+  edgeml:
+    v1beta1:
+      discovery_doc: edgeml_v1beta1.json
   eventflow:
     v1beta2:
       discovery_doc: eventflow_v1beta2.json
   file:
-    v1alpha1:
-      discovery_doc: file_v1alpha1.json
+    v1p1alpha1:
+      discovery_doc: file_v1p1alpha1.json
       default: true
     v1beta1:
       discovery_doc: file_v1beta1.json
@@ -348,6 +358,14 @@ apis:
       discovery_doc: genomics_v1alpha2.json
     v2alpha1:
       discovery_doc: genomics_v2alpha1.json
+  gkehub:
+    v1beta1:
+      discovery_doc: gkehub_v1beta1.json
+      default: true
+  healthcare:
+    v1alpha2:
+      discovery_doc: healthcare_v1alpha2.json
+      default: true
   oslogin:
     v1alpha:
       discovery_doc: oslogin_v1alpha.json
@@ -365,6 +383,10 @@ apis:
       resources:
         users.projects:
           path: users/{user}/projects/{project}
+  osconfig:
+    v1alpha1:
+      discovery_doc: osconfig_v1alpha1.json
+      default: true
   iam:
     v1:
       discovery_doc: iam_v1.json
@@ -380,9 +402,15 @@ apis:
   iap:
     v1beta1:
       discovery_doc: iap_v1beta1.json
-  kubernetespolicy:
-    v1alpha1:
-      discovery_doc: kubernetespolicy_v1alpha1.json
+      resources:
+        projects:
+          path: projects/{project}/iap_web
+        projects.iap_web:
+          path: projects/{project}/iap_web/{iapWebId}
+        projects.iap_web.services:
+          path: projects/{project}/iap_web/{iapWebId}/services/{serviceId}
+        projects.iap_web.services.versions:
+          path: projects/{project}/iap_web/{iapWebId}/services/{serviceId}/versions/{versionId}
   language:
     v1beta2:
       discovery_doc: language_v1beta2.json
@@ -425,20 +453,37 @@ apis:
     v1:
       discovery_doc: redis_v1.json
       default: true
+  run:
+    v1alpha1:
+      discovery_doc: run_v1alpha1.json
   runtimeconfig:
     v1beta1:
       discovery_doc: runtimeconfig_v1beta1.json
-  serverless:
-    v1alpha1:
-      discovery_doc: serverless_v1alpha1.json
+  securitycenter:
+    v1beta1:
+      discovery_doc: securitycenter_v1beta1.json
+      resources:
+        organizations.sources.findings:
+          path: organizations/{organizationsId}/sources/{sourcesId}/findings/{findingId}
+        organizations.assets:
+          path: organizations/{organizationsId}/assets/{assetsId}
+    v1:
+      discovery_doc: securitycenter_v1.json
+      resources:
+        organizations.sources.findings:
+          path: organizations/{organizationsId}/sources/{sourcesId}/findings/{findingId}
+        organizations.assets:
+          path: organizations/{organizationsId}/assets/{assetsId}
+      default: true
   servicemanagement:
     v1:
       discovery_doc: servicemanagement_v1.json
   servicenetworking:
-    v1alpha:
-      discovery_doc: servicenetworking_v1alpha.json
     v1beta:
       discovery_doc: servicenetworking_v1beta.json
+      default: false
+    v1:
+      discovery_doc: servicenetworking_v1.json
       default: true
   serviceusage:
     v1beta1:
@@ -515,13 +560,10 @@ apis:
       resources:
         images:
           path: images
-  alpha_vision:
-    v1:
-      discovery_doc: alpha_vision_v1.json
-      default: true
-      resources:
-        images:
-          path: images
+        projects.locations.productSets.products:
+          path: projects/{projectsId}/locations/{locationsId}/productSets/{productSetsId}/products
+        files:
+          path: files
   dlp:
     v2:
       discovery_doc: dlp_v2.json
@@ -538,6 +580,9 @@ apis:
   vpcaccess:
     v1alpha1:
       discovery_doc: vpcaccess_v1alpha1.json
+    v1beta1:
+      discovery_doc: vpcaccess_v1beta1.json
+      default: true
   remotebuildexecution:
     v1alpha:
       discovery_doc: remotebuildexecution_v1alpha.json
@@ -551,3 +596,25 @@ apis:
   bigquerydatatransfer:
     v1:
       discovery_doc: bigquerydatatransfer_v1.json
+  websecurityscanner:
+    v1beta:
+      discovery_doc: websecurityscanner_v1beta.json
+      resources:
+        projects.scanConfigs.scanRuns.crawledUrls:
+          path: projects/{projectsId}/scanConfigs/{scanConfigsId}/scanRuns/{scanRunsId}
+          enable_uri_parsing: false
+  recommender:
+    v1alpha1:
+      discovery_doc: recommender_v1alpha1.json
+      resources:
+        projects.locations:
+          path: projects/{projectsId}/locations/{locationsId}
+          enable_uri_parsing: false
+        projects.locations.recommenders:
+          path: projects/{projectsId}/locations/{locationsId}/recommenders/{recommendersId}
+          enable_uri_parsing: false
+        projects.locations.recommenders.recommendations:
+          path: projects/{projectsId}/locations/{locationsId}/recommenders/{recommendersId}/recommendations/{recommendationsId}
+          enable_uri_parsing: false
+        operations:
+          path: operations/{+operationId}

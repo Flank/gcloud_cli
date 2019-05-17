@@ -1,6 +1,7 @@
 skip:
   reason: Failing
-  bug: b/121387177
+  bug: b/122968518
+  always: true  # Never run this because it takes too long.
 title: Create a disk snapshot from a Windows image.
 release_tracks: [GA]
 
@@ -38,7 +39,9 @@ summary:
 
 
 actions:
-
+- define_reference:
+    reference: compute-uri
+    value: www.googleapis.com/compute
 
 - generate_resource_id:
     reference: instance
@@ -63,7 +66,9 @@ actions:
 
 - execute_command_until:
     command: compute instances get-serial-port-output $$instance$$ --zone us-central1-f
-    timeout: 600
+    timeout: 900
+    exponential_sleep_multiplier: '1.5'
+    wait_ceiling: 30
     stdout:
       matches: .*Instance setup finished.*
 
@@ -79,7 +84,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$instance$$/createSnapshot?alt=json&guestFlush=True
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$instance$$/createSnapshot?alt=json&guestFlush=True
           method: POST
           headers: {}
           body:
@@ -110,7 +115,7 @@ actions:
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
           method: GET
           headers: {}
           body:
@@ -147,7 +152,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
           method: GET
           headers: {}
           body:

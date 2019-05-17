@@ -19,7 +19,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core.console import console_io
 from tests.lib import sdk_test_base
 from tests.lib.surface.dataproc import base
@@ -78,8 +77,11 @@ class JobsDeleteUnitTestBeta(JobsDeleteUnitTest, base.DataprocTestBaseBeta):
 
   def testBeta(self):
     self.assertEqual(self.messages, self._beta_messages)
-    self.assertEqual(self.track, calliope_base.ReleaseTrack.BETA)
 
+
+class JobsDeleteUnitTestAlpha(JobsDeleteUnitTestBeta,
+                              base.DataprocTestBaseAlpha):
+  pass
 
 if __name__ == '__main__':
   sdk_test_base.main()

@@ -1,0 +1,102 @@
+
+.TH "GCLOUD_BETA_ML_VISION_PRODUCT\-SEARCH_PRODUCT\-SETS_ADD\-PRODUCT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta ml vision product\-search product\-sets add\-product \- add a product to the specified product set
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta ml vision product\-search product\-sets add\-product\fR (\fIPRODUCT_SET\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) \fB\-\-product\fR=\fIPRODUCT\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Add a product to the specified product set. One product can be
+added to at most 100 product sets.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+Product set resource \- Product set to add product to. The arguments in this
+group can be used to specify the attributes of this resource. (NOTE) Some
+attributes are not given arguments in this group but can be set in other ways.
+To set the [project] attribute: provide the argument [product_set] on the
+command line with a fully specified name; set the property [core/project];
+provide the argument [\-\-project] on the command line. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIPRODUCT_SET\fR
+ID of the product set or fully qualified identifier for the product set. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+The location of product set.
+
+
+.RE
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-product\fR=\fIPRODUCT\fR
+The id of the product to add to the product set. The product must be in the same
+project and location as the specified product set.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBvision/v1\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/vision/
+
+
+
+.SH "EXAMPLES"
+
+To add product 'my\-product' to product set 'my\-product\-set' in location
+\'us\-east1', run:
+
+.RS 2m
+$ gcloud beta ml vision product\-search product\-sets add\-product \e
+    my\-product\-set \-\-location=us\-east1 \-\-product=my\-product
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha ml vision product\-search product\-sets add\-product
+.RE
+

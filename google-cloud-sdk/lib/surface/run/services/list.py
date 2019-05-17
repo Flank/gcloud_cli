@@ -18,7 +18,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
-from googlecloudsdk.calliope import base
+from googlecloudsdk.api_lib.run import global_methods
+from googlecloudsdk.command_lib.run import commands
 from googlecloudsdk.command_lib.run import connection_context
 from googlecloudsdk.command_lib.run import flags
 from googlecloudsdk.command_lib.run import pretty_print
@@ -28,7 +29,7 @@ from googlecloudsdk.command_lib.util.concepts import concept_parsers
 from googlecloudsdk.command_lib.util.concepts import presentation_specs
 
 
-class List(base.ListCommand):
+class List(commands.List):
   """List available services."""
 
   detailed_help = {
@@ -42,9 +43,8 @@ class List(base.ListCommand):
           """,
   }
 
-  @staticmethod
-  def Args(parser):
-    flags.AddRegionArgWithDefault(parser)
+  @classmethod
+  def Args(cls, parser):
     namespace_presentation = presentation_specs.ResourcePresentationSpec(
         '--namespace',
         resource_args.GetNamespaceResourceSpec(),
@@ -52,20 +52,30 @@ class List(base.ListCommand):
         required=True,
         prefixes=False)
     concept_parsers.ConceptParser([
+        resource_args.CLOUD_RUN_LOCATION_PRESENTATION,
         resource_args.CLUSTER_PRESENTATION,
         namespace_presentation]).AddToParser(parser)
-    parser.display_info.AddFormat(
-        """table(
+    parser.display_info.AddFormat("""table(
         {ready_column},
         firstof(id,metadata.name):label=SERVICE,
         region:label=REGION,
         latest_created_revision:label="LATEST REVISION",
-        serving_revisions.list():label="SERVING REVISION")""".format(
+        serving_revisions.list():label="SERVING REVISION",
+        last_modifier:label="LAST DEPLOYED BY",
+        last_transition_time:label="LAST DEPLOYED AT")""".format(
             ready_column=pretty_print.READY_COLUMN))
+    parser.display_info.AddUriFunc(cls._GetResourceUri)
 
   def Run(self, args):
     """List available services."""
-    conn_context = connection_context.GetConnectionContext(args)
-    namespace_ref = args.CONCEPTS.namespace.Parse()
-    with serverless_operations.Connect(conn_context) as client:
-      return client.ListServices(namespace_ref)
+    if not flags.ValidateIsGKE(args) and not getattr(args, 'region', None):
+      client = global_methods.GetServerlessClientInstance()
+      self.SetPartialApiEndpoint(client.url)
+      locations_ref = args.CONCEPTS.region.Parse()
+      return global_methods.ListServices(client, locations_ref.RelativeName())
+    else:
+      conn_context = connection_context.GetConnectionContext(args)
+      namespace_ref = args.CONCEPTS.namespace.Parse()
+      with serverless_operations.Connect(conn_context) as client:
+        self.SetCompleteApiEndpoint(conn_context.endpoint)
+        return client.ListServices(namespace_ref)

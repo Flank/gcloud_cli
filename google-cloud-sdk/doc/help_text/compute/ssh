@@ -105,6 +105,9 @@ FLAGS
         to ssh(1) if the external IP address of 'example-instance' is
         162.222.181.197.
 
+        If connecting to the instance's external IP, then %INSTANCE% is
+        replaced with that, otherwise it is replaced with the internal IP.
+
      --ssh-key-file=SSH_KEY_FILE
         The path to the SSH key file. By default, this is
         ~/.ssh/google_compute_engine.
@@ -137,8 +140,9 @@ FLAGS
         CLOUDSDK_COMPUTE_ZONE.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

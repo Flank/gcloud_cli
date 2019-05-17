@@ -27,4 +27,4 @@ from googlecloudsdk.calliope import base
 class Meta(base.Group):
   """Cloud meta introspection commands."""
 
-  category = 'SDK Tools'
+  category = base.SDK_TOOLS_CATEGORY

@@ -429,9 +429,14 @@ class CommandSchemaTests(sdk_test_base.SdkBase, parameterized.TestCase):
     self.assertEqual(o.mask_field, 'resource.updateMask')
     self.assertTrue(o.read_modify_update)
 
+    o = yaml_command_schema.UpdateData({'disable_auto_field_mask': True})
+    self.assertIsNone(o.mask_field)
+    self.assertTrue(o.disable_auto_field_mask)
+
     o = yaml_command_schema.UpdateData({})
     self.assertIsNone(o.mask_field)
     self.assertFalse(o.read_modify_update)
+    self.assertFalse(o.disable_auto_field_mask)
 
 
 class ArgGenParseTests(sdk_test_base.SdkBase, parameterized.TestCase):

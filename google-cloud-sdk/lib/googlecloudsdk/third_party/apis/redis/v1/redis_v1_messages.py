@@ -22,6 +22,42 @@ class Empty(_messages.Message):
 
 
 
+class FailoverInstanceRequest(_messages.Message):
+  r"""Request for Failover.
+
+  Enums:
+    DataProtectionModeValueValuesEnum: Optional. Available data protection
+      modes that the user can choose. If it's unspecified, data protection
+      mode will be LIMITED_DATA_LOSS by default.
+
+  Fields:
+    dataProtectionMode: Optional. Available data protection modes that the
+      user can choose. If it's unspecified, data protection mode will be
+      LIMITED_DATA_LOSS by default.
+  """
+
+  class DataProtectionModeValueValuesEnum(_messages.Enum):
+    r"""Optional. Available data protection modes that the user can choose. If
+    it's unspecified, data protection mode will be LIMITED_DATA_LOSS by
+    default.
+
+    Values:
+      DATA_PROTECTION_MODE_UNSPECIFIED: Defaults to LIMITED_DATA_LOSS if a
+        data protection mode is not specified.
+      LIMITED_DATA_LOSS: Instance failover will be protected with data loss
+        control. More specifically, the failover will only be performed if the
+        current replication offset diff between master and replica is under a
+        certain threshold.
+      FORCE_DATA_LOSS: Instance failover will be performed without data loss
+        control.
+    """
+    DATA_PROTECTION_MODE_UNSPECIFIED = 0
+    LIMITED_DATA_LOSS = 1
+    FORCE_DATA_LOSS = 2
+
+  dataProtectionMode = _messages.EnumField('DataProtectionModeValueValuesEnum', 1)
+
+
 class GoogleCloudRedisV1LocationMetadata(_messages.Message):
   r"""This location metadata represents additional configuration options for a
   given location where a Redis instance may be created. All fields are output
@@ -179,9 +215,10 @@ class Instance(_messages.Message):
         of updates may cause the instance to become unusable while the update
         is in progress.
       DELETING: Redis instance is being deleted.
-      REPAIRING: Redis instance is being repaired and may be unusable. Details
-        can be found in the `status_message` field.
+      REPAIRING: Redis instance is being repaired and may be unusable.
       MAINTENANCE: Maintenance is being performed on this Redis instance.
+      FAILING_OVER: Redis instance is failing over (availability may be
+        affected).
     """
     STATE_UNSPECIFIED = 0
     CREATING = 1
@@ -190,6 +227,7 @@ class Instance(_messages.Message):
     DELETING = 4
     REPAIRING = 5
     MAINTENANCE = 6
+    FAILING_OVER = 7
 
   class TierValueValuesEnum(_messages.Enum):
     r"""Required. The service tier of the instance.
@@ -447,7 +485,8 @@ class Operation(_messages.Message):
       `apiVersion`: API version used to start the operation.  }
     name: The server-assigned name, which is only unique within the same
       service that originally returns it. If you use the default HTTP mapping,
-      the `name` should have the format of `operations/some/unique/name`.
+      the `name` should be a resource name ending with
+      `operations/{unique_id}`.
     response: The normal response of the operation in case of success.  If the
       original method returns no data on success, such as `Delete`, the
       response is `google.protobuf.Empty`.  If the original method is standard
@@ -550,7 +589,7 @@ class RedisProjectsLocationsInstancesCreateRequest(_messages.Message):
       Must be unique within the customer project / location
     parent: Required. The resource name of the instance location using the
       form:     `projects/{project_id}/locations/{location_id}` where
-      `location_id` refers to a GCP region
+      `location_id` refers to a GCP region.
   """
 
   instance = _messages.MessageField('Instance', 1)
@@ -564,10 +603,25 @@ class RedisProjectsLocationsInstancesDeleteRequest(_messages.Message):
   Fields:
     name: Required. Redis instance resource name using the form:
       `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
-      where `location_id` refers to a GCP region
+      where `location_id` refers to a GCP region.
   """
 
   name = _messages.StringField(1, required=True)
+
+
+class RedisProjectsLocationsInstancesFailoverRequest(_messages.Message):
+  r"""A RedisProjectsLocationsInstancesFailoverRequest object.
+
+  Fields:
+    failoverInstanceRequest: A FailoverInstanceRequest resource to be passed
+      as the request body.
+    name: Required. Redis instance resource name using the form:
+      `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
+      where `location_id` refers to a GCP region.
+  """
+
+  failoverInstanceRequest = _messages.MessageField('FailoverInstanceRequest', 1)
+  name = _messages.StringField(2, required=True)
 
 
 class RedisProjectsLocationsInstancesGetRequest(_messages.Message):
@@ -576,7 +630,7 @@ class RedisProjectsLocationsInstancesGetRequest(_messages.Message):
   Fields:
     name: Required. Redis instance resource name using the form:
       `projects/{project_id}/locations/{location_id}/instances/{instance_id}`
-      where `location_id` refers to a GCP region
+      where `location_id` refers to a GCP region.
   """
 
   name = _messages.StringField(1, required=True)
@@ -595,7 +649,7 @@ class RedisProjectsLocationsInstancesListRequest(_messages.Message):
       request, if any.
     parent: Required. The resource name of the instance location using the
       form:     `projects/{project_id}/locations/{location_id}` where
-      `location_id` refers to a GCP region
+      `location_id` refers to a GCP region.
   """
 
   pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)

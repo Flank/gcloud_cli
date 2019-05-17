@@ -6,7 +6,7 @@
   "canonicalName": "Speech",
   "version": "v1p1beta1",
   "revision": "0",
-  "title": "Cloud Speech API",
+  "title": "Cloud Speech-to-Text API",
   "description": "Converts audio to text by applying powerful neural network models.",
   "ownerDomain": "google.com",
   "ownerName": "Google",
@@ -133,7 +133,7 @@
       "type": "object",
       "properties": {
         "name": {
-          "description": "The server-assigned name, which is only unique within the same service that\noriginally returns it. If you use the default HTTP mapping, the\n`name` should have the format of `operations\/some\/unique\/name`.",
+          "description": "The server-assigned name, which is only unique within the same service that\noriginally returns it. If you use the default HTTP mapping, the\n`name` should be a resource name ending with `operations\/{unique_id}`.",
           "type": "string"
         },
         "metadata": {
@@ -164,7 +164,7 @@
     },
     "Status": {
       "id": "Status",
-      "description": "The `Status` type defines a logical error model that is suitable for different\nprogramming environments, including REST APIs and RPC APIs. It is used by\n[gRPC](https:\/\/github.com\/grpc). The error model is designed to be:\n\n- Simple to use and understand for most users\n- Flexible enough to meet unexpected needs\n\n# Overview\n\nThe `Status` message contains three pieces of data: error code, error message,\nand error details. The error code should be an enum value of\ngoogle.rpc.Code, but it may accept additional error codes if needed.  The\nerror message should be a developer-facing English message that helps\ndevelopers *understand* and *resolve* the error. If a localized user-facing\nerror message is needed, put the localized message in the error details or\nlocalize it in the client. The optional error details may contain arbitrary\ninformation about the error. There is a predefined set of error detail types\nin the package `google.rpc` that can be used for common error conditions.\n\n# Language mapping\n\nThe `Status` message is the logical representation of the error model, but it\nis not necessarily the actual wire format. When the `Status` message is\nexposed in different client libraries and different wire protocols, it can be\nmapped differently. For example, it will likely be mapped to some exceptions\nin Java, but more likely mapped to some error codes in C.\n\n# Other uses\n\nThe error model and the `Status` message can be used in a variety of\nenvironments, either with or without APIs, to provide a\nconsistent developer experience across different environments.\n\nExample uses of this error model include:\n\n- Partial errors. If a service needs to return partial errors to the client,\n    it may embed the `Status` in the normal response to indicate the partial\n    errors.\n\n- Workflow errors. A typical workflow has multiple steps. Each step may\n    have a `Status` message for error reporting.\n\n- Batch operations. If a client uses batch request and batch response, the\n    `Status` message should be used directly inside batch response, one for\n    each error sub-response.\n\n- Asynchronous operations. If an API call embeds asynchronous operation\n    results in its response, the status of those operations should be\n    represented directly using the `Status` message.\n\n- Logging. If some API errors are stored in logs, the message `Status` could\n    be used directly after any stripping needed for security\/privacy reasons.",
+      "description": "The `Status` type defines a logical error model that is suitable for\ndifferent programming environments, including REST APIs and RPC APIs. It is\nused by [gRPC](https:\/\/github.com\/grpc). The error model is designed to be:\n\n- Simple to use and understand for most users\n- Flexible enough to meet unexpected needs\n\n# Overview\n\nThe `Status` message contains three pieces of data: error code, error\nmessage, and error details. The error code should be an enum value of\ngoogle.rpc.Code, but it may accept additional error codes if needed.  The\nerror message should be a developer-facing English message that helps\ndevelopers *understand* and *resolve* the error. If a localized user-facing\nerror message is needed, put the localized message in the error details or\nlocalize it in the client. The optional error details may contain arbitrary\ninformation about the error. There is a predefined set of error detail types\nin the package `google.rpc` that can be used for common error conditions.\n\n# Language mapping\n\nThe `Status` message is the logical representation of the error model, but it\nis not necessarily the actual wire format. When the `Status` message is\nexposed in different client libraries and different wire protocols, it can be\nmapped differently. For example, it will likely be mapped to some exceptions\nin Java, but more likely mapped to some error codes in C.\n\n# Other uses\n\nThe error model and the `Status` message can be used in a variety of\nenvironments, either with or without APIs, to provide a\nconsistent developer experience across different environments.\n\nExample uses of this error model include:\n\n- Partial errors. If a service needs to return partial errors to the client,\n    it may embed the `Status` in the normal response to indicate the partial\n    errors.\n\n- Workflow errors. A typical workflow has multiple steps. Each step may\n    have a `Status` message for error reporting.\n\n- Batch operations. If a client uses batch request and batch response, the\n    `Status` message should be used directly inside batch response, one for\n    each error sub-response.\n\n- Asynchronous operations. If an API call embeds asynchronous operation\n    results in its response, the status of those operations should be\n    represented directly using the `Status` message.\n\n- Logging. If some API errors are stored in logs, the message `Status` could\n    be used directly after any stripping needed for security\/privacy reasons.",
       "type": "object",
       "properties": {
         "code": {
@@ -201,6 +201,10 @@
         "audio": {
           "description": "*Required* The audio data to be recognized.",
           "$ref": "RecognitionAudio"
+        },
+        "name": {
+          "description": "*Optional* The name of the model to use for recognition.",
+          "type": "string"
         }
       }
     },
@@ -219,7 +223,8 @@
             "Adaptive Multi-Rate Narrowband codec. `sample_rate_hertz` must be 8000.",
             "Adaptive Multi-Rate Wideband codec. `sample_rate_hertz` must be 16000.",
             "Opus encoded audio frames in Ogg container\n([OggOpus](https:\/\/wiki.xiph.org\/OggOpus)).\n`sample_rate_hertz` must be one of 8000, 12000, 16000, 24000, or 48000.",
-            "Although the use of lossy encodings is not recommended, if a very low\nbitrate encoding is required, `OGG_OPUS` is highly preferred over\nSpeex encoding. The [Speex](https:\/\/speex.org\/)  encoding supported by\nCloud Speech API has a header byte in each block, as in MIME type\n`audio\/x-speex-with-header-byte`.\nIt is a variant of the RTP Speex encoding defined in\n[RFC 5574](https:\/\/tools.ietf.org\/html\/rfc5574).\nThe stream is a sequence of blocks, one block per RTP packet. Each block\nstarts with a byte containing the length of the block, in bytes, followed\nby one or more frames of Speex data, padded to an integral number of\nbytes (octets) as specified in RFC 5574. In other words, each RTP header\nis replaced with a single byte containing the block length. Only Speex\nwideband is supported. `sample_rate_hertz` must be 16000."
+            "Although the use of lossy encodings is not recommended, if a very low\nbitrate encoding is required, `OGG_OPUS` is highly preferred over\nSpeex encoding. The [Speex](https:\/\/speex.org\/)  encoding supported by\nCloud Speech API has a header byte in each block, as in MIME type\n`audio\/x-speex-with-header-byte`.\nIt is a variant of the RTP Speex encoding defined in\n[RFC 5574](https:\/\/tools.ietf.org\/html\/rfc5574).\nThe stream is a sequence of blocks, one block per RTP packet. Each block\nstarts with a byte containing the length of the block, in bytes, followed\nby one or more frames of Speex data, padded to an integral number of\nbytes (octets) as specified in RFC 5574. In other words, each RTP header\nis replaced with a single byte containing the block length. Only Speex\nwideband is supported. `sample_rate_hertz` must be 16000.",
+            "MP3 audio. Support all standard MP3 bitrates (which range from 32-320\nkbps)\nIf using this encoding, then 'sample_rate_hertz' can be optionally unset\nif not known."
           ],
           "type": "string",
           "enum": [
@@ -230,11 +235,12 @@
             "AMR",
             "AMR_WB",
             "OGG_OPUS",
-            "SPEEX_WITH_HEADER_BYTE"
+            "SPEEX_WITH_HEADER_BYTE",
+            "MP3"
           ]
         },
         "sampleRateHertz": {
-          "description": "Sample rate in Hertz of the audio data sent in all\n`RecognitionAudio` messages. Valid values are: 8000-48000.\n16000 is optimal. For best results, set the sampling rate of the audio\nsource to 16000 Hz. If that's not possible, use the native sample rate of\nthe audio source (instead of re-sampling).\nThis field is optional for `FLAC` and `WAV` audio files and required\nfor all other audio formats. For details, see AudioEncoding.",
+          "description": "Sample rate in Hertz of the audio data sent in all\n`RecognitionAudio` messages. Valid values are: 8000-48000.\n16000 is optimal. For best results, set the sampling rate of the audio\nsource to 16000 Hz. If that's not possible, use the native sample rate of\nthe audio source (instead of re-sampling).\nThis field is optional for FLAC and WAV audio files, but is\nrequired for all other audio formats. For details, see AudioEncoding.",
           "type": "integer",
           "format": "int32"
         },
@@ -244,7 +250,7 @@
           "format": "int32"
         },
         "enableSeparateRecognitionPerChannel": {
-          "description": "This needs to be set to \u2018true\u2019 explicitly and `audio_channel_count` > 1\nto get each channel recognized separately. The recognition result will\ncontain a `channel_tag` field to state which channel that result belongs\nto. If this is not true, we will only recognize the first channel. The\nrequest is billed cumulatively for all channels recognized:\n`audio_channel_count` multiplied by the length of the audio.",
+          "description": "This needs to be set to `true` explicitly and `audio_channel_count` > 1\nto get each channel recognized separately. The recognition result will\ncontain a `channel_tag` field to state which channel that result belongs\nto. If this is not true, we will only recognize the first channel. The\nrequest is billed cumulatively for all channels recognized:\n`audio_channel_count` multiplied by the length of the audio.",
           "type": "boolean"
         },
         "languageCode": {
@@ -580,6 +586,10 @@
         "audio": {
           "description": "*Required* The audio data to be recognized.",
           "$ref": "RecognitionAudio"
+        },
+        "name": {
+          "description": "*Optional* The name of the model to use for recognition.",
+          "type": "string"
         }
       }
     },
@@ -1020,54 +1030,146 @@
         }
       }
     },
-    "speech": {
-      "methods": {
-        "recognize": {
-          "id": "speech.speech.recognize",
-          "path": "v1p1beta1/speech:recognize",
-          "flatPath": "v1p1beta1/speech:recognize",
-          "httpMethod": "POST",
-          "parameters": {
-          },
-          "parameterOrder": [
-          ],
-          "request": {
-            "$ref": "RecognizeRequest"
-          },
-          "response": {
-            "$ref": "RecognizeResponse"
-          },
-          "scopes": [
-            "https://www.googleapis.com/auth/cloud-platform"
-          ],
-          "description": "Performs synchronous speech recognition: receive results after all audio\nhas been sent and processed."
-        },
-        "longrunningrecognize": {
-          "id": "speech.speech.longrunningrecognize",
-          "path": "v1p1beta1/speech:longrunningrecognize",
-          "flatPath": "v1p1beta1/speech:longrunningrecognize",
-          "httpMethod": "POST",
-          "parameters": {
-          },
-          "parameterOrder": [
-          ],
-          "request": {
-            "$ref": "LongRunningRecognizeRequest"
-          },
-          "response": {
-            "$ref": "Operation"
-          },
-          "scopes": [
-            "https://www.googleapis.com/auth/cloud-platform"
-          ],
-          "description": "Performs asynchronous speech recognition: receive results via the\ngoogle.longrunning.Operations interface. Returns either an\n`Operation.error` or an `Operation.response` which contains\na `LongRunningRecognizeResponse` message."
-        }
-      }
-    },
     "projects": {
       "resources": {
-        "locations": {
+        "operations": {
           "resources": {
+            "manualRecognitionTasks": {
+              "methods": {
+                "get": {
+                  "id": "speech.projects.operations.manualRecognitionTasks.get",
+                  "path": "v1p1beta1/{+name}",
+                  "flatPath": "v1p1beta1/projects/{projectsId}/operations/manualRecognitionTasks/{manualRecognitionTasksId}",
+                  "httpMethod": "GET",
+                  "parameters": {
+                    "name": {
+                      "description": "The name of the operation resource.",
+                      "location": "path",
+                      "required": true,
+                      "pattern": "^projects\/[^\/]+\/operations\/manualRecognitionTasks\/[^\/]+$",
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "response": {
+                    "$ref": "Operation"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Gets the latest state of a long-running operation.  Clients can use this\nmethod to poll the operation result at intervals as recommended by the API\nservice."
+                }
+              }
+            }
+          }
+        },
+        "locations": {
+          "methods": {
+            "log_data": {
+              "id": "speech.projects.locations.log_data",
+              "path": "v1p1beta1/{+parent}/log_data",
+              "flatPath": "v1p1beta1/projects/{projectsId}/locations/{locationsId}/log_data",
+              "httpMethod": "DELETE",
+              "parameters": {
+                "parent": {
+                  "description": "Required. Resource name of the parent. Has the format :-\n\"projects\/{project_id}\/locations\/{location_id}\"",
+                  "location": "path",
+                  "required": true,
+                  "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
+                  "type": "string"
+                },
+                "bucketName": {
+                  "description": "Optional. Bucket name to delete all logs from. If empty, all logs are\ndeleted.",
+                  "location": "query",
+                  "type": "string"
+                }
+              },
+              "parameterOrder": [
+                "parent"
+              ],
+              "response": {
+                "$ref": "Operation"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "description": "Purges all log data associated with requested project. Operation response\ntype is google.protobuf.Empty.\n\nSince logs are stored by asynchronous writer process, buffered log data\nmight still end up in storage, even after this call. To ensure all data is\npurged, call this method 3 days after last recognition call."
+            }
+          }
+          ,
+          "resources": {
+            "operations": {
+              "methods": {
+                "list": {
+                  "id": "speech.projects.locations.operations.list",
+                  "path": "v1p1beta1/{+name}/operations",
+                  "flatPath": "v1p1beta1/projects/{projectsId}/locations/{locationsId}/operations",
+                  "httpMethod": "GET",
+                  "parameters": {
+                    "name": {
+                      "description": "The name of the operation's parent resource.",
+                      "location": "path",
+                      "required": true,
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+$",
+                      "type": "string"
+                    },
+                    "filter": {
+                      "description": "The standard list filter.",
+                      "location": "query",
+                      "type": "string"
+                    },
+                    "pageSize": {
+                      "description": "The standard list page size.",
+                      "location": "query",
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "pageToken": {
+                      "description": "The standard list page token.",
+                      "location": "query",
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "response": {
+                    "$ref": "ListOperationsResponse"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Lists operations that match the specified filter in the request. If the\nserver doesn't support this method, it returns `UNIMPLEMENTED`.\n\nNOTE: the `name` binding allows API services to override the binding\nto use different resource name schemes, such as `users\/*\/operations`. To\noverride the binding, API services can add a binding such as\n`\"\/v1\/{name=users\/*}\/operations\"` to their service configuration.\nFor backwards compatibility, the default name includes the operations\ncollection id, however overriding users must ensure the name binding\nis the parent resource, without the operations collection id."
+                },
+                "get": {
+                  "id": "speech.projects.locations.operations.get",
+                  "path": "v1p1beta1/{+name}",
+                  "flatPath": "v1p1beta1/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}",
+                  "httpMethod": "GET",
+                  "parameters": {
+                    "name": {
+                      "description": "The name of the operation resource.",
+                      "location": "path",
+                      "required": true,
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/operations\/[^\/]+$",
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "response": {
+                    "$ref": "Operation"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Gets the latest state of a long-running operation.  Clients can use this\nmethod to poll the operation result at intervals as recommended by the API\nservice."
+                }
+              }
+            },
             "log_data_stats": {
               "methods": {
                 "list": {
@@ -1093,7 +1195,7 @@
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "description": "List all log data stats associated with this consumer project."
+                  "description": "Lists all log data stats associated with requested project."
                 }
               }
             },
@@ -1230,6 +1332,31 @@
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
                   "description": "Get the dataset associated with the dataset resource."
+                },
+                "delete": {
+                  "id": "speech.projects.locations.datasets.delete",
+                  "path": "v1p1beta1/{+name}",
+                  "flatPath": "v1p1beta1/projects/{projectsId}/locations/{locationsId}/datasets/{datasetsId}",
+                  "httpMethod": "DELETE",
+                  "parameters": {
+                    "name": {
+                      "description": "Required. Resource name of the dataset. Has the format :-\n'projects\/{project_number}\/locations\/{location_id}\/datasets\/{dataset_id}'",
+                      "location": "path",
+                      "required": true,
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/datasets\/[^\/]+$",
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "response": {
+                    "$ref": "Operation"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Deletes the named automl dataset. Returns an Empty response."
                 }
               }
             },
@@ -1267,6 +1394,31 @@
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
                   "description": "Creates a new custom model. Metadata type is SpeechOperationMetadata.\nResponse type is Model."
+                },
+                "delete": {
+                  "id": "speech.projects.locations.models.delete",
+                  "path": "v1p1beta1/{+name}",
+                  "flatPath": "v1p1beta1/projects/{projectsId}/locations/{locationsId}/models/{modelsId}",
+                  "httpMethod": "DELETE",
+                  "parameters": {
+                    "name": {
+                      "description": "Required. Resource name of the model. Has the format :-\n'projects\/{project_id}\/locations\/{location_id}\/models\/{model_id}'",
+                      "location": "path",
+                      "required": true,
+                      "pattern": "^projects\/[^\/]+\/locations\/[^\/]+\/models\/[^\/]+$",
+                      "type": "string"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "response": {
+                    "$ref": "Operation"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Deletes the named automl model. Returns an Empty response."
                 },
                 "list": {
                   "id": "speech.projects.locations.models.list",
@@ -1368,6 +1520,50 @@
               }
             }
           }
+        }
+      }
+    },
+    "speech": {
+      "methods": {
+        "recognize": {
+          "id": "speech.speech.recognize",
+          "path": "v1p1beta1/speech:recognize",
+          "flatPath": "v1p1beta1/speech:recognize",
+          "httpMethod": "POST",
+          "parameters": {
+          },
+          "parameterOrder": [
+          ],
+          "request": {
+            "$ref": "RecognizeRequest"
+          },
+          "response": {
+            "$ref": "RecognizeResponse"
+          },
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform"
+          ],
+          "description": "Performs synchronous speech recognition: receive results after all audio\nhas been sent and processed."
+        },
+        "longrunningrecognize": {
+          "id": "speech.speech.longrunningrecognize",
+          "path": "v1p1beta1/speech:longrunningrecognize",
+          "flatPath": "v1p1beta1/speech:longrunningrecognize",
+          "httpMethod": "POST",
+          "parameters": {
+          },
+          "parameterOrder": [
+          ],
+          "request": {
+            "$ref": "LongRunningRecognizeRequest"
+          },
+          "response": {
+            "$ref": "Operation"
+          },
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform"
+          ],
+          "description": "Performs asynchronous speech recognition: receive results via the\ngoogle.longrunning.Operations interface. Returns either an\n`Operation.error` or an `Operation.response` which contains\na `LongRunningRecognizeResponse` message.\nFor more information on asynchronous speech recognition, see the\n[how-to](https:\/\/cloud.google.com\/speech-to-text\/docs\/async-recognize)."
         }
       }
     }

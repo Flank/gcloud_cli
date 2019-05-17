@@ -149,9 +149,13 @@ OPTIONAL FLAGS
             --target-instance.
          INTERNAL
             Internal load balancing or forwarding, used with --backend-service.
+         INTERNAL_SELF_MANAGED
+            Traffic director load balancing or forwarding, used with
+            --target-http-proxy, --target-https-proxy.
 
      --network=NETWORK
-        (Only for --load-balancing-scheme=INTERNAL) Network that this
+        (Only for --load-balancing-scheme=INTERNAL or
+        --load-balancing-scheme=INTERNAL_SELF_MANAGED) Network that this
         forwarding rule applies to. If this field is not specified, the default
         network will be used. In the absence of the default network, this field
         must be specified.
@@ -203,8 +207,8 @@ OPTIONAL FLAGS
           forwarding rule. Assigned IP addresses can be reserved or unreserved.
 
           IP addresses are restricted based on the forwarding rule's load
-          balancing scheme (EXTERNAL or INTERNAL) and scope (global or
-          regional).
+          balancing scheme ((EXTERNAL, INTERNAL, INTERNAL_SELF_MANAGED)) and
+          scope (global or regional).
 
           When the --load-balancing-scheme is EXTERNAL, if the address is
           reserved, it must either (1) reside in the global scope if the
@@ -221,6 +225,9 @@ OPTIONAL FLAGS
           omitted, an ephemeral internal IP address will be automatically
           allocated from the IP range of the subnet or network configured for
           this forwarding rule.
+
+          When the --load-balancing-scheme is INTERNAL_SELF_MANAGED, this must
+          be a URL reference to an existing Address resource.
 
           Note: An IP address must be specified if the traffic is being
           forwarded to a VPN.
@@ -327,8 +334,9 @@ OPTIONAL FLAGS
           can be all or a set of at most 5 ports.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

@@ -22,14 +22,15 @@ from __future__ import unicode_literals
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.pubsub import util
 from googlecloudsdk.core import properties
+from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.pubsub import base
 
 
-class SubscriptionsSeekTest(base.CloudPubsubTestBase):
+class SubscriptionsSeekTest(base.CloudPubsubTestBase, parameterized.TestCase):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
     self.svc = self.client.projects_subscriptions.Seek
     properties.VALUES.core.user_output_enabled.Set(True)
 
@@ -78,19 +79,23 @@ class SubscriptionsSeekTest(base.CloudPubsubTestBase):
     self.assertEqual(result['snapshotId'], snap_ref.RelativeName())
     self.assertNotIn('time', result)
 
-  def testSeekToTime(self):
+  @parameterized.parameters(
+      ('2016-10-31T12:34:56Z', '2016-10-31T12:34:56.000000Z'),
+      ('2019-01-24T15:15:25-05:00', '2019-01-24T20:15:25.000000Z'))
+  def testSeekToTime(self, time_flag_value, time_parsed_value):
     sub_ref = util.ParseSubscription('sub', self.Project())
 
     seek_req = self.msgs.PubsubProjectsSubscriptionsSeekRequest(
-        seekRequest=self.msgs.SeekRequest(time='2016-10-31T12:34:56.000000Z'),
+        seekRequest=self.msgs.SeekRequest(time=time_parsed_value),
         subscription=sub_ref.RelativeName())
     self.svc.Expect(request=seek_req, response=self.msgs.SeekResponse())
 
     result = self.Run('pubsub subscriptions seek sub'
-                      '    --time 2016-10-31T12:34:56Z')
+                      '    --time ' + time_flag_value)
     self.assertEqual(result['subscriptionId'], sub_ref.RelativeName())
-    self.assertEqual(result['time'], '2016-10-31T12:34:56.000000Z')
+    self.assertEqual(result['time'], time_parsed_value)
     self.assertNotIn('snapshotId', result)
+
 
 if __name__ == '__main__':
   test_case.main()

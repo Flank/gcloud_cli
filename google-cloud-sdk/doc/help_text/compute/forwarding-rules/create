@@ -13,7 +13,8 @@ SYNOPSIS
           | --target-vpn-gateway=TARGET_VPN_GATEWAY)
         [--description=DESCRIPTION] [--ip-protocol=IP_PROTOCOL]
         [--load-balancing-scheme=LOAD_BALANCING_SCHEME; default="EXTERNAL"]
-        [--network=NETWORK] [--network-tier=NETWORK_TIER] [--subnet=SUBNET]
+        [--network=NETWORK] [--network-tier=NETWORK_TIER]
+        [--service-label=SERVICE_LABEL] [--subnet=SUBNET]
         [--subnet-region=SUBNET_REGION]
         [--target-instance-zone=TARGET_INSTANCE_ZONE]
         [--target-pool-region=TARGET_POOL_REGION]
@@ -22,7 +23,7 @@ SYNOPSIS
         [--address-region=ADDRESS_REGION | --global-address]
         [--backend-service-region=BACKEND_SERVICE_REGION
           | --global-backend-service] [--global | --region=REGION]
-        [--port-range=[PORT | START_PORT-END_PORT] | --ports=[PORT
+        [--port-range=[PORT | START_PORT-END_PORT] | --ports=ALL | [PORT
           | START_PORT-END_PORT],[...]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -159,6 +160,14 @@ OPTIONAL FLAGS
         Network tier to assign to the forwarding rules. NETWORK_TIER must be
         one of: PREMIUM, STANDARD. The default value is PREMIUM.
 
+     --service-label=SERVICE_LABEL
+        (Only for Internal Load Balancing):
+        https://cloud.google.com/compute/docs/load-balancing/internal/ The DNS
+        label to use as the prefix of the fully qualified domain name for this
+        forwarding rule. The full name will be internally generated and output
+        as dnsName. If this field is not specified, no DNS record will be
+        generated and no DNS name will be output.
+
      --subnet=SUBNET
         (Only for --load-balancing-scheme=INTERNAL) Subnetwork that this
         forwarding rule applies to. If the network configured for this
@@ -194,7 +203,7 @@ OPTIONAL FLAGS
           forwarding rule. Assigned IP addresses can be reserved or unreserved.
 
           IP addresses are restricted based on the forwarding rule's load
-          balancing scheme (EXTERNAL or INTERNAL) and scope (global or
+          balancing scheme ((EXTERNAL, INTERNAL)) and scope (global or
           regional).
 
           When the --load-balancing-scheme is EXTERNAL, if the address is
@@ -301,22 +310,26 @@ OPTIONAL FLAGS
           Either an individual port (--port-range 80) or a range of ports
           (--port-range 3000-3100) may be specified.
 
-       --ports=[PORT | START_PORT-END_PORT],[...]
-          If specified, only packets addressed to ports in the specified list
-          will be forwarded. If not specified for regional forwarding rules,
+       --ports=ALL | [PORT | START_PORT-END_PORT],[...]
+          List of comma separated ports and/or port ranges or the value all. If
+          a list is provided, only packets addressed to ports in the list will
+          be forwarded. If unspecified or all for regional forwarding rules,
           all ports are matched. This flag is required for global forwarding
-          rules and accepts a single continuous set of ports.
+          rules and accepts a single set of contiguous ports (i.e.
+          --ports=80,82 is not valid because 80 and 82 are not contiguous).
+
+          A list can consist of individual ports and ranges. For example,
+          --ports 8000-8004 or --ports 80.
 
           Some forwarding targets have restriction on acceptable ports, e.g.,
           if --target-http-proxy is specified, the acceptable values for
-          --ports are: 80, 8080.
-
-          Individual ports and ranges can be specified, for example (--ports
-          8000-8004 or --ports 80).
+          --ports are: 80, 8080. For internal load balancing, the allowed ports
+          can be all or a set of at most 5 ports.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

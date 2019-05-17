@@ -48,35 +48,35 @@ class LoggingTestBase(cli_test_base.CliTestBase,
 
     self.msgs = core_apis.GetMessagesModule('logging', 'v2')
 
-  def RunLogging(self, cmd):
-    return self.Run('logging ' + cmd)
+  def RunLogging(self, cmd, track=None):
+    return self.Run('logging ' + cmd, track)
 
-  def RunWithoutPerms(self, cmd):
+  def RunWithoutPerms(self, cmd, track=None):
     """Test the command without valid permissions."""
     # Disable user output, this way we can check error handling from all
     # formatters Display() method, not only the default one.
     properties.VALUES.core.user_output_enabled.Set(False)
     # This is simulated by the API call returning a 403 http error.
     with self.AssertRaisesHttpExceptionMatches('Permission denied.'):
-      result = self.RunLogging(cmd)
+      result = self.RunLogging(cmd, track)
       # In case the command returns a generator, force its expansion.
       result = list(result)
 
-  def RunWithoutProject(self, cmd):
+  def RunWithoutProject(self, cmd, track=None):
     """Test the command without a set project."""
     # Remove project.
     properties.PersistProperty(properties.VALUES.core.project, None)
     # We don't care what type of exception is raised here.
     with self.assertRaisesRegex(Exception, NO_PROJECT_REGEXP):
-      self.RunLogging(cmd)
+      self.RunLogging(cmd, track)
 
-  def RunWithoutAuth(self, cmd):
+  def RunWithoutAuth(self, cmd, track=None):
     """Test the command without authentication."""
     # Remove credentials.
     self.FakeAuthSetCredentialsPresent(False)
     # We don't care what type of exception is raised here.
     with self.assertRaisesRegex(Exception, NO_AUTH_REGEXP):
-      self.RunLogging(cmd)
+      self.RunLogging(cmd, track)
 
 
 class LoggingIntegrationTestBase(e2e_base.WithServiceAuth):

@@ -9,8 +9,9 @@ DESCRIPTION
     (BETA) List, create, and delete Google Compute Engine images.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -51,13 +52,13 @@ COMMANDS
         (BETA) List Google Compute Engine images.
 
      remove-iam-policy-binding
-        (BETA) Remove IAM policy binding of a Google Compute Engine image.
+        (BETA) Remove IAM policy binding from a Google Compute Engine image.
 
      remove-labels
         (BETA) Remove labels from Google Compute Engine images.
 
      set-iam-policy
-        (BETA) Set IAM policy for a disk image.
+        (BETA) Set the IAM policy for a Google Compute Engine image.
 
      update
         (BETA) Update a Google Compute Engine image.

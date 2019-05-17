@@ -11,7 +11,7 @@ gcloud beta access\-context\-manager perimeters update \- update an existing acc
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud beta access\-context\-manager perimeters update\fR (\fIPERIMETER\fR\ :\ \fB\-\-policy\fR=\fIPOLICY\fR) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-title\fR=\fITITLE\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-add\-access\-levels\fR=[\fILEVEL\fR,...]\ |\ \fB\-\-clear\-access\-levels\fR\ |\ \fB\-\-remove\-access\-levels\fR=[\fILEVEL\fR,...]\ |\ \fB\-\-set\-access\-levels\fR=[\fILEVEL\fR,...]] [\fB\-\-add\-resources\fR=[\fIRESOURCES\fR,...]\ |\ \fB\-\-clear\-resources\fR\ |\ \fB\-\-remove\-resources\fR=[\fIRESOURCES\fR,...]\ |\ \fB\-\-set\-resources\fR=[\fIRESOURCES\fR,...]] [\fB\-\-add\-restricted\-services\fR=[\fISERVICE\fR,...]\ |\ \fB\-\-clear\-restricted\-services\fR\ |\ \fB\-\-remove\-restricted\-services\fR=[\fISERVICE\fR,...]\ |\ \fB\-\-set\-restricted\-services\fR=[\fISERVICE\fR,...]] [\fB\-\-add\-unrestricted\-services\fR=[\fISERVICE\fR,...]\ |\ \fB\-\-clear\-unrestricted\-services\fR\ |\ \fB\-\-remove\-unrestricted\-services\fR=[\fISERVICE\fR,...]\ |\ \fB\-\-set\-unrestricted\-services\fR=[\fISERVICE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud beta access\-context\-manager perimeters update\fR (\fIPERIMETER\fR\ :\ \fB\-\-policy\fR=\fIPOLICY\fR) [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-title\fR=\fITITLE\fR] [\fB\-\-type\fR=\fITYPE\fR] [\fB\-\-add\-access\-levels\fR=[\fILEVEL\fR,...]\ |\ \fB\-\-clear\-access\-levels\fR\ |\ \fB\-\-remove\-access\-levels\fR=[\fILEVEL\fR,...]\ |\ \fB\-\-set\-access\-levels\fR=[\fILEVEL\fR,...]] [\fB\-\-add\-resources\fR=[\fIRESOURCES\fR,...]\ |\ \fB\-\-clear\-resources\fR\ |\ \fB\-\-remove\-resources\fR=[\fIRESOURCES\fR,...]\ |\ \fB\-\-set\-resources\fR=[\fIRESOURCES\fR,...]] [\fB\-\-add\-restricted\-services\fR=[\fISERVICE\fR,...]\ |\ \fB\-\-clear\-restricted\-services\fR\ |\ \fB\-\-remove\-restricted\-services\fR=[\fISERVICE\fR,...]\ |\ \fB\-\-set\-restricted\-services\fR=[\fISERVICE\fR,...]] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -26,7 +26,7 @@ gcloud beta access\-context\-manager perimeters update \- update an existing acc
 .RS 2m
 .TP 2m
 
-Perimeter resource \- The service perimemter to update. The arguments in this
+Perimeter resource \- The service perimeter to update. The arguments in this
 group can be used to specify the attributes of this resource. This must be
 specified.
 
@@ -128,10 +128,7 @@ Completely replace the current resources with the given values.
 
 These flags modify the member restricted services of this perimeter. The
 perimeter boundary DOES apply to these services (for example,
-\f5storage.googleapis.com\fR). A wildcard (\f5*\fR) may be given to denote all
-services. If unrestricted services are set, restricted services must be a
-wildcard. At most one of these may be specified:
-
+\f5storage.googleapis.com\fR). At most one of these may be specified:
 
 .RS 2m
 .TP 2m
@@ -150,34 +147,6 @@ Remove the given values from the current restricted services.
 \fB\-\-set\-restricted\-services\fR=[\fISERVICE\fR,...]
 Completely replace the current restricted services with the given values.
 
-.RE
-.sp
-.TP 2m
-
-These flags modify the member unrestricted services of this perimemter. The
-perimeter boundary DOES NOT apply to these services (for example,
-\f5storage.googleapis.com\fR). A wildcard (\f5*\fR) may be given to denote all
-services. If restricted services are set, unrestricted services must be a
-wildcard. At most one of these may be specified:
-
-
-.RS 2m
-.TP 2m
-\fB\-\-add\-unrestricted\-services\fR=[\fISERVICE\fR,...]
-Append the given values to the current unrestricted services.
-
-.TP 2m
-\fB\-\-clear\-unrestricted\-services\fR
-Empty the current unrestricted services.
-
-.TP 2m
-\fB\-\-remove\-unrestricted\-services\fR=[\fISERVICE\fR,...]
-Remove the given values from the current unrestricted services.
-
-.TP 2m
-\fB\-\-set\-unrestricted\-services\fR=[\fISERVICE\fR,...]
-Completely replace the current unrestricted services with the given values.
-
 
 .RE
 .RE
@@ -185,14 +154,21 @@ Completely replace the current unrestricted services with the given values.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice.
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud access\-context\-manager perimeters update
+$ gcloud alpha access\-context\-manager perimeters update
+.RE
 

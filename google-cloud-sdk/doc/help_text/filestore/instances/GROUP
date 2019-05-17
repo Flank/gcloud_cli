@@ -1,0 +1,40 @@
+NAME
+    gcloud filestore instances - create and manage Cloud Filestore instances
+
+SYNOPSIS
+    gcloud filestore instances COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Create and manage Cloud Filestore instances.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        Create a Cloud Filestore instance.
+
+     delete
+        Delete a Cloud Filestore instance.
+
+     describe
+        Show metadata for a Cloud Filestore instance.
+
+     list
+        List Cloud Filestore instances.
+
+     update
+        Update a Cloud Filestore instance.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha filestore instances
+        $ gcloud beta filestore instances
+

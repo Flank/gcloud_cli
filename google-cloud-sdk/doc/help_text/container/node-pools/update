@@ -34,7 +34,8 @@ REQUIRED FLAGS
               $ gcloud container node-pools update node-pool-1 \
                   --cluster=example-cluster --enable-autoupgrade
 
-          See https://cloud.google.com/kubernetes-engine/docs/node-management
+          See
+          https://cloud.google.com/kubernetes-engine/docs/node-auto-upgrades
           for more info.
 
 OPTIONAL FLAGS
@@ -52,8 +53,9 @@ OPTIONAL FLAGS
           default compute/zone property value for this command invocation.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

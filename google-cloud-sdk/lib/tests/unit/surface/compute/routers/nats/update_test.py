@@ -269,17 +269,6 @@ class BetaUpdateTest(UpdateTest):
         self.messages, track='beta')
     self.orig.nats = [self.messages.RouterNat(name='my-nat')]
 
-
-class AlphaUpdateTest(BetaUpdateTest):
-
-  def SetUp(self):
-    self.version = 'alpha'
-    self.SelectApi(calliope_base.ReleaseTrack.ALPHA, 'alpha')
-
-    self.orig = router_test_utils.CreateEmptyRouterMessage(
-        self.messages, track='alpha')
-    self.orig.nats = [self.messages.RouterNat(name='my-nat')]
-
   def testLogging(self):
     expected_router = copy.deepcopy(self.orig)
     expected_router.nats = [
@@ -291,7 +280,7 @@ class AlphaUpdateTest(BetaUpdateTest):
             .SourceSubnetworkIpRangesToNatValueValuesEnum
             .ALL_SUBNETWORKS_ALL_IP_RANGES,
             logConfig=self.messages.RouterNatLogConfig(
-                enabled=True,
+                enable=True,
                 filter=self.messages.RouterNatLogConfig.FilterValueValuesEnum
                 .TRANSLATIONS_ONLY))
     ]
@@ -308,7 +297,7 @@ class AlphaUpdateTest(BetaUpdateTest):
         --log-filter TRANSLATIONS_ONLY
         """)
 
-  def testClearLogFilter(self):
+  def testChangeLogFilter(self):
     initial_router = copy.deepcopy(self.orig)
     initial_router.nats = [
         self.messages.RouterNat(
@@ -319,7 +308,7 @@ class AlphaUpdateTest(BetaUpdateTest):
             .SourceSubnetworkIpRangesToNatValueValuesEnum
             .ALL_SUBNETWORKS_ALL_IP_RANGES,
             logConfig=self.messages.RouterNatLogConfig(
-                enabled=True,
+                enable=True,
                 filter=self.messages.RouterNatLogConfig.FilterValueValuesEnum
                 .TRANSLATIONS_ONLY))
     ]
@@ -333,7 +322,9 @@ class AlphaUpdateTest(BetaUpdateTest):
             .SourceSubnetworkIpRangesToNatValueValuesEnum
             .ALL_SUBNETWORKS_ALL_IP_RANGES,
             logConfig=self.messages.RouterNatLogConfig(
-                enabled=True, filter=None))
+                enable=True,
+                filter=self.messages.RouterNatLogConfig.FilterValueValuesEnum
+                .ALL))
     ]
 
     self.ExpectGet(initial_router)
@@ -343,7 +334,7 @@ class AlphaUpdateTest(BetaUpdateTest):
 
     self.Run("""
         compute routers nats update my-nat --router my-router
-        --region us-central1 --clear-log-filter
+        --region us-central1 --log-filter ALL
         """)
 
   def testDisableLogging(self):
@@ -357,7 +348,7 @@ class AlphaUpdateTest(BetaUpdateTest):
             .SourceSubnetworkIpRangesToNatValueValuesEnum
             .ALL_SUBNETWORKS_ALL_IP_RANGES,
             logConfig=self.messages.RouterNatLogConfig(
-                enabled=True,
+                enable=True,
                 filter=self.messages.RouterNatLogConfig.FilterValueValuesEnum
                 .ERRORS_ONLY))
     ]
@@ -371,7 +362,7 @@ class AlphaUpdateTest(BetaUpdateTest):
             .SourceSubnetworkIpRangesToNatValueValuesEnum
             .ALL_SUBNETWORKS_ALL_IP_RANGES,
             logConfig=self.messages.RouterNatLogConfig(
-                enabled=False,
+                enable=False,
                 filter=self.messages.RouterNatLogConfig.FilterValueValuesEnum
                 .ERRORS_ONLY))
     ]
@@ -386,6 +377,151 @@ class AlphaUpdateTest(BetaUpdateTest):
         --region us-central1 --no-enable-logging
         """)
 
+
+class AlphaUpdateTest(BetaUpdateTest):
+
+  def SetUp(self):
+    self.version = 'alpha'
+    self.SelectApi(calliope_base.ReleaseTrack.ALPHA, 'alpha')
+
+    self.orig = router_test_utils.CreateEmptyRouterMessage(
+        self.messages, track='alpha')
+    self.orig.nats = [self.messages.RouterNat(name='my-nat')]
+
+  def testDrainIps(self):
+    expected_router = copy.deepcopy(self.orig)
+    expected_router.nats = [
+        self.messages.RouterNat(
+            name='my-nat',
+            natIpAllocateOption=self.messages.RouterNat
+            .NatIpAllocateOptionValueValuesEnum.MANUAL_ONLY,
+            natIps=[
+                ('https://www.googleapis.com/compute/%s/projects/'
+                 'fake-project/regions/us-central1/addresses/address-1') %
+                self.version,
+                ('https://www.googleapis.com/compute/%s/projects/'
+                 'fake-project/regions/us-central1/addresses/address-2') %
+                self.version,
+            ],
+            drainNatIps=[
+                ('https://www.googleapis.com/compute/%s/projects/'
+                 'fake-project/regions/us-central1/addresses/address-3') %
+                self.version,
+            ],
+            sourceSubnetworkIpRangesToNat=self.messages.RouterNat
+            .SourceSubnetworkIpRangesToNatValueValuesEnum
+            .ALL_SUBNETWORKS_ALL_IP_RANGES)
+    ]
+
+    self.ExpectGet(self.orig)
+    self.ExpectPatch(expected_router)
+    self.ExpectOperationsGet()
+    self.ExpectGet(expected_router)
+
+    self.Run("""
+        compute routers nats update my-nat --router my-router
+        --region us-central1 --nat-external-ip-pool=address-1,address-2
+        --drain-nat-ips=address-3
+        --nat-all-subnet-ip-ranges
+        """)
+
+  def testDrainExistIp(self):
+    expected_manual_router = copy.deepcopy(self.orig)
+    expected_manual_router.nats = [
+        self.messages.RouterNat(
+            name='my-nat',
+            natIpAllocateOption=self.messages.RouterNat
+            .NatIpAllocateOptionValueValuesEnum.MANUAL_ONLY,
+            natIps=[
+                ('https://www.googleapis.com/compute/%s/projects/'
+                 'fake-project/regions/us-central1/addresses/address-1') %
+                self.version,
+                ('https://www.googleapis.com/compute/%s/projects/'
+                 'fake-project/regions/us-central1/addresses/address-2') %
+                self.version,
+            ],
+            sourceSubnetworkIpRangesToNat=self.messages.RouterNat
+            .SourceSubnetworkIpRangesToNatValueValuesEnum
+            .ALL_SUBNETWORKS_ALL_IP_RANGES)
+    ]
+
+    expected_drained_router = copy.deepcopy(expected_manual_router)
+    expected_drained_router.nats = [
+        self.messages.RouterNat(
+            name='my-nat',
+            natIpAllocateOption=self.messages.RouterNat
+            .NatIpAllocateOptionValueValuesEnum.MANUAL_ONLY,
+            natIps=[
+                ('https://www.googleapis.com/compute/%s/projects/'
+                 'fake-project/regions/us-central1/addresses/address-2') %
+                self.version,
+            ],
+            drainNatIps=[
+                ('https://www.googleapis.com/compute/%s/projects/'
+                 'fake-project/regions/us-central1/addresses/address-1') %
+                self.version,
+            ],
+            sourceSubnetworkIpRangesToNat=self.messages.RouterNat
+            .SourceSubnetworkIpRangesToNatValueValuesEnum
+            .ALL_SUBNETWORKS_ALL_IP_RANGES)
+    ]
+
+    self.ExpectGet(self.orig)
+    self.ExpectPatch(expected_manual_router)
+    self.ExpectOperationsGet()
+    self.ExpectGet(expected_manual_router)
+
+    self.ExpectGet(self.orig)
+    self.ExpectPatch(expected_drained_router)
+    self.ExpectOperationsGet()
+    self.ExpectGet(expected_drained_router)
+
+    self.Run("""
+        compute routers nats update my-nat --router my-router
+        --region us-central1
+        --nat-external-ip-pool=address-1,address-2
+        --nat-all-subnet-ip-ranges
+        """)
+    self.Run("""
+        compute routers nats update my-nat --router my-router
+        --region us-central1
+        --drain-nat-ips=address-1
+        --nat-all-subnet-ip-ranges
+        """)
+
+  def testClearDrainIps(self):
+    expected_router = copy.deepcopy(self.orig)
+    expected_router.nats = [
+        self.messages.RouterNat(
+            name='my-nat',
+            natIpAllocateOption=self.messages.RouterNat
+            .NatIpAllocateOptionValueValuesEnum.MANUAL_ONLY,
+            natIps=[
+                ('https://www.googleapis.com/compute/%s/projects/'
+                 'fake-project/regions/us-central1/addresses/address-1') %
+                self.version,
+                ('https://www.googleapis.com/compute/%s/projects/'
+                 'fake-project/regions/us-central1/addresses/address-2') %
+                self.version,
+            ],
+            drainNatIps=[
+            ],
+            sourceSubnetworkIpRangesToNat=self.messages.RouterNat
+            .SourceSubnetworkIpRangesToNatValueValuesEnum
+            .ALL_SUBNETWORKS_ALL_IP_RANGES)
+    ]
+
+    self.ExpectGet(self.orig)
+    self.ExpectPatch(expected_router)
+    self.ExpectOperationsGet()
+    self.ExpectGet(expected_router)
+
+    self.Run("""
+        compute routers nats update my-nat --router my-router
+        --region us-central1 --nat-external-ip-pool=address-1,address-2
+        --clear-drain-nat-ips
+        --nat-all-subnet-ip-ranges
+        """)
 
 if __name__ == '__main__':
   test_case.main()

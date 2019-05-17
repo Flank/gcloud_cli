@@ -17,16 +17,21 @@ gcloud alpha filestore locations \- list locations where Cloud Filestore is avai
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR List locations where Cloud Filestore is available.
+\fB(ALPHA)\fR \fB(DEPRECATED)\fR List locations where Cloud Filestore is
+available.
+
+\f5gcloud filestore locations\fR is deprecated. Use \f5gcloud filestore zones\fR
+or \f5gcloud filestore regions\fR instead.
 
 
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -37,11 +42,11 @@ gcloud help\fR for details.
 .RS 2m
 .TP 2m
 \fBdescribe\fR
-\fB(ALPHA)\fR Describe a Cloud Filestore location.
+\fB(ALPHA)\fR \fB(DEPRECATED)\fR Describe a Cloud Filestore location.
 
 .TP 2m
 \fBlist\fR
-\fB(ALPHA)\fR List all Cloud Filestore locations.
+\fB(ALPHA)\fR \fB(DEPRECATED)\fR List all Cloud Filestore locations.
 
 
 .RE
@@ -53,9 +58,10 @@ This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you will have to apply for early access and have your projects registered on the
 API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. This variant is also available:
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
+$ gcloud filestore locations
 $ gcloud beta filestore locations
 .RE
 

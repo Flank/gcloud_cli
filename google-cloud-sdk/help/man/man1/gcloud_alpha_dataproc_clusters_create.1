@@ -1,0 +1,703 @@
+
+.TH "GCLOUD_ALPHA_DATAPROC_CLUSTERS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha dataproc clusters create \- create a cluster
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha dataproc clusters create\fR \fINAME\fR \fB\-\-autoscaling\-policy\fR=\fIAUTOSCALING_POLICY\fR [\fB\-\-no\-address\fR] [\fB\-\-async\fR] [\fB\-\-bucket\fR=\fIBUCKET\fR] [\fB\-\-enable\-component\-gateway\fR] [\fB\-\-initialization\-action\-timeout\fR=\fITIMEOUT\fR;\ default="10m"] [\fB\-\-initialization\-actions\fR=\fICLOUD_STORAGE_URI\fR,[...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-master\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]] [\fB\-\-master\-boot\-disk\-size\fR=\fIMASTER_BOOT_DISK_SIZE\fR] [\fB\-\-master\-boot\-disk\-type\fR=\fIMASTER_BOOT_DISK_TYPE\fR] [\fB\-\-master\-machine\-type\fR=\fIMASTER_MACHINE_TYPE\fR] [\fB\-\-master\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-max\-idle\fR=\fIMAX_IDLE\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-num\-master\-local\-ssds\fR=\fINUM_MASTER_LOCAL_SSDS\fR] [\fB\-\-num\-masters\fR=\fINUM_MASTERS\fR] [\fB\-\-num\-preemptible\-worker\-local\-ssds\fR=\fINUM_PREEMPTIBLE_WORKER_LOCAL_SSDS\fR] [\fB\-\-num\-worker\-local\-ssds\fR=\fINUM_WORKER_LOCAL_SSDS\fR] [\fB\-\-optional\-components\fR=[\fICOMPONENT\fR,...]] [\fB\-\-preemptible\-worker\-boot\-disk\-size\fR=\fIPREEMPTIBLE_WORKER_BOOT_DISK_SIZE\fR] [\fB\-\-preemptible\-worker\-boot\-disk\-type\fR=\fIPREEMPTIBLE_WORKER_BOOT_DISK_TYPE\fR] [\fB\-\-properties\fR=[\fIPREFIX\fR:\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-scopes\fR=\fISCOPE\fR,[\fISCOPE\fR,...]] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-worker\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]] [\fB\-\-worker\-boot\-disk\-size\fR=\fIWORKER_BOOT_DISK_SIZE\fR] [\fB\-\-worker\-boot\-disk\-type\fR=\fIWORKER_BOOT_DISK_TYPE\fR] [\fB\-\-worker\-machine\-type\fR=\fIWORKER_MACHINE_TYPE\fR] [\fB\-\-worker\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-expiration\-time\fR=\fIEXPIRATION_TIME\fR\ |\ \fB\-\-max\-age\fR=\fIMAX_AGE\fR] [\fB\-\-gce\-pd\-kms\-key\fR=\fIGCE_PD_KMS_KEY\fR\ :\ \fB\-\-gce\-pd\-kms\-key\-keyring\fR=\fIGCE_PD_KMS_KEY_KEYRING\fR\ \fB\-\-gce\-pd\-kms\-key\-location\fR=\fIGCE_PD_KMS_KEY_LOCATION\fR\ \fB\-\-gce\-pd\-kms\-key\-project\fR=\fIGCE_PD_KMS_KEY_PROJECT\fR] [\fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-version\fR=\fIVERSION\fR] [\fB\-\-kerberos\-config\-file\fR=\fIKERBEROS_CONFIG_FILE\fR\ |\ \fB\-\-kerberos\-root\-principal\-password\-uri\fR=\fIKERBEROS_ROOT_PRINCIPAL_PASSWORD_URI\fR\ (\fB\-\-kerberos\-kms\-key\fR=\fIKERBEROS_KMS_KEY\fR\ :\ \fB\-\-kerberos\-kms\-key\-keyring\fR=\fIKERBEROS_KMS_KEY_KEYRING\fR\ \fB\-\-kerberos\-kms\-key\-location\fR=\fIKERBEROS_KMS_KEY_LOCATION\fR\ \fB\-\-kerberos\-kms\-key\-project\fR=\fIKERBEROS_KMS_KEY_PROJECT\fR)] [\fB\-\-network\fR=\fINETWORK\fR\ |\ \fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-single\-node\fR\ |\ \fB\-\-num\-preemptible\-workers\fR=\fINUM_PREEMPTIBLE_WORKERS\fR\ \fB\-\-num\-workers\fR=\fINUM_WORKERS\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Create a cluster.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fINAME\fR
+The name of this cluster.
+
+
+.RE
+.sp
+
+.SH "FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-autoscaling\-policy\fR=\fIAUTOSCALING_POLICY\fR
+ID of the autoscaling policy or fully qualified identifier for the autoscaling
+policy.
+
+.TP 2m
+\fB\-\-no\-address\fR
+If provided, the instances in the cluster will not be assigned external IP
+addresses.
+
+If omitted the instances in the cluster will each be assigned an ephemeral
+external IP address.
+
+Note: Dataproc VMs need access to the Dataproc API. This can be achieved without
+external IP addresses using Private Google Access
+(https://cloud.google.com/compute/docs/private\-google\-access).
+
+.TP 2m
+\fB\-\-async\fR
+Display information about the operation in progress, without waiting for the
+operation to complete.
+
+.TP 2m
+\fB\-\-bucket\fR=\fIBUCKET\fR
+The Google Cloud Storage bucket to use by default to stage job dependencies,
+miscellaneous config files, and job driver console output when using this
+cluster.
+
+.TP 2m
+\fB\-\-enable\-component\-gateway\fR
+Enable access to the web UIs of selected components on the cluster through the
+component gateway.
+
+.TP 2m
+\fB\-\-initialization\-action\-timeout\fR=\fITIMEOUT\fR; default="10m"
+The maximum duration of each initialization action. See $ gcloud topic datetimes
+for information on duration formats.
+
+.TP 2m
+\fB\-\-initialization\-actions\fR=\fICLOUD_STORAGE_URI\fR,[...]
+A list of Google Cloud Storage URIs of executables to run on each node in the
+cluster.
+
+.TP 2m
+\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of label KEY=VALUE pairs to add.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
+.TP 2m
+\fB\-\-master\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]
+Attaches accelerators (e.g. GPUs) to the master instance(s).
+
+.RS 2m
+.TP 2m
+\fBtype\fR
+The specific type (e.g. nvidia\-tesla\-k80 for nVidia Tesla K80) of accelerator
+to attach to the instances. Use 'gcloud compute accelerator\-types list' to
+learn about all available accelerator types.
+
+.TP 2m
+\fBcount\fR
+The number of pieces of the accelerator to attach to each of the instances. The
+default value is 1.
+
+.RE
+.sp
+.TP 2m
+\fB\-\-master\-boot\-disk\-size\fR=\fIMASTER_BOOT_DISK_SIZE\fR
+The size of the boot disk. The value must be a whole number followed by a size
+unit of \f5\fIKB\fR\fR for kilobyte, \f5\fIMB\fR\fR for megabyte, \f5\fIGB\fR\fR
+for gigabyte, or \f5\fITB\fR\fR for terabyte. For example, \f5\fI10GB\fR\fR will
+produce a 10 gigabyte disk. The minimum size a boot disk can have is 10 GB. Disk
+size must be a multiple of 1 GB.
+
+.TP 2m
+\fB\-\-master\-boot\-disk\-type\fR=\fIMASTER_BOOT_DISK_TYPE\fR
+The type of the boot disk. The value must be \f5\fIpd\-standard\fR\fR or
+\f5\fIpd\-ssd\fR\fR.
+
+.TP 2m
+\fB\-\-master\-machine\-type\fR=\fIMASTER_MACHINE_TYPE\fR
+The type of machine to use for the master. Defaults to server\-specified.
+
+.TP 2m
+\fB\-\-master\-min\-cpu\-platform\fR=\fIPLATFORM\fR
+When specified, the VM will be scheduled on host with specified CPU architecture
+or a newer one. To list available CPU platforms in given zone, run:
+
+.RS 2m
+$ gcloud beta compute zones describe ZONE
+.RE
+
+CPU platform selection is available only in selected zones; zones that allow CPU
+platform selection will have an \f5availableCpuPlatforms\fR field that contains
+the list of available CPU platforms for that zone.
+
+You can find more information online:
+https://cloud.google.com/compute/docs/instances/specify\-min\-cpu\-platform
+
+.TP 2m
+\fB\-\-max\-idle\fR=\fIMAX_IDLE\fR
+The duration before cluster is auto\-deleted after last job completes, such as
+"2h" or "1d". See $ gcloud topic datetimes for information on duration formats.
+
+.TP 2m
+\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]
+Metadata to be made available to the guest operating system running on the
+instances
+
+.TP 2m
+\fB\-\-num\-master\-local\-ssds\fR=\fINUM_MASTER_LOCAL_SSDS\fR
+The number of local SSDs to attach to the master in a cluster.
+
+.TP 2m
+\fB\-\-num\-masters\fR=\fINUM_MASTERS\fR
+The number of master nodes in the cluster.
+
+
+.TS
+tab(	);
+lB lB
+l l.
+Number of Masters	Cluster Mode
+1	Standard
+3	High Availability
+.TE
+
+.TP 2m
+\fB\-\-num\-preemptible\-worker\-local\-ssds\fR=\fINUM_PREEMPTIBLE_WORKER_LOCAL_SSDS\fR
+The number of local SSDs to attach to each preemptible worker in a cluster.
+
+.TP 2m
+\fB\-\-num\-worker\-local\-ssds\fR=\fINUM_WORKER_LOCAL_SSDS\fR
+The number of local SSDs to attach to each worker in a cluster.
+
+.TP 2m
+\fB\-\-optional\-components\fR=[\fICOMPONENT\fR,...]
+List of optional components to be installed on cluster machines.
+
+The following page documents the optional components that can be installed:
+https://cloud.google.com/dataproc/docs/concepts/configuring\-clusters/optional\-components.
+
+.TP 2m
+\fB\-\-preemptible\-worker\-boot\-disk\-size\fR=\fIPREEMPTIBLE_WORKER_BOOT_DISK_SIZE\fR
+The size of the boot disk. The value must be a whole number followed by a size
+unit of \f5\fIKB\fR\fR for kilobyte, \f5\fIMB\fR\fR for megabyte, \f5\fIGB\fR\fR
+for gigabyte, or \f5\fITB\fR\fR for terabyte. For example, \f5\fI10GB\fR\fR will
+produce a 10 gigabyte disk. The minimum size a boot disk can have is 10 GB. Disk
+size must be a multiple of 1 GB.
+
+.TP 2m
+\fB\-\-preemptible\-worker\-boot\-disk\-type\fR=\fIPREEMPTIBLE_WORKER_BOOT_DISK_TYPE\fR
+The type of the boot disk. The value must be \f5\fIpd\-standard\fR\fR or
+\f5\fIpd\-ssd\fR\fR.
+
+.TP 2m
+\fB\-\-properties\fR=[\fIPREFIX\fR:\fIPROPERTY\fR=\fIVALUE\fR,...]
+Specifies configuration properties for installed packages, such as Hadoop and
+Spark.
+
+Properties are mapped to configuration files by specifying a prefix, such as
+"core:io.serializations". The following are supported prefixes and their
+mappings:
+
+
+.TS
+tab(	);
+lB lB lB
+l l l.
+Prefix	File	Purpose of file
+capacity-scheduler	capacity-scheduler.xml	Hadoop YARN Capacity Scheduler configuration
+core	core-site.xml	Hadoop general configuration
+distcp	distcp-default.xml	Hadoop Distributed Copy configuration
+hadoop-env	hadoop-env.sh	Hadoop specific environment variables
+hdfs	hdfs-site.xml	Hadoop HDFS configuration
+hive	hive-site.xml	Hive configuration
+mapred	mapred-site.xml	Hadoop MapReduce configuration
+mapred-env	mapred-env.sh	Hadoop MapReduce specific environment variables
+pig	pig.properties	Pig configuration
+spark	spark-defaults.conf	Spark configuration
+spark-env	spark-env.sh	Spark specific environment variables
+yarn	yarn-site.xml	Hadoop YARN configuration
+yarn-env	yarn-env.sh	Hadoop YARN specific environment variables
+.TE
+
+See
+https://cloud.google.com/dataproc/docs/concepts/configuring\-clusters/cluster\-properties
+for more information.
+
+
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
+independent resource namespace constrained to deploying instances into Compute
+Engine zones inside the region. The default value of \f5global\fR is a special
+multi\-region namespace which is capable of deploying instances into all Compute
+Engine zones globally, and is disjoint from other Cloud Dataproc regions.
+Overrides the default \fBdataproc/region\fR property value for this command
+invocation.
+
+.TP 2m
+\fB\-\-scopes\fR=\fISCOPE\fR,[\fISCOPE\fR,...]
+Specifies scopes for the node instances. Multiple SCOPEs can be specified,
+separated by commas. Examples:
+
+.RS 2m
+$ gcloud alpha dataproc clusters create example\-cluster \e
+    \-\-scopes https://www.googleapis.com/auth/bigtable.admin
+.RE
+
+.RS 2m
+$ gcloud alpha dataproc clusters create example\-cluster \e
+    \-\-scopes sqlservice,bigquery
+.RE
+
+The following \fBminimum scopes\fR are necessary for the cluster to function
+properly and are always added, even if not explicitly specified:
+
+.RS 2m
+https://www.googleapis.com/auth/devstorage.read_write
+https://www.googleapis.com/auth/logging.write
+.RE
+
+If the \f5\-\-scopes\fR flag is not specified, the following \fBdefault
+scopes\fR are also included:
+
+.RS 2m
+https://www.googleapis.com/auth/bigquery
+https://www.googleapis.com/auth/bigtable.admin.table
+https://www.googleapis.com/auth/bigtable.data
+https://www.googleapis.com/auth/devstorage.full_control
+.RE
+
+If you want to enable all scopes use the 'cloud\-platform' scope.
+
+SCOPE can be either the full URI of the scope or an alias. \fBdefault\fR scopes
+are assigned to all instances. Available aliases are:
+
+
+.TS
+tab(	);
+lB lB
+l l.
+Alias	URI
+bigquery	https://www.googleapis.com/auth/bigquery
+cloud-platform	https://www.googleapis.com/auth/cloud-platform
+cloud-source-repos	https://www.googleapis.com/auth/source.full_control
+cloud-source-repos-ro	https://www.googleapis.com/auth/source.read_only
+compute-ro	https://www.googleapis.com/auth/compute.readonly
+compute-rw	https://www.googleapis.com/auth/compute
+datastore	https://www.googleapis.com/auth/datastore
+default	https://www.googleapis.com/auth/devstorage.read_only
+	https://www.googleapis.com/auth/logging.write
+	https://www.googleapis.com/auth/monitoring.write
+	https://www.googleapis.com/auth/pubsub
+	https://www.googleapis.com/auth/service.management.readonly
+	https://www.googleapis.com/auth/servicecontrol
+	https://www.googleapis.com/auth/trace.append
+gke-default	https://www.googleapis.com/auth/devstorage.read_only
+	https://www.googleapis.com/auth/logging.write
+	https://www.googleapis.com/auth/monitoring
+	https://www.googleapis.com/auth/service.management.readonly
+	https://www.googleapis.com/auth/servicecontrol
+	https://www.googleapis.com/auth/trace.append
+logging-write	https://www.googleapis.com/auth/logging.write
+monitoring	https://www.googleapis.com/auth/monitoring
+monitoring-write	https://www.googleapis.com/auth/monitoring.write
+pubsub	https://www.googleapis.com/auth/pubsub
+service-control	https://www.googleapis.com/auth/servicecontrol
+service-management	https://www.googleapis.com/auth/service.management.readonly
+sql (deprecated)	https://www.googleapis.com/auth/sqlservice
+sql-admin	https://www.googleapis.com/auth/sqlservice.admin
+storage-full	https://www.googleapis.com/auth/devstorage.full_control
+storage-ro	https://www.googleapis.com/auth/devstorage.read_only
+storage-rw	https://www.googleapis.com/auth/devstorage.read_write
+taskqueue	https://www.googleapis.com/auth/taskqueue
+trace	https://www.googleapis.com/auth/trace.append
+userinfo-email	https://www.googleapis.com/auth/userinfo.email
+.TE
+
+DEPRECATION WARNING: https://www.googleapis.com/auth/sqlservice account scope
+and \f5sql\fR alias do not provide SQL instance management capabilities and have
+been deprecated. Please, use https://www.googleapis.com/auth/sqlservice.admin or
+\f5sql\-admin\fR to manage your Google SQL Service instances.
+
+
+.TP 2m
+\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR
+The Google Cloud IAM service account to be authenticated as.
+
+.TP 2m
+\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]
+Specifies a list of tags to apply to the instance. These tags allow network
+firewall rules and routes to be applied to specified VM instances. See \fBgcloud
+compute firewall\-rules create\fR(1) for more details.
+
+To read more about configuring network tags, read this guide:
+https://cloud.google.com/vpc/docs/add\-remove\-network\-tags
+
+To list instances with their respective status and tags, run:
+
+.RS 2m
+$ gcloud compute instances list \e
+    \-\-format='table(name,status,tags.list())'
+.RE
+
+To list instances tagged with a specific tag, \f5tag1\fR, run:
+
+.RS 2m
+$ gcloud compute instances list \-\-filter='tags:tag1'
+.RE
+
+.TP 2m
+\fB\-\-worker\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]
+Attaches accelerators (e.g. GPUs) to the worker instance(s).
+
+Note: No accelerators will be attached to preemptible workers, because
+preemptible VMs do not support accelerators.
+
+.RS 2m
+.TP 2m
+\fBtype\fR
+The specific type (e.g. nvidia\-tesla\-k80 for nVidia Tesla K80) of accelerator
+to attach to the instances. Use 'gcloud compute accelerator\-types list' to
+learn about all available accelerator types.
+
+.TP 2m
+\fBcount\fR
+The number of pieces of the accelerator to attach to each of the instances. The
+default value is 1.
+
+.RE
+.sp
+.TP 2m
+\fB\-\-worker\-boot\-disk\-size\fR=\fIWORKER_BOOT_DISK_SIZE\fR
+The size of the boot disk. The value must be a whole number followed by a size
+unit of \f5\fIKB\fR\fR for kilobyte, \f5\fIMB\fR\fR for megabyte, \f5\fIGB\fR\fR
+for gigabyte, or \f5\fITB\fR\fR for terabyte. For example, \f5\fI10GB\fR\fR will
+produce a 10 gigabyte disk. The minimum size a boot disk can have is 10 GB. Disk
+size must be a multiple of 1 GB.
+
+.TP 2m
+\fB\-\-worker\-boot\-disk\-type\fR=\fIWORKER_BOOT_DISK_TYPE\fR
+The type of the boot disk. The value must be \f5\fIpd\-standard\fR\fR or
+\f5\fIpd\-ssd\fR\fR.
+
+.TP 2m
+\fB\-\-worker\-machine\-type\fR=\fIWORKER_MACHINE_TYPE\fR
+The type of machine to use for workers. Defaults to server\-specified.
+
+.TP 2m
+\fB\-\-worker\-min\-cpu\-platform\fR=\fIPLATFORM\fR
+When specified, the VM will be scheduled on host with specified CPU architecture
+or a newer one. To list available CPU platforms in given zone, run:
+
+.RS 2m
+$ gcloud beta compute zones describe ZONE
+.RE
+
+CPU platform selection is available only in selected zones; zones that allow CPU
+platform selection will have an \f5availableCpuPlatforms\fR field that contains
+the list of available CPU platforms for that zone.
+
+You can find more information online:
+https://cloud.google.com/compute/docs/instances/specify\-min\-cpu\-platform
+
+.TP 2m
+\fB\-\-zone\fR=\fIZONE\fR, \fB\-z\fR \fIZONE\fR
+The compute zone (e.g. us\-central1\-a) for the cluster. If empty and \-\-region
+is set to a value other than \f5global\fR, the server will pick a zone in the
+region. Overrides the default \fBcompute/zone\fR property value for this command
+invocation.
+
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-expiration\-time\fR=\fIEXPIRATION_TIME\fR
+The time when cluster will be auto\-deleted, such as
+"2017\-08\-29T18:52:51.142Z." See $ gcloud topic datetimes for information on
+time formats.
+
+.TP 2m
+\fB\-\-max\-age\fR=\fIMAX_AGE\fR
+The lifespan of the cluster before it is auto\-deleted, such as "2h" or "1d".
+See $ gcloud topic datetimes for information on duration formats.
+
+.RE
+.sp
+.TP 2m
+
+Key resource \- The Cloud KMS (Key Management Service) cryptokey that will be
+used to protect the cluster. The 'Compute Engine Service Agent' service account
+must hold permission 'Cloud KMS CryptoKey Encrypter/Decrypter'. The arguments in
+this group can be used to specify the attributes of this resource.
+
+.RS 2m
+.TP 2m
+\fB\-\-gce\-pd\-kms\-key\fR=\fIGCE_PD_KMS_KEY\fR
+ID of the key or fully qualified identifier for the key. This flag must be
+specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-gce\-pd\-kms\-key\-keyring\fR=\fIGCE_PD_KMS_KEY_KEYRING\fR
+The KMS keyring of the key.
+
+.TP 2m
+\fB\-\-gce\-pd\-kms\-key\-location\fR=\fIGCE_PD_KMS_KEY_LOCATION\fR
+The Cloud location for the key.
+
+.TP 2m
+\fB\-\-gce\-pd\-kms\-key\-project\fR=\fIGCE_PD_KMS_KEY_PROJECT\fR
+The Cloud project for the key.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-image\fR=\fIIMAGE\fR
+The full custom image URI or the custom image name that will be used to create a
+cluster.
+
+.TP 2m
+\fB\-\-image\-version\fR=\fIVERSION\fR
+The image version to use for the cluster. Defaults to the latest version.
+
+.RE
+.sp
+.TP 2m
+
+Specifying these flags will enable Kerberos for the cluster. At most one of
+these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-kerberos\-config\-file\fR=\fIKERBEROS_CONFIG_FILE\fR
+Path to a YAML (or JSON) file containing the configuration for Kerberos on the
+cluster. If you pass \f5\-\fR as the value of the flag the file content will be
+read from stdin.
+
+The YAML file is formatted as follows:
+
+.RS 2m
+  # Optional. Flag to indicate whether to Kerberize the cluster.
+  # The default value is true.
+  enable_kerberos: true
+.RE
+
+.RS 2m
+  # Required. The Google Cloud Storage URI of a KMS encrypted file
+  # containing the root principal password.
+  root_principal_password_uri: gs://bucket/password.encrypted
+.RE
+
+.RS 2m
+  # Required. The URI of the KMS key used to encrypt various
+  # sensitive files.
+  kms_key_uri:
+    projects/myproject/locations/global/keyRings/mykeyring/cryptoKeys/my\-key
+.RE
+
+.RS 2m
+  # Configuration of SSL encryption. If specified, all sub\-fields
+  # are required. Otherwise, Dataproc will provide a self\-signed
+  # certificate and generate the passwords.
+  ssl:
+    # Optional. The Google Cloud Storage URI of the keystore file.
+    keystore_uri: gs://bucket/keystore.jks
+.RE
+
+.RS 2m
+    # Optional. The Google Cloud Storage URI of a KMS encrypted
+    # file containing the password to the keystore.
+    keystore_password_uri: gs://bucket/keystore_password.encrypted
+.RE
+
+.RS 2m
+    # Optional. The Google Cloud Storage URI of a KMS encrypted
+    # file containing the password to the user provided key.
+    key_password_uri: gs://bucket/key_password.encrypted
+.RE
+
+.RS 2m
+    # Optional. The Google Cloud Storage URI of the truststore
+    # file.
+    truststore_uri: gs://bucket/truststore.jks
+.RE
+
+.RS 2m
+    # Optional. The Google Cloud Storage URI of a KMS encrypted
+    # file containing the password to the user provided
+    # truststore.
+    truststore_password_uri:
+      gs://bucket/truststore_password.encrypted
+.RE
+
+.RS 2m
+  # Configuration of cross realm trust.
+  cross_realm_trust:
+    # Optional. The remote realm the Dataproc on\-cluster KDC will
+    # trust, should the user enable cross realm trust.
+    realm: REMOTE.REALM
+.RE
+
+.RS 2m
+    # Optional. The KDC (IP or hostname) for the remote trusted
+    # realm in a cross realm trust relationship.
+    kdc: kdc.remote.realm
+.RE
+
+.RS 2m
+    # Optional. The admin server (IP or hostname) for the remote
+    # trusted realm in a cross realm trust relationship.
+    admin_server: admin\-server.remote.realm
+.RE
+
+.RS 2m
+    # Optional. The Google Cloud Storage URI of a KMS encrypted
+    # file containing the shared password between the on\-cluster
+    # Kerberos realm and the remote trusted realm, in a cross
+    # realm trust relationship.
+    shared_password_uri:
+      gs://bucket/cross\-realm.password.encrypted
+.RE
+
+.RS 2m
+  # Optional. The Google Cloud Storage URI of a KMS encrypted file
+  # containing the master key of the KDC database.
+  kdc_db_key_uri: gs://bucket/kdc_db_key.encrypted
+.RE
+
+.RS 2m
+  # Optional. The lifetime of the ticket granting ticket, in
+  # hours. If not specified, or user specifies 0, then default
+  # value 10 will be used.
+  tgt_lifetime_hours: 1
+.RE
+
+.TP 2m
+\fB\-\-kerberos\-root\-principal\-password\-uri\fR=\fIKERBEROS_ROOT_PRINCIPAL_PASSWORD_URI\fR
+Google Cloud Storage URI of a KMS encrypted file containing the root principal
+password. Must be a URL beginning with 'gs://'. This flag must be specified if
+any of the other arguments in this group are specified.
+
+.TP 2m
+
+Key resource \- The Cloud KMS (Key Management Service) cryptokey that will be
+used to protect the password. The 'Compute Engine Service Agent' service account
+must hold permission 'Cloud KMS CryptoKey Encrypter/Decrypter'. The arguments in
+this group can be used to specify the attributes of this resource. This must be
+specified.
+
+.RS 2m
+.TP 2m
+\fB\-\-kerberos\-kms\-key\fR=\fIKERBEROS_KMS_KEY\fR
+ID of the key or fully qualified identifier for the key. This flag must be
+specified if any of the other arguments in this group are specified.
+
+.TP 2m
+\fB\-\-kerberos\-kms\-key\-keyring\fR=\fIKERBEROS_KMS_KEY_KEYRING\fR
+The KMS keyring of the key.
+
+.TP 2m
+\fB\-\-kerberos\-kms\-key\-location\fR=\fIKERBEROS_KMS_KEY_LOCATION\fR
+The Cloud location for the key.
+
+.TP 2m
+\fB\-\-kerberos\-kms\-key\-project\fR=\fIKERBEROS_KMS_KEY_PROJECT\fR
+The Cloud project for the key.
+
+.RE
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-network\fR=\fINETWORK\fR
+The Compute Engine network that the VM instances of the cluster will be part of.
+This is mutually exclusive with \-\-subnet. If neither is specified, this
+defaults to the "default" network.
+
+.TP 2m
+\fB\-\-subnet\fR=\fISUBNET\fR
+Specifies the subnet that the cluster will be part of. This is mutally exclusive
+with \-\-network.
+
+.RE
+.sp
+.TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-single\-node\fR
+Create a single node cluster.
+
+A single node cluster has all master and worker components. It cannot have any
+separate worker nodes. If this flag is not specified, a cluster with separate
+workers is created.
+
+.TP 2m
+
+Multi\-node cluster flags
+
+.RS 2m
+.TP 2m
+\fB\-\-num\-preemptible\-workers\fR=\fINUM_PREEMPTIBLE_WORKERS\fR
+The number of preemptible worker nodes in the cluster.
+
+.TP 2m
+\fB\-\-num\-workers\fR=\fINUM_WORKERS\fR
+The number of worker nodes in the cluster. Defaults to server\-specified.
+
+
+.RE
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "EXAMPLES"
+
+To create a cluster, run:
+
+.RS 2m
+$ gcloud alpha dataproc clusters create my_cluster
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
+
+.RS 2m
+$ gcloud dataproc clusters create
+$ gcloud beta dataproc clusters create
+.RE
+

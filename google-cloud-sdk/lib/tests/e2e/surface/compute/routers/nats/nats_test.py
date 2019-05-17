@@ -137,10 +137,10 @@ class NatsTest(e2e_test_base.BaseTest):
     Retry(lambda: self.Run(cmd))
 
 
-class NatsAlphaTest(NatsTest):
+class NatsTestBeta(NatsTest):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.track = calliope_base.ReleaseTrack.BETA
     self.network_name = next(e2e_utils.GetResourceNameGenerator(
         prefix='routers-test-network'))
     self.router_name = next(e2e_utils.GetResourceNameGenerator(
@@ -160,25 +160,26 @@ class NatsAlphaTest(NatsTest):
 
     self.Run('compute routers nats create {0} --router {1} --region {2} '
              '--nat-all-subnet-ip-ranges --auto-allocate-nat-external-ips '
-             '--enable-logging --log-filter TRANSLATIONS_ONLY'.format(
+             '--enable-logging '.format(
                  self.nat_name, self.router_name, self.region))
 
     self.Run(
         'compute routers nats describe {0} --router {1} --region {2}'.format(
             self.nat_name, self.router_name, self.region))
     self.AssertNewOutputContainsAll([
-        'name: {0}'.format(self.nat_name), 'logConfig:', 'enabled: true',
-        'filter: TRANSLATIONS_ONLY'
+        'name: {0}'.format(self.nat_name), 'logConfig:', 'enable: true',
+        # Default filter should be ALL.
+        'filter: ALL'
     ])
 
-    # Clear the filter, verify that there's no filter on describe
+    # Change the log filter, verify that it's reflected on describe
     self.Run('compute routers nats update {0} --router {1} --region {2} '
-             '--clear-log-filter'.format(self.nat_name, self.router_name,
-                                         self.region))
+             '--log-filter TRANSLATIONS_ONLY'.format(
+                 self.nat_name, self.router_name, self.region))
     self.Run(
         'compute routers nats describe {0} --router {1} --region {2}'.format(
             self.nat_name, self.router_name, self.region))
-    self.AssertNewOutputNotContains('filter: TRANSLATIONS_ONLY')
+    self.AssertNewOutputContains('filter: TRANSLATIONS_ONLY')
 
     # Retry deletion in case resource was not ready yet.
     cmd = 'compute routers nats delete {0} --router {1} --region {2}'.format(

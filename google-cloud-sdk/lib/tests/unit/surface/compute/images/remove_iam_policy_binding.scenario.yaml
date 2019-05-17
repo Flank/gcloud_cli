@@ -1,14 +1,35 @@
 title: compute images remove-iam-policy-binding scenario test
-release_tracks: [BETA]
-
+release_tracks: [ALPHA, BETA, GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute images remove-iam-policy-binding my-image --member=user:owner@gmail.com
+      --role=roles/owner
+  - stderr: |
+      Updated IAM policy for image [my-image].
+  - stdout: |
+      bindings:
+      - members:
+        - user:newowner@gmail.com
+        role: roles/owner
+      etag: etag
+      version: 1
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1
+      BETA: beta
+      ALPHA: alpha
+
 # remove binding without condition to a policy without condition
 - execute_command:
-    command: compute images remove-iam-policy-binding my-image --member=user:owner@gmail.com --role=roles/owner
+    command: compute images remove-iam-policy-binding my-image --member=user:owner@gmail.com
+      --role=roles/owner
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/beta/projects/fake-project/global/images/projects%2Ffake-project%2Fglobal%2Fimages%2Fmy-image/getIamPolicy?alt=json
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/images/my-image/getIamPolicy?alt=json
           method: GET
           body: null
         return_response:
@@ -30,15 +51,15 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/beta/projects/fake-project/global/images/projects%2Ffake-project%2Fglobal%2Fimages%2Fmy-image/setIamPolicy?alt=json
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/global/images/my-image/setIamPolicy?alt=json
           method: POST
           body:
             json:
               policy:
                 bindings:
-                - role: 'roles/owner'
-                  members: ['user:newowner@gmail.com']
-                etag: 'etag'
+                - role: roles/owner
+                  members: ["user:newowner@gmail.com"]
+                etag: etag
                 version: 1
         return_response:
           headers:

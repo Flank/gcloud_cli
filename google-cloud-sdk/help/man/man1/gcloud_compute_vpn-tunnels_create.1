@@ -11,7 +11,7 @@ gcloud compute vpn\-tunnels create \- create a VPN tunnel
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute vpn\-tunnels create\fR \fINAME\fR \fB\-\-peer\-address\fR=\fIPEER_ADDRESS\fR \fB\-\-shared\-secret\fR=\fISHARED_SECRET\fR \fB\-\-target\-vpn\-gateway\fR=\fITARGET_VPN_GATEWAY\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-ike\-version\fR=\fIIKE_VERSION\fR] [\fB\-\-local\-traffic\-selector\fR=\fICIDR\fR,[\fICIDR\fR,...]] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-remote\-traffic\-selector\fR=\fICIDR\fR,[\fICIDR\fR,...]] [\fB\-\-router\fR=\fIROUTER\fR] [\fB\-\-target\-vpn\-gateway\-region\fR=\fITARGET_VPN_GATEWAY_REGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute vpn\-tunnels create\fR \fINAME\fR \fB\-\-peer\-address\fR=\fIPEER_ADDRESS\fR \fB\-\-shared\-secret\fR=\fISHARED_SECRET\fR \fB\-\-target\-vpn\-gateway\fR=\fITARGET_VPN_GATEWAY\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-ike\-version\fR=\fIIKE_VERSION\fR] [\fB\-\-local\-traffic\-selector\fR=\fICIDR\fR,[\fICIDR\fR,...]] [\fB\-\-region\fR=\fIREGION\fR] [\fB\-\-remote\-traffic\-selector\fR=\fICIDR\fR,[\fICIDR\fR,...]] [\fB\-\-router\fR=\fIROUTER\fR] [\fB\-\-router\-region\fR=\fIROUTER_REGION\fR] [\fB\-\-target\-vpn\-gateway\-region\fR=\fITARGET_VPN_GATEWAY_REGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -39,16 +39,16 @@ Name of the VPN Tunnel to create.
 .RS 2m
 .TP 2m
 \fB\-\-peer\-address\fR=\fIPEER_ADDRESS\fR
-A valid IP\-v4 address representing the remote tunnel endpoint
+Valid IP\-v4 address representing the remote tunnel endpoint
 
 .TP 2m
 \fB\-\-shared\-secret\fR=\fISHARED_SECRET\fR
-A shared secret consisting of printable characters. Valid arguments match the
+Shared secret consisting of printable characters. Valid arguments match the
 regular expression [ \-~]+
 
 .TP 2m
 \fB\-\-target\-vpn\-gateway\fR=\fITARGET_VPN_GATEWAY\fR
-A reference to a target vpn gateway
+A reference to a Cloud VPN Classic Target VPN Gateway.
 
 
 .RE
@@ -59,7 +59,7 @@ A reference to a target vpn gateway
 .RS 2m
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
-An optional, textual description for the target VPN tunnel.
+An optional, textual description for the VPN tunnel.
 
 .TP 2m
 \fB\-\-ike\-version\fR=\fIIKE_VERSION\fR
@@ -69,9 +69,10 @@ must be one of: \fB1\fR, \fB2\fR.
 .TP 2m
 \fB\-\-local\-traffic\-selector\fR=\fICIDR\fR,[\fICIDR\fR,...]
 Traffic selector is an agreement between IKE peers to permit traffic through a
-tunnel if the traffic matches a specified pair of local and remote addresses.
+tunnel if the traffic matches a specified pair of local and remote addresses;
+this flag can only be specified for Classic VPN tunnels.
 
-local_traffic_selector allows to configure the local addresses that are
+\-\-local\-traffic\-selector allows to configure the local addresses that are
 permitted. The value should be a comma separated list of CIDR formatted strings.
 Example: 192.168.0.0/16,10.0.0.0/24.
 
@@ -105,15 +106,43 @@ Alternatively, the region can be stored in the environment variable
 .TP 2m
 \fB\-\-remote\-traffic\-selector\fR=\fICIDR\fR,[\fICIDR\fR,...]
 Traffic selector is an agreement between IKE peers to permit traffic through a
-tunnel if the traffic matches a specified pair of local and remote addresses.
+tunnel if the traffic matches a specified pair of local and remote addresses;
+this flag can only be specified for Classic VPN tunnels.
 
-remote_traffic_selector allows to configure the remote addresses that are
+\-\-remote\-traffic\-selector allows to configure the remote addresses that are
 permitted. The value should be a comma separated list of CIDR formatted strings.
 Example: 192.168.0.0/16,10.0.0.0/24.
 
 .TP 2m
 \fB\-\-router\fR=\fIROUTER\fR
 The Router to use for dynamic routing.
+
+.TP 2m
+\fB\-\-router\-region\fR=\fIROUTER_REGION\fR
+Region of the router to operate on. If not specified, you may be prompted to
+select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
 
 .TP 2m
 \fB\-\-target\-vpn\-gateway\-region\fR=\fITARGET_VPN_GATEWAY_REGION\fR
@@ -127,10 +156,11 @@ not specified, it will be automatically set. Overrides the default
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

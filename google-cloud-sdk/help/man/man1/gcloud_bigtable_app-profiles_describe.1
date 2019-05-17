@@ -1,0 +1,70 @@
+
+.TH "GCLOUD_BIGTABLE_APP\-PROFILES_DESCRIBE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud bigtable app\-profiles describe \- describe an existing Bigtable app profile
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud bigtable app\-profiles describe\fR (\fIAPP_PROFILE\fR\ :\ \fB\-\-instance\fR=\fIINSTANCE\fR) [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Describe an existing Bigtable app profile.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+
+App profile resource \- The app profile to describe. The arguments in this group
+can be used to specify the attributes of this resource. (NOTE) Some attributes
+are not given arguments in this group but can be set in other ways. To set the
+[project] attribute: provide the argument [app_profile] on the command line with
+a fully specified name; provide the argument [\-\-project] on the command line;
+set the property [core/project]. This must be specified.
+
+.RS 2m
+.TP 2m
+\fIAPP_PROFILE\fR
+ID of the app profile or fully qualified identifier for the app profile. This
+positional must be specified if any of the other arguments in this group are
+specified.
+
+.TP 2m
+\fB\-\-instance\fR=\fIINSTANCE\fR
+Cloud Bigtable instance for the app profile.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha bigtable app\-profiles describe
+$ gcloud beta bigtable app\-profiles describe
+.RE
+

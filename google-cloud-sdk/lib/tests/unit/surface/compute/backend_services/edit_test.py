@@ -33,7 +33,7 @@ def _MakeBackendService(messages):
                   messages.Backend.BalancingModeValueValuesEnum.RATE),
               group=(
                   'https://www.googleapis.com/compute/v1/projects/'
-                  'my-project/zones/us-central1-a/instanceGroups/group-1'),
+                  'my-project/regions/us-central1/instanceGroups/group-1'),
               maxRate=123),
           messages.Backend(
               balancingMode=(

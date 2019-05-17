@@ -32,10 +32,11 @@ https://cloud.google.com/compute/docs/
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -51,10 +52,6 @@ gcloud help\fR for details.
 .TP 2m
 \fBaddresses\fR
 \fB(ALPHA)\fR Read and manipulate Google Compute Engine addresses.
-
-.TP 2m
-\fBallocations\fR
-\fB(ALPHA)\fR Manage Compute Engine zonal allocations.
 
 .TP 2m
 \fBbackend\-buckets\fR
@@ -75,6 +72,10 @@ gcloud help\fR for details.
 .TP 2m
 \fBdisks\fR
 \fB(ALPHA)\fR Read and manipulate Google Compute Engine disks.
+
+.TP 2m
+\fBexternal\-vpn\-gateways\fR
+\fB(ALPHA)\fR Read and manipulate Google Compute Engine External VPN Gateways.
 
 .TP 2m
 \fBfirewall\-rules\fR
@@ -142,6 +143,10 @@ instances.
 \fB(ALPHA)\fR Read and manipulate Google Compute Engine operations.
 
 .TP 2m
+\fBos\-config\fR
+\fB(ALPHA)\fR Manage OS Config tasks for Compute Engine VMs.
+
+.TP 2m
 \fBos\-login\fR
 \fB(ALPHA)\fR Create and manipulate Google Compute Engine OS Login resources.
 
@@ -152,6 +157,10 @@ instances.
 .TP 2m
 \fBregions\fR
 \fB(ALPHA)\fR List Google Compute Engine regions.
+
+.TP 2m
+\fBreservations\fR
+\fB(ALPHA)\fR Manage Compute Engine reservations.
 
 .TP 2m
 \fBresource\-policies\fR
@@ -219,7 +228,7 @@ instances.
 
 .TP 2m
 \fBtarget\-vpn\-gateways\fR
-\fB(ALPHA)\fR Read and manipulate Google Compute Engine VPN Gateways.
+\fB(ALPHA)\fR read and manipulate Google Compute Engine Classic VPN Gateways.
 
 .TP 2m
 \fBtpus\fR
@@ -228,6 +237,11 @@ instances.
 .TP 2m
 \fBurl\-maps\fR
 \fB(ALPHA)\fR List, create, and delete URL maps.
+
+.TP 2m
+\fBvpn\-gateways\fR
+\fB(ALPHA)\fR read and manipulate Google Compute Engine Highly Available VPN
+Gateways.
 
 .TP 2m
 \fBvpn\-tunnels\fR
@@ -278,7 +292,7 @@ scp.
 
 .TP 2m
 \fBstart\-iap\-tunnel\fR
-\fB(ALPHA)\fR Starts an IAP TCP Fordwarding tunnel over WebSocket connection.
+\fB(ALPHA)\fR Starts an IAP TCP forwarding tunnel over WebSocket connection.
 
 
 .RE

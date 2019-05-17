@@ -3,9 +3,11 @@ NAME
 
 SYNOPSIS
     gcloud beta dataflow jobs run JOB_NAME --gcs-location=GCS_LOCATION
-        [--max-workers=MAX_WORKERS] [--parameters=[PARAMETERS,...]]
+        [--max-workers=MAX_WORKERS] [--network=NETWORK]
+        [--num-workers=NUM_WORKERS] [--parameters=[PARAMETERS,...]]
         [--region=REGION_ID] [--service-account-email=SERVICE_ACCOUNT_EMAIL]
-        [--staging-location=STAGING_LOCATION] [--zone=ZONE]
+        [--staging-location=STAGING_LOCATION] [--subnetwork=SUBNETWORK]
+        [--worker-machine-type=WORKER_MACHINE_TYPE] [--zone=ZONE]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -24,6 +26,13 @@ OPTIONAL FLAGS
      --max-workers=MAX_WORKERS
         The maximum number of workers to run.
 
+     --network=NETWORK
+        The Compute Engine network for launching instances to run your
+        pipeline.
+
+     --num-workers=NUM_WORKERS
+        The initial number of workers to use.
+
      --parameters=[PARAMETERS,...]
         The parameters to pass to the job.
 
@@ -37,12 +46,20 @@ OPTIONAL FLAGS
         The Google Cloud Storage location to stage temporary files. (Must be a
         URL beginning with 'gs://'.)
 
+     --subnetwork=SUBNETWORK
+        The Compute Engine subnetwork for launching instances to run your
+        pipeline.
+
+     --worker-machine-type=WORKER_MACHINE_TYPE
+        The type of machine to use for workers. Defaults to server-specified.
+
      --zone=ZONE
         The zone to run the workers in.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

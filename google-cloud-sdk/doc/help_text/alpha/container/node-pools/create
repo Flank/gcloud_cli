@@ -6,23 +6,25 @@ SYNOPSIS
     gcloud alpha container node-pools create NAME
         [--accelerator=[type=TYPE,[count=COUNT],...]] [--cluster=CLUSTER]
         [--disk-size=DISK_SIZE] [--disk-type=DISK_TYPE] [--enable-autorepair]
-        [--enable-autoupgrade] [--image-type=IMAGE_TYPE]
+        [--no-enable-autoupgrade] [--image-type=IMAGE_TYPE]
+        [--linux-sysctls=KEY=VALUE,[KEY=VALUE,...]]
         [--machine-type=MACHINE_TYPE, -m MACHINE_TYPE]
         [--max-pods-per-node=MAX_PODS_PER_NODE]
         [--metadata=KEY=VALUE,[KEY=VALUE,...]]
         [--metadata-from-file=KEY=LOCAL_FILE_PATH,[...]]
-        [--min-cpu-platform=PLATFORM] [--node-labels=[NODE_LABEL,...]]
-        [--node-taints=[NODE_TAINT,...]] [--node-version=NODE_VERSION]
-        [--num-nodes=NUM_NODES; default=3] [--preemptible]
-        [--tags=TAG,[TAG,...]]
+        [--min-cpu-platform=PLATFORM] [--node-group=NODE_GROUP]
+        [--node-labels=[NODE_LABEL,...]] [--node-taints=[NODE_TAINT,...]]
+        [--node-version=NODE_VERSION] [--num-nodes=NUM_NODES; default=3]
+        [--preemptible] [--sandbox=[type=TYPE]] [--tags=TAG,[TAG,...]]
         [--workload-metadata-from-node=WORKLOAD_METADATA_FROM_NODE]
         [--enable-autoscaling --max-nodes=MAX_NODES --min-nodes=MIN_NODES]
         [--local-ssd-count=LOCAL_SSD_COUNT
           | --local-ssd-volumes=[[count=COUNT],
           [type=TYPE],[format=FORMAT],...]]
         [--region=REGION | --zone=ZONE, -z ZONE]
-        [--service-account=SERVICE_ACCOUNT | --no-enable-cloud-endpoints
-          --scopes=[SCOPE,...]; default="gke-default"] [GCLOUD_WIDE_FLAG ...]
+        [--scopes=[SCOPE,...];
+          default="gke-default" --service-account=SERVICE_ACCOUNT]
+        [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) gcloud alpha container node-pools create facilitates the creation
@@ -77,8 +79,10 @@ FLAGS
             $ gcloud alpha container node-pools create node-pool-1 \
                 --cluster=example-cluster --enable-autoupgrade
 
-        See https://cloud.google.com/kubernetes-engine/docs/node-management for
-        more info.
+        See https://cloud.google.com/kubernetes-engine/docs/node-auto-upgrades
+        for more info.
+
+        Enabled by default, use --no-enable-autoupgrade to disable.
 
      --image-type=IMAGE_TYPE
         The image type to use for the node pool. Defaults to server-specified.
@@ -92,6 +96,16 @@ FLAGS
         using the following command.
 
             $ gcloud container get-server-config
+
+     --linux-sysctls=KEY=VALUE,[KEY=VALUE,...]
+        Linux kernel parameters to be applied to all nodes in the new node-pool
+        as well as the pods running on the nodes.
+
+        Example:
+
+            $ gcloud alpha container node-pools create node-pool-1 \
+                --linux-sysctls="net.core.somaxconn=1024,net.ipv4.tcp_rmem=4096\
+             87380 6291456"
 
      --machine-type=MACHINE_TYPE, -m MACHINE_TYPE
         The type of machine to use for nodes. Defaults to n1-standard-1. The
@@ -170,6 +184,24 @@ FLAGS
 
         CPU platform selection is available only in selected zones.
 
+     --node-group=NODE_GROUP
+        Assign instances of this pool to run on the specified Google Compute
+        Engine node group. This is useful for running workloads on sole tenant
+        nodes.
+
+        To see available sole tenant node-groups, run:
+
+            $ gcloud compute sole-tenancy node-groups list
+
+        To create a sole tenant node group, run:
+
+            $ gcloud compute sole-tenancy node-groups create [GROUP_NAME]     \
+                --zone [ZONE] --node-template [TEMPLATE_NAME] \
+                --target-size [TARGET_SIZE]
+
+        See https://cloud.google.com/compute/docs/nodes for more information on
+        sole tenancy and node groups.
+
      --node-labels=[NODE_LABEL,...]
         Applies the given kubernetes labels on all nodes in the new node-pool.
         Example:
@@ -225,6 +257,14 @@ FLAGS
         https://cloud.google.com/kubernetes-engine/docs/preemptible-vm for more
         information on how to use Preemptible VMs with Kubernetes Engine.
 
+     --sandbox=[type=TYPE]
+        Enables the requested sandbox on all nodes in the node-pool. Example:
+
+            $ gcloud alpha container node-pools create node-pool-1 \
+                --cluster=example-cluster --sandbox="type=gvisor"
+
+        The only supported type is 'gvisor'.
+
      --tags=TAG,[TAG,...]
         Applies the given Compute Engine tags (comma separated) on all nodes in
         the new node-pool. Example:
@@ -239,19 +279,27 @@ FLAGS
         for examples.
 
      --workload-metadata-from-node=WORKLOAD_METADATA_FROM_NODE
-        Sets the node metadata option for workload metadata configuration. This
-        feature is scheduled to be deprecated in the future and later removed.
+        Type of metadata server available to pods running in the nodepool.
         WORKLOAD_METADATA_FROM_NODE must be one of:
 
          EXPOSED
-            Exposes all VM metadata to workloads.
+            Pods running in this nodepool have access to the node's underlying
+            Compute Engine Metadata Server.
+         GKE_METADATA_SERVER
+            Run the Kubernetes Engine Metadata Server on this node. The
+            Kubernetes Engine Metadata Server exposes a metadata API to
+            workloads that is compatible with the V1 Compute Metadata APIs
+            exposed by the Compute Engine and App Engine Metadata Servers. This
+            feature can only be enabled if Workload Identity is enabled at the
+            cluster level.
          SECURE
-            Prevents workloads not in hostNetwork from accessing certain VM
+            Prevents pods not in hostNetwork from accessing certain VM
             metadata, specifically kube-env, which contains Kubelet
             credentials, and the instance identity token. This is a temporary
             security solution available while the bootstrapping process for
             cluster nodes is being redesigned with significant security
-            improvements.
+            improvements. This feature is scheduled to be deprecated in the
+            future and later removed.
          UNSPECIFIED
             Chooses the default.
 
@@ -332,32 +380,9 @@ FLAGS
           Compute zone (e.g. us-central1-a) for the cluster. Overrides the
           default compute/zone property value for this command invocation.
 
-     Options to specify the node identity. At most one of these may be
-     specified:
-
-       --service-account=SERVICE_ACCOUNT
-          The Google Cloud Platform Service Account to be used by the node VMs.
-          If a service account is specified, the cloud-platform and
-          userinfo.email scopes are used. If no Service Account is specified,
-          the project default service account is used.
+     Options to specify the node identity.
 
        Scopes options.
-
-         --enable-cloud-endpoints
-            (REMOVED) Automatically enable Google Cloud Endpoints to take
-            advantage of API management features by adding service-control and
-            service-management scopes.
-
-            If --no-enable-cloud-endpoints is set, remove service-control and
-            service-management scopes, even if they are implicitly (via
-            default) or explicitly set via --scopes.
-
-            --[no-]enable-cloud-endpoints is not allowed if
-            container/new_scopes_behavior property is set to true.
-
-            Flag --[no-]enable-cloud-endpoints has been removed.
-
-            Enabled by default, use --no-enable-cloud-endpoints to disable.
 
          --scopes=[SCOPE,...]; default="gke-default"
             Specifies scopes for the node instances. Examples:
@@ -373,20 +398,9 @@ FLAGS
             Multiple SCOPEs can be specified, separated by commas.
             logging-write and/or monitoring are added unless Cloud Logging
             and/or Cloud Monitoring are disabled (see --enable-cloud-logging
-            and --enable-cloud-monitoring for more information).
-
-            Unless container/new_scopes_behavior property is true, compute-rw
-            and storage-ro are always added, even if not explicitly specified,
-            and --enable-cloud-endpoints (by default) adds service-control and
-            service-management scopes.
-
-            If container/new_scopes_behavior property is true, none of the
-            above scopes are added (though storage-ro, service-control, and
-            service-management are all included in the default scopes. In a
-            future release, this will be the default behavior.
-
-            SCOPE can be either the full URI of the scope or an alias. default
-            scopes are assigned to all instances. Available aliases are:
+            and --enable-cloud-monitoring for more information). SCOPE can be
+            either the full URI of the scope or an alias. default scopes are
+            assigned to all instances. Available aliases are:
 
               Alias                  URI
               bigquery               https://www.googleapis.com/auth/bigquery
@@ -430,9 +444,16 @@ FLAGS
             https://www.googleapis.com/auth/sqlservice.admin or sql-admin to
             manage your Google SQL Service instances.
 
+       --service-account=SERVICE_ACCOUNT
+          The Google Cloud Platform Service Account to be used by the node VMs.
+          If a service account is specified, the cloud-platform and
+          userinfo.email scopes are used. If no Service Account is specified,
+          the project default service account is used.
+
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

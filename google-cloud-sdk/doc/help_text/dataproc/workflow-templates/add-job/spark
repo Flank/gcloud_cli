@@ -57,8 +57,6 @@ OPTIONAL FLAGS
         List of key value pairs to configure Spark. For a list of available
         properties, see:
         https://spark.apache.org/docs/latest/configuration.html#available-properties.
-        Alternatively, to see examples of how to use the properties flag, see:
-        https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/cluster-properties#how_the_properties_flag_works
 
      --region=REGION
         Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
@@ -80,13 +78,15 @@ OPTIONAL FLAGS
         The HCFS URI of jar file containing the driver jar.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
 NOTES
-    This variant is also available:
+    These variants are also available:
 
+        $ gcloud alpha dataproc workflow-templates add-job spark
         $ gcloud beta dataproc workflow-templates add-job spark
 

@@ -1,0 +1,82 @@
+
+.TH "GCLOUD_ALPHA_LOGGING_BUCKETS_UPDATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha logging buckets update \- updates a bucket
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha logging buckets update\fR \fIBUCKET_ID\fR \fB\-\-location\fR=\fILOCATION\fR [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR] [\fB\-\-retention\-days\fR=\fIRETENTION_DAYS\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Changes one or more proprties associated with a bucket.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIBUCKET_ID\fR
+The id of the bucket to update.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+Location of the bucket.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+A new description for the bucket.
+
+.TP 2m
+\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
+A new display name for the bucket.
+
+.TP 2m
+\fB\-\-retention\-days\fR=\fIRETENTION_DAYS\fR
+A new retention period for the bucket.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/.
+

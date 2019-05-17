@@ -26,8 +26,8 @@ from tests.lib.surface.compute import test_base
 class NetworkEndpointGroupsDeleteTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.SelectApi(self.track.prefix)
+    self.track = calliope_base.ReleaseTrack.GA
+    self.SelectApi('v1')
 
   def testSimpleCase(self):
     self.make_requests.side_effect = iter([[
@@ -37,13 +37,11 @@ class NetworkEndpointGroupsDeleteTest(test_base.BaseTest):
     self.WriteInput('y\n')
     self.Run('compute network-endpoint-groups delete my-neg1 --zone zone-1')
     self.CheckRequests(
-        [(self.compute_beta.networkEndpointGroups,
-          'Delete',
+        [(self.compute.networkEndpointGroups, 'Delete',
           self.messages.ComputeNetworkEndpointGroupsDeleteRequest(
               networkEndpointGroup='my-neg1',
               project='my-project',
-              zone='zone-1'))],
-    )
+              zone='zone-1'))],)
     self.AssertErrContains('Deleted network endpoint group [my-neg1]')
 
 

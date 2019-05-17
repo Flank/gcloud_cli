@@ -119,3 +119,8 @@ class WorkflowTemplatesJobPigUnitTestBeta(WorkflowTemplatesJobPigUnitTest,
         '--file {1} --params foo=bar,var=value '.format(self.WORKFLOW_TEMPLATE,
                                                         self.SCRIPT_URI))
     self.AssertMessagesEqual(expected, result)
+
+
+class WorkflowTemplatesJobPigUnitTestAlpha(WorkflowTemplatesJobPigUnitTestBeta,
+                                           base.DataprocTestBaseAlpha):
+  pass

@@ -49,13 +49,7 @@ REQUIRED FLAGS
 
           This flag can be repeated to provide multiple indexes. Any existing
           indexes will be overwritten with the ones provided. Any omitted
-          indexes will be deleted if they currently exist. For example, to
-          explicitly set the list of indexes for the tags field in the Events
-          collection group to [ascending, contains], run:
-
-              $ gcloud beta firestore indexes fields update tags \
-                  --collection-group=Events \
-                  --index order=ascending --index array-config=contains
+          indexes will be deleted if they currently exist.
 
           The following keys are allowed:
 
@@ -75,8 +69,9 @@ OPTIONAL FLAGS
         for the operation to complete.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

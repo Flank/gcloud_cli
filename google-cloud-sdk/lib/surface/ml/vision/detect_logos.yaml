@@ -2,8 +2,12 @@
 
   help_text:
     brief: Detect popular product logos within an image.
-    DESCRIPTION: |
+    description: |
       Detect popular product logos within an image.
+    examples: |
+      To detect product logos in an image 'gs://my_bucket/input_file':
+
+        $ {command} gs://my_bucket/input_file
 
   request:
     _COMMON_: request
@@ -25,8 +29,12 @@
 
   help_text:
     brief: Detect popular product logos within an image.
-    DESCRIPTION: |
+    description: |
       Detect popular product logos within an image.
+    examples: |
+      To detect product logos in an image 'gs://my_bucket/input_file':
+
+        $ {command} gs://my_bucket/input_file
 
   request:
     _COMMON_: request

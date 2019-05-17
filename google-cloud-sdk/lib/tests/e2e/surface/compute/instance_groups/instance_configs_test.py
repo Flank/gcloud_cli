@@ -21,7 +21,6 @@ from __future__ import unicode_literals
 import re
 
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import e2e_utils
 from tests.lib.surface.compute import e2e_managers_stateful_test_base
 from tests.lib.surface.compute import e2e_test_base
 
@@ -40,15 +39,24 @@ class ManagedInstanceGroupsInstanceConfigsZonalTest(
           {scope_flag}
     """.format(group_name=group_name, scope_flag=self.GetScopeFlag()))
 
-  def _CreateInstanceUrl(self):
-    name = next(e2e_utils.GetResourceNameGenerator(prefix=self.prefix))
-    return ('https://www.googleapis.com/compute/'
-            '{0}/projects/{1}/zones/{2}/instances/{3}').format(
-                self.track.prefix, self.Project(), self.zone, name)
+  def _CreateInstanceConfigs(self, name, instance, stateful_disks):
+    command = """\
+      compute instance-groups managed instance-configs create {group_name} \
+        {scope_flag} \
+        --instance {instance}""".format(
+            group_name=name, scope_flag=self.GetScopeFlag(), instance=instance)
+    for stateful_disk in stateful_disks:
+      command += (' --stateful-disk device-name={disk_name}'.format(
+          disk_name=stateful_disk))
+    self.Run(command)
 
   @staticmethod
   def _ExtractZoneFromUri(uri):
     return re.search(r'/zones/([^/]+)/', uri).group(1)
+
+  @staticmethod
+  def _ExtractInstanceNameFromUri(uri):
+    return re.search(r'/instances/([^/]+)', uri).group(1)
 
   def testCreateEmptyInstanceConfig(self):
     instance_template_name = self.CreateInstanceTemplate()
@@ -65,7 +73,8 @@ class ManagedInstanceGroupsInstanceConfigsZonalTest(
         scope_flag=self.GetScopeFlag(),
         instance=instance_uri))
     self._ListInstanceConfigs(igm_name)
-    self.AssertOutputContains('instance: {0}'.format(instance_uri))
+    self.AssertOutputContains(
+        'name: {0}'.format(self._ExtractInstanceNameFromUri(instance_uri)))
     self.AssertOutputNotContains('deviceName:')
 
   def testCreateInstanceConfigWithStatefulDisksAndForceInstanceUpdate(self):
@@ -92,10 +101,17 @@ class ManagedInstanceGroupsInstanceConfigsZonalTest(
     self.ClearOutput()
     self._ListInstanceConfigs(igm_name)
     self.AssertNewOutputContainsAll([
-        'instance: {0}'.format(instance_uri), 'deviceName: disk1',
-        'deviceName: disk3'
-    ])
-    self.AssertOutputNotContains('deviceName: disk2')
+        'name: {0}'.format(self._ExtractInstanceNameFromUri(instance_uri)),
+        """\
+        disk3:
+          autoDelete: NEVER
+        """,
+        """\
+        disk1:
+          autoDelete: NEVER
+        """
+    ], normalize_space=True)
+    self.AssertOutputNotContains('disk2')
     self.WaitUntilStable(igm_name)
     self.ClearOutput()
     self.DescribeInstance(instance_uri)
@@ -107,9 +123,10 @@ class ManagedInstanceGroupsInstanceConfigsZonalTest(
     instance_template_name = self.CreateInstanceTemplate(
         additional_disks=['disk1', 'disk2', 'disk3'])
     igm_name = self.CreateInstanceGroupManagerStateful(
-        instance_template_name, size=1, stateful_disks=['disk1', 'disk3'])
+        instance_template_name, size=1)
     self.WaitUntilStable(igm_name)
     instance_uri = self.GetInstanceUris(igm_name)[0]
+    self._CreateInstanceConfigs(igm_name, instance_uri, ['disk1', 'disk3'])
     self.Run("""\
         compute instance-groups managed instance-configs update {group_name} \
           {scope_flag} \
@@ -122,18 +139,26 @@ class ManagedInstanceGroupsInstanceConfigsZonalTest(
         instance=instance_uri))
     self._ListInstanceConfigs(igm_name)
     self.AssertNewOutputContainsAll([
-        'instance: {0}'.format(instance_uri), 'deviceName: disk1',
-        'deviceName: disk2'
-    ])
-    self.AssertOutputNotContains('deviceName: disk3')
+        """\
+        disk1:
+          autoDelete: NEVER
+        """,
+        """\
+        disk2:
+          autoDelete: NEVER
+        """,
+        'name: {0}'.format(self._ExtractInstanceNameFromUri(instance_uri))
+    ], normalize_space=True)
+    self.AssertOutputNotContains('disk3')
 
   def testUpdateInstanceConfigRemoveAllStatefulDisks(self):
     instance_template_name = self.CreateInstanceTemplate(
         additional_disks=['disk1', 'disk2'])
     igm_name = self.CreateInstanceGroupManagerStateful(
-        instance_template_name, size=1, stateful_disks=['disk1', 'disk2'])
+        instance_template_name, size=1)
     self.WaitUntilStable(igm_name)
     instance_uri = self.GetInstanceUris(igm_name)[0]
+    self._CreateInstanceConfigs(igm_name, instance_uri, ['disk1', 'disk2'])
     self.Run("""\
         compute instance-groups managed instance-configs update {group_name} \
           {scope_flag} \
@@ -144,15 +169,21 @@ class ManagedInstanceGroupsInstanceConfigsZonalTest(
         scope_flag=self.GetScopeFlag(),
         instance=instance_uri))
     self._ListInstanceConfigs(igm_name)
-    self.AssertNewOutputContainsAll(['instance: {0}'.format(instance_uri)])
-    self.AssertOutputNotContains('deviceName')
+    self.AssertNewOutputContainsAll(
+        ['name: {0}'
+         .format(self._ExtractInstanceNameFromUri(instance_uri))])
+    self.AssertOutputNotContains('disk1')
+    self.AssertOutputNotContains('disk2')
 
   def testDeleteInstanceConfigs(self):
-    instance_template_name = self.CreateInstanceTemplate()
+    instance_template_name = self.CreateInstanceTemplate(
+        additional_disks=['disk1', 'disk2'])
     igm_name = self.CreateInstanceGroupManagerStateful(
-        instance_template_name, size=2, stateful_names=True)
+        instance_template_name, size=2)
     self.WaitUntilStable(igm_name)
     instance_uris = self.GetInstanceUris(igm_name)
+    self._CreateInstanceConfigs(igm_name, instance_uris[0], ['disk1', 'disk2'])
+    self._CreateInstanceConfigs(igm_name, instance_uris[1], ['disk1'])
     self.Run("""\
         compute instance-groups managed instance-configs delete {group_name} \
           {scope_flag} \
@@ -166,9 +197,12 @@ class ManagedInstanceGroupsInstanceConfigsZonalTest(
 
   def testListInstanceConfigs(self):
     instance_template_name = self.CreateInstanceTemplate()
-    igm_name = self.CreateInstanceGroupManagerStateful(instance_template_name)
-    instance_uri = self._CreateInstanceUrl()
-    disk_uri = self.CreateDisk()
+    igm_name = self.CreateInstanceGroupManagerStateful(
+        instance_template_name, size=1)
+    self.WaitUntilStable(igm_name)
+    instance_uri = self.GetInstanceUris(igm_name)[0]
+    instance_zone = self._ExtractZoneFromUri(instance_uri)
+    disk_uri = self.CreateDisk(zone=instance_zone)
     self.Run("""\
         compute instance-groups managed instance-configs create {group_name} \
           {scope_flag} \
@@ -179,14 +213,15 @@ class ManagedInstanceGroupsInstanceConfigsZonalTest(
         scope_flag=self.GetScopeFlag(),
         instance=instance_uri,
         source=disk_uri))
-    self.Run("""\
-        compute instance-groups managed instance-configs list {group_name} \
-          {scope_flag}
-    """.format(group_name=igm_name, scope_flag=self.GetScopeFlag()))
+    self._ListInstanceConfigs(igm_name)
     self.AssertNewOutputContainsAll([
-        'instance: {0}'.format(instance_uri), 'deviceName: disk1',
+        'name: {0}'.format(self._ExtractInstanceNameFromUri(instance_uri)),
+        """\
+        disk1:
+          autoDelete: NEVER
+        """,
         'mode: READ_ONLY', 'source: {0}'.format(disk_uri)
-    ])
+    ], normalize_space=True)
 
 
 class ManagedInstanceGroupsInstanceConfigsRegionalTest(

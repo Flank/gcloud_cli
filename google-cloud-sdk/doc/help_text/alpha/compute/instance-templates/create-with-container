@@ -312,7 +312,7 @@ FLAGS
             If yes, this persistent disk will be automatically deleted when the
             instance is deleted. However, if the disk is later detached from
             the instance, this option won't apply. The default value for this
-            is no.
+            is yes.
 
      --labels=[KEY=VALUE,...]
         List of label KEY=VALUE pairs to add.
@@ -339,8 +339,8 @@ FLAGS
 
          device-name
             Optional. A name that indicates the disk name the guest operating
-            system will see. If omitted, a device name of the form local-ssd-N
-            will be used.
+            system will see. Can only be specified if interface is SCSI. If
+            omitted, a device name of the form local-ssd-N will be used.
 
          interface
             Optional. The kind of disk interface exposed to the VM for this
@@ -410,7 +410,8 @@ FLAGS
      --network-interface=[PROPERTY=VALUE,...]
         Adds a network interface to the instance. Mutually exclusive with any
         of these flags: --address, --network, --network-tier, --subnet,
-        --private-network-ip.
+        --private-network-ip. This flag can be repeated to specify multiple
+        network interfaces.
 
         The following keys are allowed:
          address
@@ -673,8 +674,9 @@ FLAGS
           Create instance without service account
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

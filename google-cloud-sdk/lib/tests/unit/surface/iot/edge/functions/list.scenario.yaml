@@ -1,0 +1,70 @@
+title: cloud iot edge functions list test scenario
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      iot edge functions list --region asia-east1 --registry my-registry --device my-device
+  - stdout: |
+      NAME                                                                                               DOCKER_IMAGE_URI                                                     UPDATE_TIME
+      projects/fake-project/locations/asia-east1/registries/my-registry/devices/my-device/functions/bar  gcr.io/cloud-iot-edge/worker-streamprocessing-nodejs8:aarch64-0.7.0  2019-02-24T08:29:53.355225062Z
+      projects/fake-project/locations/asia-east1/registries/my-registry/devices/my-device/functions/foo  gcr.io/cloud-iot-edge/worker-nodejs8:aarch64                         2019-02-24T08:28:29.528680775Z
+actions:
+- execute_command:
+    command: |
+      iot edge functions list --region asia-east1 --registry my-registry --device my-device
+    events:
+    - api_call:
+        expect_request:
+          uri: https://edge.googleapis.com/v1alpha1/projects/fake-project/locations/asia-east1/registries/my-registry/devices/my-device/functions?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "functions": [
+                {
+                  "name": "projects/fake-project/locations/asia-east1/registries/my-registry/devices/my-device/functions/bar",
+                  "dockerImageUri": "gcr.io/cloud-iot-edge/worker-streamprocessing-nodejs8:aarch64-0.7.0",
+                  "inputTopics": [
+                    {
+                      "topic": "/function/bar/input"
+                    }
+                  ],
+                  "outputTopics": [
+                    {
+                      "topic": "/function/bar/output"
+                    }
+                  ],
+                  "functionType": "ON_DEMAND",
+                  "updateTime": "2019-02-24T08:29:53.355225062Z",
+                  "version": "1"
+                },
+                {
+                  "name": "projects/fake-project/locations/asia-east1/registries/my-registry/devices/my-device/functions/foo",
+                  "dockerImageUri": "gcr.io/cloud-iot-edge/worker-nodejs8:aarch64",
+                  "inputTopics": [
+                    {
+                      "topic": "/function/foo/input"
+                    }
+                  ],
+                  "outputTopics": [
+                    {
+                      "topic": "/function/foo/output"
+                    }
+                  ],
+                  "functionType": "STREAM_PROCESSING",
+                  "updateTime": "2019-02-24T08:28:29.528680775Z",
+                  "version": "1"
+                }
+              ]
+            }
+    - expect_stdout: |
+        NAME                                                                                               DOCKER_IMAGE_URI                                                     UPDATE_TIME
+        projects/fake-project/locations/asia-east1/registries/my-registry/devices/my-device/functions/bar  gcr.io/cloud-iot-edge/worker-streamprocessing-nodejs8:aarch64-0.7.0  2019-02-24T08:29:53.355225062Z
+        projects/fake-project/locations/asia-east1/registries/my-registry/devices/my-device/functions/foo  gcr.io/cloud-iot-edge/worker-nodejs8:aarch64                         2019-02-24T08:28:29.528680775Z
+    - expect_exit:
+        code: 0

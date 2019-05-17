@@ -83,7 +83,8 @@ class FakeRuntimeModule(object):
 
 @test_case.Filters.DoNotRunIf(not properties.VALUES.app.runtime_root.Get(),
                               'No app runtime root is configured')
-@test_case.Filters.SkipOnPy3('Breaks kokoro py3 periodic tests', 'b/113686771')
+@test_case.Filters.SkipOnPy3Always('Breaks kokoro py3 periodic tests',
+                                   'b/113686771')
 class RuntimeSelectionTests(sdk_test_base.WithLogCapture,
                             test_case.WithOutputCapture):
 

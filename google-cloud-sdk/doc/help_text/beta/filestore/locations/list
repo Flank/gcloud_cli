@@ -7,7 +7,10 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) List all Cloud Filestore locations.
+    (BETA) (DEPRECATED) gcloud filestore locations is deprecated. Use gcloud
+    filestore zones or gcloud filestore regions instead.
+
+    List all Cloud Filestore locations.
 
 LIST COMMAND FLAGS
      --filter=EXPRESSION
@@ -39,8 +42,9 @@ LIST COMMAND FLAGS
         Print a list of resource URIs instead of the default output.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -51,8 +55,9 @@ EXAMPLES
         $ gcloud beta filestore locations list --limit=5 --sort-by=~name
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud filestore locations list
         $ gcloud alpha filestore locations list
 

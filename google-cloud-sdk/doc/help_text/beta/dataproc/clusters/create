@@ -2,8 +2,9 @@ NAME
     gcloud beta dataproc clusters create - create a cluster
 
 SYNOPSIS
-    gcloud beta dataproc clusters create NAME [--no-address] [--async]
-        [--bucket=BUCKET]
+    gcloud beta dataproc clusters create NAME
+        --autoscaling-policy=AUTOSCALING_POLICY [--no-address] [--async]
+        [--bucket=BUCKET] [--enable-component-gateway]
         [--initialization-action-timeout=TIMEOUT; default="10m"]
         [--initialization-actions=CLOUD_STORAGE_URI,[...]]
         [--labels=[KEY=VALUE,...]]
@@ -34,6 +35,8 @@ SYNOPSIS
           --gce-pd-kms-key-location=GCE_PD_KMS_KEY_LOCATION
           --gce-pd-kms-key-project=GCE_PD_KMS_KEY_PROJECT]
         [--image=IMAGE | --image-version=VERSION]
+        [--kerberos-config-file=KERBEROS_CONFIG_FILE
+          | --kerberos-root-principal-password-uri=KERBEROS_ROOT_PRINCIPAL_PASSWORD_URI (--kerberos-kms-key=KERBEROS_KMS_KEY : --kerberos-kms-key-keyring=KERBEROS_KMS_KEY_KEYRING --kerberos-kms-key-location=KERBEROS_KMS_KEY_LOCATION --kerberos-kms-key-project=KERBEROS_KMS_KEY_PROJECT)]
         [--network=NETWORK | --subnet=SUBNET]
         [--single-node | --num-preemptible-workers=NUM_PREEMPTIBLE_WORKERS
           --num-workers=NUM_WORKERS] [GCLOUD_WIDE_FLAG ...]
@@ -46,6 +49,10 @@ POSITIONAL ARGUMENTS
         The name of this cluster.
 
 FLAGS
+     --autoscaling-policy=AUTOSCALING_POLICY
+        ID of the autoscaling policy or fully qualified identifier for the
+        autoscaling policy.
+
      --no-address
         If provided, the instances in the cluster will not be assigned external
         IP addresses.
@@ -62,9 +69,13 @@ FLAGS
         for the operation to complete.
 
      --bucket=BUCKET
-        The Google Cloud Storage bucket to use with the Google Cloud Storage
-        connector. A bucket is auto created when this parameter is not
-        specified.
+        The Google Cloud Storage bucket to use by default to stage job
+        dependencies, miscellaneous config files, and job driver console output
+        when using this cluster.
+
+     --enable-component-gateway
+        Enable access to the web UIs of selected components on the cluster
+        through the component gateway.
 
      --initialization-action-timeout=TIMEOUT; default="10m"
         The maximum duration of each initialization action. See $ gcloud topic
@@ -153,7 +164,7 @@ FLAGS
         List of optional components to be installed on cluster machines.
 
         The following page documents the optional components that can be
-        installed.
+        installed:
         https://cloud.google.com/dataproc/docs/concepts/configuring-clusters/optional-components.
 
      --preemptible-worker-boot-disk-size=PREEMPTIBLE_WORKER_BOOT_DISK_SIZE
@@ -393,6 +404,110 @@ FLAGS
           The image version to use for the cluster. Defaults to the latest
           version.
 
+     Specifying these flags will enable Kerberos for the cluster. At most one
+     of these may be specified:
+
+       --kerberos-config-file=KERBEROS_CONFIG_FILE
+          Path to a YAML (or JSON) file containing the configuration for
+          Kerberos on the cluster. If you pass - as the value of the flag the
+          file content will be read from stdin.
+
+          The YAML file is formatted as follows:
+
+                # Optional. Flag to indicate whether to Kerberize the cluster.
+                # The default value is true.
+                enable_kerberos: true
+
+                # Required. The Google Cloud Storage URI of a KMS encrypted file
+                # containing the root principal password.
+                root_principal_password_uri: gs://bucket/password.encrypted
+
+                # Required. The URI of the KMS key used to encrypt various
+                # sensitive files.
+                kms_key_uri:
+                  projects/myproject/locations/global/keyRings/mykeyring/cryptoKeys/my-key
+
+                # Configuration of SSL encryption. If specified, all sub-fields
+                # are required. Otherwise, Dataproc will provide a self-signed
+                # certificate and generate the passwords.
+                ssl:
+                  # Optional. The Google Cloud Storage URI of the keystore file.
+                  keystore_uri: gs://bucket/keystore.jks
+
+                  # Optional. The Google Cloud Storage URI of a KMS encrypted
+                  # file containing the password to the keystore.
+                  keystore_password_uri: gs://bucket/keystore_password.encrypted
+
+                  # Optional. The Google Cloud Storage URI of a KMS encrypted
+                  # file containing the password to the user provided key.
+                  key_password_uri: gs://bucket/key_password.encrypted
+
+                  # Optional. The Google Cloud Storage URI of the truststore
+                  # file.
+                  truststore_uri: gs://bucket/truststore.jks
+
+                  # Optional. The Google Cloud Storage URI of a KMS encrypted
+                  # file containing the password to the user provided
+                  # truststore.
+                  truststore_password_uri:
+                    gs://bucket/truststore_password.encrypted
+
+                # Configuration of cross realm trust.
+                cross_realm_trust:
+                  # Optional. The remote realm the Dataproc on-cluster KDC will
+                  # trust, should the user enable cross realm trust.
+                  realm: REMOTE.REALM
+
+                  # Optional. The KDC (IP or hostname) for the remote trusted
+                  # realm in a cross realm trust relationship.
+                  kdc: kdc.remote.realm
+
+                  # Optional. The admin server (IP or hostname) for the remote
+                  # trusted realm in a cross realm trust relationship.
+                  admin_server: admin-server.remote.realm
+
+                  # Optional. The Google Cloud Storage URI of a KMS encrypted
+                  # file containing the shared password between the on-cluster
+                  # Kerberos realm and the remote trusted realm, in a cross
+                  # realm trust relationship.
+                  shared_password_uri:
+                    gs://bucket/cross-realm.password.encrypted
+
+                # Optional. The Google Cloud Storage URI of a KMS encrypted file
+                # containing the master key of the KDC database.
+                kdc_db_key_uri: gs://bucket/kdc_db_key.encrypted
+
+                # Optional. The lifetime of the ticket granting ticket, in
+                # hours. If not specified, or user specifies 0, then default
+                # value 10 will be used.
+                tgt_lifetime_hours: 1
+
+       --kerberos-root-principal-password-uri=KERBEROS_ROOT_PRINCIPAL_PASSWORD_URI
+          Google Cloud Storage URI of a KMS encrypted file containing the root
+          principal password. Must be a URL beginning with 'gs://'. This flag
+          must be specified if any of the other arguments in this group are
+          specified.
+
+       Key resource - The Cloud KMS (Key Management Service) cryptokey that
+       will be used to protect the password. The 'Compute Engine Service Agent'
+       service account must hold permission 'Cloud KMS CryptoKey
+       Encrypter/Decrypter'. The arguments in this group can be used to specify
+       the attributes of this resource. This must be specified.
+
+         --kerberos-kms-key=KERBEROS_KMS_KEY
+            ID of the key or fully qualified identifier for the key. This flag
+            must be specified if any of the other arguments in this group are
+            specified.
+
+         --kerberos-kms-key-keyring=KERBEROS_KMS_KEY_KEYRING
+            The KMS keyring of the key.
+
+         --kerberos-kms-key-location=KERBEROS_KMS_KEY_LOCATION
+            The Cloud location for the key.
+
+         --kerberos-kms-key-project=KERBEROS_KMS_KEY_PROJECT
+            The Cloud project for the key.
+
      At most one of these may be specified:
 
        --network=NETWORK
@@ -423,8 +538,9 @@ FLAGS
             server-specified.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -434,8 +550,9 @@ EXAMPLES
         $ gcloud beta dataproc clusters create my_cluster
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
         $ gcloud dataproc clusters create
+        $ gcloud alpha dataproc clusters create
 

@@ -212,21 +212,6 @@ class ListFilesForUploadTest(cli_test_base.CliTestBase, parameterized.TestCase):
   def testSameResultsAsGit(self, line, paths, gitignore):
     self._RunTest(paths, gitignore=gitignore)
 
-  @test_case.Filters.skip('Different results than git.', 'b/73452717')
-  @parameterized.named_parameters(
-      T('BackslashGcloudCorrect',
-        ['foo?',
-         'foo.',
-         'fooX'],
-        '.gitignore\nfoo\\?'),
-      T('SlashClassGitCorrect',
-        [os.path.join('foo', 'bar'),
-         os.path.join('foo[', ']bar')],
-        '.gitignore\nfoo[/]bar'),
-  )
-  def testDifferentResultsThanGit(self, line, paths, gitignore):
-    self._RunTest(paths, gitignore=gitignore)
-
   # The version of Git used in our .deb and .rpm packaging tests don't conform
   # to https://git-scm.com/docs/gitignore.
   #
@@ -243,16 +228,6 @@ class ListFilesForUploadTest(cli_test_base.CliTestBase, parameterized.TestCase):
       T('AllTabs', ['\t', '\t\t'], '.gitignore\n\t\n\t\t '),
   )
   def testDifferentGitVersions(self, line, paths, gitignore):
-    self._RunTest(paths, gitignore=gitignore)
-
-  @test_case.Filters.skip('Currently incorrect behavior.', 'b/38300876')
-  @parameterized.named_parameters(
-      # See <https://marc.info/?l=git&m=150721244311661>; corresponds to an
-      # inconsistency in the documentation.
-      T('ShellGlobOpeningBrace', ['[', os.path.join('dir', '[')],
-        '.gitignore\n[\ndir/['),
-  )
-  def testMismatched(self, line, paths, gitignore):
     self._RunTest(paths, gitignore=gitignore)
 
 

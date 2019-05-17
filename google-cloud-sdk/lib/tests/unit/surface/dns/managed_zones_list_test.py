@@ -47,8 +47,8 @@ class ManagedZonesListTest(base.DnsMockTest):
 
     self.Run('dns managed-zones list')
     self.AssertOutputContains("""\
-NAME  DNS_NAME   DESCRIPTION
-mz    zone.com.  My zone!
+NAME  DNS_NAME   DESCRIPTION VISIBILITY
+mz    zone.com.  My zone!    public
 """, normalize_space=True)
 
   def testMultipleZonesList(self):
@@ -61,9 +61,9 @@ mz    zone.com.  My zone!
 
     self.Run('dns managed-zones list')
     self.AssertOutputContains("""\
-NAME  DNS_NAME    DESCRIPTION
-mz    zone.com.   My zone!
-mz1   zone1.com.  My zone 1!
+NAME  DNS_NAME    DESCRIPTION VISIBILITY
+mz    zone.com.   My zone!    public
+mz1   zone1.com.  My zone 1!  public
 """, normalize_space=True)
 
   def testZonesListWithLimit(self):
@@ -76,8 +76,8 @@ mz1   zone1.com.  My zone 1!
 
     self.Run('dns managed-zones list --limit=1')
     self.AssertOutputContains("""\
-NAME  DNS_NAME   DESCRIPTION
-mz    zone.com.  My zone!
+NAME  DNS_NAME   DESCRIPTION VISIBILITY
+mz    zone.com.  My zone!    public
 """, normalize_space=True)
 
 
@@ -93,9 +93,9 @@ class ManagedZonesListBetaTest(base.DnsMockBetaTest):
 
     self.Run('dns managed-zones list')
     self.AssertOutputContains("""\
-NAME  DNS_NAME    DESCRIPTION
-mz    zone.com.   My zone!
-mz1   zone1.com.  My zone 1!
+NAME  DNS_NAME    DESCRIPTION VISIBILITY
+mz    zone.com.   My zone!    public
+mz1   zone1.com.  My zone 1!  public
 """, normalize_space=True)
 
 

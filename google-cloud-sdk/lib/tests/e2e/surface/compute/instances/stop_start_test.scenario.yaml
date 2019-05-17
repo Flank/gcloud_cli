@@ -44,6 +44,9 @@ summary:
       Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].
 actions:
 - define_reference:
+    reference: compute-uri
+    value: www.googleapis.com/compute
+- define_reference:
     reference: api-version
     track_values:
       GA: v1
@@ -57,7 +60,7 @@ actions:
     - api_call:
         expect_request:
           headers: {}
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f?alt=json
           method: GET
           body: null
         return_response:
@@ -83,7 +86,7 @@ actions:
             description: us-central1-f
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing?alt=json
           headers: {}
           method: GET
           body: null
@@ -106,7 +109,7 @@ actions:
           body:
             json: {}
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances?alt=json
           headers: {}
           method: POST
           body:
@@ -162,7 +165,7 @@ actions:
     - expect_stderr: "Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$].\n"
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
           headers: {}
           method: GET
           body: null
@@ -245,7 +248,7 @@ actions:
         poll_operation: true
         expect_request:
           headers: {}
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$/stop?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$/stop?alt=json
           method: POST
           body: null
         return_response:
@@ -272,7 +275,7 @@ actions:
         message: Stopping instance(s) $$instance$$
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
           headers: {}
           method: GET
           body: null
@@ -351,7 +354,7 @@ actions:
     - api_call:
         expect_request:
           headers: {}
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
           method: GET
           body: null
         return_response:
@@ -431,7 +434,7 @@ actions:
         poll_operation: true
         expect_request:
           headers: {}
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$/start?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$/start?alt=json
           method: POST
           body: null
         return_response:
@@ -458,7 +461,7 @@ actions:
         message: Starting instance(s) $$instance$$
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
           headers: {}
           method: GET
           body: null
@@ -538,7 +541,7 @@ actions:
     - api_call:
         expect_request:
           headers: {}
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
           method: GET
           body: null
         return_response:
@@ -620,7 +623,7 @@ actions:
         poll_operation: true
         expect_request:
           headers: {}
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/zones/us-central1-f/instances/$$instance$$?alt=json
           method: DELETE
           body: null
         return_response:

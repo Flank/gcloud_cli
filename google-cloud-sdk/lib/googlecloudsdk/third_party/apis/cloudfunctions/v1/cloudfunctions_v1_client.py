@@ -127,8 +127,8 @@ is the parent resource, without the operations collection id.
     def Call(self, request, global_params=None):
       r"""Synchronously invokes a deployed Cloud Function. To be used for testing.
 purposes as very limited traffic is allowed. For more information on
-the actual limits refer to [API Calls](
-https://cloud.google.com/functions/quotas#rate_limits).
+the actual limits, refer to
+[Rate Limits](https://cloud.google.com/functions/quotas#rate_limits).
 
       Args:
         request: (CloudfunctionsProjectsLocationsFunctionsCallRequest) input message
@@ -256,11 +256,19 @@ these restrictions:
 
 * Source file type should be a zip file.
 * Source file size should not exceed 100MB limit.
+* No credentials should be attached - the signed URLs provide access to the
+  target bucket using internal service identity; if credentials were
+  attached, the identity from the credentials would be used, but that
+  identity does not have permissions to upload files to the URL.
 
 When making a HTTP PUT request, these two headers need to be specified:
 
 * `content-type: application/zip`
 * `x-goog-content-length-range: 0,104857600`
+
+And this header SHOULD NOT be specified:
+
+* `Authorization: Bearer YOUR_TOKEN`
 
       Args:
         request: (CloudfunctionsProjectsLocationsFunctionsGenerateUploadUrlRequest) input message
@@ -314,8 +322,8 @@ When making a HTTP PUT request, these two headers need to be specified:
     )
 
     def GetIamPolicy(self, request, global_params=None):
-      r"""Gets the access control policy for a resource.
-Returns an empty policy if the resource exists and does not have a policy
+      r"""Gets the IAM access control policy for a function.
+Returns an empty policy if the function exists and does not have a policy
 set.
 
       Args:
@@ -397,8 +405,8 @@ set.
     )
 
     def SetIamPolicy(self, request, global_params=None):
-      r"""Sets the access control policy on the specified resource. Replaces any.
-existing policy.
+      r"""Sets the IAM access control policy on the specified function.
+Replaces any existing policy.
 
       Args:
         request: (CloudfunctionsProjectsLocationsFunctionsSetIamPolicyRequest) input message
@@ -425,13 +433,10 @@ existing policy.
     )
 
     def TestIamPermissions(self, request, global_params=None):
-      r"""Returns permissions that a caller has on the specified resource.
-If the resource does not exist, this will return an empty set of
+      r"""Tests the specified permissions against the IAM access control policy.
+for a function.
+If the function does not exist, this will return an empty set of
 permissions, not a NOT_FOUND error.
-
-Note: This operation is designed to be used for building permission-aware
-UIs and command-line tools, not for authorization checking. This operation
-may "fail open" without warning.
 
       Args:
         request: (CloudfunctionsProjectsLocationsFunctionsTestIamPermissionsRequest) input message

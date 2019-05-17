@@ -31,9 +31,8 @@ class NetworkEndpointGroupsListEndpointsTest(sdk_test_base.WithFakeAuth,
                                              cli_test_base.CliTestBase):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.client = mock.Client(
-        core_apis.GetClientClass('compute', 'beta'))
+    self.track = calliope_base.ReleaseTrack.GA
+    self.client = mock.Client(core_apis.GetClientClass('compute', 'v1'))
     self.client.Mock()
     self.addCleanup(self.client.Unmock)
     self.messages = self.client.MESSAGES_MODULE

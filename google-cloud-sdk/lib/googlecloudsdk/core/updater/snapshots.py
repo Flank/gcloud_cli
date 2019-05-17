@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2013 Google Inc. All Rights Reserved.
+# Copyright 2013 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -472,14 +472,14 @@ class ComponentSnapshot(object):
       deps = [self.ComponentFromId(d)
               for d in self.__dependencies[component_id]]
       deps = [d for d in deps
-              if d.platform.Matches(platform_filter) and  # pytype: disable=attribute-error
-              d.is_hidden and d.data]  # pytype: disable=attribute-error
+              if d.platform.Matches(platform_filter) and
+              d.is_hidden and d.data]
       for d in deps:
         # If we get here, the component has a data section. The size should
         # always be populated, but sometimes in the local state the size is
         # deleted from the cached snapshot. The size data is not critical, so
         # just substitute in 0 if we can't find the size so things don't crash.
-        size += d.data.size or 0  # pytype: disable=attribute-error
+        size += d.data.size or 0
     return size
 
   def CreateDiff(self, latest_snapshot, platform_filter=None):

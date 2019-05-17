@@ -93,11 +93,10 @@ class CustomRolesBaseTest(e2e_base.WithServiceAuth,
         prefix='iam_testing_copiedCustomRole', delimiter='_'))
 
   def SetPermissions(self, resource_type):
-    self.permissions = ('automatedtests.{resource_type}.create,'
-                        'automatedtests.{resource_type}.delete,'
-                        'automatedtests.{resource_type}.get,'
-                        'automatedtests.{resource_type}.list,'
-                        'automatedtests.{resource_type}.update'.format(
+    self.permissions = ('example.{resource_type}.create,'
+                        'example.{resource_type}.get,'
+                        'example.{resource_type}.list,'
+                        'example.{resource_type}.set'.format(
                             resource_type=resource_type))
 
   def RunFormat(self, cmd, *args):

@@ -4,7 +4,7 @@ NAME
 
 SYNOPSIS
     gcloud alpha container binauthz attestations create
-        --artifact-url=ARTIFACT_URL --pgp-key-fingerprint=PGP_KEY_FINGERPRINT
+        --artifact-url=ARTIFACT_URL --public-key-id=PUBLIC_KEY_ID
         --signature-file=SIGNATURE_FILE
         (--attestor=ATTESTOR : --attestor-project=ATTESTOR_PROJECT)
         [GCLOUD_WIDE_FLAG ...]
@@ -17,13 +17,19 @@ DESCRIPTION
 
 REQUIRED FLAGS
      --artifact-url=ARTIFACT_URL
-        Container URL. May be in the .gcr.io/repository/image format, or may
+        Container URL. May be in the gcr.io/repository/image format, or may
         optionally contain the http or https scheme
 
-     --pgp-key-fingerprint=PGP_KEY_FINGERPRINT
-        The cryptographic ID of the key used to generate the signature. For
-        Binary Authorization, this must be the version 4, full 160-bit
-        fingerprint, expressed as a 40 character hexidecimal string. See
+     --public-key-id=PUBLIC_KEY_ID
+        The ID of the public key that will be used to verify the signature of
+        the created Attestation. This ID should match the one found on the
+        Attestor resource(s) which will use this Attestation.
+
+        For PKIX keys, this will be the URI-formatted id field of the
+        associated Attestor public key.
+
+        For PGP keys, this must be the version 4, full 160-bit fingerprint,
+        expressed as a 40 character hexadecimal string. See
         https://tools.ietf.org/html/rfc4880#section-12.2 for details.
 
      --signature-file=SIGNATURE_FILE
@@ -47,8 +53,9 @@ REQUIRED FLAGS
           The Cloud project for the attestor.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -61,7 +68,7 @@ EXAMPLES
             --artifact-url='gcr.io/example-project/example-image@sha256:abcd' \
             --attestor=projects/foo/attestors/bar \
             --signature-file=signed_artifact_attestation.pgp.sig \
-            --pgp-key-fingerprint=AAAA0000000000000000FFFFFFFFFFFFFFFFFFFF
+            --public-key-id=AAAA0000000000000000FFFFFFFFFFFFFFFFFFFF
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

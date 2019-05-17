@@ -1,0 +1,188 @@
+
+.TH "GCLOUD_BETA_AI\-PLATFORM_VERSIONS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta ai\-platform versions create \- create a new AI Platform version
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta ai\-platform versions create\fR \fIVERSION\fR \fB\-\-model\fR=\fIMODEL\fR [\fB\-\-async\fR] [\fB\-\-config\fR=\fICONFIG\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-framework\fR=\fIFRAMEWORK\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-origin\fR=\fIORIGIN\fR] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR] [\fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR] [\fB\-\-package\-uris\fR=[\fIPACKAGE_URI\fR,...]\ \fB\-\-prediction\-class\fR=\fIPREDICTION_CLASS\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Creates a new version of an AI Platform model.
+
+For more details on managing AI Platform models and versions see
+https://cloud.google.com/ml\-engine/docs/how\-tos/managing\-models\-jobs
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fIVERSION\fR
+Name of the model version.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-model\fR=\fIMODEL\fR
+Name of the model.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Display information about the operation in progress, without waiting for the
+operation to complete.
+
+.TP 2m
+\fB\-\-config\fR=\fICONFIG\fR
+Path to a YAML configuration file containing configuration parameters for the
+Version (https://cloud.google.com/ml/reference/rest/v1/projects.models.versions)
+to create.
+
+The file is in YAML format. Note that not all attributes of a Version are
+configurable; available attributes (with example values) are:
+
+.RS 2m
+description: A free\-form description of the version.
+deploymentUri: gs://path/to/source
+runtimeVersion: '1.0'
+manualScaling:
+  nodes: 10  # The number of nodes to allocate for this model.
+autoScaling:
+  minNodes: 0  # The minimum number of nodes to allocate for this model.
+labels:
+  user\-defined\-key: user\-defined\-value
+.RE
+
+The name of the version must always be specified via the required VERSION
+argument.
+
+Only one of manualScaling or autoScaling must be specified. If both are
+specified in same yaml file an error will be returned.
+
+If an option is specified both in the configuration file and via command line
+arguments, the command line arguments override the configuration file.
+
+.TP 2m
+\fB\-\-description\fR=\fIDESCRIPTION\fR
+The description of the version.
+
+.TP 2m
+\fB\-\-framework\fR=\fIFRAMEWORK\fR
+The ML framework used to train this version of the model. If not specified,
+defaults to \f5tensorflow\fR. \fIFRAMEWORK\fR must be one of:
+\fBscikit\-learn\fR, \fBtensorflow\fR, \fBxgboost\fR.
+
+.TP 2m
+\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of label KEY=VALUE pairs to add.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
+.TP 2m
+\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR
+Type of machine on which to serve the model. Currently only applies to online
+prediction. For available machine types, see
+https://cloud.google.com/ml\-engine/docs/tensorflow/online\-predict#machine\-types.
+
+.TP 2m
+\fB\-\-origin\fR=\fIORIGIN\fR
+Location of \f5model/\fR "directory" (as output by
+https://www.tensorflow.org/versions/r0.12/api_docs/python/state_ops.html#Saver).
+
+This overrides \f5deploymentUri\fR in the \f5\-\-config\fR file. If this flag is
+not passed, \f5deploymentUri\fR \fBmust\fR be specified in the file from
+\f5\-\-config\fR.
+
+Can be a Google Cloud Storage (\f5gs://\fR) path or local file path (no prefix).
+In the latter case the files will be uploaded to Google Cloud Storage and a
+\f5\-\-staging\-bucket\fR argument is required.
+
+.TP 2m
+\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR
+Version of Python used when creating the version. If not set, the default
+version is 2.7. Python 3.5 is available when \f5runtime_version\fR is set to 1.4
+and above. Python 2.7 works with all supported runtime versions.
+
+.TP 2m
+\fB\-\-runtime\-version\fR=\fIRUNTIME_VERSION\fR
+AI Platform runtime version for this job. Defaults to a stable version, which is
+defined in documentation along with the list of supported versions:
+https://cloud.google.com/ml\-engine/docs/tensorflow/runtime\-version\-list
+
+.TP 2m
+\fB\-\-staging\-bucket\fR=\fISTAGING_BUCKET\fR
+Bucket in which to stage training archives.
+
+Required only if a file upload is necessary (that is, other flags include local
+paths) and no other flags implicitly specify an upload path.
+
+.TP 2m
+
+Configure user code in prediction. AI Platform allows a model to have
+user\-provided prediction code; these options configure that code.
+
+
+
+.RS 2m
+.TP 2m
+\fB\-\-package\-uris\fR=[\fIPACKAGE_URI\fR,...]
+Comma\-separated list of Google Cloud Storage URIs (\f5gs://...\fR) for
+user\-supplied Python packages to use.
+
+.TP 2m
+\fB\-\-prediction\-class\fR=\fIPREDICTION_CLASS\fR
+The fully\-qualified name of the custom prediction class in the package provided
+for custom prediction.
+
+For example, \f5\-\-prediction\-class my_package.SequenceModel\fR.
+
+
+.RE
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. These variants
+are also available:
+
+.RS 2m
+$ gcloud ai\-platform versions create
+$ gcloud alpha ai\-platform versions create
+.RE
+

@@ -190,5 +190,12 @@ class WorkflowTemplatesInstantiateUnitTestBeta(
         response=response,
         exception=exception)
 
-  def SetUp(self):
-    self.SetupForReleaseTrack(calliope.base.ReleaseTrack.BETA)
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.BETA
+
+
+class WorkflowTemplatesInstantiateUnitTestAlpha(
+    WorkflowTemplatesInstantiateUnitTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.ALPHA

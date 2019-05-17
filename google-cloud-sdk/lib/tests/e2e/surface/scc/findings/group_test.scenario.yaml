@@ -1,0 +1,66 @@
+title: scc findings list scenario test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      scc findings group 345840165995 --source 2948230327750090626 --group-by 'category,parent' --read-time '2019-03-13T21:34:39.405Z'
+  - stdout: |
+      groupByResults:
+      - count: '1'
+        properties:
+          category: null
+          parent: organizations/345840165995/sources/2948230327750090626
+      - count: '2'
+        properties:
+          category: CAT3
+          parent: organizations/345840165995/sources/2948230327750090626
+      readTime: '2019-03-13T21:34:39.405Z'
+      totalSize: 2
+actions:
+- execute_command:
+    # Group by multiple fields (comma-separated).
+    command: |
+      scc findings group 345840165995 --source 2948230327750090626 --group-by 'category,parent' --read-time '2019-03-13T21:34:39.405Z'
+    events:
+    - api_call:
+        expect_request:
+          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/sources/2948230327750090626/findings:group?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              groupBy: category,parent
+              readTime: '2019-03-13T21:34:39.405Z'
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '419'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            groupByResults:
+            - properties:
+                category: null
+                parent: organizations/345840165995/sources/2948230327750090626
+              count: '1'
+            - properties:
+                category: CAT3
+                parent: organizations/345840165995/sources/2948230327750090626
+              count: '2'
+            readTime: '2019-03-13T21:34:39.405Z'
+            totalSize: 2
+    - expect_stdout: |
+        groupByResults:
+        - count: '1'
+          properties:
+            category: null
+            parent: organizations/345840165995/sources/2948230327750090626
+        - count: '2'
+          properties:
+            category: CAT3
+            parent: organizations/345840165995/sources/2948230327750090626
+        readTime: '2019-03-13T21:34:39.405Z'
+        totalSize: 2
+    - expect_exit:
+        code: 0

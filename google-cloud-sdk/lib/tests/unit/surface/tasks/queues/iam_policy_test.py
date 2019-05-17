@@ -20,6 +20,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from apitools.base.py import encoding
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.tasks import test_base
 
@@ -65,6 +66,12 @@ class GetIamPolicyTest(test_base.CloudTasksTestBase):
             queue_id))
 
     self.assertEqual(actual_policy, expected_policy)
+
+
+class GetIamPolicyTestBeta(GetIamPolicyTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class SetIamPolicyTest(test_base.CloudTasksTestBase):
@@ -115,6 +122,12 @@ class SetIamPolicyTest(test_base.CloudTasksTestBase):
             queue_id, policy_file))
 
     self.assertEqual(actual_policy, expected_policy)
+
+
+class SetIamPolicyTestBeta(SetIamPolicyTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 if __name__ == '__main__':

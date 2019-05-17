@@ -108,13 +108,10 @@ class Scenario(object):
   def FromData(cls, data):
     """Build the object from spec data."""
 
-    skip_data = data.get('skip')
-    skip = (skip_data.get('reason'),
-            skip_data.get('bug')) if skip_data else None
     return cls(
         title=data.get('title'),
         description=data.get('description'),
-        skip=skip,
+        skip=data.get('skip'),
         data=data)
 
   def __init__(self, title, description, skip, data):
@@ -219,13 +216,13 @@ class WriteFileAction(Action):
     self._binary_contents = binary_contents
 
   def Execute(self, scenario_context):
-    del scenario_context
     full_path = os.path.join(os.getcwd(), self._path)
     files.MakeDir(os.path.dirname(full_path))
     if self._binary_contents:
       files.WriteBinaryFileContents(full_path, self._binary_contents)
     else:
-      files.WriteFileContents(full_path, self._contents)
+      rrr = scenario_context.resource_ref_resolver
+      files.WriteFileContents(full_path, rrr.Resolve(self._contents))
 
 
 class LoadResourceAction(Action):
@@ -313,15 +310,32 @@ class ExecuteCommandUntilAction(Action):
         command_execution_data.get('exit_code'),
         command_execution_data.get('stdout'),
         command_execution_data.get('stderr'),
+        command_execution_data.get('exponential_sleep_multiplier', None),
+        command_execution_data.get('wait_ceiling', None)
     )
 
-  def __init__(self, command, retries, timeout, exit_code, stdout, stderr):
+  def __init__(self,
+               command,
+               retries,
+               timeout,
+               exit_code,
+               stdout,
+               stderr,
+               exponential_sleep_multiplier,
+               wait_ceiling):
     self._command = command
     self._retries = retries
     self._timeout = timeout
     self._exit_code = exit_code
     self._stdout = stdout
     self._stderr = stderr
+    self._exponential_sleep_multiplier = None
+    self._wait_ceiling_ms = None
+
+    if exponential_sleep_multiplier:
+      self._exponential_sleep_multiplier = float(exponential_sleep_multiplier)
+    if wait_ceiling:
+      self._wait_ceiling_ms = wait_ceiling * 1000
 
   def Execute(self, scenario_context):
     if scenario_context.execution_mode == session.ExecutionMode.LOCAL:
@@ -368,8 +382,11 @@ class ExecuteCommandUntilAction(Action):
       return False
 
     retrier = retry.Retryer(max_retrials=self._retries,
-                            max_wait_ms=self._timeout*1000)
-    retrier.RetryOnResult(_Run, should_retry_if=_ShouldRetry)
+                            max_wait_ms=self._timeout*1000,
+                            exponential_sleep_multiplier=
+                            self._exponential_sleep_multiplier,
+                            wait_ceiling_ms=self._wait_ceiling_ms)
+    retrier.RetryOnResult(_Run, should_retry_if=_ShouldRetry, sleep_ms=1000)
 
 
 class ExecuteBinaryAction(Action):

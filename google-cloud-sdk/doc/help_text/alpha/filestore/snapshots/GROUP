@@ -1,0 +1,60 @@
+NAME
+    gcloud alpha filestore snapshots - create and manage Cloud Filestore
+        snapshots
+
+SYNOPSIS
+    gcloud alpha filestore snapshots COMMAND [GCLOUD_WIDE_FLAG ...]
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     create
+        (ALPHA) Create a Cloud Filestore snapshot.
+
+     delete
+        (ALPHA) Delete a Cloud Filestore snapshot.
+
+     describe
+        (ALPHA) Describe a Cloud Filestore snapshot.
+
+     list
+        (ALPHA) List Cloud Filestore snapshots.
+
+EXAMPLES
+    To create an snapshot with the name 'my-snapshot', run:
+
+        $ gcloud alpha filestore snapshots create my-snapshot
+
+    To delete an snapshot with the name 'my-snapshot', run:
+
+        $ gcloud alpha filestore snapshots delete my-snapshot
+
+    To display the details for an snapshot with the name 'my-snapshot', run:
+
+        $ gcloud alpha filestore snapshots describe my-snapshot
+
+    To list all the snapshots, run:
+
+        $ gcloud alpha filestore snapshots list
+
+    To set the label 'env' to 'prod' for an snapshot with the name
+    'my-snapshot', run:
+
+        $ gcloud alpha filestore snapshots my-snapshot \
+            --update-labels=env=prod
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you will have to apply for early access and
+    have your projects registered on the API whitelist to use it. To do so,
+    contact Support at https://cloud.google.com/support/.
+

@@ -16,10 +16,10 @@ DESCRIPTION
     updates; see $ {parent} set-iam-policy for additional details.
 
 POSITIONAL ARGUMENTS
-     Instance template resource - The instance template for which to display
-     the IAM policy. This represents a Cloud resource. (NOTE) Some attributes
-     are not given arguments in this group but can be set in other ways. To set
-     the [project] attribute: provide the argument [instance_template] on the
+     Instance template resource - The instance template to display the IAM
+     policy for. This represents a Cloud resource. (NOTE) Some attributes are
+     not given arguments in this group but can be set in other ways. To set the
+     [project] attribute: provide the argument [instance_template] on the
      command line with a fully specified name; set the property [core/project];
      provide the argument [--project] on the command line. This must be
      specified.
@@ -55,8 +55,9 @@ LIST COMMAND FLAGS
         applied in this order: --flatten, --sort-by, --filter, --limit.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -69,14 +70,15 @@ EXAMPLES
     To print the IAM policy for a given instance template, run:
 
         $ gcloud alpha compute instance-templates get-iam-policy \
-            --zone=my-zone my-instance-template
+            my-instance-template --zone=my-zone
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this
     command fails with API permission errors despite specifying the right
     project, you will have to apply for early access and have your projects
     registered on the API whitelist to use it. To do so, contact Support at
-    https://cloud.google.com/support/. This variant is also available:
+    https://cloud.google.com/support/. These variants are also available:
 
+        $ gcloud compute instance-templates get-iam-policy
         $ gcloud beta compute instance-templates get-iam-policy
 

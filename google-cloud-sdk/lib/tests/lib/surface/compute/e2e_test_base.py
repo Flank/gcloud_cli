@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 import logging
+import re
 import time
 
 from googlecloudsdk.calliope import base as calliope_base
@@ -29,7 +30,6 @@ from tests.lib import test_case
 import mock
 import six
 from six.moves import range  # pylint: disable=redefined-builtin
-
 
 ZONE = 'us-central1-f'
 REGION = 'us-central1'
@@ -50,10 +50,12 @@ def main():
 class BaseTest(e2e_base.WithServiceAuth):
   """Base class for compute integration tests."""
 
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+
   def SetUp(self):
     self.stdout_seek = 0
     self.stderr_seek = 0
-    self.track = calliope_base.ReleaseTrack.GA
     self.zone = properties.VALUES.compute.zone.Get() or ZONE
     self.alternative_zone = self.MutatedZone(self.zone)
     self.region = properties.VALUES.compute.region.Get() or REGION
@@ -135,6 +137,20 @@ class BaseTest(e2e_base.WithServiceAuth):
     if expected in new_output:
       self.fail('stdout contains unexpected message [{0}]: [{1}]'
                 .format(expected, new_output))
+
+  def AssertNewOutputMatchesAll(self,
+                                expected_patterns,
+                                reset=True,
+                                normalize_space=False):
+    new_output = self.GetNewOutput(reset=reset)
+    if normalize_space:
+      new_output = test_case.NormalizeSpace(normalize_space, new_output)
+    for expected_pattern in expected_patterns:
+      p = re.compile(expected_pattern)
+      if not p.search(new_output):
+        self.fail(
+            'stdout does not contain expected pattern [{0}]: [{1}]'.format(
+                expected_pattern, new_output))
 
   def ClearInput(self):
     self.stdin.truncate(0)

@@ -49,6 +49,12 @@ create-instance1 MYSQL_5_7        us-central db-n1-standard-1 0.0.0.0         - 
 """,
         normalize_space=True)
 
+    # TODO(b/122660263): Remove when V1 instances are no longer supported.
+    # Check that no V1 warning is logged.
+    self.AssertErrNotContains(
+        'First Generation instances will be automatically upgraded '
+        'to Second Generation')
+
   def testCreateActivationPolicy(self):
     diff = {
         'name': 'create-instance1',
@@ -468,13 +474,12 @@ tiered-instance MYSQL_5_7        us-central db-n1-standard-2 0.0.0.0         -  
     self.ExpectInstanceInsert(self.GetRequestInstance(), updated_fields)
     self.ExpectDoneCreateOperationGet()
     self.ExpectInstanceGet(self.GetV2Instance(), updated_fields)
-    self.Run('sql instances create created-instance --gce-zone europe-west1-b')
+    self.Run('sql instances create created-instance --zone europe-west1-b')
 
-    # Ensure that no zone warning is shown for misuse of region and zone flags.
+    # Ensure that a warning is not shown for use of `--zone` over `--gce-zone`.
     self.AssertErrNotContains('WARNING')
 
-  def testCreateWithRegionAndZoneWarning(self):
-    # Check for a warning when both --region and --gce-zone are used.
+  def testCreateWithDeprecatedGceZone(self):
     updated_fields = {
         'name': 'created-instance',
         'region': 'europe-west1',
@@ -486,12 +491,12 @@ tiered-instance MYSQL_5_7        us-central db-n1-standard-2 0.0.0.0         -  
     self.ExpectInstanceInsert(self.GetRequestInstance(), updated_fields)
     self.ExpectDoneCreateOperationGet()
     self.ExpectInstanceGet(self.GetV2Instance(), updated_fields)
-    self.Run('sql instances create created-instance '
-             '--region europe-west1 --gce-zone europe-west1-b')
+    self.Run('sql instances create created-instance --gce-zone europe-west1-b')
 
-    # TODO(b/73362466): Remove these checks.
-    self.AssertErrContains('Zone will override region')
-    self.AssertErrContains('region and zone will become mutually exclusive')
+    # Ensure that a warning is shown for use of `--gce-zone`.
+    self.AssertErrContains(
+        'WARNING: Flag `--gce-zone` is deprecated and will be removed by '
+        'release 255.0.0. Use `--zone` instead.')
 
   def testCreateWithoutLocationWarning(self):
     # Check for a warning when neither --region nor --gce-zone are used.
@@ -523,6 +528,37 @@ tiered-instance MYSQL_5_7        us-central db-n1-standard-2 0.0.0.0         -  
     with self.assertRaises(exceptions.InvalidArgumentException):
       self.Run('sql instances create custom-instance1 '
                '--database-version=MYSQL_5_7 --availability-type=REGIONAL')
+
+  # TODO(b/122660263): Remove when V1 instances are no longer supported.
+  def testV1WarningAndPrompt(self):
+    # Mock the prompt to continue creating a V1 instance.
+    prompt_mock = self.StartObjectPatch(
+        console_io, 'PromptContinue', return_value=True)
+    diff = {'name': 'create-instance1', 'settings': {'tier': 'D1',}}
+    self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
+    self.ExpectDoneCreateOperationGet()
+    self.ExpectInstanceGet(self.GetV1Instance(), diff)
+
+    # Create V1 instance.
+    self.Run('sql instances create create-instance1 --tier=D1')
+
+    # Check that a V1 warning is logged.
+    self.AssertErrContains(
+        'First Generation instances will be automatically upgraded '
+        'to Second Generation')
+
+    # Check that the V1 prompt to continue was called.
+    self.assertEqual(prompt_mock.call_count, 1)
+
+  def testCreateWithRootPassword(self):
+    diff = {
+        'name': 'some-instance',
+        'rootPassword': 'somepassword'
+    }
+    self.ExpectInstanceInsert(self.GetRequestInstance(), diff)
+    self.ExpectDoneCreateOperationGet()
+    self.ExpectInstanceGet(self.GetExternalMasterInstance(), diff)
+    self.Run('sql instances create some-instance --root-password=somepassword')
 
 
 class InstancesCreateGATest(_BaseInstancesCreateTest, base.SqlMockTestGA):

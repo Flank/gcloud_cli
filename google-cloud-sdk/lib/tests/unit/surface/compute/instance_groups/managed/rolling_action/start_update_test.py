@@ -74,13 +74,17 @@ def SetUpClass(test_obj, api_version):
   ]
 
 
-class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
+class InstanceGroupManagersUpdateInstancesZonalTest(test_base.BaseTest):
+
+  def PreSetUp(self):
+    self.api_version = 'v1'
+    self.track = calliope_base.ReleaseTrack.GA
+    self.should_list_per_instance_configs = False
 
   def SetUp(self):
-    SetUpClass(self, 'beta')
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.igms = test_resources.MakeInstanceGroupManagersWithVersions('beta',
-                                                                     self.ZONE)
+    SetUpClass(self, self.api_version)
+    self.igms = test_resources.MakeInstanceGroupManagersWithVersions(
+        self.api_version, self.ZONE)
     self.StartPatch('datetime.datetime', test_base.FakeDateTime)
 
   def generateGetRequestStub(self, igm_name):
@@ -98,14 +102,31 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
         project=self.PROJECT_NAME,
         zone=self.ZONE)
 
+  def generateListPerInstanceConfigsRequestStub(self, get_request):
+    return (self.messages.
+            ComputeInstanceGroupManagersListPerInstanceConfigsRequest(
+                instanceGroupManager=get_request.instanceGroupManager,
+                project=get_request.project,
+                zone=get_request.zone))
+
   def checkUpdateRequest(self, expected_get_request, expected_update_request):
-    self.CheckRequests(
-        [(self.compute.instanceGroupManagers, 'Get', expected_get_request)],
-        [(self.compute.instanceGroupManagers, 'Patch',
-          expected_update_request)])
+    if self.should_list_per_instance_configs:
+      expected_list_pics_request = (
+          self.generateListPerInstanceConfigsRequestStub(expected_get_request))
+      self.CheckRequests(
+          [(self.compute.instanceGroupManagers, 'Get', expected_get_request)],
+          [(self.compute.instanceGroupManagers, 'ListPerInstanceConfigs',
+            expected_list_pics_request)],
+          [(self.compute.instanceGroupManagers, 'Patch',
+            expected_update_request)])
+    else:
+      self.CheckRequests(
+          [(self.compute.instanceGroupManagers, 'Get', expected_get_request)],
+          [(self.compute.instanceGroupManagers, 'Patch',
+            expected_update_request)])
 
   def testOneToOneVersion(self):
-    self.make_requests.side_effect = iter([[self.igms[0]], []])
+    self.make_requests.side_effect = iter([[self.igms[0]], [], []])
     self.Run('compute instance-groups managed rolling-action start-update {0} '
              '--version template={1} --zone {2}'.format(
                  self.IGM_NAME_A, self.TEMPLATE_B_NAME, self.ZONE))
@@ -115,7 +136,7 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
     self.checkUpdateRequest(get_request, update_request)
 
   def testOneToOneVersionOnlyName(self):
-    self.make_requests.side_effect = iter([[self.igms[0]], []])
+    self.make_requests.side_effect = iter([[self.igms[0]], [], []])
     self.Run('compute instance-groups managed rolling-action start-update {0} '
              '--version template={1} --zone {2}'.format(
                  self.IGM_NAME_A, 'template-2', self.ZONE))
@@ -125,7 +146,7 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
     self.checkUpdateRequest(get_request, update_request)
 
   def testOneToOneNamedVersion(self):
-    self.make_requests.side_effect = iter([[self.igms[0]], []])
+    self.make_requests.side_effect = iter([[self.igms[0]], [], []])
     self.Run('compute instance-groups managed rolling-action start-update {0} '
              '--version template={1},name=my-name --zone {2}'.format(
                  self.IGM_NAME_A, self.TEMPLATE_B_NAME, self.ZONE))
@@ -136,7 +157,7 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
     self.checkUpdateRequest(get_request, update_request)
 
   def testOneToTwoVersions(self):
-    self.make_requests.side_effect = iter([[self.igms[0]], []])
+    self.make_requests.side_effect = iter([[self.igms[0]], [], []])
     self.Run('compute instance-groups managed rolling-action start-update {0} '
              '--version template={1} '
              '--canary-version template={2},target-size=100% --zone {3}'.format(
@@ -155,7 +176,7 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
         'The only allowed transitions between versions are: '
         'X -> Y, X -> (X, Y), (X, Y) -> X, (X, Y) -> Y, (X, Y) -> (X, Y). '
         'Please check versions templates or use --force.'):
-      self.make_requests.side_effect = iter([[self.igms[0]], []])
+      self.make_requests.side_effect = iter([[self.igms[0]], [], []])
       self.Run(
           'compute instance-groups managed rolling-action start-update {0} '
           '--version template={1} '
@@ -164,7 +185,7 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
               self.ZONE))
 
   def testOneToTwoOtherVersionsForce(self):
-    self.make_requests.side_effect = iter([[self.igms[0]], []])
+    self.make_requests.side_effect = iter([[self.igms[0]], [], []])
     self.Run('compute instance-groups managed rolling-action start-update {0} '
              '--force --version template={1} --canary-version '
              'template={2},target-size=100% --zone {3}'.format(
@@ -182,7 +203,7 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
     self.checkUpdateRequest(get_request, update_request)
 
   def testTwoToFirstVersion(self):
-    self.make_requests.side_effect = iter([[self.igms[1]], []])
+    self.make_requests.side_effect = iter([[self.igms[1]], [], []])
     self.Run('compute instance-groups managed rolling-action start-update {0} '
              '--version template={1} --zone {2}'.format(
                  self.IGM_NAME_B, self.TEMPLATE_A_NAME, self.ZONE))
@@ -195,7 +216,7 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
     self.checkUpdateRequest(get_request, update_request)
 
   def testTwoToFirstVersion_TwoDifferentTagsInIgm(self):
-    self.make_requests.side_effect = iter([[self.igms[3]], []])
+    self.make_requests.side_effect = iter([[self.igms[3]], [], []])
     self.Run('compute instance-groups managed rolling-action start-update {0} '
              '--version template={1} --zone {2}'.format(
                  self.IGM_NAME_D, self.TEMPLATE_A_NAME, self.ZONE))
@@ -209,7 +230,7 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
     self.checkUpdateRequest(get_request, update_request)
 
   def testTwoToSecondVersion(self):
-    self.make_requests.side_effect = iter([[self.igms[1]], []])
+    self.make_requests.side_effect = iter([[self.igms[1]], [], []])
     self.Run('compute instance-groups managed rolling-action start-update {0} '
              '--version template={1} --zone {2}'.format(
                  self.IGM_NAME_B, self.TEMPLATE_B_NAME, self.ZONE))
@@ -219,7 +240,7 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
     self.checkUpdateRequest(get_request, update_request)
 
   def testTwoToTwoVersions(self):
-    self.make_requests.side_effect = iter([[self.igms[1]], []])
+    self.make_requests.side_effect = iter([[self.igms[1]], [], []])
     self.Run('compute instance-groups managed rolling-action start-update {0} '
              '--canary-version template={1},target-size=3 '
              '--version template={2} --zone {3}'.format(
@@ -245,7 +266,7 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
         'The only allowed transitions between versions are: '
         'X -> Y, X -> (X, Y), (X, Y) -> X, (X, Y) -> Y, (X, Y) -> (X, Y). '
         'Please check versions templates or use --force.'):
-      self.make_requests.side_effect = iter([[self.igms[1]], []])
+      self.make_requests.side_effect = iter([[self.igms[1]], [], []])
       self.Run(
           'compute instance-groups managed rolling-action start-update {0} '
           '--version template={1} --zone {2}'.format(
@@ -257,7 +278,7 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
         'The only allowed transitions between versions are: '
         'X -> Y, X -> (X, Y), (X, Y) -> X, (X, Y) -> Y, (X, Y) -> (X, Y). '
         'Please check versions templates or use --force.'):
-      self.make_requests.side_effect = iter([[self.igms[1]], []])
+      self.make_requests.side_effect = iter([[self.igms[1]], [], []])
       self.Run(
           'compute instance-groups managed rolling-action start-update {0} '
           '--canary-version template={1},target-size=3 '
@@ -271,7 +292,7 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
         'The only allowed transitions between versions are: '
         'X -> Y, X -> (X, Y), (X, Y) -> X, (X, Y) -> Y, (X, Y) -> (X, Y). '
         'Please check versions templates or use --force.'):
-      self.make_requests.side_effect = iter([[self.igms[1]], []])
+      self.make_requests.side_effect = iter([[self.igms[1]], [], []])
       self.Run(
           'compute instance-groups managed rolling-action start-update {0} '
           '--canary-version template={1},target-size=3 '
@@ -280,7 +301,7 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
               self.ZONE))
 
   def testTwoToOneOtherVersionForce(self):
-    self.make_requests.side_effect = iter([[self.igms[1]], []])
+    self.make_requests.side_effect = iter([[self.igms[1]], [], []])
     self.Run('compute instance-groups managed rolling-action start-update {0} '
              '--force --version template={1} --zone {2}'.format(
                  self.IGM_NAME_B, self.TEMPLATE_C_NAME, self.ZONE))
@@ -294,7 +315,7 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
     self.checkUpdateRequest(get_request, update_request)
 
   def testTwoToTwoMixedVersionsForce(self):
-    self.make_requests.side_effect = iter([[self.igms[1]], []])
+    self.make_requests.side_effect = iter([[self.igms[1]], [], []])
     self.Run('compute instance-groups managed rolling-action start-update {0} '
              '--force --version template={1} --canary-version '
              'template={2},target-size=100% --zone {3}'.format(
@@ -310,7 +331,7 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
     self.checkUpdateRequest(get_request, update_request)
 
   def testTwoToTwoOtherVersionsForce(self):
-    self.make_requests.side_effect = iter([[self.igms[1]], []])
+    self.make_requests.side_effect = iter([[self.igms[1]], [], []])
     self.Run('compute instance-groups managed rolling-action start-update {0} '
              '--force --version template={1} --canary-version '
              'template={2},target-size=100% --zone {3}'.format(
@@ -330,7 +351,7 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
   def testTwoToTwoIdenticalVersionsForceFail(self):
     with self.AssertRaisesToolExceptionMatches(
         'Provided instance templates must be different.'):
-      self.make_requests.side_effect = iter([[self.igms[2]], []])
+      self.make_requests.side_effect = iter([[self.igms[2]], [], []])
       self.Run(
           'compute instance-groups managed rolling-action start-update {0} '
           '--version template={1} '
@@ -338,7 +359,7 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
               self.IGM_NAME_C, self.TEMPLATE_C_NAME, self.ZONE))
 
   def testInstanceTemplateToOneVersion(self):
-    self.make_requests.side_effect = iter([[self.igms[2]], []])
+    self.make_requests.side_effect = iter([[self.igms[2]], [], []])
     self.Run('compute instance-groups managed rolling-action start-update {0} '
              '--version template={1} --zone {2}'.format(
                  self.IGM_NAME_C, self.TEMPLATE_A_NAME, self.ZONE))
@@ -350,7 +371,7 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
     self.checkUpdateRequest(get_request, update_request)
 
   def testInstanceTemplateToTwoVersions(self):
-    self.make_requests.side_effect = iter([[self.igms[2]], []])
+    self.make_requests.side_effect = iter([[self.igms[2]], [], []])
     self.Run('compute instance-groups managed rolling-action start-update {0} '
              '--version template={1} '
              '--canary-version template={2},target-size=100% --zone {3}'.format(
@@ -369,7 +390,7 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
         'The only allowed transitions between versions are: '
         'X -> Y, X -> (X, Y), (X, Y) -> X, (X, Y) -> Y, (X, Y) -> (X, Y). '
         'Please check versions templates or use --force.'):
-      self.make_requests.side_effect = iter([[self.igms[2]], []])
+      self.make_requests.side_effect = iter([[self.igms[2]], [], []])
       self.Run(
           'compute instance-groups managed rolling-action start-update {0} '
           '--version template={1} '
@@ -378,7 +399,7 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
               self.ZONE))
 
   def testInstanceTemplateToTwoOtherVersionsForce(self):
-    self.make_requests.side_effect = iter([[self.igms[2]], []])
+    self.make_requests.side_effect = iter([[self.igms[2]], [], []])
     self.Run('compute instance-groups managed rolling-action start-update {0} '
              '--force --version template={1} --canary-version '
              'template={2},target-size=100% --zone {3}'.format(
@@ -396,7 +417,7 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
     self.checkUpdateRequest(get_request, update_request)
 
   def testOneVersionDefault(self):
-    self.make_requests.side_effect = iter([[self.igms[0]], []])
+    self.make_requests.side_effect = iter([[self.igms[0]], [], []])
     self.Run('compute instance-groups managed rolling-action start-update {0} '
              '--force --version template={1} --zone {2}'.format(
                  self.IGM_NAME_A, self.TEMPLATE_B_NAME, self.ZONE))
@@ -405,12 +426,16 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
     update_request = self.generateUpdateRequestStub(self.IGM_NAME_A)
     self.checkUpdateRequest(get_request, update_request)
 
-  def testOneVersionAllSet(self):
-    self.make_requests.side_effect = iter([[self.igms[0]], []])
-    self.Run('compute instance-groups managed rolling-action start-update {0} '
-             '--force --type proactive --min-ready 1m --max-surge 10 '
-             '--max-unavailable 9 --version template={1} --zone {2}'.format(
-                 self.IGM_NAME_A, self.TEMPLATE_B_NAME, self.ZONE))
+  def doTestOneVersionAllSet(self, with_min_ready):
+    self.make_requests.side_effect = iter([[self.igms[0]], [], []])
+    command_template = (
+        'compute instance-groups managed rolling-action start-update {0} '
+        '--force --type proactive --max-surge 10 '
+        '--max-unavailable 9 --version template={1} --zone {2}' +
+        (' --min-ready 1m' if with_min_ready else ''))
+    self.Run(
+        command_template.format(self.IGM_NAME_A, self.TEMPLATE_B_NAME,
+                                self.ZONE))
 
     get_request = self.generateGetRequestStub(self.IGM_NAME_A)
     update_request = self.generateUpdateRequestStub(self.IGM_NAME_A)
@@ -418,8 +443,13 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
     ) = self.FixedOrPercent(fixed=10)
     (update_request.instanceGroupManagerResource.updatePolicy.maxUnavailable
     ) = self.FixedOrPercent(fixed=9)
-    (update_request.instanceGroupManagerResource.updatePolicy.minReadySec) = 60
+    if with_min_ready:
+      (update_request.instanceGroupManagerResource.updatePolicy.minReadySec
+      ) = 60
     self.checkUpdateRequest(get_request, update_request)
+
+  def testOneVersionAllSet(self):
+    self.doTestOneVersionAllSet(with_min_ready=False)
 
   def testOneVersionTooMuchSurgeFail(self):
     with self.AssertRaisesToolExceptionMatches(
@@ -427,7 +457,7 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
         'than 100%.'):
       self.Run(
           'compute instance-groups managed rolling-action start-update {0} '
-          '--force --max-surge 101% --min-ready 0s --version template={1} '
+          '--force --max-surge 101% --version template={1} '
           '--zone {2}'.format(self.IGM_NAME_A, self.TEMPLATE_D_NAME, self.ZONE))
 
   def testOneVersionTooMuchUnavailableFail(self):
@@ -440,7 +470,7 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
           format(self.IGM_NAME_A, self.TEMPLATE_B_NAME, self.ZONE))
 
   def testOneVersionOpportunistic(self):
-    self.make_requests.side_effect = iter([[self.igms[0]], []])
+    self.make_requests.side_effect = iter([[self.igms[0]], [], []])
     self.Run(
         'compute instance-groups managed rolling-action start-update {0} '
         '--force --type opportunistic --version template={1} --zone {2}'.format(
@@ -452,18 +482,22 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
     ) = self.TypeValueValuesEnum.OPPORTUNISTIC
     self.checkUpdateRequest(get_request, update_request)
 
-  def testTwoVersions(self):
-    self.make_requests.side_effect = iter([[self.igms[0]], []])
-    self.Run(
+  def doTestTwoVersions(self, with_min_ready):
+    self.make_requests.side_effect = iter([[self.igms[0]], [], []])
+    command_template = (
         'compute instance-groups managed rolling-action start-update {0} '
-        '--force --min-ready 3m --max-unavailable 3 --version template={1} '
-        '--canary-version template={2},target-size=90% --zone {3}'.format(
-            self.IGM_NAME_A, self.TEMPLATE_A_NAME, self.TEMPLATE_B_NAME,
-            self.ZONE))
+        '--force --max-unavailable 3 --version template={1} '
+        '--canary-version template={2},target-size=90% --zone {3}' +
+        (' --min-ready 3m' if with_min_ready else ''))
+    self.Run(
+        command_template.format(self.IGM_NAME_A, self.TEMPLATE_A_NAME,
+                                self.TEMPLATE_B_NAME, self.ZONE))
 
     get_request = self.generateGetRequestStub(self.IGM_NAME_A)
     update_request = self.generateUpdateRequestStub(self.IGM_NAME_A)
-    (update_request.instanceGroupManagerResource.updatePolicy.minReadySec) = 180
+    if with_min_ready:
+      (update_request.instanceGroupManagerResource.updatePolicy.minReadySec
+      ) = 180
     (update_request.instanceGroupManagerResource.updatePolicy.maxUnavailable
     ) = self.FixedOrPercent(fixed=3)
     (update_request.instanceGroupManagerResource.versions
@@ -471,6 +505,9 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
     (update_request.instanceGroupManagerResource.versions[1].targetSize
     ) = self.FixedOrPercent(percent=90)
     self.checkUpdateRequest(get_request, update_request)
+
+  def testTwoVersions(self):
+    self.doTestTwoVersions(with_min_ready=False)
 
   def testTwoVersionsNoTargetSize(self):
     with self.AssertRaisesExceptionMatches(
@@ -496,13 +533,17 @@ class InstanceGroupManagersUpdateInstancesBetaZonalTest(test_base.BaseTest):
               self.IGM_NAME_B, self.TEMPLATE_B_NAME, self.ZONE))
 
 
-class InstanceGroupManagersUpdateInstancesBetaRegionalTest(test_base.BaseTest):
+class InstanceGroupManagersUpdateInstancesRegionalTest(test_base.BaseTest):
+
+  def PreSetUp(self):
+    self.api_version = 'v1'
+    self.track = calliope_base.ReleaseTrack.GA
+    self.should_list_per_instance_configs = False
 
   def SetUp(self):
-    SetUpClass(self, 'beta')
-    self.track = calliope_base.ReleaseTrack.BETA
+    SetUpClass(self, self.api_version)
     self.igms = test_resources.MakeInstanceGroupManagersWithVersions(
-        'beta', self.REGION, 'region')
+        self.api_version, self.REGION, 'region')
     self.StartPatch('datetime.datetime', test_base.FakeDateTime)
 
   def generateGetRequestStub(self, igm_name):
@@ -520,14 +561,33 @@ class InstanceGroupManagersUpdateInstancesBetaRegionalTest(test_base.BaseTest):
         project=self.PROJECT_NAME,
         region=self.REGION)
 
+  def generateListPerInstanceConfigsRequestStub(self, get_request):
+    return (self.messages.
+            ComputeRegionInstanceGroupManagersListPerInstanceConfigsRequest(
+                instanceGroupManager=get_request.instanceGroupManager,
+                project=get_request.project,
+                region=get_request.region))
+
   def checkUpdateRequest(self, expected_get_request, expected_update_request):
-    self.CheckRequests([(self.compute.regionInstanceGroupManagers, 'Get',
-                         expected_get_request)],
-                       [(self.compute.regionInstanceGroupManagers, 'Patch',
-                         expected_update_request)])
+    if self.should_list_per_instance_configs:
+      expected_list_pics_request = (
+          self.generateListPerInstanceConfigsRequestStub(expected_get_request))
+      self.CheckRequests(
+          [(self.compute.regionInstanceGroupManagers, 'Get',
+            expected_get_request)],
+          [(self.compute.regionInstanceGroupManagers, 'ListPerInstanceConfigs',
+            expected_list_pics_request)],
+          [(self.compute.regionInstanceGroupManagers, 'Patch',
+            expected_update_request)])
+    else:
+      self.CheckRequests(
+          [(self.compute.regionInstanceGroupManagers, 'Get',
+            expected_get_request)],
+          [(self.compute.regionInstanceGroupManagers, 'Patch',
+            expected_update_request)])
 
   def testOneVersionDefault(self):
-    self.make_requests.side_effect = iter([[self.igms[0]], []])
+    self.make_requests.side_effect = iter([[self.igms[0]], [], []])
     self.Run('compute instance-groups managed rolling-action start-update {0} '
              '--force --version template={1} --region {2}'.format(
                  self.IGM_NAME_A, self.TEMPLATE_B_NAME, self.REGION))
@@ -536,12 +596,16 @@ class InstanceGroupManagersUpdateInstancesBetaRegionalTest(test_base.BaseTest):
     update_request = self.generateUpdateRequestStub(self.IGM_NAME_A)
     self.checkUpdateRequest(get_request, update_request)
 
-  def testOneVersionAllSet(self):
-    self.make_requests.side_effect = iter([[self.igms[0]], []])
-    self.Run('compute instance-groups managed rolling-action start-update {0} '
-             '--force --type proactive --min-ready 1m --max-surge 10 '
-             '--max-unavailable 9 --version template={1} --region {2}'.format(
-                 self.IGM_NAME_A, self.TEMPLATE_B_NAME, self.REGION))
+  def doTestOneVersionAllSet(self, with_min_ready):
+    self.make_requests.side_effect = iter([[self.igms[0]], [], []])
+    command_template = (
+        'compute instance-groups managed rolling-action start-update {0} '
+        '--force --type proactive --max-surge 10 '
+        '--max-unavailable 9 --version template={1} --region {2}' +
+        (' --min-ready 1m ' if with_min_ready else ''))
+    self.Run(
+        command_template.format(self.IGM_NAME_A, self.TEMPLATE_B_NAME,
+                                self.REGION))
 
     get_request = self.generateGetRequestStub(self.IGM_NAME_A)
     update_request = self.generateUpdateRequestStub(self.IGM_NAME_A)
@@ -549,11 +613,16 @@ class InstanceGroupManagersUpdateInstancesBetaRegionalTest(test_base.BaseTest):
     ) = self.FixedOrPercent(fixed=10)
     (update_request.instanceGroupManagerResource.updatePolicy.maxUnavailable
     ) = self.FixedOrPercent(fixed=9)
-    (update_request.instanceGroupManagerResource.updatePolicy.minReadySec) = 60
+    if with_min_ready:
+      (update_request.instanceGroupManagerResource.updatePolicy.minReadySec
+      ) = 60
     self.checkUpdateRequest(get_request, update_request)
 
+  def testOneVersionAllSet(self):
+    self.doTestOneVersionAllSet(with_min_ready=False)
+
   def testOneVersionCommitment(self):
-    self.make_requests.side_effect = iter([[self.igms[0]], []])
+    self.make_requests.side_effect = iter([[self.igms[0]], [], []])
     self.Run('compute instance-groups managed rolling-action start-update {0} '
              '--force --version template={1} --region {2}'.format(
                  self.IGM_NAME_A, self.TEMPLATE_D_NAME, self.REGION))
@@ -569,24 +638,28 @@ class InstanceGroupManagersUpdateInstancesBetaRegionalTest(test_base.BaseTest):
   def testOneVersionNoTemplateFail(self):
     with self.AssertRaisesToolExceptionMatches(
         '[--version]: template has to be specified.'):
-      self.make_requests.side_effect = iter([[self.igms[0]], []])
+      self.make_requests.side_effect = iter([[self.igms[0]], [], []])
       self.Run(
           'compute instance-groups managed rolling-action start-update {0} '
           '--force --version name=template --region {1}'.format(self.IGM_NAME_A,
                                                                 self.REGION))
 
-  def testTwoVersions(self):
-    self.make_requests.side_effect = iter([[self.igms[0]], []])
-    self.Run('compute instance-groups managed rolling-action start-update {0} '
-             '--min-ready 3m --max-unavailable 3 --force '
-             '--version template={2} '
-             '--region {3} --canary-version template={1},target-size=10'.format(
-                 self.IGM_NAME_A, self.TEMPLATE_D_NAME, self.TEMPLATE_C_NAME,
-                 self.REGION))
+  def doTestTwoVersions(self, with_min_ready):
+    self.make_requests.side_effect = iter([[self.igms[0]], [], []])
+    command_template = ('compute instance-groups managed rolling-action '
+                        'start-update {0} --max-unavailable 3 --force '
+                        '--version template={2} --region {3} --canary-version '
+                        'template={1},target-size=10' +
+                        (' --min-ready 3m' if with_min_ready else ''))
+    self.Run(
+        command_template.format(self.IGM_NAME_A, self.TEMPLATE_D_NAME,
+                                self.TEMPLATE_C_NAME, self.REGION))
 
     get_request = self.generateGetRequestStub(self.IGM_NAME_A)
     update_request = self.generateUpdateRequestStub(self.IGM_NAME_A)
-    (update_request.instanceGroupManagerResource.updatePolicy.minReadySec) = 180
+    if with_min_ready:
+      (update_request.instanceGroupManagerResource.updatePolicy.minReadySec
+      ) = 180
     (update_request.instanceGroupManagerResource.updatePolicy.maxUnavailable
     ) = self.FixedOrPercent(fixed=3)
     update_request.instanceGroupManagerResource.versions = [
@@ -597,6 +670,9 @@ class InstanceGroupManagersUpdateInstancesBetaRegionalTest(test_base.BaseTest):
             targetSize=self.FixedOrPercent(fixed=10))
     ]
     self.checkUpdateRequest(get_request, update_request)
+
+  def testTwoVersions(self):
+    self.doTestTwoVersions(with_min_ready=False)
 
   def testTwoVersionsNoTargetSize(self):
     with self.AssertRaisesExceptionMatches(
@@ -624,24 +700,109 @@ class InstanceGroupManagersUpdateInstancesBetaRegionalTest(test_base.BaseTest):
                                 self.REGION))
 
 
+class InstanceGroupManagersUpdateInstancesBetaZonalTest(
+    InstanceGroupManagersUpdateInstancesZonalTest):
+
+  def PreSetUp(self):
+    self.api_version = 'beta'
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def testOneVersionAllSet(self):
+    self.doTestOneVersionAllSet(with_min_ready=True)
+
+  def testTwoVersions(self):
+    self.doTestTwoVersions(with_min_ready=True)
+
+
+class InstanceGroupManagersUpdateInstancesBetaRegionalTest(
+    InstanceGroupManagersUpdateInstancesRegionalTest):
+
+  def PreSetUp(self):
+    self.api_version = 'beta'
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def testOneVersionAllSet(self):
+    self.doTestOneVersionAllSet(with_min_ready=True)
+
+  def testTwoVersions(self):
+    self.doTestTwoVersions(with_min_ready=True)
+
+
 class InstanceGroupManagersUpdateInstancesAlphaZonalTest(
     InstanceGroupManagersUpdateInstancesBetaZonalTest):
 
-  def SetUp(self):
-    SetUpClass(self, 'alpha')
+  def PreSetUp(self):
+    self.api_version = 'alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
-    self.igms = test_resources.MakeInstanceGroupManagersWithVersions('alpha',
-                                                                     self.ZONE)
+    self.should_list_per_instance_configs = True
+
+  def testReplacementMethod(self):
+    self.make_requests.side_effect = iter([[self.igms[0]], [], []])
+    self.Run('compute instance-groups managed rolling-action start-update {0} '
+             '--version template={1} --zone {2} --replacement-method recreate'
+             .format(self.IGM_NAME_A, self.TEMPLATE_B_NAME, self.ZONE))
+
+    get_request = self.generateGetRequestStub(self.IGM_NAME_A)
+    update_request = self.generateUpdateRequestStub(self.IGM_NAME_A)
+    (update_request.instanceGroupManagerResource.updatePolicy.replacementMethod
+    ) = (self.messages.InstanceGroupManagerUpdatePolicy.
+         ReplacementMethodValueValuesEnum.RECREATE)
+    self.checkUpdateRequest(get_request, update_request)
+
+  def testReplaceIgmWithStatefulPolicy(self):
+    igm = test_resources.MakeStatefulInstanceGroupManager(
+        self.api_version, self.ZONE)
+    self.make_requests.side_effect = iter([[igm], [], []])
+    self.Run('compute instance-groups managed rolling-action start-update {0} '
+             '--version template={1} --zone {2} --max-unavailable 1'
+             .format(igm.name, self.TEMPLATE_B_NAME, self.ZONE))
+
+    get_request = self.generateGetRequestStub(igm.name)
+    update_request = self.generateUpdateRequestStub(igm.name)
+    (update_request.instanceGroupManagerResource.updatePolicy.maxUnavailable
+    ) = self.FixedOrPercent(fixed=1)
+    (update_request.instanceGroupManagerResource.updatePolicy.maxSurge
+    ) = self.FixedOrPercent(fixed=0)
+    (update_request.instanceGroupManagerResource.updatePolicy.minimalAction
+    ) = self.MinimalActionValueValuesEnum.REPLACE
+    (update_request.instanceGroupManagerResource.updatePolicy.replacementMethod
+    ) = (self.messages.InstanceGroupManagerUpdatePolicy.
+         ReplacementMethodValueValuesEnum.RECREATE)
+    (update_request.instanceGroupManagerResource.versions[0].instanceTemplate
+    ) = self.TEMPLATE_B_NAME
+    self.checkUpdateRequest(get_request, update_request)
+
+  def testReplaceIgmWithPerInstanceConfigs(self):
+    pics = self.messages.InstanceGroupManagersListPerInstanceConfigsResp(
+        items=[self.messages.PerInstanceConfig(instance='instance123')])
+    self.make_requests.side_effect = iter([[self.igms[0]], [pics], []])
+    self.Run('compute instance-groups managed rolling-action start-update {0} '
+             '--version template={1} --zone {2} --max-unavailable 1'
+             .format(self.IGM_NAME_A, self.TEMPLATE_B_NAME, self.ZONE))
+
+    get_request = self.generateGetRequestStub(self.IGM_NAME_A)
+    update_request = self.generateUpdateRequestStub(self.IGM_NAME_A)
+    (update_request.instanceGroupManagerResource.updatePolicy.maxUnavailable
+    ) = self.FixedOrPercent(fixed=1)
+    (update_request.instanceGroupManagerResource.updatePolicy.maxSurge
+    ) = self.FixedOrPercent(fixed=0)
+    (update_request.instanceGroupManagerResource.updatePolicy.minimalAction
+    ) = self.MinimalActionValueValuesEnum.REPLACE
+    (update_request.instanceGroupManagerResource.updatePolicy.replacementMethod
+    ) = (self.messages.InstanceGroupManagerUpdatePolicy.
+         ReplacementMethodValueValuesEnum.RECREATE)
+    (update_request.instanceGroupManagerResource.versions[0].instanceTemplate
+    ) = self.TEMPLATE_B_NAME
+    self.checkUpdateRequest(get_request, update_request)
 
 
 class InstanceGroupManagersUpdateInstancesAlphaRegionalTest(
     InstanceGroupManagersUpdateInstancesBetaRegionalTest):
 
-  def SetUp(self):
-    SetUpClass(self, 'alpha')
+  def PreSetUp(self):
+    self.api_version = 'alpha'
     self.track = calliope_base.ReleaseTrack.ALPHA
-    self.igms = test_resources.MakeInstanceGroupManagersWithVersions(
-        'alpha', self.REGION, 'region')
+    self.should_list_per_instance_configs = True
 
 if __name__ == '__main__':
   test_case.main()

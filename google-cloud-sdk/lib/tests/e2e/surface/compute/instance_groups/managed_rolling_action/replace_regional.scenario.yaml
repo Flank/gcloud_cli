@@ -32,7 +32,7 @@ summary:
       region:     https://www.googleapis.com/compute/beta/projects/cloud-sdk-integration-testing/regions/us-central1
       targetSize: 12
 - execute:
-  - command: compute instance-groups managed wait-until-stable $$manager$$ --timeout
+  - command: compute instance-groups managed wait-until --stable $$manager$$ --timeout
       600 --region us-central1 --no-user-output-enabled
 - execute:
   - command: compute instances list --filter 'machineType:n1-standard-1 AND name:$$manager$$'
@@ -62,7 +62,7 @@ summary:
        - Instance template was ignored because it was overridden by versions.
 
 - execute:
-  - command: compute instance-groups managed wait-until-stable $$manager$$ --timeout
+  - command: compute instance-groups managed wait-until --stable $$manager$$ --timeout
       600 --region us-central1 --no-user-output-enabled
 - execute:
   - command: compute instances list --filter 'machineType:f1-micro AND name:$$manager$$'
@@ -595,7 +595,7 @@ actions:
 
 
 - execute_command:
-    command: compute instance-groups managed wait-until-stable $$manager$$ --timeout
+    command: compute instance-groups managed wait-until --stable $$manager$$ --timeout
       600 --region us-central1 --no-user-output-enabled
     validation_only: true
     events:
@@ -796,7 +796,7 @@ actions:
 
 
 - execute_command:
-    command: compute instance-groups managed wait-until-stable $$manager$$ --timeout
+    command: compute instance-groups managed wait-until --stable $$manager$$ --timeout
       600 --region us-central1 --no-user-output-enabled
     validation_only: true
     events:

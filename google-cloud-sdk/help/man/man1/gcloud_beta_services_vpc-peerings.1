@@ -23,10 +23,11 @@ gcloud beta services vpc\-peerings \- VPC Peerings to various services
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -57,16 +58,22 @@ gcloud help\fR for details.
 \fB(BETA)\fR List connections to a service via VPC peering for a project
 network.
 
+.TP 2m
+\fBupdate\fR
+\fB(BETA)\fR Update a private service connection to a service for a project
+network.
+
 
 .RE
 .sp
 
 .SH "NOTES"
 
-This command is currently in BETA and may change without notice. This variant is
-also available:
+This command is currently in BETA and may change without notice. These variants
+are also available:
 
 .RS 2m
+$ gcloud services vpc\-peerings
 $ gcloud alpha services vpc\-peerings
 .RE
 

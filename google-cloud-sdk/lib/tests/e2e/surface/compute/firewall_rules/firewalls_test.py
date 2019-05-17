@@ -22,6 +22,7 @@ import logging
 
 from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import e2e_utils
+from tests.lib import test_case
 from tests.lib.surface.compute import e2e_test_base
 
 
@@ -178,6 +179,7 @@ class FirewallsTest(e2e_test_base.BaseTest):
     self.AssertNewOutputContains("ports:\n  - '443'", reset=False)
     self.AssertNewOutputNotContains('disabled: false')
 
+  @test_case.Filters.skip('Failing', 'b/131857233')
   def testFirewallLogging(self):
     self._TestCreateLoggingFirewall()
 

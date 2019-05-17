@@ -10,8 +10,9 @@ DESCRIPTION
     (ALPHA) Read and manipulate Google Compute Engine managed instance groups.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -33,6 +34,11 @@ COMMANDS
 
      create
         (ALPHA) Create a Compute Engine managed instance group.
+
+     create-instance
+        (ALPHA) Create a new virtual machine instance in a managed instance
+        group with a defined name and optionally its stateful configuration:
+        stateful disk, stateful metadata.
 
      delete
         (ALPHA) Delete Google Compute Engine managed instance groups.
@@ -62,7 +68,7 @@ COMMANDS
         (ALPHA) Set managed instance group size.
 
      set-autohealing
-        (ALPHA) Set autohealing policy for managed instance group.
+        (ALPHA) (DEPRECATED) Set autohealing policy for managed instance group.
 
      set-autoscaling
         (ALPHA) Set autoscaling parameters of a managed instance group.
@@ -85,8 +91,12 @@ COMMANDS
      update-autoscaling
         (ALPHA) Update autoscaling parameters of a managed instance group.
 
+     wait-until
+        (ALPHA) Wait until managed instance group reaches desired state.
+
      wait-until-stable
-        (ALPHA) Waits until state of managed instance group is stable.
+        (ALPHA) (DEPRECATED) Waits until state of managed instance group is
+        stable.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

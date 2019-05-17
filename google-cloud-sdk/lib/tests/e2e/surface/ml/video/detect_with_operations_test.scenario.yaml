@@ -12,16 +12,6 @@ summary:
   - command: ml video operations describe $$operation-id$$ --format="value(name)"
   - stdout: |
       $$operation-id$$
-- execute:
-  - command: ml video operations wait $$operation-id$$ --format text
-  - progress_tracker:
-    - message: Waiting for operation [$$operation-id$$] to complete
-    - status: SUCCESS
-  - stdout: |
-      @type:                                                   type.googleapis.com/google.cloud.videointelligence.v1.AnnotateVideoResponse
-      annotationResults[0].inputUri:                           /do-not-delete-ml-video-test/chicago.mp4
-      annotationResults[0].shotAnnotations[0].endTimeOffset:   38.757872s
-      annotationResults[0].shotAnnotations[0].startTimeOffset: 0s
 actions:
 - execute_command:
     command: ml video detect-shot-changes gs://do-not-delete-ml-video-test/chicago.mp4
@@ -44,7 +34,7 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: us-east1.8365073731912230568
+            name: us-east1.6453306309129917618
         expect_response:
           extract_references:
           - field: name
@@ -73,57 +63,14 @@ actions:
             content-type: application/json; charset=UTF-8
             status: '200'
           body:
-            name: us-east1.8365073731912230568
+            name: us-east1.6453306309129917618
             metadata:
               '@type': type.googleapis.com/google.cloud.videointelligence.v1.AnnotateVideoProgress
               annotationProgress:
               - inputUri: /do-not-delete-ml-video-test/chicago.mp4
-                startTime: '2018-11-19T16:53:35.337983Z'
-                updateTime: '2018-11-19T16:53:35.403647Z'
+                startTime: '2019-04-26T17:04:20.468063Z'
+                updateTime: '2019-04-26T17:04:20.535167Z'
     - expect_stdout: |
         $$operation-id$$
-    - expect_exit:
-        code: 0
-- execute_command:
-    command: ml video operations wait $$operation-id$$ --format text
-    events:
-    - api_call:
-        expect_request:
-          uri: https://videointelligence.googleapis.com/v1/operations/$$operation-id$$?alt=json
-          method: GET
-          headers: {}
-          body: null
-        return_response:
-          headers:
-            cache-control: private
-            content-length: '792'
-            content-type: application/json; charset=UTF-8
-            status: '200'
-          body:
-            name: us-east1.8365073731912230568
-            metadata:
-              '@type': type.googleapis.com/google.cloud.videointelligence.v1.AnnotateVideoProgress
-              annotationProgress:
-              - inputUri: /do-not-delete-ml-video-test/chicago.mp4
-                progressPercent: 100
-                startTime: '2018-11-19T16:53:35.337983Z'
-                updateTime: '2018-11-19T16:53:45.475932Z'
-            done: true
-            response:
-              '@type': type.googleapis.com/google.cloud.videointelligence.v1.AnnotateVideoResponse
-              annotationResults:
-              - inputUri: /do-not-delete-ml-video-test/chicago.mp4
-                shotAnnotations:
-                - startTimeOffset: 0s
-                  endTimeOffset: 38.757872s
-        repeatable: true
-    - expect_progress_tracker:
-        message: Waiting for operation [$$operation-id$$] to complete
-        status: SUCCESS
-    - expect_stdout: |
-        @type:                                                   type.googleapis.com/google.cloud.videointelligence.v1.AnnotateVideoResponse
-        annotationResults[0].inputUri:                           /do-not-delete-ml-video-test/chicago.mp4
-        annotationResults[0].shotAnnotations[0].endTimeOffset:   38.757872s
-        annotationResults[0].shotAnnotations[0].startTimeOffset: 0s
     - expect_exit:
         code: 0

@@ -8,8 +8,8 @@ SYNOPSIS
           | --nat-external-ip-pool=IP_ADDRESS,[IP_ADDRESS,...])
         (--nat-all-subnet-ip-ranges
           | --nat-custom-subnet-ip-ranges=SUBNETWORK[:RANGE_NAME],[...]
-          | --nat-primary-subnet-ip-ranges) [--async]
-        [--icmp-idle-timeout=ICMP_IDLE_TIMEOUT]
+          | --nat-primary-subnet-ip-ranges) [--async] [--enable-logging]
+        [--icmp-idle-timeout=ICMP_IDLE_TIMEOUT] [--log-filter=LOG_FILTER]
         [--min-ports-per-vm=MIN_PORTS_PER_VM] [--region=REGION]
         [--tcp-established-idle-timeout=TCP_ESTABLISHED_IDLE_TIMEOUT]
         [--tcp-transitory-idle-timeout=TCP_TRANSITORY_IDLE_TIMEOUT]
@@ -57,9 +57,34 @@ OPTIONAL FLAGS
         Display information about the operation in progress, without waiting
         for the operation to complete.
 
+     --enable-logging
+        Enable logging for the NAT. Logs will be exported to Stackdriver. NAT
+        logging is disabled by default. To disable logging for the NAT, use $
+        gcloud beta compute routers nats update MY-NAT \ --no-enable-logging
+        --router ROUTER --region REGION
+
      --icmp-idle-timeout=ICMP_IDLE_TIMEOUT
         Timeout for ICMP connections. See $ gcloud topic datetimes for
         information on duration formats.
+
+     --log-filter=LOG_FILTER
+        Filter for logs exported to stackdriver.
+
+        The default is ALL.
+
+        If logging is not enabled, filter settings will be persisted but will
+        have no effect.
+
+        Use --[no-]enable-logging to enable and disable logging.
+
+        LOG_FILTER must be one of:
+
+         ALL
+            Export logs for all connections handled by this NAT.
+         ERRORS_ONLY
+            Export logs for connection failures only.
+         TRANSLATIONS_ONLY
+            Export logs for successful connections only.
 
      --min-ports-per-vm=MIN_PORTS_PER_VM
         Minimum ports to be allocated to a VM
@@ -97,8 +122,9 @@ OPTIONAL FLAGS
         information on duration formats.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

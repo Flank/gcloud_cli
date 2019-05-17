@@ -1,13 +1,13 @@
 NAME
     gcloud beta bigtable app-profiles describe - describe an existing Bigtable
-        app-profile
+        app profile
 
 SYNOPSIS
     gcloud beta bigtable app-profiles describe
         (APP_PROFILE : --instance=INSTANCE) [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) Describe an existing Bigtable app-profile.
+    (BETA) Describe an existing Bigtable app profile.
 
 POSITIONAL ARGUMENTS
      App profile resource - The app profile to describe. The arguments in this
@@ -19,22 +19,24 @@ POSITIONAL ARGUMENTS
      must be specified.
 
        APP_PROFILE
-          ID of the app-profile or fully qualified identifier for the
-          app-profile. This positional must be specified if any of the other
+          ID of the app profile or fully qualified identifier for the app
+          profile. This positional must be specified if any of the other
           arguments in this group are specified.
 
        --instance=INSTANCE
-          The Cloud Bigtable instance for the app-profile.
+          Cloud Bigtable instance for the app profile.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud bigtable app-profiles describe
         $ gcloud alpha bigtable app-profiles describe
 

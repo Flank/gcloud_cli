@@ -40,7 +40,7 @@ YAML_FILE_CONTENTS_HEADER = textwrap.dedent("""\
 YAML_FILE_CONTENTS_WORKSPACE = textwrap.dedent("""\
     backends:
     - balancingMode: RATE
-      group: https://www.googleapis.com/compute/v1/projects/my-project/zones/us-central1-a/instanceGroups/group-1
+      group: https://www.googleapis.com/compute/v1/projects/my-project/regions/us-central1/instanceGroups/group-1
       maxRate: 123
     - balancingMode: RATE
       group: https://www.googleapis.com/compute/v1/projects/my-project/zones/us-central1-b/instanceGroups/group-2
@@ -83,7 +83,7 @@ YAML_FILE_CONTENTS_EXAMPLE = textwrap.dedent("""\
 YAML_FILE_CONTENTS_ORIGINAL = textwrap.dedent("""\
     #   backends:
     #   - balancingMode: RATE
-    #     group: https://www.googleapis.com/compute/v1/projects/my-project/zones/us-central1-a/instanceGroups/group-1
+    #     group: https://www.googleapis.com/compute/v1/projects/my-project/regions/us-central1/instanceGroups/group-1
     #     maxRate: 123
     #   - balancingMode: RATE
     #     group: https://www.googleapis.com/compute/v1/projects/my-project/zones/us-central1-b/instanceGroups/group-2

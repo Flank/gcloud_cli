@@ -20,6 +20,11 @@ DESCRIPTION
     will move the disk called example-disk-1, currently running in
     us-central1-b, to us-central1-f.
 
+    Please note that gcloud compute disks move does not yet support regional
+    persistent disks. Please see
+    https://cloud.google.com/compute/docs/disks/regional-persistent-disk for
+    more details.
+
 POSITIONAL ARGUMENTS
      DISK_NAME
         Name of the disk to operate on.
@@ -54,8 +59,9 @@ OPTIONAL FLAGS
         CLOUDSDK_COMPUTE_ZONE.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

@@ -190,5 +190,10 @@ class JobsSubmitSparkUnitTestBeta(JobsSubmitSparkUnitTest,
                            self.JAR_URI))
 
 
+class JobsSubmitSparkUnitTestAlpha(
+    JobsSubmitSparkUnitTestBeta, base.DataprocTestBaseAlpha):
+  pass
+
+
 if __name__ == '__main__':
   sdk_test_base.main()

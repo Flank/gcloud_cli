@@ -1,0 +1,176 @@
+NAME
+    gcloud alpha compute instances import - create Google Compute Engine
+        virtual machine instances from virtual appliance in OVA/OVF format
+
+SYNOPSIS
+    gcloud alpha compute instances import INSTANCE_NAMES [INSTANCE_NAMES ...]
+        --os=OS --source-uri=SOURCE_URI [--async] [--can-ip-forward]
+        [--deletion-protection] [--description=DESCRIPTION]
+        [--no-guest-environment] [--labels=[KEY=VALUE,...]]
+        [--machine-type=MACHINE_TYPE] [--network=NETWORK]
+        [--network-tier=NETWORK_TIER] [--private-network-ip=PRIVATE_NETWORK_IP]
+        [--no-restart-on-failure] [--subnet=SUBNET] [--tags=TAG,[TAG,...]]
+        [--timeout=TIMEOUT; default="2h"] [--zone=ZONE]
+        [--custom-cpu=CUSTOM_CPU --custom-memory=CUSTOM_MEMORY
+          : --custom-extensions] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) gcloud alpha compute instances import creates Google Compute Engine
+    virtual machine instances from virtual appliance in OVA/OVF format.
+
+    Importing OVF involves:
+      o Unpacking OVF package (if in OVA format) to Cloud Storage.
+      o Import disks from OVF to Google Compute Engine.
+      o Translate the boot disk to make it bootable in Google Compute Engine.
+      o Create a VM instance using OVF metadata and imported disks and boot
+        it.
+
+    Virtual machine instances, images and disks in Compute engine and files
+    stored on Cloud Storage incur charges. See
+    https://cloud.google.com/compute/docs/images/importing-virtual-disks#resource_cleanup.
+
+POSITIONAL ARGUMENTS
+     INSTANCE_NAMES [INSTANCE_NAMES ...]
+        Names of the instances to import.
+
+REQUIRED FLAGS
+     --os=OS
+        Specifies the OS of the image being imported. OS must be one of:
+        centos-6, centos-7, debian-8, debian-9, rhel-6, rhel-6-byol, rhel-7,
+        rhel-7-byol, ubuntu-1404, ubuntu-1604, windows-2008r2, windows-2012,
+        windows-2012r2, windows-2016.
+
+     --source-uri=SOURCE_URI
+        Google Cloud Storage path to one of: OVF descriptor OVA file Directory
+        with OVF package
+
+OPTIONAL FLAGS
+     --async
+        Display information about the operation in progress, without waiting
+        for the operation to complete.
+
+     --can-ip-forward
+        If provided, allows the instances to send and receive packets with
+        non-matching destination or source IP addresses.
+
+     --deletion-protection
+        Enables deletion protection for the instance.
+
+     --description=DESCRIPTION
+        Specifies a textual description of the instances.
+
+     --guest-environment
+        Google Guest Environment will be installed on the instance. Enabled by
+        default, use --no-guest-environment to disable.
+
+     --labels=[KEY=VALUE,...]
+        List of label KEY=VALUE pairs to add.
+
+        Keys must start with a lowercase character and contain only hyphens
+        (-), underscores (_), lowercase characters, and numbers. Values must
+        contain only hyphens (-), underscores (_), lowercase characters, and
+        numbers.
+
+     --machine-type=MACHINE_TYPE
+        Specifies the machine type used for the instances. To get a list of
+        available machine types, run 'gcloud compute machine-types list'. If
+        unspecified, the default type is n1-standard-1.
+
+     --network=NETWORK
+        Specifies the network that the instances will be part of. If --subnet
+        is also specified subnet must be a subnetwork of network specified by
+        --network. If neither is specified, this defaults to the "default"
+        network.
+
+     --network-tier=NETWORK_TIER
+        Specifies the network tier that will be used to configure the instance.
+        NETWORK_TIER must be one of: PREMIUM, STANDARD. The default value is
+        PREMIUM.
+
+     --private-network-ip=PRIVATE_NETWORK_IP
+        Specifies the RFC1918 IP to assign to the instance. The IP should be in
+        the subnet or legacy network IP range.
+
+     --restart-on-failure
+        The instances will be restarted if they are terminated by Compute
+        Engine. This does not affect terminations performed by the user.
+        Enabled by default, use --no-restart-on-failure to disable.
+
+     --subnet=SUBNET
+        Specifies the subnet that the instances will be part of. If --network
+        is also specified subnet must be a subnetwork of network specified by
+        --network.
+
+     --tags=TAG,[TAG,...]
+        Specifies a list of tags to apply to the instance. These tags allow
+        network firewall rules and routes to be applied to specified VM
+        instances. See gcloud compute firewall-rules create(1) for more
+        details.
+
+        To read more about configuring network tags, read this guide:
+        https://cloud.google.com/vpc/docs/add-remove-network-tags
+
+        To list instances with their respective status and tags, run:
+
+            $ gcloud compute instances list \
+                --format='table(name,status,tags.list())'
+
+        To list instances tagged with a specific tag, tag1, run:
+
+            $ gcloud compute instances list --filter='tags:tag1'
+
+     --timeout=TIMEOUT; default="2h"
+        Maximum time a build can last before it is failed as "TIMEOUT". For
+        example, specifying 2h will fail the process after 2 hours. See $
+        gcloud topic datetimes for information on duration formats.
+
+     --zone=ZONE
+        Zone of the instances to import. If not specified and the compute/zone
+        property isn't set, you may be prompted to select a zone.
+
+        To avoid prompting when this flag is omitted, you can set the
+        compute/zone property:
+
+            $ gcloud config set compute/zone ZONE
+
+        A list of zones can be fetched by running:
+
+            $ gcloud compute zones list
+
+        To unset the property, run:
+
+            $ gcloud config unset compute/zone
+
+        Alternatively, the zone can be stored in the environment variable
+        CLOUDSDK_COMPUTE_ZONE.
+
+     Custom machine type extensions.
+
+       --custom-cpu=CUSTOM_CPU
+          A whole number value indicating how many cores are desired in the
+          custom machine type. This flag must be specified if any of the other
+          arguments in this group are specified.
+
+       --custom-memory=CUSTOM_MEMORY
+          A whole number value indicating how much memory is desired in the
+          custom machine type. A size unit should be provided (eg. 3072MB or
+          9GB) - if no units are specified, GB is assumed. This flag must be
+          specified if any of the other arguments in this group are specified.
+
+       --custom-extensions
+          Use the extended custom machine type.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/.
+

@@ -1,0 +1,89 @@
+
+.TH "GCLOUD_PUBSUB_SNAPSHOTS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud pubsub snapshots create \- creates one or more Cloud Pub/Sub snapshots
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud pubsub snapshots create\fR \fISNAPSHOT\fR [\fISNAPSHOT\fR\ ...] \fB\-\-subscription\fR=\fISUBSCRIPTION\fR [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-subscription\-project\fR=\fISUBSCRIPTION_PROJECT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+Creates one or more Cloud Pub/Sub snapshots.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fISNAPSHOT\fR [\fISNAPSHOT\fR ...]
+One or more snapshot names to create.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-subscription\fR=\fISUBSCRIPTION\fR
+The subscription whose backlog the snapshot retains. Specifically, the created
+snapshot is guaranteed to retain a) The existing backlog on the subscription,
+i.e., the set of messages in the subscription that are unacknowledged upon the
+successful completion of the create snapshot request, b) Any messages published
+to the subscription's topic following the successful creation of the snapshot.
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
+List of label KEY=VALUE pairs to add.
+
+Keys must start with a lowercase character and contain only hyphens (\f5\-\fR),
+underscores (\f5_\fR), lowercase characters, and numbers. Values must contain
+only hyphens (\f5\-\fR), underscores (\f5_\fR), lowercase characters, and
+numbers.
+
+.TP 2m
+\fB\-\-subscription\-project\fR=\fISUBSCRIPTION_PROJECT\fR
+The name of the project the provided subscription belongs to. If not set, it
+defaults to the currently selected cloud project.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "NOTES"
+
+These variants are also available:
+
+.RS 2m
+$ gcloud alpha pubsub snapshots create
+$ gcloud beta pubsub snapshots create
+.RE
+

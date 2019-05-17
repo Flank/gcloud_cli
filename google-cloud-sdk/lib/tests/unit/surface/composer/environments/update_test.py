@@ -22,7 +22,9 @@ import itertools
 
 from googlecloudsdk.api_lib.util import exceptions
 from googlecloudsdk.calliope import base as calliope_base
+from googlecloudsdk.command_lib.composer import image_versions_util
 from googlecloudsdk.command_lib.composer import util as command_util
+from tests.lib import cli_test_base
 from tests.lib import test_case
 from tests.lib.apitools import http_error
 from tests.lib.surface.composer import base
@@ -859,6 +861,220 @@ class EnvironmentsUpdateBetaTest(EnvironmentsUpdateGATest):
 
   def PreSetUp(self):
     self.SetTrack(calliope_base.ReleaseTrack.BETA)
+
+  def _buildImageVersionUpdateObject(self, image_version):
+    return self.messages.Environment(
+        config=self.messages.EnvironmentConfig(
+            softwareConfig=self.messages.SoftwareConfig(
+                imageVersion=image_version)))
+
+  def testAirflowVersionUpdateAsync(self):
+    """Updates to airflow version creates proper env patch & field mask."""
+    self._SetTestMessages()
+    later_airflow_version = '1.9.1'
+
+    software_config = self.messages.SoftwareConfig(
+        imageVersion=self.TEST_UPGRADEABLE_IMAGE_VERSION,
+        pythonVersion=self.TEST_PYTHON_VERSION)
+    config = self.messages.EnvironmentConfig(softwareConfig=software_config)
+
+    expected_get_response = self.MakeEnvironment(
+        self.TEST_PROJECT, self.TEST_LOCATION, self.TEST_ENVIRONMENT_ID, config)
+
+    self.ExpectEnvironmentGet(
+        self.TEST_PROJECT,
+        self.TEST_LOCATION,
+        self.TEST_ENVIRONMENT_ID,
+        response=expected_get_response)
+
+    expected_patch = self._buildImageVersionUpdateObject(
+        'composer-latest-airflow-{}'.format(later_airflow_version))
+    self.ExpectEnvironmentPatch(
+        self.TEST_PROJECT,
+        self.TEST_LOCATION,
+        self.TEST_ENVIRONMENT_ID,
+        patch_environment=expected_patch,
+        update_mask='config.software_config.image_version',
+        response=self.running_op)
+
+    self.RunEnvironments(
+        'update',
+        '--async',
+        '--location',
+        self.TEST_LOCATION,
+        '--project',
+        self.TEST_PROJECT,
+        self.TEST_ENVIRONMENT_ID,
+        '--airflow-version',
+        later_airflow_version,
+    )
+    self.AssertErrMatches(
+        r'^Update in progress for environment \[{}] with operation '
+        r'\[{}]'.format(self.TEST_ENVIRONMENT_NAME, self.TEST_OPERATION_NAME))
+
+  def testImageVersionUpdateAsync(self):
+    """Updates to image version creates proper env patch & field mask."""
+    self._SetTestMessages()
+    later_image_version = 'composer-1.3.2-airflow-1.9.1'
+
+    software_config = self.messages.SoftwareConfig(
+        imageVersion=self.TEST_UPGRADEABLE_IMAGE_VERSION,
+        pythonVersion=self.TEST_PYTHON_VERSION)
+    config = self.messages.EnvironmentConfig(softwareConfig=software_config)
+
+    expected_get_response = self.MakeEnvironment(
+        self.TEST_PROJECT, self.TEST_LOCATION, self.TEST_ENVIRONMENT_ID, config)
+
+    self.ExpectEnvironmentGet(
+        self.TEST_PROJECT,
+        self.TEST_LOCATION,
+        self.TEST_ENVIRONMENT_ID,
+        response=expected_get_response)
+
+    image_version_resp = self.messages.ListImageVersionsResponse(
+        imageVersions=self.test_image_versions_list, nextPageToken=None)
+
+    self.ExpectEnvironmentsListUpgrades(
+        self.TEST_PROJECT,
+        self.TEST_LOCATION,
+        1000,
+        response=image_version_resp)
+
+    expected_patch = self._buildImageVersionUpdateObject(later_image_version)
+    self.ExpectEnvironmentPatch(
+        self.TEST_PROJECT,
+        self.TEST_LOCATION,
+        self.TEST_ENVIRONMENT_ID,
+        patch_environment=expected_patch,
+        update_mask='config.software_config.image_version',
+        response=self.running_op)
+    self.RunEnvironments(
+        'update',
+        '--async',
+        '--image-version',
+        later_image_version,
+        '--location',
+        self.TEST_LOCATION,
+        '--project',
+        self.TEST_PROJECT,
+        self.TEST_ENVIRONMENT_ID,
+    )
+    self.AssertErrMatches(
+        r'^Update in progress for environment \[{}] with operation '
+        r'\[{}]'.format(self.TEST_ENVIRONMENT_NAME, self.TEST_OPERATION_NAME))
+
+  def testUpdateAsync_ComposerLatestWithBadAirflowVersion(self):
+    """Tests for valid airflow versions when composer version alias is used."""
+    self._SetTestMessages()
+    bad_image_version = 'composer-latest-airflow-1.8.0'
+
+    software_config = self.messages.SoftwareConfig(
+        imageVersion=self.TEST_UPGRADEABLE_IMAGE_VERSION,
+        pythonVersion=self.TEST_PYTHON_VERSION)
+    config = self.messages.EnvironmentConfig(softwareConfig=software_config)
+
+    expected_get_response = self.MakeEnvironment(
+        self.TEST_PROJECT, self.TEST_LOCATION, self.TEST_ENVIRONMENT_ID, config)
+
+    self.ExpectEnvironmentGet(
+        self.TEST_PROJECT,
+        self.TEST_LOCATION,
+        self.TEST_ENVIRONMENT_ID,
+        response=expected_get_response)
+
+    with self.assertRaisesRegex(command_util.InvalidUserInputError,
+                                '.*Invalid environment upgrade.*'):
+      self.RunEnvironments('update', '--async', '--image-version',
+                           bad_image_version, '--location', self.TEST_LOCATION,
+                           '--project', self.TEST_PROJECT,
+                           self.TEST_ENVIRONMENT_ID)
+
+  def testUpdateAsync_ForNonGAComposerEnv(self):
+    """Tests that update fails when Composer env does meet min requirements."""
+    self._SetTestMessages()
+    bad_starting_image_version = 'composer-0.4.9-airflow-1.9.0'
+
+    software_config = self.messages.SoftwareConfig(
+        imageVersion=bad_starting_image_version,
+        pythonVersion=self.TEST_PYTHON_VERSION)
+    config = self.messages.EnvironmentConfig(softwareConfig=software_config)
+
+    expected_get_response = self.MakeEnvironment(
+        self.TEST_PROJECT, self.TEST_LOCATION, self.TEST_ENVIRONMENT_ID, config)
+
+    self.ExpectEnvironmentGet(
+        self.TEST_PROJECT,
+        self.TEST_LOCATION,
+        self.TEST_ENVIRONMENT_ID,
+        response=expected_get_response)
+
+    with self.assertRaisesRegex(image_versions_util.InvalidImageVersionError,
+                                'This environment does not support upgrades.'):
+      self.RunEnvironments('update', '--async', '--image-version',
+                           bad_starting_image_version, '--location',
+                           self.TEST_LOCATION, '--project', self.TEST_PROJECT,
+                           self.TEST_ENVIRONMENT_ID)
+
+  def testImageVersionIncompatibleUpdateAsync(self):
+    """Tests that downgrade requests (aka improper upgrade) reports an error."""
+    self._SetTestMessages()
+    earlier_image_version = 'composer-1.3.2-airflow-1.8.0'
+
+    software_config = self.messages.SoftwareConfig(
+        imageVersion=self.TEST_UPGRADEABLE_IMAGE_VERSION,
+        pythonVersion=self.TEST_PYTHON_VERSION)
+    config = self.messages.EnvironmentConfig(softwareConfig=software_config)
+
+    expected_get_response = self.MakeEnvironment(
+        self.TEST_PROJECT, self.TEST_LOCATION, self.TEST_ENVIRONMENT_ID, config)
+
+    self.ExpectEnvironmentGet(
+        self.TEST_PROJECT,
+        self.TEST_LOCATION,
+        self.TEST_ENVIRONMENT_ID,
+        response=expected_get_response)
+
+    image_version_resp = self.messages.ListImageVersionsResponse(
+        imageVersions=self.test_image_versions_list, nextPageToken=None)
+
+    self.ExpectEnvironmentsListUpgrades(
+        self.TEST_PROJECT,
+        self.TEST_LOCATION,
+        1000,
+        response=image_version_resp)
+
+    with self.assertRaisesRegex(command_util.InvalidUserInputError,
+                                '.*Invalid environment upgrade.*'):
+      self.RunEnvironments(
+          'update',
+          '--async',
+          '--image-version',
+          earlier_image_version,
+          '--location',
+          self.TEST_LOCATION,
+          '--project',
+          self.TEST_PROJECT,
+          self.TEST_ENVIRONMENT_ID,
+      )
+
+  def testBadFormatImageVersionUpdateAsync(self):
+    """Tests that update fails on bad image version input."""
+    self._SetTestMessages()
+
+    bad_input = 'X.Y.Z'  # Proper input format: `composer-A.B.C-airflow-X.Y.Z`.
+    with self.AssertRaisesExceptionRegexp(
+        cli_test_base.MockArgumentError, r'Bad value \[{}\]'.format(bad_input)):
+      self.RunEnvironments(
+          'update',
+          '--async',
+          '--image-version',
+          bad_input,
+          '--location',
+          self.TEST_LOCATION,
+          '--project',
+          self.TEST_PROJECT,
+          self.TEST_ENVIRONMENT_ID,
+      )
 
 
 class EnvironmentsUpdateAlphaTest(EnvironmentsUpdateBetaTest):

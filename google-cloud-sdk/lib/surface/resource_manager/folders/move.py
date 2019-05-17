@@ -25,7 +25,8 @@ from googlecloudsdk.command_lib.resource_manager import flags
 from googlecloudsdk.core import log
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA,
+                    base.ReleaseTrack.GA)
 class Move(base.UpdateCommand):
   """Move a folder to a new position within the same organization.
 
@@ -43,12 +44,12 @@ class Move(base.UpdateCommand):
   The following command moves a folder with the ID `123456789` into a
   folder with the ID `2345`:
 
-    $ {command} 123456789 --folder 2345
+    $ {command} 123456789 --folder=2345
 
   The following command moves a folder with the ID `123456789` into an
   organization with ID `1234`:
 
-    $ {command} 123456789 --organization 1234
+    $ {command} 123456789 --organization=1234
   """
 
   @staticmethod

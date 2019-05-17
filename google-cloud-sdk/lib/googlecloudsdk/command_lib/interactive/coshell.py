@@ -56,6 +56,7 @@ import subprocess
 import six
 
 
+COSHELL_ENV = 'COSHELL'
 COSHELL_VERSION = '1.1'
 
 
@@ -436,9 +437,9 @@ class _UnixCoshellBase(six.with_metaclass(abc.ABCMeta, _CoshellBase)):
 
   def __init__(self):
     super(_UnixCoshellBase, self).__init__()
-    self.status = None  # type: int
-    self._status_fd = None  # type: int
-    self._shell = None  # type: subprocess.Popen
+    self.status = None
+    self._status_fd = None
+    self._shell = None
 
   @staticmethod
   def _Quote(command):
@@ -637,8 +638,16 @@ class _UnixCoshell(_UnixCoshellBase):
     os.dup2(w, self.SHELL_STATUS_FD)
     os.close(w)
 
+    # Check for an alternate coshell command.
+
+    coshell_command_line = os.environ.get(COSHELL_ENV)
+    if coshell_command_line:
+      shell_command = coshell_command_line.split(' ')
+    else:
+      shell_command = [self.SHELL_PATH]
+
     self._shell = subprocess.Popen(
-        [self.SHELL_PATH],
+        shell_command,
         env=os.environ,  # NOTE: Needed to pass mocked environ to children.
         stdin=subprocess.PIPE,
         stdout=stdout,
@@ -826,7 +835,7 @@ class _MinGWCoshell(_UnixCoshellBase):
 
   def Interrupt(self):
     """Sends the interrupt signal to the coshell."""
-    self._shell.send_signal(signal.CTRL_C_EVENT)  # pytype: disable=module-attr
+    self._shell.send_signal(signal.CTRL_C_EVENT)
 
 
 class _WindowsCoshell(_CoshellBase):
@@ -851,7 +860,7 @@ class _WindowsCoshell(_CoshellBase):
 def _RunningOnWindows():
   """Lightweight mockable Windows check."""
   try:
-    return bool(WindowsError)  # pytype: disable=name-error
+    return bool(WindowsError)
   except NameError:
     return False
 

@@ -1,0 +1,37 @@
+NAME
+    gcloud asset - manage the Cloud Asset Inventory
+
+SYNOPSIS
+    gcloud asset GROUP | COMMAND [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Manage the Cloud Asset Inventory.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+GROUPS
+    GROUP is one of the following:
+
+     operations
+        Manage Cloud Asset Inventory operations.
+
+COMMANDS
+    COMMAND is one of the following:
+
+     export
+        Export the cloud assets to Google Cloud Storage.
+
+     get-history
+        Get the update history of assets that overlaps a time window.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha asset
+        $ gcloud beta asset
+

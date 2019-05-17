@@ -40,87 +40,96 @@ REQUIRED FLAGS
      The update type. Exactly one of these must be specified:
 
        --node-count=NODE_COUNT
-          The new number of nodes running the Environment. Must be >= 3.
+          The new number of nodes running the environment. Must be >= 3.
 
-       --update-airflow-configs=[KEY=VALUE,...]
-          A list of Airflow config override KEY=VALUE pairs to set. If a config
-          override already exists, its value is updated; otherwise a new config
-          override is created.
+       Group of arguments for modifying the Airflow configuration.
 
-          KEYs should specify the configuration section and property name,
-          separated by a hyphen, for example core-print_stats_interval. The
-          section may not contain a closing square brace or period. The
-          property name must be non-empty and may not contain an equals sign,
-          semicolon, or period. By convention, property names are spelled with
-          snake_case. VALUEs may contain any character.
+         --update-airflow-configs=[KEY=VALUE,...]
+            A list of Airflow config override KEY=VALUE pairs to set. If a
+            config override exists, its value is updated; otherwise, a new
+            config override is created.
 
-       At most one of these may be specified:
+            KEYs should specify the configuration section and property name,
+            separated by a hyphen, for example core-print_stats_interval. The
+            section may not contain a closing square brace or period. The
+            property name must be non-empty and may not contain an equals sign,
+            semicolon, or period. By convention, property names are spelled
+            with snake_case. VALUEs may contain any character.
 
-         --clear-airflow-configs
-            Remove all Airflow config overrides from the environment.
+         Arguments available for item removal. At most one of these may be
+         specified:
 
-         --remove-airflow-configs=[KEY,...]
-            A list of Airflow config override keys to remove.
+           --clear-airflow-configs
+              Removes all Airflow config overrides from the environment.
 
-       --update-env-variables=[NAME=VALUE,...]
-          A list of environment variable NAME=VALUE pairs to set and provide to
-          the Aiflow scheduler, worker, and webserver processes. If an
-          environment variable already exists, its value is updated; otherwise
-          a new environment variable is created.
+           --remove-airflow-configs=[KEY,...]
+              A list of Airflow config override keys to remove.
 
-          NAMEs are the environment variable names and may contain upper and
-          lowercase letters, digits, and underscores; they must not begin with
-          a digit.
+       Group of arguments for modifying environment variables.
 
-          User-specified environment variables should not be used to set
-          Airflow configuration properties. Instead use the
-          --update-airflow-configs flag.
+         --update-env-variables=[NAME=VALUE,...]
+            A list of environment variable NAME=VALUE pairs to set and provide
+            to the Airflow scheduler, worker, and webserver processes. If an
+            environment variable exists, its value is updated; otherwise, a new
+            environment variable is created.
 
-       At most one of these may be specified:
+            NAMEs are the environment variable names and may contain upper and
+            lowercase letters, digits, and underscores; they must not begin
+            with a digit.
 
-         --clear-env-variables
-            Remove all environment variables from the environment.
+            User-specified environment variables should not be used to set
+            Airflow configuration properties. Instead use the
+            --update-airflow-configs flag.
 
-            Environment variables that have system-provided defaults cannot be
-            unset with the --remove-env-variables or --clear-env-variables
-            flags; only the user-supplied overrides will be removed.
+         Arguments available for item removal. At most one of these may be
+         specified:
 
-         --remove-env-variables=[NAME,...]
-            A list of environment variables to remove.
+           --clear-env-variables
+              Removes all environment variables from the environment.
 
-            Environment variables that have system-provided defaults cannot be
-            unset with the --remove-env-variables or --clear-env-variables
-            flags; only the user-supplied overrides will be removed.
+              Environment variables that have system-provided defaults cannot
+              be unset with the --remove-env-variables or --clear-env-variables
+              flags; only the user-supplied overrides will be removed.
 
-       --update-labels=[KEY=VALUE,...]
-          List of label KEY=VALUE pairs to update. If a label exists its value
-          is modified, otherwise a new label is created.
+           --remove-env-variables=[NAME,...]
+              A list of environment variables to remove.
 
-          Keys must start with a lowercase character and contain only hyphens
-          (-), underscores (_), lowercase characters, and numbers. Values must
-          contain only hyphens (-), underscores (_), lowercase characters, and
-          numbers.
+              Environment variables that have system-provided defaults cannot
+              be unset with the --remove-env-variables or --clear-env-variables
+              flags; only the user-supplied overrides will be removed.
 
-       At most one of these may be specified:
+       Group of arguments for modifying environment labels.
 
-         --clear-labels
-            Remove all labels. If --update-labels is also specified then
-            --clear-labels is applied first.
+         --update-labels=[KEY=VALUE,...]
+            List of label KEY=VALUE pairs to update. If a label exists its
+            value is modified, otherwise a new label is created.
 
-            For example, to remove all labels:
+            Keys must start with a lowercase character and contain only hyphens
+            (-), underscores (_), lowercase characters, and numbers. Values
+            must contain only hyphens (-), underscores (_), lowercase
+            characters, and numbers.
 
-                $ gcloud composer environments update --clear-labels
+         At most one of these may be specified:
 
-            To set the labels to exactly "foo" and "baz":
+           --clear-labels
+              Remove all labels. If --update-labels is also specified then
+              --clear-labels is applied first.
 
-                $ gcloud composer environments update --clear-labels \
-                  --update-labels foo=bar,baz=qux
+              For example, to remove all labels:
 
-         --remove-labels=[KEY,...]
-            List of label keys to remove. If a label does not exist it is
-            silently ignored.
+                  $ gcloud composer environments update --clear-labels
 
-       At most one of these may be specified:
+              To set the labels to exactly "foo" and "baz":
+
+                  $ gcloud composer environments update --clear-labels \
+                    --update-labels foo=bar,baz=qux
+
+           --remove-labels=[KEY,...]
+              List of label keys to remove. If a label does not exist it is
+              silently ignored.
+
+       Group of arguments for modifying the PyPI package configuration. At most
+       one of these may be specified:
 
          --update-pypi-packages-from-file=UPDATE_PYPI_PACKAGES_FROM_FILE
             The path to a file containing a list of PyPI packages to install in
@@ -130,13 +139,13 @@ REQUIRED FLAGS
             Storage file path (Cloud Storage file path starts with 'gs://').
 
          --update-pypi-package=PACKAGE[EXTRAS_LIST]VERSION_SPECIFIER
-            A PyPI package add to the environment. If a package already exists,
-            its value is updated; otherwise a new package is installed.
+            A PyPI package to add to the environment. If a package exists, its
+            value is updated; otherwise, a new package is installed.
 
             The value takes the form of: PACKAGE[EXTRAS_LIST]VERSION_SPECIFIER,
             as one would specify in a pip requirements file.
 
-            PACKAGE is specified as a package name such as numpy. EXTRAS_LIST
+            PACKAGE is specified as a package name, such as numpy. EXTRAS_LIST
             is a comma-delimited list of PEP 508 distribution extras that may
             be empty, in which case the enclosing square brackets may be
             omitted. VERSION_SPECIFIER is an optional PEP 440 version
@@ -147,10 +156,11 @@ REQUIRED FLAGS
             update multiple packages. If PACKAGE appears more than once, the
             last value will be used.
 
-         At most one of these may be specified:
+         Arguments available for item removal. At most one of these may be
+         specified:
 
            --clear-pypi-packages
-              Remove all PyPI packages from the environment.
+              Removes all PyPI packages from the environment.
 
               PyPI packages that are required by the environment's core
               software cannot be uninstalled with the --remove-pypi-packages or
@@ -169,8 +179,9 @@ OPTIONAL FLAGS
         for the operation to complete.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

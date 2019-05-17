@@ -116,6 +116,14 @@ INSTANCES_ARG_FOR_CREATE = compute_flags.ResourceArgument(
     zone_explanation=compute_flags.ZONE_PROPERTY_EXPLANATION,
     plural=True)
 
+INSTANCES_ARG_FOR_IMPORT = compute_flags.ResourceArgument(
+    resource_name='instance',
+    name='instance_names',
+    completer=compute_completers.InstancesCompleter,
+    zonal_collection='compute.instances',
+    zone_explanation=compute_flags.ZONE_PROPERTY_EXPLANATION,
+    plural=True)
+
 SSH_INSTANCE_RESOLVER = compute_flags.ResourceResolver.FromMap(
     'instance', {compute_scope.ScopeEnum.ZONE: 'compute.instances'})
 
@@ -294,7 +302,8 @@ def AddLocalSsdArgs(parser):
       Attaches a local SSD to the instances.
 
       *device-name*::: Optional. A name that indicates the disk name
-      the guest operating system will see.  If omitted, a device name
+      the guest operating system will see. Can only be specified if
+      `interface` is `SCSI`. If omitted, a device name
       of the form ``local-ssd-N'' will be used.
 
       *interface*::: Optional. The kind of disk interface exposed to the VM
@@ -341,7 +350,8 @@ def AddLocalSsdArgsWithSize(parser):
       This flag is currently in BETA and may change without notice.
 
       *device-name*::: Optional. A name that indicates the disk name
-      the guest operating system will see.  If omitted, a device name
+      the guest operating system will see. Can only be specified if `interface`
+      is `SCSI`. If omitted, a device name
       of the form ``local-ssd-N'' will be used.
 
       *interface*::: Optional. The kind of disk interface exposed to the VM
@@ -456,7 +466,7 @@ def AddDiskArgs(parser, enable_regional_disks=False, enable_kms=False,
       *auto-delete*::: If ``yes'',  this persistent disk will be
       automatically deleted when the instance is deleted. However,
       if the disk is later detached from the instance, this option
-      won't apply. The default value for this is ``no''.
+      won't apply. The default value for this is ``yes''.
       """.format(disk_device_name_help)
   if enable_regional_disks:
     disk_help += """
@@ -474,7 +484,7 @@ def AddDiskArgs(parser, enable_regional_disks=False, enable_kms=False,
 
 
 def AddCreateDiskArgs(parser, enable_kms=False, enable_snapshots=False,
-                      container_mount_enabled=False):
+                      container_mount_enabled=False, resource_policy=False):
   """Adds create-disk argument for instances and instance-templates."""
 
   disk_device_name_help = _GetDiskDeviceNameHelp(
@@ -579,7 +589,7 @@ def AddCreateDiskArgs(parser, enable_kms=False, enable_snapshots=False,
       'image': str,
       'image-family': str,
       'image-project': str,
-      'size': arg_parsers.BinarySize(lower_bound='10GB'),
+      'size': arg_parsers.BinarySize(lower_bound='1GB'),
       'type': str,
       'device-name': str,
       'auto-delete': str,
@@ -600,6 +610,16 @@ def AddCreateDiskArgs(parser, enable_kms=False, enable_snapshots=False,
         * snapshot
       """
     spec['source-snapshot'] = str
+
+  if resource_policy:
+    disk_help += """
+      *disk-resource-policy*::: Resource policy that will be applied to created
+      disk. You can provide full or partial URL. See
+        * https://cloud.google.com/sdk/gcloud/reference/beta/compute/resource-policies/
+        * https://cloud.google.com/compute/docs/disks/scheduled-snapshots
+      for more details about resource-policies.
+      """
+    spec['disk-resource-policy'] = arg_parsers.ArgList(max_length=1)
 
   parser.add_argument(
       '--create-disk',
@@ -921,7 +941,8 @@ def AddAddressArgs(parser,
     network_interface_help = """\
         Adds a network interface to the instance. Mutually exclusive with any
         of these flags: *--address*, *--network*, *--network-tier*, *--subnet*,
-        *--private-network-ip*.
+        *--private-network-ip*. This flag can be repeated to specify multiple
+        network interfaces.
 
         The following keys are allowed:
         *address*::: Assigns the given external address to the instance that is
@@ -1406,8 +1427,8 @@ def AddAcceleratorArgs(parser):
       of accelerator to attach to the instances. Use 'gcloud compute
       accelerator-types list' to learn about all available accelerator types.
 
-      *count*::: The number of pieces of the accelerator to attach to the
-      instances. The default value is 1.
+      *count*::: Number of accelerators to attach to each
+      instance. The default value is 1.
       """)
 
 
@@ -1566,10 +1587,10 @@ def ValidateLocalSsdFlags(args):
 
 
 def ValidateNicFlags(args):
-  """Valiadates flags specifying network interface cards.
+  """Validates flags specifying network interface cards.
 
   Args:
-    args: parsed comandline arguments.
+    args: parsed command line arguments.
   Raises:
     InvalidArgumentException: when it finds --network-interface that has both
                               address, and no-address keys.
@@ -1666,27 +1687,26 @@ def AddDeletionProtectionFlag(parser, use_default_value=True):
       action=action)
 
 
-def AddShieldedVMConfigArgs(parser, use_default_value=True, for_update=False):
-  """Adds flags for shielded VM configuration.
+def AddShieldedInstanceConfigArgs(parser,
+                                  use_default_value=True,
+                                  for_update=False):
+  """Adds flags for shielded Instance configuration.
 
   Args:
     parser: ArgumentParser, parser to which flags will be added.
     use_default_value: Bool, if True, flag will be given the default value
-        False, else None. Update uses None as an indicator that no update needs
-        to be done for deletion protection.
+      False, else None. Update uses None as an indicator that no update needs to
+      be done for deletion protection.
     for_update: Bool, if True, flags are intended for an update operation.
   """
   if use_default_value:
-    kwargs = {
-        'action': 'store_true',
-        'default': None
-    }
+    default_action = 'store_true'
+    action_kwargs = {'default': None}
   else:
-    kwargs = {
-        'action': arg_parsers.StoreTrueFalseAction
-    }
+    default_action = arg_parsers.StoreTrueFalseAction
+    action_kwargs = {}
 
-  # --shielded-vm-secure-boot
+  # --shielded-secure-boot
   secure_boot_help = """\
       The instance will boot with secure boot enabled.
       """
@@ -1695,12 +1715,15 @@ def AddShieldedVMConfigArgs(parser, use_default_value=True, for_update=False):
       Changes to this setting (via the update command) will only take effect
       after stopping and starting the instance.
       """
-  parser.add_argument(
-      '--shielded-vm-secure-boot',
-      help=secure_boot_help,
-      **kwargs)
 
-  # --shielded-vm-vtpm
+  parser.add_argument(
+      '--shielded-secure-boot',
+      help=secure_boot_help,
+      dest='shielded_vm_secure_boot',
+      action=default_action,
+      **action_kwargs)
+
+  # --shielded-vtpm
   vtpm_help = """\
       The instance will boot with the TPM (Trusted Platform Module) enabled.
       A TPM is a hardware module that can be used for different security
@@ -1711,12 +1734,15 @@ def AddShieldedVMConfigArgs(parser, use_default_value=True, for_update=False):
       Changes to this setting (via the update command) will only take effect
       after stopping and starting the instance.
       """
-  parser.add_argument(
-      '--shielded-vm-vtpm',
-      help=vtpm_help,
-      **kwargs)
 
-  # --shielded-vm-integrity-monitoring
+  parser.add_argument(
+      '--shielded-vtpm',
+      dest='shielded_vm_vtpm',
+      help=vtpm_help,
+      action=default_action,
+      **action_kwargs)
+
+  # --shielded-integrity-monitoring
   integrity_monitoring_help = """\
       Enables monitoring and attestation of the boot integrity of the
       instance. The attestation is performed against the integrity policy
@@ -1729,24 +1755,30 @@ def AddShieldedVMConfigArgs(parser, use_default_value=True, for_update=False):
       Changes to this setting (via the update command) will only take effect
       after stopping and starting the instance.
       """
+
   parser.add_argument(
-      '--shielded-vm-integrity-monitoring',
+      '--shielded-integrity-monitoring',
       help=integrity_monitoring_help,
-      **kwargs)
+      dest='shielded_vm_integrity_monitoring',
+      action=default_action,
+      **action_kwargs)
 
 
-def AddShieldedVMIntegrityPolicyArgs(parser):
-  """Adds flags for shielded VM integrity policy settings."""
+def AddShieldedInstanceIntegrityPolicyArgs(parser):
+  """Adds flags for shielded instance integrity policy settings."""
+  help_text = """\
+  Causes the instance to re-learn the integrity policy baseline using
+  the current instance configuration. Use this flag after any planned
+  boot-specific changes in the instance configuration, like kernel
+  updates or kernel driver installation.
+  """
+  default_action = 'store_true'
   parser.add_argument(
-      '--shielded-vm-learn-integrity-policy',
-      action='store_true',
+      '--shielded-learn-integrity-policy',
+      dest='shielded_vm_learn_integrity_policy',
+      action=default_action,
       default=None,
-      help="""\
-      Causes the instance to re-learn the integrity policy baseline using
-      the current instance configuration. Use this flag after any planned
-      boot-specific changes in the instance configuration, like kernel
-      updates or kernel driver installation.
-      """)
+      help=help_text)
 
 
 def AddHostnameArg(parser):
@@ -1762,44 +1794,29 @@ def AddHostnameArg(parser):
       """)
 
 
-def AddAllocationAffinityGroup(parser):
-  """Adds the argument group to handle allocation affinity configurations."""
-  group = parser.add_group(help="""
-Manage the configuration of desired allocation which this instance could take
-capacity from.
-""")
+def AddReservationAffinityGroup(parser, group_text, affinity_text):
+  """Adds the argument group to handle reservation affinity configurations."""
+  group = parser.add_group(help=group_text)
   group.add_argument(
-      '--allocation-affinity',
+      '--reservation-affinity',
       choices=['any', 'none', 'specific'],
       default='any',
-      help="""
-Specifies the configuration of desired allocation which this instance could
-take capacity from. Choices are 'any', 'none' and 'specific', default is 'any'.
-""")
+      help=affinity_text)
   group.add_argument(
-      '--allocation-label',
-      type=arg_parsers.ArgDict(spec={
-          'key': str,
-          'value': str,
-      }),
+      '--reservation',
       help="""
-The key and values of the label of the allocation resource. Required if the
-value of `--allocation-affinity` is `specific`.
-
-*key*::: The label key of allocation resource.
-
-*value*::: The label value of allocation resource.
+The name of the reservation, required when `--reservation-affinity=specific`.
 """)
 
 
-def ValidateAllocationAffinityGroup(args):
-  """Validates flags specifying allocation affinity."""
-  affinity = getattr(args, 'allocation_affinity', None)
+def ValidateReservationAffinityGroup(args):
+  """Validates flags specifying reservation affinity."""
+  affinity = getattr(args, 'reservation_affinity', None)
   if affinity == 'specific':
-    if not args.IsSpecified('allocation_label'):
+    if not args.IsSpecified('reservation'):
       raise exceptions.InvalidArgumentException(
-          '--allocation-label',
-          'The label of the specific allocation must be specified.')
+          '--reservation',
+          'The name the specific reservation must be specified.')
 
 
 def _GetContainerMountDescriptionAndNameDescription(for_update=False):

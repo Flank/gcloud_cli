@@ -82,5 +82,10 @@ class OperationsDeleteUnitTestBeta(OperationsDeleteUnitTest,
     self.assertEqual(self.track, calliope_base.ReleaseTrack.BETA)
 
 
+class OperationsDeleteUnitTestAlpha(OperationsDeleteUnitTestBeta,
+                                    base.DataprocTestBaseAlpha):
+  pass
+
+
 if __name__ == '__main__':
   sdk_test_base.main()

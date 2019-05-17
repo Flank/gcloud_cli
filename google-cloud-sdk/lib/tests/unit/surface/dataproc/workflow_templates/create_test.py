@@ -79,5 +79,11 @@ class WorkflowTemplateCreateUnitTest(unit_base.DataprocUnitTestBase,
 
 class WorkflowTemplateCreateUnitTestBeta(WorkflowTemplateCreateUnitTest):
 
-  def SetUp(self):
-    self.SetupForReleaseTrack(calliope.base.ReleaseTrack.BETA)
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.BETA
+
+
+class WorkflowTemplateCreateUnitTestAlpha(WorkflowTemplateCreateUnitTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope.base.ReleaseTrack.ALPHA

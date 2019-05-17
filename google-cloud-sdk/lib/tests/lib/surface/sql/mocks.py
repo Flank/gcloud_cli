@@ -27,17 +27,21 @@ class MockEndpoints(object):
 
   # Operation helpers.
 
+  def GetOperation(self, op_type, op_status, error=None):
+    return data.GetOperation(self.Project(), self.instance, op_type, op_status,
+                             error)
+
   def GetPendingCreateOperation(self):
-    return data.GetOperation(self.Project(), self.instance, 'CREATE', 'PENDING')
+    return self.GetOperation('CREATE', 'PENDING')
 
   def GetDoneCreateOperation(self):
-    return data.GetOperation(self.Project(), self.instance, 'CREATE', 'DONE')
+    return self.GetOperation('CREATE', 'DONE')
 
   def GetPendingUpdateOperation(self):
-    return data.GetOperation(self.Project(), self.instance, 'UPDATE', 'PENDING')
+    return self.GetOperation('UPDATE', 'PENDING')
 
   def GetDoneUpdateOperation(self):
-    return data.GetOperation(self.Project(), self.instance, 'UPDATE', 'DONE')
+    return self.GetOperation('UPDATE', 'DONE')
 
   def GetDoneDeleteBackupOperation(self):
     return data.GetOperation(self.Project(),
@@ -86,21 +90,21 @@ class MockEndpoints(object):
 
   # Operation expect helpers.
 
-  def ExpectDoneCreateOperationGet(self):
+  def ExpectOperationGet(self, operation):
     self.mocked_client.operations.Get.Expect(self.GetOperationGetRequest(),
-                                             self.GetDoneCreateOperation())
+                                             operation)
+
+  def ExpectDoneCreateOperationGet(self):
+    self.ExpectOperationGet(self.GetDoneCreateOperation())
 
   def ExpectDoneUpdateOperationGet(self):
-    self.mocked_client.operations.Get.Expect(self.GetOperationGetRequest(),
-                                             self.GetDoneUpdateOperation())
+    self.ExpectOperationGet(self.GetDoneUpdateOperation())
 
   def ExpectRunningCreateOperationGet(self):
-    self.mocked_client.operations.Get.Expect(self.GetOperationGetRequest(),
-                                             self.GetRunningCreateOperation())
+    self.ExpectOperationGet(self.GetRunningCreateOperation())
 
   def ExpectDoneDeleteBackupOperationGet(self):
-    self.mocked_client.operations.Get.Expect(
-        self.GetOperationGetRequest(), self.GetDoneDeleteBackupOperation())
+    self.ExpectOperationGet(self.GetDoneDeleteBackupOperation())
 
   # Instance expect helpers.
 

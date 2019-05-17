@@ -23,6 +23,7 @@ import uuid
 from apitools.base.py import encoding
 from apitools.base.py.testing import mock as client_mocker
 
+from googlecloudsdk.api_lib.compute import daisy_utils
 from googlecloudsdk.api_lib.util import apis as core_apis
 from googlecloudsdk.core import properties
 from tests.lib import e2e_base
@@ -91,11 +92,16 @@ class DaisyBaseTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
     admin_permissions_binding = self.crm_v1_messages.Binding(
         members=['serviceAccount:123456@cloudbuild.gserviceaccount.com'],
         role='roles/compute.admin')
-    iam_permissions_binding = self.crm_v1_messages.Binding(
-        members=['serviceAccount:123456@cloudbuild.gserviceaccount.com'],
-        role='roles/iam.serviceAccountActor')
-    self.permissions = self.crm_v1_messages.Policy(
-        bindings=[admin_permissions_binding, iam_permissions_binding])
+
+    bindings = [admin_permissions_binding]
+
+    for role in daisy_utils.SERVICE_ACCOUNT_ROLES:
+      bindings.append(
+          self.crm_v1_messages.Binding(
+              members=['serviceAccount:123456@cloudbuild.gserviceaccount.com'],
+              role=role))
+
+    self.permissions = self.crm_v1_messages.Policy(bindings=bindings)
     self.services = self.servicemanagement_v1_messages.ListServicesResponse(
         services=[
             self.servicemanagement_v1_messages.ManagedService(
@@ -109,8 +115,7 @@ class DaisyBaseTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
     self.subnet = 'my-subnet'
 
   def PrepareDaisyMocks(self, daisy_step, timeout='7200s', log_location=None,
-                        permissions=None, async_flag=False, regionalized=True,
-                        source_disk='source-image.vmdk', is_import=True):
+                        permissions=None, async_flag=False, is_import=True):
     if log_location:
       buildin_logs_bucket = 'gs://{0}'.format(log_location)
     else:
@@ -148,12 +153,12 @@ class DaisyBaseTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
               log_location or 'my-project_cloudbuild/logs'),
           request_headers={'Range': 'bytes=0-'}, status=200,
           body=('Cloudbuild output\n[import-image] output\n'
-                '[image-export] output'))
+                '[image-export] output\n[import-ovf] output'))
 
     if is_import:
       self.mocked_servicemanagement_v1.services.List.Expect(
-          self.servicemanagement_v1_messages.
-          ServicemanagementServicesListRequest(
+          self.servicemanagement_v1_messages
+          .ServicemanagementServicesListRequest(
               consumerId='project:my-project',
               pageSize=100,
           ),
@@ -161,8 +166,8 @@ class DaisyBaseTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
       )
 
       self.mocked_servicemanagement_v1.services.List.Expect(
-          self.servicemanagement_v1_messages.
-          ServicemanagementServicesListRequest(
+          self.servicemanagement_v1_messages
+          .ServicemanagementServicesListRequest(
               consumerId='project:my-project',
               pageSize=100,
           ),
@@ -203,56 +208,69 @@ class DaisyBaseTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
         response=permissions or self.permissions,
     )
 
-    self.PrepareDaisyBucketMocks(regionalized=regionalized)
+  def PrepareDaisyMocksWithRegionalBucket(self, daisy_step, timeout='7200s',
+                                          log_location=None, permissions=None,
+                                          async_flag=False, is_import=True):
+    self.PrepareDaisyMocks(daisy_step, timeout, log_location, permissions,
+                           async_flag, is_import)
+    self.PrepareDaisyBucketMocksWithRegion()
 
-  def PrepareDaisyBucketMocks(self, regionalized=True):
-    if regionalized:
-      self.mocked_storage_v1.buckets.Get.Expect(
-          self.storage_v1_messages.StorageBucketsGetRequest(bucket='31dd'),
-          response=self.storage_v1_messages.Bucket(
-              name='31dd',
-              storageClass='REGIONAL',
-              location=self.GetScratchBucketRegion()
-          ),
-      )
+  def PrepareDaisyMocksWithDefaultBucket(
+      self,
+      daisy_step,
+      timeout='7200s',
+      log_location=None,
+      permissions=None,
+      async_flag=False,
+      is_import=True):
+    self.PrepareDaisyMocks(daisy_step, timeout, log_location, permissions,
+                           async_flag, is_import)
+    self.PrepareDaisyBucketMocksWithoutRegion()
 
-    daisy_bucket_name = self.GetScratchBucketName(regionalized=regionalized)
-    if regionalized:
-      self.mocked_storage_v1.buckets.Insert.Expect(
-          self.storage_v1_messages.StorageBucketsInsertRequest(
-              bucket=self.storage_v1_messages.Bucket(
-                  name=daisy_bucket_name,
-                  location=self.GetScratchBucketRegion()
-              ),
-              project='my-project',
-          ),
-          response=self.storage_v1_messages.Bucket(name='foo'),
-      )
-    else:
-      self.mocked_storage_v1.buckets.Insert.Expect(
-          self.storage_v1_messages.StorageBucketsInsertRequest(
-              bucket=self.storage_v1_messages.Bucket(name=daisy_bucket_name),
-              project='my-project',
-          ),
-          response=self.storage_v1_messages.Bucket(name='foo'),
-      )
+  def PrepareDaisyBucketMocksWithRegion(self):
+    self.mocked_storage_v1.buckets.Get.Expect(
+        self.storage_v1_messages.StorageBucketsGetRequest(bucket='31dd'),
+        response=self.storage_v1_messages.Bucket(
+            name='31dd',
+            storageClass='REGIONAL',
+            location=self.GetScratchBucketRegion()
+        ),
+    )
 
-  def GetNetworkStep(self, workflow, daisy_vars, operation, network=None,
-                     subnet=None, include_zone=True,
+    daisy_bucket_name = self.GetScratchBucketNameWithRegion()
+    self.mocked_storage_v1.buckets.Get.Expect(
+        self.storage_v1_messages.StorageBucketsGetRequest(
+            bucket=daisy_bucket_name),
+        response=self.storage_v1_messages.Bucket(
+            id=daisy_bucket_name, location=self.GetScratchBucketRegion()))
+
+  def PrepareDaisyBucketMocksWithoutRegion(self):
+    daisy_bucket_name = self.GetScratchBucketNameWithoutRegion()
+    self.mocked_storage_v1.buckets.Get.Expect(
+        self.storage_v1_messages.StorageBucketsGetRequest(
+            bucket=daisy_bucket_name),
+        response=self.storage_v1_messages.Bucket(
+            id=daisy_bucket_name))
+
+  def GetNetworkStep(self, workflow, daisy_vars, operation, regionalized,
+                     network=None, subnet=None, include_zone=True,
                      include_empty_network=False):
+    network_vars = ''
     if subnet:
-      daisy_vars += ',{0}_subnet=regions/my-region/subnetworks/{1}'.format(
+      network_vars += ',{0}_subnet=regions/my-region/subnetworks/{1}'.format(
           operation, subnet)
 
     if network:
-      daisy_vars += ',{0}_network=global/networks/{1}'.format(
+      network_vars += ',{0}_network=global/networks/{1}'.format(
           operation, network)
     elif include_empty_network:
-      daisy_vars += ',{0}_network='.format(operation)
+      network_vars += ',{0}_network='.format(operation)
+
+    daisy_vars = daisy_vars.format(network_vars)
 
     args = [
         '-gcs_path=gs://{0}/'.format(
-            self.GetScratchBucketName(regionalized=self.regionalized)),
+            self.GetScratchBucketName(regionalized)),
         '-default_timeout={0}'.format(_DEFAULT_TIMEOUT),
         daisy_vars,
         workflow,
@@ -264,13 +282,21 @@ class DaisyBaseTest(e2e_base.WithMockHttp, sdk_test_base.SdkBase):
         args=args, name=self.daisy_builder)
 
   @staticmethod
-  def GetScratchBucketRegion():
-    return 'EUROPE-NORTH1'
+  def GetScratchBucketNameWithRegion():
+    return ('my-project-daisy-bkt-' +
+            DaisyBaseTest.GetScratchBucketRegion().lower())
 
   @staticmethod
-  def GetScratchBucketName(regionalized=True):
+  def GetScratchBucketNameWithoutRegion():
+    return 'my-project-daisy-bkt'
+
+  @staticmethod
+  def GetScratchBucketName(regionalized):
     if regionalized:
-      return ('my-project-daisy-bkt-' +
-              DaisyBaseTest.GetScratchBucketRegion().lower())
+      return DaisyBaseTest.GetScratchBucketNameWithRegion()
     else:
-      return 'my-project-daisy-bkt'
+      return DaisyBaseTest.GetScratchBucketNameWithoutRegion()
+
+  @staticmethod
+  def GetScratchBucketRegion():
+    return 'EUROPE-NORTH1'

@@ -2996,10 +2996,9 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
 
   def testInvalidUri(self):
     with self.assertRaisesRegex(
-        resources.InvalidResourceException,
-        r'could not parse resource '
+        resources.InvalidResourceException, r'could not parse resource '
         r'\[https://www.googleapis.com/compute/zones/central3-a/instances/'
-        r'instance-2\]: unknown api version zones'):
+        r'instance-2\]: unknown api www'):
       self.Run("""
          compute instances create https://www.googleapis.com/compute/zones/central3-a/instances/instance-2
          """)
@@ -4703,6 +4702,53 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
             project='my-project',
             zone='central2-a',))],)
 
+  def testHostnameArg(self):
+    m = self.messages
+    self.Run("""
+        compute instances create instance-1
+          --zone central2-a --hostname my-new-hostname
+        """)
+
+    self.CheckRequests(
+        self.zone_get_request,
+        self.project_get_request,
+        [(self.compute.instances,
+          'Insert',
+          m.ComputeInstancesInsertRequest(
+              instance=m.Instance(
+                  canIpForward=False,
+                  deletionProtection=False,
+                  disks=[m.AttachedDisk(
+                      autoDelete=True,
+                      boot=True,
+                      initializeParams=m.AttachedDiskInitializeParams(
+                          sourceImage=self._default_image,
+                      ),
+                      mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                      type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
+                  hostname='my-new-hostname',
+                  machineType=self._default_machine_type,
+                  metadata=m.Metadata(),
+                  name='instance-1',
+                  networkInterfaces=[m.NetworkInterface(
+                      accessConfigs=[m.AccessConfig(
+                          name='external-nat',
+                          type=self._one_to_one_nat)],
+                      network=self._default_network)],
+                  serviceAccounts=[
+                      m.ServiceAccount(
+                          email='default',
+                          scopes=_DEFAULT_SCOPES
+                      ),
+                  ],
+                  scheduling=m.Scheduling(
+                      automaticRestart=True),
+              ),
+              project='my-project',
+              zone='central2-a',
+          ))],
+    )
+
   def testNoAddreassAndAddressOnOneInterface(self):
     with self.assertRaisesRegex(
         exceptions.InvalidArgumentException,
@@ -4721,7 +4767,7 @@ class InstancesCreateTest(InstancesCreateTestsMixin):
         r'the following: --address, --network, --private-network-ip$'):
       self.Run("""
           compute instances create instance-1
-            compute instances create hamlet
+            --zone central2-a
             --network-interface ''
             --address 8.8.8.8
             --network net
@@ -5051,6 +5097,80 @@ class InstancesCreateDiskTest(InstancesCreateTestsMixin):
                         email='default', scopes=_DEFAULT_SCOPES),
                 ],
                 scheduling=msg.Scheduling(automaticRestart=True),),
+            project='my-project',
+            zone='central2-a',))],)
+
+
+class InstancesCreateDiskTestBeta(InstancesCreateTestsMixin):
+  """Test creation of VM instances with create disk(s)."""
+
+  def SetUp(self):
+    SetUp(self, 'beta')
+
+  def testCreateDiskWithAllProperties(self):
+
+    m = self.messages
+    self.track = calliope_base.ReleaseTrack.BETA
+
+    self.Run(
+        'compute instances create testrp '
+        '  --zone central2-a '
+        '  --create-disk name=disk-1,size=10GB,mode=ro,type=SSD,image=debian-8,'
+        'image-project=debian-cloud,device-name=data,auto-delete=yes,'
+        'disk-resource-policy='
+        'https://www.googleapis.com/compute/projects/'
+        'cloudsdktest/regions/central2-a/resourcePolicies/testpolicy',
+        self.track)
+
+    self.CheckRequests(
+        self.zone_get_request,
+        self.project_get_request,
+        [(self.compute.instances, 'Insert', m.ComputeInstancesInsertRequest(
+            instance=m.Instance(
+                canIpForward=False,
+                deletionProtection=False,
+                disks=[
+                    m.AttachedDisk(
+                        autoDelete=True,
+                        boot=True,
+                        initializeParams=m.AttachedDiskInitializeParams(
+                            sourceImage=self._default_image,),
+                        mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                        type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT),
+                    m.AttachedDisk(
+                        autoDelete=True,
+                        boot=False,
+                        deviceName='data',
+                        initializeParams=m.AttachedDiskInitializeParams(
+                            diskName='disk-1',
+                            diskSizeGb=10,
+                            sourceImage=(self.compute_uri +
+                                         '/projects/debian-cloud/global/images'
+                                         '/debian-8'),
+                            diskType=(self.compute_uri +
+                                      '/projects/my-project/zones/central2-a/'
+                                      'diskTypes/SSD'),
+                            resourcePolicies=['https://www.googleapis.com/'
+                                              'compute/projects/'
+                                              'cloudsdktest/regions/central2-a/'
+                                              'resourcePolicies/testpolicy']),
+                        mode=m.AttachedDisk.ModeValueValuesEnum.READ_ONLY,
+                        type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+                ],
+                machineType=self._default_machine_type,
+                metadata=m.Metadata(),
+                name='testrp',
+                networkInterfaces=[m.NetworkInterface(
+                    accessConfigs=[m.AccessConfig(
+                        name='external-nat',
+                        type=self._one_to_one_nat)],
+                    network=self._default_network)],
+                serviceAccounts=[
+                    m.ServiceAccount(
+                        email='default',
+                        scopes=_DEFAULT_SCOPES,),
+                ],
+                scheduling=m.Scheduling(automaticRestart=True),),
             project='my-project',
             zone='central2-a',))],)
 
@@ -7875,47 +7995,158 @@ class InstancesCreateTestBeta(InstancesCreateTestsMixin,
     SetUp(self, 'beta')
     self.track = calliope_base.ReleaseTrack.BETA
 
-  def testHostnameArg(self):
+  def testWithAnyReservationAffinity(self):
     m = self.messages
     self.Run("""
-        compute instances create instance-1
-          --zone central2-a --hostname my-new-hostname
+        compute instances create instance-1 --zone central2-a
+        --reservation-affinity=any
         """)
 
     self.CheckRequests(
         self.zone_get_request,
         self.project_get_request,
-        [(self.compute.instances,
-          'Insert',
+        [(self.compute.instances, 'Insert',
           m.ComputeInstancesInsertRequest(
               instance=m.Instance(
+                  reservationAffinity=m.ReservationAffinity(
+                      consumeReservationType=m.ReservationAffinity
+                        .ConsumeReservationTypeValueValuesEnum.ANY_RESERVATION,),
                   canIpForward=False,
                   deletionProtection=False,
-                  disks=[m.AttachedDisk(
-                      autoDelete=True,
-                      boot=True,
-                      initializeParams=m.AttachedDiskInitializeParams(
-                          sourceImage=self._default_image,
-                      ),
-                      mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                      type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)],
-                  hostname='my-new-hostname',
+                  disks=[
+                      m.AttachedDisk(
+                          autoDelete=True,
+                          boot=True,
+                          initializeParams=m.AttachedDiskInitializeParams(
+                              sourceImage=self._default_image,),
+                          mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                          type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+                  ],
                   machineType=self._default_machine_type,
                   metadata=m.Metadata(),
                   name='instance-1',
-                  networkInterfaces=[m.NetworkInterface(
-                      accessConfigs=[m.AccessConfig(
-                          name='external-nat',
-                          type=self._one_to_one_nat)],
-                      network=self._default_network)],
-                  serviceAccounts=[
-                      m.ServiceAccount(
-                          email='default',
-                          scopes=_DEFAULT_SCOPES
-                      ),
+                  networkInterfaces=[
+                      m.NetworkInterface(
+                          accessConfigs=[
+                              m.AccessConfig(
+                                  name='external-nat',
+                                  type=self._one_to_one_nat)
+                          ],
+                          network=self._default_network)
                   ],
-                  scheduling=m.Scheduling(
-                      automaticRestart=True),
+                  serviceAccounts=[
+                      m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
+                  ],
+                  scheduling=m.Scheduling(automaticRestart=True),
+              ),
+              project='my-project',
+              zone='central2-a',
+          ))],
+    )
+
+  def testWithSpecificReservationAffinity(self):
+    m = self.messages
+    self.Run("""
+        compute instances create instance-1 --zone central2-a
+        --reservation-affinity=specific --reservation=my-reservation
+        """)
+
+    self.CheckRequests(
+        self.zone_get_request,
+        self.project_get_request,
+        [(self.compute.instances, 'Insert',
+          m.ComputeInstancesInsertRequest(
+              instance=m.Instance(
+                  reservationAffinity=m.ReservationAffinity(
+                      consumeReservationType=m.ReservationAffinity
+                        .ConsumeReservationTypeValueValuesEnum
+                        .SPECIFIC_RESERVATION,
+                      key='compute.googleapis.com/reservation-name',
+                      values=['my-reservation']),
+                  canIpForward=False,
+                  deletionProtection=False,
+                  disks=[
+                      m.AttachedDisk(
+                          autoDelete=True,
+                          boot=True,
+                          initializeParams=m.AttachedDiskInitializeParams(
+                              sourceImage=self._default_image,),
+                          mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                          type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+                  ],
+                  machineType=self._default_machine_type,
+                  metadata=m.Metadata(),
+                  name='instance-1',
+                  networkInterfaces=[
+                      m.NetworkInterface(
+                          accessConfigs=[
+                              m.AccessConfig(
+                                  name='external-nat',
+                                  type=self._one_to_one_nat)
+                          ],
+                          network=self._default_network)
+                  ],
+                  serviceAccounts=[
+                      m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
+                  ],
+                  scheduling=m.Scheduling(automaticRestart=True),
+              ),
+              project='my-project',
+              zone='central2-a',
+          ))],
+    )
+
+  def testWithNotSpecifiedReservation(self):
+    with self.AssertRaisesExceptionRegexp(
+        exceptions.InvalidArgumentException,
+        'The name the specific reservation must be specified.'):
+      self.Run("""
+        compute instances create instance-1 --zone central2-a
+        --reservation-affinity=specific
+        """)
+
+  def testWithNoReservationAffinity(self):
+    m = self.messages
+    self.Run("""
+        compute instances create instance-1 --zone central2-a
+        --reservation-affinity=none
+        """)
+    self.CheckRequests(
+        self.zone_get_request,
+        self.project_get_request,
+        [(self.compute.instances, 'Insert',
+          m.ComputeInstancesInsertRequest(
+              instance=m.Instance(
+                  reservationAffinity=m.ReservationAffinity(
+                      consumeReservationType=m.ReservationAffinity
+                        .ConsumeReservationTypeValueValuesEnum.NO_RESERVATION,),
+                  canIpForward=False,
+                  deletionProtection=False,
+                  disks=[
+                      m.AttachedDisk(
+                          autoDelete=True,
+                          boot=True,
+                          initializeParams=m.AttachedDiskInitializeParams(
+                              sourceImage=self._default_image,),
+                          mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                          type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+                  ],
+                  machineType=self._default_machine_type,
+                  metadata=m.Metadata(),
+                  name='instance-1',
+                  networkInterfaces=[
+                      m.NetworkInterface(
+                          accessConfigs=[
+                              m.AccessConfig(
+                                  name='external-nat',
+                                  type=self._one_to_one_nat)
+                          ],
+                          network=self._default_network)
+                  ],
+                  serviceAccounts=[
+                      m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
+                  ],
+                  scheduling=m.Scheduling(automaticRestart=True),
               ),
               project='my-project',
               zone='central2-a',
@@ -8229,109 +8460,6 @@ class InstancesCreateTestAlpha(InstancesCreateTestBeta):
                 scheduling=m.Scheduling(automaticRestart=True),),
             project='my-project',
             zone='central2-a',))],)
-
-  def testAllocationAffinityWithLabels(self):
-    m = self.messages
-    self.Run("""
-        compute instances create instance-1 --zone central2-a
-        --allocation-affinity specific --allocation-label key=a,value=b
-        """)
-
-    self.CheckRequests(
-        self.zone_get_request,
-        self.project_get_request,
-        [(self.compute.instances, 'Insert',
-          m.ComputeInstancesInsertRequest(
-              instance=m.Instance(
-                  allocationAffinity=m.AllocationAffinity(
-                      consumeAllocationType=m.AllocationAffinity
-                      .ConsumeAllocationTypeValueValuesEnum.SPECIFIC_ALLOCATION,
-                      key='a',
-                      values=['b']),
-                  canIpForward=False,
-                  deletionProtection=False,
-                  disks=[
-                      m.AttachedDisk(
-                          autoDelete=True,
-                          boot=True,
-                          initializeParams=m.AttachedDiskInitializeParams(
-                              sourceImage=self._default_image,),
-                          mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                          type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
-                  ],
-                  machineType=self._default_machine_type,
-                  metadata=m.Metadata(),
-                  name='instance-1',
-                  networkInterfaces=[
-                      m.NetworkInterface(
-                          accessConfigs=[
-                              m.AccessConfig(
-                                  name='external-nat',
-                                  type=self._one_to_one_nat)
-                          ],
-                          network=self._default_network)
-                  ],
-                  serviceAccounts=[
-                      m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
-                  ],
-                  scheduling=m.Scheduling(automaticRestart=True),
-              ),
-              project='my-project',
-              zone='central2-a',
-          ))],
-    )
-
-    self.AssertOutputNotContains('Please use --image-family')
-
-  def testAllocationAffinityAny(self):
-    m = self.messages
-    self.Run("""
-        compute instances create instance-1 --zone central2-a
-        --allocation-affinity any
-        """)
-
-    self.CheckRequests(
-        self.zone_get_request,
-        self.project_get_request,
-        [(self.compute.instances, 'Insert',
-          m.ComputeInstancesInsertRequest(
-              instance=m.Instance(
-                  allocationAffinity=m.AllocationAffinity(
-                      consumeAllocationType=m.AllocationAffinity.ConsumeAllocationTypeValueValuesEnum.ANY_ALLOCATION),  # pylint: disable=line-too-long
-                  canIpForward=False,
-                  deletionProtection=False,
-                  disks=[
-                      m.AttachedDisk(
-                          autoDelete=True,
-                          boot=True,
-                          initializeParams=m.AttachedDiskInitializeParams(
-                              sourceImage=self._default_image,),
-                          mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                          type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
-                  ],
-                  machineType=self._default_machine_type,
-                  metadata=m.Metadata(),
-                  name='instance-1',
-                  networkInterfaces=[
-                      m.NetworkInterface(
-                          accessConfigs=[
-                              m.AccessConfig(
-                                  name='external-nat',
-                                  type=self._one_to_one_nat)
-                          ],
-                          network=self._default_network)
-                  ],
-                  serviceAccounts=[
-                      m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
-                  ],
-                  scheduling=m.Scheduling(automaticRestart=True),
-              ),
-              project='my-project',
-              zone='central2-a',
-          ))],
-    )
-
-    self.AssertOutputNotContains('Please use --image-family')
 
 
 class InstancesCreateWithLabelsTest(test_base.BaseTest):
@@ -8744,34 +8872,36 @@ class InstancesCreateDeletionProtection(InstancesCreateTestsMixin,
             zone='central2-a',))],)
 
 
-class InstancesCreateShieldedVMConfigAlphaTest(InstancesCreateTestsMixin,
-                                               parameterized.TestCase):
-  """Test creation of VM instances with shielded VM config for Alpha API."""
+class InstancesCreateShieldedInstanceConfigGATest(InstancesCreateTestsMixin,
+                                                  parameterized.TestCase):
+  """Test creation of VM instances with shielded VM config for v1 API."""
 
   def SetUp(self):
-    SetUp(self, 'alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    SetUp(self, 'v1')
+    self.track = calliope_base.ReleaseTrack.GA
 
+  # TODO(b/120429236): remove tests for shielded-vm flag after migration to
+  # shielded-instance flags is complete.
   @parameterized.named_parameters(
-      ('EnableSecureBoot', '--shielded-vm-secure-boot', True, None, None),
-      ('EnableVtpm', '--shielded-vm-vtpm', None, True, None),
-      ('EnableIntegrity', '--shielded-vm-integrity-monitoring', None, None,
-       True),
-      ('DisableSecureBoot', '--no-shielded-vm-secure-boot', False, None, None),
-      ('DisableVtpm', '--no-shielded-vm-vtpm', None, False, None),
-      ('DisableIntegrity', '--no-shielded-vm-integrity-monitoring', None, None,
-       False),
-      ('ESecureBootEvtpm', '--shielded-vm-secure-boot --shielded-vm-vtpm', True,
-       True, None),
-      ('DSecureBootDvtpm', '--no-shielded-vm-secure-boot --no-shielded-vm-vtpm',
-       False, False, None),
-      ('ESecureBootDvtpm', '--shielded-vm-secure-boot --no-shielded-vm-vtpm',
+      ('-InstanceEnableSecureBoot', '--shielded-secure-boot', True, None, None),
+      ('-InstanceEnableVtpm', '--shielded-vtpm', None, True, None),
+      ('-InstanceEnableIntegrity', '--shielded-integrity-monitoring', None,
+       None, True), ('-InstanceDisableSecureBoot', '--no-shielded-secure-boot',
+                     False, None, None),
+      ('-InstanceDisableVtpm', '--no-shielded-vtpm', None, False, None),
+      ('-InstanceDisableIntegrity', '--no-shielded-integrity-monitoring', None,
+       None, False),
+      ('-InstanceESecureBootEvtpm', '--shielded-secure-boot --shielded-vtpm',
+       True, True, None),
+      ('-InstanceDSecureBootDvtpm',
+       '--no-shielded-secure-boot --no-shielded-vtpm', False, False, None),
+      ('-InstanceESecureBootDvtpm', '--shielded-secure-boot --no-shielded-vtpm',
        True, False, None),
-      ('DSecureBootEvtpm', '--no-shielded-vm-secure-boot --shielded-vm-vtpm',
+      ('-InstanceDSecureBootEvtpm', '--no-shielded-secure-boot --shielded-vtpm',
        False, True, None),
-      ('DSecureBootEvtpmEIntegrity',
-       ('--no-shielded-vm-secure-boot --shielded-vm-vtpm'
-        ' --shielded-vm-integrity-monitoring'), False, True, True))
+      ('-InstanceDSecureBootEvtpmEIntegrity',
+       ('--no-shielded-secure-boot --shielded-vtpm'
+        ' --shielded-integrity-monitoring'), False, True, True))
   def testCreateSVMCkWithAllProperties(self, cmd_flag, enable_secure_boot,
                                        enable_vtpm,
                                        enable_integrity_monitoring):
@@ -8784,51 +8914,63 @@ class InstancesCreateShieldedVMConfigAlphaTest(InstancesCreateTestsMixin,
     self.CheckRequests(
         self.zone_get_request,
         self.project_get_request,
-        [(self.compute.instances, 'Insert', m.ComputeInstancesInsertRequest(
-            instance=m.Instance(
-                canIpForward=False,
-                deletionProtection=False,
-                disks=[
-                    m.AttachedDisk(
-                        autoDelete=True,
-                        boot=True,
-                        initializeParams=m.AttachedDiskInitializeParams(
-                            sourceImage=self._default_image,),
-                        mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
-                        type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
-                ],
-                machineType=self._default_machine_type,
-                metadata=m.Metadata(),
-                minCpuPlatform=None,
-                name='instance-1',
-                networkInterfaces=[
-                    m.NetworkInterface(
-                        accessConfigs=[
-                            m.AccessConfig(
-                                name='external-nat', type=self._one_to_one_nat)
-                        ],
-                        network=self._default_network)
-                ],
-                serviceAccounts=[
-                    m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
-                ],
-                scheduling=m.Scheduling(automaticRestart=True),
-                shieldedVmConfig=m.ShieldedVmConfig(
-                    enableSecureBoot=enable_secure_boot,
-                    enableVtpm=enable_vtpm,
-                    enableIntegrityMonitoring=enable_integrity_monitoring)
-            ),
-            project='my-project',
-            zone='central2-a',))],)
+        [(self.compute.instances, 'Insert',
+          m.ComputeInstancesInsertRequest(
+              instance=m.Instance(
+                  canIpForward=False,
+                  deletionProtection=False,
+                  disks=[
+                      m.AttachedDisk(
+                          autoDelete=True,
+                          boot=True,
+                          initializeParams=m.AttachedDiskInitializeParams(
+                              sourceImage=self._default_image,),
+                          mode=m.AttachedDisk.ModeValueValuesEnum.READ_WRITE,
+                          type=m.AttachedDisk.TypeValueValuesEnum.PERSISTENT)
+                  ],
+                  machineType=self._default_machine_type,
+                  metadata=m.Metadata(),
+                  minCpuPlatform=None,
+                  name='instance-1',
+                  networkInterfaces=[
+                      m.NetworkInterface(
+                          accessConfigs=[
+                              m.AccessConfig(
+                                  name='external-nat',
+                                  type=self._one_to_one_nat)
+                          ],
+                          network=self._default_network)
+                  ],
+                  serviceAccounts=[
+                      m.ServiceAccount(email='default', scopes=_DEFAULT_SCOPES),
+                  ],
+                  scheduling=m.Scheduling(automaticRestart=True),
+                  shieldedInstanceConfig=m.ShieldedInstanceConfig(
+                      enableSecureBoot=enable_secure_boot,
+                      enableVtpm=enable_vtpm,
+                      enableIntegrityMonitoring=enable_integrity_monitoring)),
+              project='my-project',
+              zone='central2-a',
+          ))],
+    )
 
 
-class InstancesCreateShieldedVMConfigBetaTest(
-    InstancesCreateShieldedVMConfigAlphaTest):
+class InstancesCreateShieldedInstanceConfigBetaTest(
+    InstancesCreateShieldedInstanceConfigGATest):
   """Test creation of VM instances with shielded VM config for Beta API."""
 
   def SetUp(self):
     SetUp(self, 'beta')
     self.track = calliope_base.ReleaseTrack.BETA
+
+
+class InstancesCreateShieldedInstanceConfigAlphaTest(
+    InstancesCreateShieldedInstanceConfigGATest):
+  """Test creation of VM instances with shielded VM config for alpha API."""
+
+  def SetUp(self):
+    SetUp(self, 'alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 class InstancesCreateDiskFromSnapshotTestGA(InstancesCreateTestsMixin,
@@ -9084,8 +9226,8 @@ class InstancesCreateFromMachineImage(InstancesCreateTestsMixin):
 class InstancesCreateWithDisplayDevice(InstancesCreateTestsMixin):
 
   def SetUp(self):
-    SetUp(self, 'alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    SetUp(self, 'beta')
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testCreateWithDisplayDevice(self):
     m = self.messages

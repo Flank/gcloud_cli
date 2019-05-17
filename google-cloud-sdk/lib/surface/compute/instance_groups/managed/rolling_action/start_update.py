@@ -26,16 +26,20 @@ from googlecloudsdk.command_lib.compute import flags
 from googlecloudsdk.command_lib.compute import scope as compute_scope
 from googlecloudsdk.command_lib.compute.instance_groups import flags as instance_groups_flags
 from googlecloudsdk.command_lib.compute.instance_groups.managed import flags as instance_groups_managed_flags
+from googlecloudsdk.command_lib.compute.instance_groups.managed import rolling_action
 from googlecloudsdk.command_lib.compute.managed_instance_groups import update_instances_utils
 
 
-# Forked from ../update_instances.py
-def _AddArgs(parser):
+def _AddArgs(
+    parser, supports_min_ready=False, supports_replacement_method=False):
   """Adds args."""
   instance_groups_managed_flags.AddTypeArg(parser)
   instance_groups_managed_flags.AddMaxSurgeArg(parser)
   instance_groups_managed_flags.AddMaxUnavailableArg(parser)
-  instance_groups_managed_flags.AddMinReadyArg(parser)
+  if supports_min_ready:
+    instance_groups_managed_flags.AddMinReadyArg(parser)
+  if supports_replacement_method:
+    instance_groups_managed_flags.AddReplacementMethodFlag(parser)
   parser.add_argument(
       '--version',
       type=arg_parsers.ArgDict(spec={'template': str,
@@ -59,7 +63,7 @@ def _AddArgs(parser):
   instance_groups_managed_flags.AddForceArg(parser)
 
 
-@base.ReleaseTracks(base.ReleaseTrack.ALPHA, base.ReleaseTrack.BETA)
+@base.ReleaseTracks(base.ReleaseTrack.GA)
 class StartUpdate(base.Command):
   """Start update instances of managed instance group."""
 
@@ -75,13 +79,10 @@ class StartUpdate(base.Command):
     holder = base_classes.ComputeApiHolder(self.ReleaseTrack())
     client = holder.client
 
-    cleared_fields = []
-    request = self.CreateRequest(args, cleared_fields, client, holder.resources)
+    request = self.CreateRequest(args, client, holder.resources)
+    return client.MakeRequests([request])
 
-    with client.apitools_client.IncludeFields(cleared_fields):
-      return client.MakeRequests([request])
-
-  def CreateRequest(self, args, cleared_fields, client, resources):
+  def CreateRequest(self, args, client, resources):
     resource_arg = instance_groups_flags.MULTISCOPE_INSTANCE_GROUP_MANAGER_ARG
     default_scope = compute_scope.ScopeEnum.ZONE
     scope_lister = flags.GetDefaultScopeLister(client)
@@ -134,9 +135,20 @@ class StartUpdate(base.Command):
     update_policy = client.messages.InstanceGroupManagerUpdatePolicy(
         maxSurge=max_surge,
         maxUnavailable=max_unavailable,
-        minReadySec=args.min_ready,
         minimalAction=minimal_action,
         type=update_policy_type)
+    # min_ready is available in alpha and beta APIs only
+    if hasattr(args, 'min_ready'):
+      update_policy.minReadySec = args.min_ready
+    # replacement_method is available in alpha API only
+    if hasattr(args, 'replacement_method'):
+      replacement_method = update_instances_utils.ParseReplacementMethod(
+          args.replacement_method, client.messages)
+      update_policy.replacementMethod = replacement_method
+
+    rolling_action.ValidateAndFixUpdaterAgainstStateful(update_policy, igm_ref,
+                                                        igm_info, client, args)
+
     igm_resource = client.messages.InstanceGroupManager(
         instanceTemplate=None, updatePolicy=update_policy, versions=versions)
     if hasattr(igm_ref, 'zone'):
@@ -153,16 +165,29 @@ class StartUpdate(base.Command):
           instanceGroupManagerResource=igm_resource,
           project=igm_ref.project,
           region=igm_ref.region))
-    # Due to 'Patch' semantics, we have to clear either 'fixed' or 'percent'.
-    # Otherwise, we'll get an error that both 'fixed' and 'percent' are set.
-    if max_surge is not None:
-      cleared_fields.append('updatePolicy.maxSurge.fixed' if max_surge.fixed is
-                            None else 'updatePolicy.maxSurge.percent')
-    if max_unavailable is not None:
-      cleared_fields.append('updatePolicy.maxUnavailable.fixed'
-                            if max_unavailable.fixed is None else
-                            'updatePolicy.maxUnavailable.percent')
-    return (service, 'Patch', request)
+    return service, 'Patch', request
+
+
+@base.ReleaseTracks(base.ReleaseTrack.BETA)
+class StartUpdateBeta(StartUpdate):
+  """Start update instances of managed instance group."""
+
+  @staticmethod
+  def Args(parser):
+    _AddArgs(parser=parser, supports_min_ready=True)
+    instance_groups_flags.MULTISCOPE_INSTANCE_GROUP_MANAGER_ARG.AddArgument(
+        parser)
+
+
+@base.ReleaseTracks(base.ReleaseTrack.ALPHA)
+class StartUpdateAlpha(StartUpdate):
+  """Start update instances of managed instance group."""
+
+  @staticmethod
+  def Args(parser):
+    _AddArgs(parser, supports_min_ready=True, supports_replacement_method=True)
+    instance_groups_flags.MULTISCOPE_INSTANCE_GROUP_MANAGER_ARG.AddArgument(
+        parser)
 
 
 StartUpdate.detailed_help = {

@@ -26,10 +26,10 @@ from six.moves import map
 from six.moves import range
 
 
-class LevelsListTestBeta(accesscontextmanager.Base):
+class LevelsListTestGA(accesscontextmanager.Base):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     properties.VALUES.core.user_output_enabled.Set(False)
@@ -91,10 +91,17 @@ class LevelsListTestBeta(accesscontextmanager.Base):
         """, normalize_space=True)
 
 
-class LevelsListTestAlpha(LevelsListTestBeta):
+class LevelsListTestBeta(LevelsListTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class LevelsListTestAlpha(LevelsListTestGA):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
+
 
 if __name__ == '__main__':
   test_case.main()

@@ -72,7 +72,7 @@ Deleted [https://www.googleapis.com/dns/v1/projects/{0}/managedZones/{1}].
   def testList(self):
     self.Run('dns managed-zones list')
     self.AssertOutputContains("""\
-{0}   {1}  Zone!
+{0}   {1}  Zone! public
 """.format(self.test_zone.name, self.test_zone.dnsName), normalize_space=True)
 
   def testDescribe(self):

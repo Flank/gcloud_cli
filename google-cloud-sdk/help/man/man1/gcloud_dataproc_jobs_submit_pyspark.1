@@ -100,8 +100,6 @@ Expressed as a per\-hour rate. Default is 0 (no failure retries).
 List of key value pairs to configure PySpark. For a list of available
 properties, see:
 https://spark.apache.org/docs/latest/configuration.html#available\-properties.
-Alternatively, to see examples of how to use the \f5\-\-properties\fR flag, see:
-https://cloud.google.com/dataproc/docs/concepts/configuring\-clusters/cluster\-properties#how_the_properties_flag_works
 
 .TP 2m
 \fB\-\-py\-files\fR=[\fIPY_FILE\fR,...]
@@ -124,10 +122,11 @@ invocation.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -151,9 +150,10 @@ $ gcloud dataproc jobs submit pyspark \-\-cluster my_cluster \e
 
 .SH "NOTES"
 
-This variant is also available:
+These variants are also available:
 
 .RS 2m
+$ gcloud alpha dataproc jobs submit pyspark
 $ gcloud beta dataproc jobs submit pyspark
 .RE
 

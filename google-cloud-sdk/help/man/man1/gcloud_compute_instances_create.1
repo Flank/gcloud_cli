@@ -11,7 +11,7 @@ gcloud compute instances create \- create Google Compute Engine virtual machine 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute instances create\fR \fIINSTANCE_NAMES\fR [\fIINSTANCE_NAMES\fR\ ...] [\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-async\fR] [\fB\-\-no\-boot\-disk\-auto\-delete\fR] [\fB\-\-boot\-disk\-device\-name\fR=\fIBOOT_DISK_DEVICE_NAME\fR] [\fB\-\-boot\-disk\-size\fR=\fIBOOT_DISK_SIZE\fR] [\fB\-\-boot\-disk\-type\fR=\fIBOOT_DISK_TYPE\fR] [\fB\-\-can\-ip\-forward\fR] [\fB\-\-create\-disk\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-deletion\-protection\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIboot\fR=\fIBOOT\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIname\fR=\fINAME\fR]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-local\-ssd\fR=[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fIinterface\fR=\fIINTERFACE\fR]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-interface\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-preemptible\fR] [\fB\-\-private\-network\-ip\fR=\fIPRIVATE_NETWORK_IP\fR] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-no\-restart\-on\-failure\fR] [\fB\-\-source\-instance\-template\fR=\fISOURCE_INSTANCE_TEMPLATE\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-address\fR=\fIADDRESS\fR\ |\ \fB\-\-no\-address\fR] [\fB\-\-boot\-disk\-kms\-key\fR=\fIBOOT_DISK_KMS_KEY\fR\ :\ \fB\-\-boot\-disk\-kms\-keyring\fR=\fIBOOT_DISK_KMS_KEYRING\fR\ \fB\-\-boot\-disk\-kms\-location\fR=\fIBOOT_DISK_KMS_LOCATION\fR\ \fB\-\-boot\-disk\-kms\-project\fR=\fIBOOT_DISK_KMS_PROJECT\fR] [\fB\-\-custom\-cpu\fR=\fICUSTOM_CPU\fR\ \fB\-\-custom\-memory\fR=\fICUSTOM_MEMORY\fR\ :\ \fB\-\-custom\-extensions\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR] [\fB\-\-node\fR=\fINODE\fR\ |\ \fB\-\-node\-affinity\-file\fR=\fINODE_AFFINITY_FILE\fR\ |\ \fB\-\-node\-group\fR=\fINODE_GROUP\fR] [\fB\-\-public\-ptr\fR\ |\ \fB\-\-no\-public\-ptr\fR] [\fB\-\-public\-ptr\-domain\fR=\fIPUBLIC_PTR_DOMAIN\fR\ |\ \fB\-\-no\-public\-ptr\-domain\fR] [\fB\-\-scopes\fR=[\fISCOPE\fR,...]\ |\ \fB\-\-no\-scopes\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-service\-account\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute instances create\fR \fIINSTANCE_NAMES\fR [\fIINSTANCE_NAMES\fR\ ...] [\fB\-\-accelerator\fR=[\fIcount\fR=\fICOUNT\fR],[\fItype\fR=\fITYPE\fR]] [\fB\-\-async\fR] [\fB\-\-no\-boot\-disk\-auto\-delete\fR] [\fB\-\-boot\-disk\-device\-name\fR=\fIBOOT_DISK_DEVICE_NAME\fR] [\fB\-\-boot\-disk\-size\fR=\fIBOOT_DISK_SIZE\fR] [\fB\-\-boot\-disk\-type\fR=\fIBOOT_DISK_TYPE\fR] [\fB\-\-can\-ip\-forward\fR] [\fB\-\-create\-disk\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-csek\-key\-file\fR=\fIFILE\fR] [\fB\-\-deletion\-protection\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIboot\fR=\fIBOOT\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fImode\fR=\fIMODE\fR],[\fIname\fR=\fINAME\fR]] [\fB\-\-hostname\fR=\fIHOSTNAME\fR] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-local\-ssd\fR=[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR],[\fIinterface\fR=\fIINTERFACE\fR]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-maintenance\-policy\fR=\fIMAINTENANCE_POLICY\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-network\fR=\fINETWORK\fR] [\fB\-\-network\-interface\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]] [\fB\-\-network\-tier\fR=\fINETWORK_TIER\fR] [\fB\-\-preemptible\fR] [\fB\-\-private\-network\-ip\fR=\fIPRIVATE_NETWORK_IP\fR] [\fB\-\-no\-require\-csek\-key\-create\fR] [\fB\-\-no\-restart\-on\-failure\fR] [\fB\-\-shielded\-integrity\-monitoring\fR] [\fB\-\-shielded\-secure\-boot\fR] [\fB\-\-shielded\-vtpm\fR] [\fB\-\-source\-instance\-template\fR=\fISOURCE_INSTANCE_TEMPLATE\fR] [\fB\-\-subnet\fR=\fISUBNET\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-address\fR=\fIADDRESS\fR\ |\ \fB\-\-no\-address\fR] [\fB\-\-boot\-disk\-kms\-key\fR=\fIBOOT_DISK_KMS_KEY\fR\ :\ \fB\-\-boot\-disk\-kms\-keyring\fR=\fIBOOT_DISK_KMS_KEYRING\fR\ \fB\-\-boot\-disk\-kms\-location\fR=\fIBOOT_DISK_KMS_LOCATION\fR\ \fB\-\-boot\-disk\-kms\-project\fR=\fIBOOT_DISK_KMS_PROJECT\fR] [\fB\-\-custom\-cpu\fR=\fICUSTOM_CPU\fR\ \fB\-\-custom\-memory\fR=\fICUSTOM_MEMORY\fR\ :\ \fB\-\-custom\-extensions\fR] [\fB\-\-image\-project\fR=\fIIMAGE_PROJECT\fR\ \fB\-\-image\fR=\fIIMAGE\fR\ |\ \fB\-\-image\-family\fR=\fIIMAGE_FAMILY\fR] [\fB\-\-node\fR=\fINODE\fR\ |\ \fB\-\-node\-affinity\-file\fR=\fINODE_AFFINITY_FILE\fR\ |\ \fB\-\-node\-group\fR=\fINODE_GROUP\fR] [\fB\-\-public\-ptr\fR\ |\ \fB\-\-no\-public\-ptr\fR] [\fB\-\-public\-ptr\-domain\fR=\fIPUBLIC_PTR_DOMAIN\fR\ |\ \fB\-\-no\-public\-ptr\-domain\fR] [\fB\-\-scopes\fR=[\fISCOPE\fR,...]\ |\ \fB\-\-no\-scopes\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-service\-account\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -66,8 +66,7 @@ learn about all available accelerator types.
 
 .TP 2m
 \fBcount\fR
-The number of pieces of the accelerator to attach to the instances. The default
-value is 1.
+Number of accelerators to attach to each instance. The default value is 1.
 
 .RE
 .sp
@@ -277,10 +276,17 @@ used.
 \fBauto\-delete\fR
 If \f5\fIyes\fR\fR, this persistent disk will be automatically deleted when the
 instance is deleted. However, if the disk is later detached from the instance,
-this option won't apply. The default value for this is \f5\fIno\fR\fR.
+this option won't apply. The default value for this is \f5\fIyes\fR\fR.
 
 .RE
 .sp
+.TP 2m
+\fB\-\-hostname\fR=\fIHOSTNAME\fR
+Specify the hostname of the instance to be created. The specified homename must
+be RFC1035 compliant. If hostname is not specified, the default hostname is
+[INSTANCE_NAME].c.[PROJECT_ID].internal when using the global DNS, and
+[INSTANCE_NAME].[ZONE].c.[PROJECT_ID].internal when using zonal DNS.
+
 .TP 2m
 \fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]
 List of label KEY=VALUE pairs to add.
@@ -298,8 +304,8 @@ Attaches a local SSD to the instances.
 .TP 2m
 \fBdevice\-name\fR
 Optional. A name that indicates the disk name the guest operating system will
-see. If omitted, a device name of the form \f5\fIlocal\-ssd\-N\fR\fR will be
-used.
+see. Can only be specified if \f5interface\fR is \f5SCSI\fR. If omitted, a
+device name of the form \f5\fIlocal\-ssd\-N\fR\fR will be used.
 
 .TP 2m
 \fBinterface\fR
@@ -392,7 +398,8 @@ neither is specified, this defaults to the "default" network.
 \fB\-\-network\-interface\fR=[\fIPROPERTY\fR=\fIVALUE\fR,...]
 Adds a network interface to the instance. Mutually exclusive with any of these
 flags: \fB\-\-address\fR, \fB\-\-network\fR, \fB\-\-network\-tier\fR,
-\fB\-\-subnet\fR, \fB\-\-private\-network\-ip\fR.
+\fB\-\-subnet\fR, \fB\-\-private\-network\-ip\fR. This flag can be repeated to
+specify multiple network interfaces.
 
 The following keys are allowed:
 .RS 2m
@@ -487,6 +494,24 @@ to disable.
 The instances will be restarted if they are terminated by Compute Engine. This
 does not affect terminations performed by the user. Enabled by default, use
 \fB\-\-no\-restart\-on\-failure\fR to disable.
+
+.TP 2m
+\fB\-\-shielded\-integrity\-monitoring\fR
+Enables monitoring and attestation of the boot integrity of the instance. The
+attestation is performed against the integrity policy baseline. This baseline is
+initially derived from the implicitly trusted boot image when the instance is
+created. This baseline can be updated by using
+\f5\-\-shielded\-vm\-learn\-integrity\-policy\fR.
+
+.TP 2m
+\fB\-\-shielded\-secure\-boot\fR
+The instance will boot with secure boot enabled.
+
+.TP 2m
+\fB\-\-shielded\-vtpm\fR
+The instance will boot with the TPM (Trusted Platform Module) enabled. A TPM is
+a hardware module that can be used for different security operations such as
+remote attestation, encryption and sealing of keys.
 
 .TP 2m
 \fB\-\-source\-instance\-template\fR=\fISOURCE_INSTANCE_TEMPLATE\fR
@@ -829,10 +854,11 @@ Create instance without service account
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

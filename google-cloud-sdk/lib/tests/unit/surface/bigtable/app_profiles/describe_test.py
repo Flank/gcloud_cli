@@ -21,14 +21,14 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.bigtable import app_profiles
 from googlecloudsdk.api_lib.bigtable import util
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import parameterized
+from tests.lib import test_case
 from tests.lib.surface.bigtable import base
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA)
-class AppProfileDescribeTests(base.BigtableV2TestBase):
+class AppProfileDescribeTestsGA(base.BigtableV2TestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
     self.app_profile_ref = util.GetAppProfileRef('my-instance',
@@ -38,8 +38,23 @@ class AppProfileDescribeTests(base.BigtableV2TestBase):
         'Describe',
         return_value=self.msgs.AppProfile(name='my-app-profile'))
 
-  def testDescribe(self, track):
-    self.track = track
+  def testDescribe(self):
     self.Run('bigtable app-profiles describe my-app-profile '
              '--instance my-instance')
     self.app_profile_describe_mock.assert_called_once_with(self.app_profile_ref)
+
+
+class AppProfileDescribeTestsBeta(AppProfileDescribeTestsGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class AppProfileDescribeTestsAlpha(AppProfileDescribeTestsBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+if __name__ == '__main__':
+  test_case.main()

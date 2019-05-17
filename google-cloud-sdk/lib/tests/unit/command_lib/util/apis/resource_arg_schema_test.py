@@ -348,7 +348,7 @@ class MultitypeTests(base.Base, parameterized.TestCase):
                 'resources': [self._zone_spec, self._region_spec]}})
     self.assertEqual(r.group_help, 'group help')
     self.assertEqual(r.removed_flags, [])
-    self.assertEqual(r.is_positional, True)
+    self.assertEqual(r.is_positional, None)
 
     spec = r.GenerateResourceSpec()
     project_attr, zone_attr, region_attr = [spec.attributes[0],
@@ -379,7 +379,7 @@ class MultitypeTests(base.Base, parameterized.TestCase):
                 'resources': [self._zone_spec, self._instance_spec]}})
     self.assertEqual(r.group_help, 'group help')
     self.assertEqual(r.removed_flags, [])
-    self.assertEqual(r.is_positional, True)
+    self.assertEqual(r.is_positional, None)
 
     spec = r.GenerateResourceSpec()
     project_attr, zone_attr, instance_attr = [spec.attributes[0],
@@ -411,7 +411,7 @@ class MultitypeTests(base.Base, parameterized.TestCase):
                               self._no_zone_instance_spec]}})
     self.assertEqual(r.group_help, 'group help')
     self.assertEqual(r.removed_flags, [])
-    self.assertEqual(r.is_positional, True)
+    self.assertEqual(r.is_positional, None)
 
     spec = r.GenerateResourceSpec()
     project_attr, zone_attr, instance_attr = [spec.attributes[0],

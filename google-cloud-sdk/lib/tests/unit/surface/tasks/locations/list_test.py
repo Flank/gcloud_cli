@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core import properties
 from googlecloudsdk.core import resources
 from tests.lib import test_case
@@ -66,9 +67,9 @@ class LocationsListTest(test_base.CloudTasksTestBase):
 
     expected_location_uris = [l.name for l in expected_locations]
     self.AssertOutputEquals("""\
-        https://cloudtasks.googleapis.com/v2beta2/{}
-        https://cloudtasks.googleapis.com/v2beta2/{}
-        https://cloudtasks.googleapis.com/v2beta2/{}
+        https://cloudtasks.googleapis.com/v2/{}
+        https://cloudtasks.googleapis.com/v2/{}
+        https://cloudtasks.googleapis.com/v2/{}
         """.format(*expected_location_uris), normalize_space=True)
 
   def testList_CheckFormat(self):
@@ -85,6 +86,13 @@ class LocationsListTest(test_base.CloudTasksTestBase):
     self.AssertOutputContains("""\
         NAME        FULL_NAME
         """, normalize_space=True)
+
+
+class LocationsListTestBeta(LocationsListTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
 
 if __name__ == '__main__':
   test_case.main()

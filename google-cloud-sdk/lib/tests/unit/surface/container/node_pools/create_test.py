@@ -55,7 +55,6 @@ class CreateTestGA(parameterized.TestCase, base.GATestBase,
                                                 self.PROJECT_ID))
     kwargs = {'zone': location}
     pool_kwargs = {
-        'management': self.messages.NodeManagement(autoRepair=True),
     }
     self.ExpectCreateNodePool(
         self._MakeNodePool(**pool_kwargs),
@@ -84,6 +83,21 @@ class CreateTestGA(parameterized.TestCase, base.GATestBase,
                 version=pool.version),
         normalize_space=True)
 
+  def _TestAutoUpgradeDefault(self, expect_default):
+    pool_kwargs = {
+        'management': self.messages.NodeManagement(
+            autoRepair=True, autoUpgrade=expect_default)
+    }
+    expected_pool, return_pool = self.makeExpectedAndReturnNodePools(
+        pool_kwargs)
+    self.ExpectCreateNodePool(expected_pool, self._MakeNodePoolOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetNodePool(return_pool.name, response=return_pool)
+    self.Run('{base} create {name} --quiet --cluster {clusterName}'.format(
+        base=self.node_pools_command_base.format(self.ZONE),
+        name=self.NODE_POOL_NAME,
+        clusterName=self.CLUSTER_NAME))
+
   def testCreateDefaults(self):
     self._TestCreateDefaults(self.ZONE)
 
@@ -94,7 +108,6 @@ class CreateTestGA(parameterized.TestCase, base.GATestBase,
     self.assertIsNone(c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,
                                                 self.PROJECT_ID))
     pool_kwargs = {
-        'management': self.messages.NodeManagement(autoRepair=True),
     }
     self.ExpectCreateNodePool(
         self._MakeNodePool(**pool_kwargs), self._MakeNodePoolOperation())
@@ -112,7 +125,6 @@ class CreateTestGA(parameterized.TestCase, base.GATestBase,
     self.assertEqual(json_pool[0]['version'], str(self.VERSION))
 
   def testCreateNoDefaults(self):
-    properties.VALUES.container.new_scopes_behavior.Set(True)
     self.assertIsNone(c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,
                                                 self.PROJECT_ID))
     pool_kwargs = {
@@ -169,11 +181,13 @@ class CreateTestGA(parameterized.TestCase, base.GATestBase,
             'https://www.googleapis.com/auth/trace.append',
         ],
         'metadata':
-            self.msgs.NodeConfig.MetadataValue(
-                additionalProperties=[
-                    self.msgs.NodeConfig.MetadataValue.AdditionalProperty(
-                        key=key, value=value)
-                    for key, value in [('key', 'value'), ('key2', 'value2')]]),
+            self.msgs.NodeConfig.MetadataValue(additionalProperties=[
+                self.msgs.NodeConfig.MetadataValue.AdditionalProperty(
+                    key=key, value=value)
+                for key, value in [('key', 'value'), ('key2', 'value2')]
+            ]),
+        'maxPodsConstraint':
+            self.msgs.MaxPodsConstraint(maxPodsPerNode=30),
     }
 
     self.ExpectCreateNodePool(
@@ -217,7 +231,8 @@ class CreateTestGA(parameterized.TestCase, base.GATestBase,
         ' --preemptible'
         ' --enable-autoupgrade'
         ' --enable-autorepair'
-        ' --metadata key=value,key2=value2'.format(**pool_kwargs))
+        ' --metadata key=value,key2=value2'
+        ' --max-pods-per-node=30'.format(**pool_kwargs))
     # pylint: disable=line-too-long
     self.AssertErrContains(
         """WARNING: Starting in 1.12, new node pools will be created with \
@@ -228,9 +243,6 @@ This will enable the autorepair feature for \
 nodes. Please see \
 https://cloud.google.com/kubernetes-engine/docs/node-auto-repair for more \
 information on node autorepairs.
-This will enable the autoupgrade feature for nodes. Please see \
-https://cloud.google.com/kubernetes-engine/docs/node-management for more \
-information on node autoupgrades.
 {{"ux": "PROGRESS_TRACKER", "message": "Creating node pool my-custom-pool", \
 "status": "SUCCESS"}}
 Created \
@@ -246,17 +258,6 @@ Created \
                 version=pool.version),
         normalize_space=True)
 
-  @parameterized.parameters(('--service-account=my-sa --scopes=gke-default',
-                             cli_test_base.MockArgumentError, 'At most one of'))
-  def testNodeIdentityMutex(self, flags, expected_err, expected_msg):
-    with self.AssertRaisesExceptionMatches(expected_err, expected_msg):
-      self.Run('{base} create {name} --cluster {cluster_name} --quiet {flags}'.
-               format(
-                   base=self.node_pools_command_base.format(self.ZONE),
-                   name=self.NODE_POOL_NAME,
-                   cluster_name=self.CLUSTER_NAME,
-                   flags=flags))
-
   @parameterized.parameters(
       ('', '', True),
       ('--image-type', 'COS', True),
@@ -265,8 +266,7 @@ Created \
   def testAutoRepairDefaults(
       self, image_flag, image_value, expect_autorepair):
     pool_kwargs = {
-        'management': self.messages.NodeManagement(
-            autoRepair=expect_autorepair,),
+        'management': self._MakeDefaultNodeManagement(expect_autorepair),
         'imageType': image_value if image_value else None,
     }
     expected_pool, return_pool = self.makeExpectedAndReturnNodePools(
@@ -282,6 +282,35 @@ Created \
                  value=image_value,
                  clusterName=self.CLUSTER_NAME))
 
+  @parameterized.named_parameters(
+      ('Implicit default', '', [
+          'https://www.googleapis.com/auth/devstorage.read_only',
+          'https://www.googleapis.com/auth/logging.write',
+          'https://www.googleapis.com/auth/monitoring',
+          'https://www.googleapis.com/auth/service.management.readonly',
+          'https://www.googleapis.com/auth/servicecontrol',
+          'https://www.googleapis.com/auth/trace.append',
+      ]),
+      ('Explicit default', '--scopes=gke-default', [
+          'https://www.googleapis.com/auth/devstorage.read_only',
+          'https://www.googleapis.com/auth/logging.write',
+          'https://www.googleapis.com/auth/monitoring',
+          'https://www.googleapis.com/auth/service.management.readonly',
+          'https://www.googleapis.com/auth/servicecontrol',
+          'https://www.googleapis.com/auth/trace.append',
+      ]),
+      ('Other scopes', '--scopes=storage-ro,pubsub', [
+          'https://www.googleapis.com/auth/devstorage.read_only',
+          'https://www.googleapis.com/auth/pubsub',
+      ]),
+      ('Unrecognized', '--scopes=idontrecognizethisscopebutgoforit ', [
+          'idontrecognizethisscopebutgoforit',
+      ]),
+      ('Empty', '--scopes=""', []),
+  )
+  def testScopes(self, flags, scopes):
+    self._testScopes(flags, scopes)
+
   def testServiceAccountCloudPlatformScope(self):
     pool_kwargs = {
         'serviceAccount':
@@ -290,8 +319,6 @@ Created \
             'https://www.googleapis.com/auth/cloud-platform',
             'https://www.googleapis.com/auth/userinfo.email'
         ],
-        'management':
-            self.messages.NodeManagement(autoRepair=True),
     }
     expected_pool, return_pool = self.makeExpectedAndReturnNodePools(
         pool_kwargs)
@@ -308,11 +335,32 @@ Created \
                  name=self.NODE_POOL_NAME,
                  clusterName=self.CLUSTER_NAME))
 
+  def testServiceAccountCustomScopes(self):
+    pool_kwargs = {
+        'serviceAccount': 'my-sa',
+        'oauthScopes': ['something-else',],
+    }
+    expected_pool, return_pool = self.makeExpectedAndReturnNodePools(
+        pool_kwargs)
+
+    # Create node pool expects node pool and returns pending operation.
+    self.ExpectCreateNodePool(expected_pool, self._MakeNodePoolOperation())
+    # Get operation returns done operation.
+    self.ExpectGetOperation(self._MakeNodePoolOperation(status=self.op_done))
+    # Get returns expected cluster, populated with other fields by server.
+    self.ExpectGetNodePool(return_pool.name, response=return_pool)
+    self.Run('{base} create {name} '
+             '--service-account=my-sa '
+             '--scopes=something-else '
+             '--cluster {clusterName}'.format(
+                 base=self.node_pools_command_base.format(self.ZONE),
+                 name=self.NODE_POOL_NAME,
+                 clusterName=self.CLUSTER_NAME))
+
   def _testScopes(self, flags, scopes):
     pool_kwargs = {
         # Sort the scopes to assert equality of the lists
         'oauthScopes': sorted(scopes),
-        'management': self.messages.NodeManagement(autoRepair=True),
     }
     expected_pool, return_pool = self.makeExpectedAndReturnNodePools(
         pool_kwargs)
@@ -352,7 +400,6 @@ Created \
         'name': 'my-custom-pool',
         'clusterId': self.CLUSTER_NAME,
         'nodeTaints': taints,
-        'management': self.messages.NodeManagement(autoRepair=True),
     }
     self.ExpectCreateNodePool(
         self._MakeNodePool(**pool_kwargs),
@@ -400,7 +447,6 @@ Created \
     self.assertIsNone(c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,
                                                 self.PROJECT_ID))
     pool_kwargs = {
-        'management': self.messages.NodeManagement(autoRepair=True),
     }
     self.ExpectCreateNodePool(
         self._MakeNodePool(**pool_kwargs), exception=self.HttpError())
@@ -464,8 +510,6 @@ Created \
             m.AcceleratorConfig(
                 acceleratorType='nvidia-tesla-k80', acceleratorCount=int(2))
         ],
-        'management':
-            m.NodeManagement(autoRepair=True),
     }
 
     self.ExpectCreateNodePool(
@@ -503,8 +547,6 @@ Created \
             m.AcceleratorConfig(
                 acceleratorType='nvidia-tesla-k80', acceleratorCount=int(1))
         ],
-        'management':
-            m.NodeManagement(autoRepair=True),
     }
 
     self.ExpectCreateNodePool(
@@ -528,247 +570,37 @@ Created \
          '{name} {version}\\n').format(name=pool.name, version=pool.version),
         normalize_space=True)
 
+  def testNodeModificationWarning(self):
+    pool_kwargs = {
+        'imageType': 'ubuntu',
+    }
+    expected_pool, return_pool = self.makeExpectedAndReturnNodePools(
+        pool_kwargs)
+    self.ExpectCreateNodePool(expected_pool, self._MakeNodePoolOperation())
+    self.ExpectGetOperation(self._MakeNodePoolOperation(status=self.op_done))
+    self.ExpectGetNodePool(return_pool.name, response=return_pool)
+    self.Run('{base} create {name} --cluster {clusterName} --image-type=ubuntu '
+             '--enable-autorepair'.format(
+                 base=self.node_pools_command_base.format(self.ZONE),
+                 name=self.NODE_POOL_NAME,
+                 clusterName=self.CLUSTER_NAME))
+    self.AssertErrContains('Created')
+    self.AssertErrContains(
+        'Modifications on the boot disks of node VMs do not persist across '
+        'node recreations. Nodes are recreated during manual-upgrade, '
+        'auto-upgrade, auto-repair, and auto-scaling. To preserve '
+        'modifications across node recreation, use a DaemonSet.')
+
 
 class CreateTestGAOnly(CreateTestGA):
   """gcloud GA track only using container v1 API (not beta/alpha)."""
 
-  @parameterized.parameters(
-      ('--service-account=my-sa --enable-cloud-endpoints',
-       cli_test_base.MockArgumentError, 'At most one of'),
-      ('--service-account=my-sa --no-enable-cloud-endpoints',
-       cli_test_base.MockArgumentError, 'At most one of'),
-      ('--service-account=my-sa --scopes=gke-default --enable-cloud-endpoints',
-       cli_test_base.MockArgumentError, 'At most one of'),
-      ('--service-account=my-sa --scopes=gke-default '
-       '--no-enable-cloud-endpoints', cli_test_base.MockArgumentError,
-       'At most one of'))
-  def testNodeIdentityMutex(self, flags, expected_err, expected_msg):
-    with self.AssertRaisesExceptionMatches(expected_err, expected_msg):
-      self.Run('{base} create {name} --cluster {cluster_name} --quiet {flags}'.
-               format(
-                   base=self.node_pools_command_base.format(self.ZONE),
-                   name=self.NODE_POOL_NAME,
-                   cluster_name=self.CLUSTER_NAME,
-                   flags=flags))
+  def testWarnFutureAutoUpgradeChange(self):
+    self._TestCreateDefaults(self.ZONE)
+    self.AssertErrContains(c_util.WARN_GA_FUTURE_AUTOUPGRADE_CHANGE)
 
-  @parameterized.parameters(('--enable-cloud-endpoints', c_util.Error,
-                             '--[no-]enable-cloud-endpoints is not allowed'),
-                            ('--no-enable-cloud-endpoints', c_util.Error,
-                             '--[no-]enable-cloud-endpoints is not allowed'))
-  def testNoEnableCloudEndpointsNewScopesBehaviorMutex(
-      self, flags, expected_err, expected_msg):
-    properties.VALUES.container.new_scopes_behavior.Set(True)
-    with self.AssertRaisesExceptionMatches(expected_err, expected_msg):
-      self.Run('{base} create {name} --cluster {cluster_name} --quiet {flags}'.
-               format(
-                   base=self.node_pools_command_base.format(self.ZONE),
-                   name=self.NODE_POOL_NAME,
-                   cluster_name=self.CLUSTER_NAME,
-                   flags=flags))
-
-  @parameterized.named_parameters(
-      ('Implicit default', '', [
-          'gke-version-default',
-          'https://www.googleapis.com/auth/devstorage.read_only',
-          'https://www.googleapis.com/auth/logging.write',
-          'https://www.googleapis.com/auth/monitoring',
-          'https://www.googleapis.com/auth/service.management.readonly',
-          'https://www.googleapis.com/auth/servicecontrol',
-          'https://www.googleapis.com/auth/trace.append',
-      ]),
-      ('Explicit default', '--scopes=gke-default', [
-          'gke-version-default',
-          'https://www.googleapis.com/auth/devstorage.read_only',
-          'https://www.googleapis.com/auth/logging.write',
-          'https://www.googleapis.com/auth/monitoring',
-          'https://www.googleapis.com/auth/service.management.readonly',
-          'https://www.googleapis.com/auth/servicecontrol',
-          'https://www.googleapis.com/auth/trace.append',
-      ]),
-      ('Explicit endpoints', '--scopes=service-management,service-control', [
-          'gke-version-default',
-          'https://www.googleapis.com/auth/service.management.readonly',
-          'https://www.googleapis.com/auth/servicecontrol',
-      ]),
-      ('Explicit endpoints (not aliased)',
-       '--scopes=https://www.googleapis.com/auth/service.management.readonly,'
-       'https://www.googleapis.com/auth/servicecontrol', [
-           'gke-version-default',
-           'https://www.googleapis.com/auth/service.management.readonly',
-           'https://www.googleapis.com/auth/servicecontrol',
-       ]),
-      # Even though these use --no-enable-cloud-endpoints, the user already gets
-      # a deprecation warning for the flag, so don't worry about printing more
-      # info about how it interacts with scopes.
-      ('Implicit default with --no-enable-cloud-endpoints',
-       '--no-enable-cloud-endpoints', [
-           'gke-version-default',
-           'https://www.googleapis.com/auth/devstorage.read_only',
-           'https://www.googleapis.com/auth/logging.write',
-           'https://www.googleapis.com/auth/monitoring',
-           'https://www.googleapis.com/auth/trace.append',
-       ]),
-      ('Explicit default with --no-enable-cloud-endpoints',
-       '--scopes=gke-default --no-enable-cloud-endpoints', [
-           'gke-version-default',
-           'https://www.googleapis.com/auth/devstorage.read_only',
-           'https://www.googleapis.com/auth/logging.write',
-           'https://www.googleapis.com/auth/monitoring',
-           'https://www.googleapis.com/auth/trace.append',
-       ]),
-      ('Explicit endpoints with --no-enable-cloud-endpoints',
-       '--scopes=service-management,service-control '
-       '--no-enable-cloud-endpoints', [
-           'gke-version-default',
-       ]),
-      ('Explicit endpoints (not aliased) with --no-enable-cloud-endpoints',
-       '--scopes=https://www.googleapis.com/auth/service.management.readonly,'
-       'https://www.googleapis.com/auth/servicecontrol '
-       '--no-enable-cloud-endpoints', [
-           'gke-version-default',
-       ]),
-      ('Other scopes with --no-enable-cloud-endpoints',
-       '--scopes=storage-ro,pubsub --no-enable-cloud-endpoints', [
-           'gke-version-default',
-           'https://www.googleapis.com/auth/devstorage.read_only',
-           'https://www.googleapis.com/auth/pubsub'
-       ]),
-      ('Unrecognized with --no-enable-cloud-endpoints',
-       '--scopes=idontrecognizethisscopebutgoforit --no-enable-cloud-endpoints',
-       [
-           'gke-version-default',
-           'idontrecognizethisscopebutgoforit',
-       ]),
-      ('Empty with --no-enable-cloud-endpoints',
-       '--scopes="" --no-enable-cloud-endpoints', [
-           'gke-version-default',
-       ]),
-  )
-  def testScopesComputeWarning(self, flags, scopes):
-    self._testScopes(flags, scopes)
-    self.AssertErrContains('new clusters will no longer get compute-rw')
-    self.AssertErrNotContains('The behavior of --scopes will change')
-
-  @parameterized.named_parameters(
-      ('Other scopes', '--scopes=storage-ro,pubsub', [
-          'gke-version-default',
-          'https://www.googleapis.com/auth/devstorage.read_only',
-          'https://www.googleapis.com/auth/pubsub',
-          'https://www.googleapis.com/auth/service.management.readonly',
-          'https://www.googleapis.com/auth/servicecontrol',
-      ]),
-      ('Unrecognized', '--scopes=idontrecognizethisscopebutgoforit ', [
-          'gke-version-default',
-          'idontrecognizethisscopebutgoforit',
-          'https://www.googleapis.com/auth/service.management.readonly',
-          'https://www.googleapis.com/auth/servicecontrol',
-      ]),
-      ('Empty', '--scopes=""', [
-          'gke-version-default',
-          'https://www.googleapis.com/auth/service.management.readonly',
-          'https://www.googleapis.com/auth/servicecontrol',
-      ]),
-  )
-  def testScopesBothWarnings(self, flags, scopes):
-    self._testScopes(flags, scopes)
-    self.AssertErrContains('new clusters will no longer get compute-rw')
-    self.AssertErrContains('The behavior of --scopes will change')
-
-  @parameterized.named_parameters(
-      ("Warn because had to add endpoints scopes, even though didn't have to "
-       'add compute-rw or storage-ro', '--scopes=compute-rw,storage-ro', [
-           'https://www.googleapis.com/auth/compute',
-           'https://www.googleapis.com/auth/devstorage.read_only',
-           'https://www.googleapis.com/auth/service.management.readonly',
-           'https://www.googleapis.com/auth/servicecontrol',
-       ]),)
-  def testScopesEndpointsWarning(self, flags, scopes):
-    self._testScopes(flags, scopes)
-    self.AssertErrNotContains('new clusters will no longer get compute-rw')
-    self.AssertErrContains('The behavior of --scopes will change')
-
-  @parameterized.named_parameters(
-      ('Implicit default with new_scopes_behavior=True', '', [
-          'https://www.googleapis.com/auth/devstorage.read_only',
-          'https://www.googleapis.com/auth/logging.write',
-          'https://www.googleapis.com/auth/monitoring',
-          'https://www.googleapis.com/auth/service.management.readonly',
-          'https://www.googleapis.com/auth/servicecontrol',
-          'https://www.googleapis.com/auth/trace.append',
-      ]), ('Explicit default with new_scopes_behavior=True',
-           '--scopes=gke-default', [
-               'https://www.googleapis.com/auth/devstorage.read_only',
-               'https://www.googleapis.com/auth/logging.write',
-               'https://www.googleapis.com/auth/monitoring',
-               'https://www.googleapis.com/auth/service.management.readonly',
-               'https://www.googleapis.com/auth/servicecontrol',
-               'https://www.googleapis.com/auth/trace.append',
-           ]),
-      ('Explicit endpoints with new_scopes_behavior=True',
-       '--scopes=service-management,service-control', [
-           'https://www.googleapis.com/auth/service.management.readonly',
-           'https://www.googleapis.com/auth/servicecontrol',
-       ]),
-      ('Explicit endpoints (not aliased) with new_scopes_behavior=True',
-       '--scopes=https://www.googleapis.com/auth/service.management.readonly,'
-       'https://www.googleapis.com/auth/servicecontrol', [
-           'https://www.googleapis.com/auth/service.management.readonly',
-           'https://www.googleapis.com/auth/servicecontrol',
-       ]), ('Other scopes with new_scopes_behavior=True',
-            '--scopes=storage-ro,pubsub', [
-                'https://www.googleapis.com/auth/devstorage.read_only',
-                'https://www.googleapis.com/auth/pubsub'
-            ]), ('Unrecognized with new_scopes_behavior=True',
-                 '--scopes=idontrecognizethisscopebutgoforit', [
-                     'idontrecognizethisscopebutgoforit',
-                 ]), ('Empty with new_scopes_behavior=True', '--scopes=""', []))
-  def testScopesNoWarningNewScopesBehavior(self, flags, scopes):
-    properties.VALUES.container.new_scopes_behavior.Set(True)
-    self._testScopes(flags, scopes)
-    self.AssertErrNotContains('new clusters will no longer get compute-rw')
-    self.AssertErrNotContains('The behavior of --scopes will change')
-
-  @parameterized.named_parameters(
-      ('Explicit default with compute-rw', '--scopes=gke-default,compute-rw', [
-          'https://www.googleapis.com/auth/compute',
-          'https://www.googleapis.com/auth/devstorage.read_only',
-          'https://www.googleapis.com/auth/logging.write',
-          'https://www.googleapis.com/auth/monitoring',
-          'https://www.googleapis.com/auth/service.management.readonly',
-          'https://www.googleapis.com/auth/servicecontrol',
-          'https://www.googleapis.com/auth/trace.append',
-      ]),
-      ('Explicit endpoints, compute-rw, storage-ro',
-       '--scopes=service-management,service-control,compute-rw,storage-ro', [
-           'https://www.googleapis.com/auth/compute',
-           'https://www.googleapis.com/auth/devstorage.read_only',
-           'https://www.googleapis.com/auth/service.management.readonly',
-           'https://www.googleapis.com/auth/servicecontrol',
-       ]),
-      ('Explicit endpoints, compute-rw, storage-ro (not aliased)',
-       '--scopes=https://www.googleapis.com/auth/service.management.readonly,'
-       'https://www.googleapis.com/auth/servicecontrol,'
-       'https://www.googleapis.com/auth/compute,'
-       'https://www.googleapis.com/auth/devstorage.read_only', [
-           'https://www.googleapis.com/auth/compute',
-           'https://www.googleapis.com/auth/devstorage.read_only',
-           'https://www.googleapis.com/auth/service.management.readonly',
-           'https://www.googleapis.com/auth/servicecontrol',
-       ]),
-      ("Don't warn because used --no-enable-cloud-endpoints, so will already "
-       'get a deprecation warning for that.',
-       '--scopes=compute-rw,gke-default --no-enable-cloud-endpoints', [
-           'https://www.googleapis.com/auth/compute',
-           'https://www.googleapis.com/auth/devstorage.read_only',
-           'https://www.googleapis.com/auth/logging.write',
-           'https://www.googleapis.com/auth/monitoring',
-           'https://www.googleapis.com/auth/trace.append',
-       ]),
-  )
-  def testScopesNoWarning(self, flags, scopes):
-    self._testScopes(flags, scopes)
-    self.AssertErrNotContains('new clusters will no longer get compute-rw')
-    self.AssertErrNotContains('The behavior of --scopes will change')
+  def testAutoUpgradeDefault(self):
+    self._TestAutoUpgradeDefault(expect_default=None)
 
 
 # TODO(b/64575339): switch to use parameterized testing.
@@ -784,7 +616,6 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
         'name': 'my-custom-pool',
         'clusterId': self.CLUSTER_NAME,
         'minCpuPlatform': 'Skylake',
-        'management': self.messages.NodeManagement(autoRepair=True),
     }
 
     self.ExpectCreateNodePool(
@@ -808,50 +639,6 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
          '{name} {version}\n').format(name=pool.name, version=pool.version),
         normalize_space=True)
 
-  @parameterized.parameters(
-      '--enable-cloud-endpoints',
-      '--no-enable-cloud-endpoints',
-  )
-  def testEnableCloudEndpointsRemoved(self, flags):
-    with self.AssertRaisesExceptionMatches(
-        cli_test_base.MockArgumentError,
-        'Flag --[no-]enable-cloud-endpoints has been removed'):
-      self.Run('{base} create {name} --cluster {cluster_name} --quiet {flags}'.
-               format(
-                   base=self.node_pools_command_base.format(self.ZONE),
-                   name=self.NODE_POOL_NAME,
-                   cluster_name=self.CLUSTER_NAME,
-                   flags=flags))
-
-  @parameterized.named_parameters(
-      ('Implicit default', '', [
-          'https://www.googleapis.com/auth/devstorage.read_only',
-          'https://www.googleapis.com/auth/logging.write',
-          'https://www.googleapis.com/auth/monitoring',
-          'https://www.googleapis.com/auth/service.management.readonly',
-          'https://www.googleapis.com/auth/servicecontrol',
-          'https://www.googleapis.com/auth/trace.append',
-      ]),
-      ('Explicit default', '--scopes=gke-default', [
-          'https://www.googleapis.com/auth/devstorage.read_only',
-          'https://www.googleapis.com/auth/logging.write',
-          'https://www.googleapis.com/auth/monitoring',
-          'https://www.googleapis.com/auth/service.management.readonly',
-          'https://www.googleapis.com/auth/servicecontrol',
-          'https://www.googleapis.com/auth/trace.append',
-      ]),
-      ('Other scopes', '--scopes=storage-ro,pubsub', [
-          'https://www.googleapis.com/auth/devstorage.read_only',
-          'https://www.googleapis.com/auth/pubsub',
-      ]),
-      ('Unrecognized', '--scopes=idontrecognizethisscopebutgoforit ', [
-          'idontrecognizethisscopebutgoforit',
-      ]),
-      ('Empty', '--scopes=""', []),
-  )
-  def testScopes(self, flags, scopes):
-    self._testScopes(flags, scopes)
-
   def testCreateBetaFeatures(self):
     m = self.messages
     self.assertIsNone(
@@ -865,10 +652,8 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
         'workloadMetadataConfig':
             m.WorkloadMetadataConfig(nodeMetadata=m.WorkloadMetadataConfig
                                      .NodeMetadataValueValuesEnum.SECURE),
-        'management':
-            m.NodeManagement(autoRepair=True),
-        'maxPodsConstraint':
-            m.MaxPodsConstraint(maxPodsPerNode=30),
+        'sandboxConfig':
+            m.SandboxConfig(sandboxType='gvisor'),
     }
 
     self.ExpectCreateNodePool(
@@ -887,7 +672,7 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
         self.node_pools_command_base.format(self.ZONE) + ' create {name}'
         ' --cluster={clusterId}'
         ' --workload-metadata-from-node=secure'
-        ' --max-pods-per-node=30'.format(**pool_kwargs))
+        ' --sandbox type=gvisor'.format(**pool_kwargs))
     self.AssertOutputEquals(
         ('NAME MACHINE_TYPE DISK_SIZE_GB NODE_VERSION\n'
          '{name} {version}\n').format(name=pool.name, version=pool.version),
@@ -897,7 +682,6 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
     pool_kwargs = {
         # Sort the scopes to assert equality of the lists
         'workloadMetadataConfig': config,
-        'management': self.messages.NodeManagement(autoRepair=True),
     }
     expected_pool, return_pool = self.makeExpectedAndReturnNodePools(
         pool_kwargs)
@@ -938,6 +722,46 @@ class CreateTestBeta(base.BetaTestBase, CreateTestGA):
             nodeMetadata=self.messages.WorkloadMetadataConfig.\
                 NodeMetadataValueValuesEnum.UNSPECIFIED))
 
+  def testAutoUpgradeDefault(self):
+    self._TestAutoUpgradeDefault(expect_default=True)
+    self.AssertErrContains(c_util.WARN_AUTOUPGRADE_ENABLED_BY_DEFAULT)
+
+  def testWarnNodeVersionWithAutoUpgradeEnabled(self):
+    pool_kwargs = {
+        'nodeVersion': self.VERSION,
+        'management': self.messages.NodeManagement(
+            autoRepair=True, autoUpgrade=True)
+    }
+    expected_pool, return_pool = self.makeExpectedAndReturnNodePools(
+        pool_kwargs)
+    self.ExpectCreateNodePool(expected_pool, self._MakeNodePoolOperation())
+    self.ExpectGetOperation(self._MakeOperation(status=self.op_done))
+    self.ExpectGetNodePool(return_pool.name, response=return_pool)
+    self.Run('{base} create {name} --cluster {clusterName} '
+             '--node-version {version} --quiet'.format(
+                 base=self.node_pools_command_base.format(self.ZONE),
+                 name=self.NODE_POOL_NAME,
+                 clusterName=self.CLUSTER_NAME,
+                 version=self.VERSION))
+    self.AssertErrContains(c_util.WARN_NODE_VERSION_WITH_AUTOUPGRADE_ENABLED)
+
+  def testCreateInvalidSandboxConfig(self):
+    with self.assertRaises(cli_test_base.MockArgumentError):
+      self.Run(
+          self.node_pools_command_base.format(self.ZONE) +
+          ' create {0} --cluster={1} --sandbox '
+          'type={2}'.format(self.NODE_POOL_NAME,
+                            self.CLUSTER_NAME, 'notatype'))
+    self.AssertErrContains('argument --sandbox')
+
+  def testCreateEmptySandboxConfig(self):
+    with self.assertRaises(cli_test_base.MockArgumentError):
+      self.Run(
+          self.node_pools_command_base.format(self.ZONE) +
+          ' create {0} --cluster={1} --sandbox'.format(self.NODE_POOL_NAME,
+                                                       self.CLUSTER_NAME))
+    self.AssertErrContains('argument --sandbox')
+
 
 # Mixin class must come in first to have the correct multi-inheritance behavior.
 class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
@@ -962,13 +786,9 @@ class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
             m.LocalSsdVolumeConfig(
                 count=1, type='scsi', format=format_enum.BLOCK),
         ],
-        'sandboxConfig':
-            m.SandboxConfig(sandboxType='gvisor'),
         'autoscaling':
             m.NodePoolAutoscaling(
                 enabled=True, maxNodeCount=6, autoprovisioned=True),
-        'management':
-            m.NodeManagement(autoRepair=True),
         'nodeGroup':
             'test-node-group',
     }
@@ -992,7 +812,6 @@ class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
         ' --local-ssd-volumes count=1,type=scsi,format=block'
         ' --enable-autoscaling --enable-autoprovisioning --max-nodes 6'
         ' --workload-metadata-from-node=secure'
-        ' --sandbox type=gvisor'
         ' --node-group {nodeGroup}'.format(**pool_kwargs))
     self.AssertOutputEquals(
         ('NAME MACHINE_TYPE DISK_SIZE_GB NODE_VERSION\n'
@@ -1023,22 +842,51 @@ class CreateTestAlpha(base.AlphaTestBase, CreateTestBeta):
               self.NODE_POOL_NAME, self.CLUSTER_NAME))
     self.AssertErrContains('argument --local-ssd-volumes')
 
-  def testCreateInvalidSandboxConfig(self):
-    with self.assertRaises(cli_test_base.MockArgumentError):
-      self.Run(
-          self.node_pools_command_base.format(self.ZONE) +
-          ' create {0} --cluster={1} --sandbox '
-          'type={2}'.format(self.NODE_POOL_NAME,
-                            self.CLUSTER_NAME, 'notatype'))
-    self.AssertErrContains('argument --sandbox')
+  def testLinuxSysctlConfig(self):
+    self.assertIsNone(
+        c_util.ClusterConfig.Load(self.CLUSTER_NAME, self.ZONE,
+                                  self.PROJECT_ID))
+    pool_kwargs = {
+        'name':
+            'my-custom-pool',
+        'clusterId':
+            self.CLUSTER_NAME,
+        'linuxNodeConfig':
+            self.msgs.LinuxNodeConfig(
+                sysctls=self.msgs.LinuxNodeConfig.SysctlsValue(
+                    additionalProperties=[
+                        self.msgs.LinuxNodeConfig.SysctlsValue
+                        .AdditionalProperty(
+                            key='net.core.somaxconn', value='4096'),
+                        self.msgs.LinuxNodeConfig.SysctlsValue
+                        .AdditionalProperty(
+                            key='net.ipv4.tcp_rmem',
+                            value='4096 87380 6291456'),
+                    ])),
+    }
 
-  def testCreateEmptySandboxConfig(self):
-    with self.assertRaises(cli_test_base.MockArgumentError):
-      self.Run(
-          self.node_pools_command_base.format(self.ZONE) +
-          ' create {0} --cluster={1} --sandbox'.format(self.NODE_POOL_NAME,
-                                                       self.CLUSTER_NAME))
-    self.AssertErrContains('argument --sandbox')
+    self.ExpectCreateNodePool(
+        self._MakeNodePool(**pool_kwargs),
+        self._MakeNodePoolOperation(**pool_kwargs))
+
+    self.ExpectGetOperation(
+        self._MakeNodePoolOperation(status=self.op_done, **pool_kwargs))
+
+    pool_version_kwargs = pool_kwargs.copy()
+    pool_version_kwargs.update({'nodeVersion': self.VERSION})
+    pool = self._MakeNodePool(**pool_version_kwargs)
+    self.ExpectGetNodePool(pool.name, response=pool)
+
+    self.Run(
+        self.node_pools_command_base.format(self.ZONE) + ' create {name}'
+        ' --cluster={clusterId}'
+        ' --linux-sysctls="net.core.somaxconn=4096,'
+        'net.ipv4.tcp_rmem=4096 87380 6291456"'.format(**pool_kwargs))
+    self.AssertOutputEquals(
+        ('NAME MACHINE_TYPE DISK_SIZE_GB NODE_VERSION\n'
+         '{name} {version}\n').format(name=pool.name, version=pool.version),
+        normalize_space=True)
+
 
 if __name__ == '__main__':
   test_case.main()

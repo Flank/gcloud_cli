@@ -64,7 +64,7 @@ FLAGS
         http://redis.io/topics/config. If a config parameter is already set,
         its value is modified; otherwise a new Redis config parameter is added.
         Currently, the only supported parameters are: maxmemory-policy,
-        notify-keyspace-events.
+        notify-keyspace-events, activedefrag, lfu-log-factor, lfu-decay-time.
 
      At most one of these may be specified:
 
@@ -86,8 +86,9 @@ FLAGS
           silently ignored.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

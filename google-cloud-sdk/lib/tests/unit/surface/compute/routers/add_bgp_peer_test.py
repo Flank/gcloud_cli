@@ -22,20 +22,19 @@ import copy
 
 from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.command_lib.compute.routers import router_utils
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import router_test_base
 from tests.lib.surface.compute import router_test_utils
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'),
-                          (calliope_base.ReleaseTrack.BETA, 'beta'),
-                          (calliope_base.ReleaseTrack.GA, 'v1'))
-class AddBgpPeerTest(parameterized.TestCase, router_test_base.RouterTestBase):
+class AddBgpPeerTestGA(router_test_base.RouterTestBase):
 
-  def testAddBgpPeerBasic_success(self, track, api_version):
-    self.SelectApi(track, api_version)
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+    self.api_version = 'v1'
+
+  def testAddBgpPeerBasic_success(self):
+    self.SelectApi(self.track, self.api_version)
 
     orig = router_test_utils.CreateMinimalRouterMessage(self.messages)
     updated = copy.deepcopy(orig)
@@ -63,10 +62,10 @@ class AddBgpPeerTest(parameterized.TestCase, router_test_base.RouterTestBase):
     self.AssertOutputEquals('')
     self.AssertErrContains('Creating peer [my-peer] in router [my-router]')
 
-  def testAddBgpPeer_async(self, track, api_version):
+  def testAddBgpPeer_async(self):
     """Test command with --async flag."""
 
-    self.SelectApi(track, api_version)
+    self.SelectApi(self.track, self.api_version)
 
     orig = router_test_utils.CreateMinimalRouterMessage(self.messages)
     updated = copy.deepcopy(orig)
@@ -93,8 +92,8 @@ class AddBgpPeerTest(parameterized.TestCase, router_test_base.RouterTestBase):
         'Run the [gcloud compute operations describe] command to check the '
         'status of this operation.\n')
 
-  def testAddBgpPeerWithAdvertisements_default(self, track, api_version):
-    self.SelectApi(track, api_version)
+  def testAddBgpPeerWithAdvertisements_default(self):
+    self.SelectApi(self.track, self.api_version)
 
     orig = router_test_utils.CreateMinimalRouterMessage(self.messages)
     updated = copy.deepcopy(orig)
@@ -120,8 +119,8 @@ class AddBgpPeerTest(parameterized.TestCase, router_test_base.RouterTestBase):
     self.AssertOutputEquals('')
     self.AssertErrContains('Creating peer [my-peer] in router [my-router]')
 
-  def testAddBgpPeerWithAdvertisements_custom(self, track, api_version):
-    self.SelectApi(track, api_version)
+  def testAddBgpPeerWithAdvertisements_custom(self):
+    self.SelectApi(self.track, self.api_version)
 
     orig = router_test_utils.CreateMinimalRouterMessage(self.messages)
     updated = copy.deepcopy(orig)
@@ -159,9 +158,8 @@ class AddBgpPeerTest(parameterized.TestCase, router_test_base.RouterTestBase):
     self.AssertOutputEquals('')
     self.AssertErrContains('Creating peer [my-peer] in router [my-router]')
 
-  def testAddBgpPeerWithAdvertisements_customWithDefaultError(
-      self, track, api_version):
-    self.SelectApi(track, api_version)
+  def testAddBgpPeerWithAdvertisements_customWithDefaultError(self):
+    self.SelectApi(self.track, self.api_version)
 
     orig = router_test_utils.CreateEmptyCustomRouterMessage(self.messages)
 
@@ -180,6 +178,66 @@ class AddBgpPeerTest(parameterized.TestCase, router_test_base.RouterTestBase):
           --set-advertisement-groups=ALL_SUBNETS
           --set-advertisement-ranges=10.10.10.10/30=custom-range,10.10.10.20/30
           """)
+
+
+class AddBgpPeerTestBeta(AddBgpPeerTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
+
+
+class AddBgpPeerTestAlpha(AddBgpPeerTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
+
+  def testAddBgpPeerBfd_success(self):
+    self.SelectApi(self.track, self.api_version)
+
+    orig = router_test_utils.CreateMinimalRouterMessage(self.messages)
+    updated = copy.deepcopy(orig)
+
+    new_peer = router_test_utils.CreateMinimalBgpPeerMessage(self.messages)
+    new_peer.interfaceName = 'my-if'
+    new_peer.peerIpAddress = '10.0.0.2'
+    new_peer.advertisedRoutePriority = 1
+    new_peer.enable = self.messages.RouterBgpPeer.EnableValueValuesEnum.FALSE
+    new_peer.bfd = self.messages.RouterBgpPeerBfd(
+        mode=self.messages.RouterBgpPeerBfd.ModeValueValuesEnum.ACTIVE,
+        minReceiveInterval=400,
+        minTransmitInterval=500,
+        multiplier=5,
+        packetMode=(self.messages.RouterBgpPeerBfd.PacketModeValueValuesEnum
+                    .CONTROL_ONLY),
+        slowTimerInterval=6000,
+    )
+
+    updated.bgpPeers.append(new_peer)
+
+    self.ExpectGet(orig)
+    self.ExpectPatch(updated)
+    self.ExpectOperationsGet()
+    self.ExpectGet(updated)
+
+    self.Run("""
+        compute routers add-bgp-peer my-router --region us-central1
+        --peer-name my-peer
+        --peer-asn 66000
+        --interface my-if
+        --peer-ip-address 10.0.0.2
+        --advertised-route-priority 1
+        --no-enabled
+        --bfd-session-initialization-mode ACTIVE
+        --bfd-min-receive-interval 400
+        --bfd-min-transmit-interval 500
+        --bfd-multiplier 5
+        --bfd-packet-mode CONTROL_ONLY
+        --bfd-slow-timer-interval 6000
+        """)
+    self.AssertOutputEquals('')
+    self.AssertErrContains('Creating peer [my-peer] in router [my-router]')
 
 
 if __name__ == '__main__':

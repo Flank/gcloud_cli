@@ -279,7 +279,10 @@ class MatchesAssertion(Assertion):
     self._regex = value_regex
 
   def Check(self, context, value):
-    if not value or not re.match(self._regex, value, flags=re.DOTALL):
+    regex = self._regex
+    if isinstance(value, six.binary_type):
+      regex = regex.encode()
+    if not value or not re.match(regex, value, flags=re.DOTALL):
       return [Failure.ForScalar(context, self.ValueRepr(), value)]
     return []
 

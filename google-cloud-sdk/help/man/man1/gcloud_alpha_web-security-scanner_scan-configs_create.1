@@ -1,0 +1,154 @@
+
+.TH "GCLOUD_ALPHA_WEB\-SECURITY\-SCANNER_SCAN\-CONFIGS_CREATE" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha web\-security\-scanner scan\-configs create \- create a Web Security Scanner ScanConfig
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha web\-security\-scanner scan\-configs create\fR \fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR \fB\-\-starting\-urls\fR=[\fISTARTING_URLS\fR,...] [\fB\-\-blacklist\-patterns\fR=[\fIBLACKLIST_PATTERNS\fR,...]] [\fB\-\-no\-export\-to\-security\-center\fR] [\fB\-\-max\-qps\fR=\fIMAX_QPS\fR] [\fB\-\-target\-platforms\fR=[\fITARGET_PLATFORMS\fR,...];\ default="app_engine,compute"] [\fB\-\-user\-agent\fR=\fIUSER_AGENT\fR] [\fB\-\-auth\-password\fR=\fIAUTH_PASSWORD\fR\ \fB\-\-auth\-type\fR=\fIAUTH_TYPE\fR\ \fB\-\-auth\-url\fR=\fIAUTH_URL\fR\ \fB\-\-auth\-user\fR=\fIAUTH_USER\fR] [\fB\-\-schedule\-interval\-days\fR=\fISCHEDULE_INTERVAL_DAYS\fR\ \fB\-\-schedule\-next\-start\fR=\fISCHEDULE_NEXT_START\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR Creates a Web Security Scanner ScanConfig.
+
+
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-display\-name\fR=\fIDISPLAY_NAME\fR
+A human\-readable name for the scan config.
+
+.TP 2m
+\fB\-\-starting\-urls\fR=[\fISTARTING_URLS\fR,...]
+URLs the scan starts scanning from. These URLs must be 'owned' by the project in
+some way (resolve to a reserved IP address, or be the default *.appspot.com).
+
+
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-blacklist\-patterns\fR=[\fIBLACKLIST_PATTERNS\fR,...]
+List of blacklist URL patterns as described online:
+https://cloud.google.com/security\-scanner/docs/excluded\-urls
+
+.TP 2m
+\fB\-\-export\-to\-security\-center\fR
+If True, the scanner will export scan results to Cloud Security Command Center.
+Defaults to true. Enabled by default, use
+\fB\-\-no\-export\-to\-security\-center\fR to disable.
+
+.TP 2m
+\fB\-\-max\-qps\fR=\fIMAX_QPS\fR
+Maximum queries per second (QPS) of the scanners. Defaults to 15, with a maximum
+of 20.
+
+.TP 2m
+\fB\-\-target\-platforms\fR=[\fITARGET_PLATFORMS\fR,...]; default="app_engine,compute"
+List of platforms the site is running on. Defaults to 'app_engine,compute'.
+\fITARGET_PLATFORMS\fR must be one of: \fBapp\-engine\fR, \fBcompute\fR,
+\fBtarget\-platform\-unspecified\fR.
+
+.TP 2m
+\fB\-\-user\-agent\fR=\fIUSER_AGENT\fR
+List of user agents to use when crawling. Defaults to 'chrome_linux'.
+\fIUSER_AGENT\fR must be one of: \fBchrome\-android\fR, \fBchrome\-linux\fR,
+\fBsafari\-iphone\fR, \fBuser\-agent\-unspecified\fR.
+
+.TP 2m
+\fB\-\-auth\-password\fR=\fIAUTH_PASSWORD\fR
+Password for the test user. Required if \f5\-\-auth\-type\fR is not 'none'.
+
+.TP 2m
+\fB\-\-auth\-type\fR=\fIAUTH_TYPE\fR
+Type of authentication to use. \fIAUTH_TYPE\fR must be one of:
+
+.RS 2m
+.TP 2m
+\fBcustom\fR
+Authentication with a custom account.
+.TP 2m
+\fBgoogle\fR
+Authentication with a Google account.
+.TP 2m
+\fBnone\fR
+Disables Authentication.
+.RE
+.sp
+
+
+.TP 2m
+\fB\-\-auth\-url\fR=\fIAUTH_URL\fR
+URL of the login page for your site. Required if \f5\-\-auth\-type\fR is
+\'custom'. Otherwise, it should not be set.
+
+.TP 2m
+\fB\-\-auth\-user\fR=\fIAUTH_USER\fR
+The test user to log in as. Required if \f5\-\-auth\-type\fR is not 'none'.
+\'google' login requires a full email address. Cannot be your own account.
+
+.TP 2m
+\fB\-\-schedule\-interval\-days\fR=\fISCHEDULE_INTERVAL_DAYS\fR
+How frequently the scan should be run automatically (in days). If not set, there
+is no automatic scheduling of this scan.
+
+.TP 2m
+\fB\-\-schedule\-next\-start\fR=\fISCHEDULE_NEXT_START\fR
+When the next automatic scheduled scan should start. Requires
+\f5\-\-schedule\-interval\-days\fR to be set. See $ gcloud topic datetimes for
+information on time formats.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBwebsecurityscanner/v1beta\fR API. The full
+documentation for this API can be found at:
+https://cloud.google.com/security\-scanner/
+
+
+
+.SH "EXAMPLES"
+
+The following command creates a scan config named "my\-scan\-config":
+
+.RS 2m
+$ gcloud alpha web\-security\-scanner scan\-configs create \e
+    \-\-display\-name=my\-scan\-config
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/.
+

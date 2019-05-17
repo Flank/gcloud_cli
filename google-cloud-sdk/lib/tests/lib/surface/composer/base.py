@@ -25,6 +25,7 @@ from apitools.base.py.testing import mock as api_mock
 from googlecloudsdk.api_lib.composer import util as api_util
 from googlecloudsdk.api_lib.util import apis
 from googlecloudsdk.command_lib.composer import storage_util as composer_storage_util
+from googlecloudsdk.command_lib.composer import util as command_util
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.util import files
 from googlecloudsdk.core.util import platforms
@@ -59,6 +60,14 @@ class ComposerUnitTestBase(sdk_test_base.WithFakeAuth, _ComposerBase):
   TEST_OPERATION_UUID2 = '22222222-2222-2222-2222-222222222222'
   TEST_GKE_CLUSTER = 'test-gke-cluster'
   TEST_CLUSTER_LOCATION = 'us-central1-a'
+  TEST_IMAGE_VERSION = 'composer-1.2.3-airflow-4.5.6'
+  TEST_UPGRADEABLE_IMAGE_VERSION = 'composer-1.3.2-airflow-1.9.0'
+  TEST_PYTHON_VERSION = '2'
+  TEST_MASTER_IPV4_CIDR_BLOCK = '192.168.0.0/26'
+  TEST_CLUSTER_IPV4_CIDR_BLOCK = '192.168.35.0/28'
+  TEST_CLUSTER_SECONDARY_RANGE_NAME = 'test-secondary-range-cluster'
+  TEST_SERVICES_IPV4_CIDR_BLOCK = '192.168.36.0/28'
+  TEST_SERVICES_SECONDARY_RANGE_NAME = 'test-secondary-range-services'
 
   TEST_ENVIRONMENT_NAME = ENVIRONMENT_NAME_FMT.format(
       TEST_PROJECT, TEST_LOCATION, TEST_ENVIRONMENT_ID)
@@ -74,6 +83,48 @@ class ComposerUnitTestBase(sdk_test_base.WithFakeAuth, _ComposerBase):
     self.test_gcs_bucket = 'test-bucket'
     self.test_gcs_bucket_path = 'gs://test-bucket'
 
+  def _SetTestImageVersionsList(self):
+    """Mimics response from ImageVersion API."""
+
+    self.test_image_versions_list = [
+        self.messages.ImageVersion(
+            imageVersionId='composer-1.3.2-airflow-1.9.1',
+            isDefault=False,
+            supportedPythonVersions=['2']),
+        self.messages.ImageVersion(
+            imageVersionId='composer-1.3.10-airflow-1.9.0',
+            isDefault=False,
+            supportedPythonVersions=['2', '3']),
+        self.messages.ImageVersion(
+            imageVersionId='composer-1.4.0-airflow-1.9.0',
+            isDefault=True,
+            supportedPythonVersions=['2', '3']),
+        self.messages.ImageVersion(
+            imageVersionId='composer-1.4.0-airflow-1.9.1',
+            isDefault=False,
+            supportedPythonVersions=['2', '3']),
+        self.messages.ImageVersion(
+            imageVersionId='composer-1.4.0-airflow-1.9.8',
+            isDefault=False,
+            supportedPythonVersions=['3']),
+        self.messages.ImageVersion(
+            imageVersionId='composer-1.4.0-airflow-1.10.0',
+            isDefault=False,
+            supportedPythonVersions=['2', '3']),
+        self.messages.ImageVersion(
+            imageVersionId='composer-1.4.0-airflow-1.10.1',
+            isDefault=False,
+            supportedPythonVersions=['2', '3']),
+        self.messages.ImageVersion(
+            imageVersionId='composer-1.5.0-airflow-1.10.1',
+            isDefault=False,
+            supportedPythonVersions=['3']),
+        self.messages.ImageVersion(
+            imageVersionId='composer-9.9.9-airflow-9.9.9',
+            isDefault=False,
+            supportedPythonVersions=['3'])
+    ]
+
   def SetTrack(self, track):
     super(ComposerUnitTestBase, self).SetTrack(track)
     self.mock_client = api_mock.Client(
@@ -82,6 +133,7 @@ class ComposerUnitTestBase(sdk_test_base.WithFakeAuth, _ComposerBase):
             api_util.GetApiVersion(release_track=self.track)))
     self.mock_client.Mock()
     self.addCleanup(self.mock_client.Unmock)
+    self._SetTestImageVersionsList()
 
   def MakeEnvironment(self,
                       project,
@@ -112,7 +164,9 @@ class ComposerUnitTestBase(sdk_test_base.WithFakeAuth, _ComposerBase):
         self.TEST_ENVIRONMENT_ID,
         config=self.messages.EnvironmentConfig(
             gkeCluster=self.TEST_GKE_CLUSTER,
-            nodeConfig=self.messages.NodeConfig(location=cluster_location)),
+            nodeConfig=self.messages.NodeConfig(location=cluster_location),
+            softwareConfig=self.messages.SoftwareConfig(
+                imageVersion=self.TEST_IMAGE_VERSION)),
         state=state)
 
   def MakeOperation(self,
@@ -261,8 +315,26 @@ class EnvironmentsUnitTest(ComposerUnitTestBase):
               pageSize=page_size,
               pageToken=page_token),
           response=mock_response,
-          exception=None)
+          exception=exception)
       page_token = mock_response.nextPageToken
+
+  def ExpectEnvironmentsListUpgrades(self,
+                                     project,
+                                     location,
+                                     page_size=None,
+                                     response=None,
+                                     exception=None):
+    if response is None and exception is None:
+      response = self.messages.Empty()
+    page_token = None
+    self.mock_client.projects_locations_imageVersions.List.Expect(
+        self.messages.ComposerProjectsLocationsImageVersionsListRequest(
+            parent=six.text_type(
+                self.LOCATION_NAME_FMT.format(project, location)),
+            pageSize=page_size,
+            pageToken=page_token),
+        response=response,
+        exception=exception)
 
   def ExpectEnvironmentPatch(self,
                              project,
@@ -346,12 +418,15 @@ class KubectlShellingUnitTest(EnvironmentsUnitTest):
   """
   TEST_GCLOUD_PATH = '/fake/path/to/gcloud'
   TEST_KUBECTL_PATH = '/fake/path/to/kubectl'
+  TEST_KUBECTL_DEFAULT_NAMESPACE = 'default'
 
   def SetUp(self):
     self.StartObjectPatch(files, 'FindExecutableOnPath',
                           self._FakeFindExecutableOnPath)
 
-  def MakeGetPodsCallback(self, pods_statuses):
+  def MakeGetPodsCallback(self,
+                          pods_statuses,
+                          kubectl_namespace=TEST_KUBECTL_DEFAULT_NAMESPACE):
     """Constructs an execution callback to use with kubectl_util.FakeExec.
 
     The callback is for a call to kubectl get pods and can return pods with
@@ -360,6 +435,7 @@ class KubectlShellingUnitTest(EnvironmentsUnitTest):
     Args:
       pods_statuses: list of tuple(str, str), pairs of (pod name, pod status)
           that will be formatted and output by the callback.
+      kubectl_namespace: str, namespace scope of the kubectl command
 
     Returns:
       Fake result of 'kubectl get pods' execution with desired pod_statuses.
@@ -368,13 +444,41 @@ class KubectlShellingUnitTest(EnvironmentsUnitTest):
         '{}\t{}'.format(pod, status) for pod, status in pods_statuses)
 
     def _GetPodsCallback(args, **kwargs):
-      kubectl_util.AssertListHasPrefix(self, args,
-                                       [self.TEST_KUBECTL_PATH, 'get', 'pods'])
+      get_pod_args = command_util.AddKubectlNamespace(
+          kubectl_namespace, [self.TEST_KUBECTL_PATH, 'get', 'pods'])
+
+      kubectl_util.AssertListHasPrefix(self, args, get_pod_args)
       if kwargs.get('out_func') is not None:
         kwargs['out_func'](output)
       return 0
 
     return _GetPodsCallback
+
+  def MakeFetchKubectlNamespaceCallback(self, namespace_statuses):
+    """Constructs an execution callback to use with kubectl_util.FakeExec.
+
+    The callback is for a call to kubectl get namespace and can return
+    namespaces with specific statuses.
+
+    Args:
+      namespace_statuses: list of tuple(str, str), pairs of (NS name, NS status)
+        that will be formatted and output by the callback.
+
+    Returns:
+      Fake result of 'kubectl get namespace --all-namespaces' execution sorted
+      (ascending) by creationTimestamp with desired namespace statuses.
+    """
+    output = '\n'.join(
+        '{}\t{}'.format(ns, status) for ns, status in namespace_statuses)
+
+    def _GetNamespacesCallback(args, **kwargs):
+      get_ns_args = [self.TEST_KUBECTL_PATH, 'get', 'namespace']
+      kubectl_util.AssertListHasPrefix(self, args, get_ns_args)
+      if kwargs.get('out_func') is not None:
+        kwargs['out_func'](output)
+      return 0
+
+    return _GetNamespacesCallback
 
   @contextlib.contextmanager
   def FakeTemporaryKubeconfig(self, *args):
@@ -510,7 +614,7 @@ class GsutilShellingUnitTest(EnvironmentsUnitTest):
       ) == platforms.OperatingSystem.WINDOWS:
         path = self.EXPECTED_WINDOWS_PATH
       expected_args = path + expected_args_to_gsutil
-      self.assertEquals(expected_args, args)
+      self.assertEqual(expected_args, args)
       return 0
 
     return _GsutilExecCallback

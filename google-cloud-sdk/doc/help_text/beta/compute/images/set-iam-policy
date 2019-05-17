@@ -1,36 +1,48 @@
 NAME
-    gcloud beta compute images set-iam-policy - set IAM policy for a disk image
+    gcloud beta compute images set-iam-policy - set the IAM policy for a Google
+        Compute Engine image
 
 SYNOPSIS
-    gcloud beta compute images set-iam-policy IMAGE_NAME POLICY_FILE
+    gcloud beta compute images set-iam-policy IMAGE POLICY_FILE
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) gcloud beta compute images set-iam-policy replaces the existing IAM
-    policy for a disk image, given an image and a file encoded in JSON or YAML
-    that contains the IAM policy. If the given policy file specifies an "etag"
-    value, then the replacement will succeed only if the policy already in
-    place matches that etag. (An etag obtained via get-iam-policy will prevent
-    the replacement if the policy for the image has been subsequently updated.)
-    A policy file that does not contain an etag value will replace any existing
-    policy for the image.
+    (BETA) Sets the IAM policy for the given image as defined in a JSON or YAML
+    file.
 
 POSITIONAL ARGUMENTS
-     IMAGE_NAME
-        Name of the disk image to set the IAM policy of.
+     Image resource - The image to set IAM policy for. This represents a Cloud
+     resource. (NOTE) Some attributes are not given arguments in this group but
+     can be set in other ways. To set the [project] attribute: provide the
+     argument [image] on the command line with a fully specified name; set the
+     property [core/project]; provide the argument [--project] on the command
+     line. This must be specified.
+
+       IMAGE
+          ID of the image or fully qualified identifier for the image.
 
      POLICY_FILE
-        JSON or YAML file containing the IAM policy.
+        Path to a local JSON or YAML formatted file containing a valid policy.
+
+        The output of the get-iam-policy command is a valid file, as is any
+        JSON or YAML file conforming to the structure of a Policy
+        (https://cloud.google.com/iam/reference/rest/v1/Policy).
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
+API REFERENCE
+    This command uses the compute/beta API. The full documentation for this API
+    can be found at:
+    https://developers.google.com/compute/docs/reference/latest/
+
 EXAMPLES
-    The following command will read an IAM policy defined in a JSON file
-    'policy.json' and set it for a disk image with identifier 'my-image'
+    The following command will read am IAM policy defined in a JSON file
+    'policy.json' and set it for the image my-image:
 
         $ gcloud beta compute images set-iam-policy my-image policy.json
 
@@ -38,8 +50,9 @@ EXAMPLES
     policy file format and contents.
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud compute images set-iam-policy
         $ gcloud alpha compute images set-iam-policy
 

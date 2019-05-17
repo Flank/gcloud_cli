@@ -68,17 +68,6 @@ class OperationsClientTest(base.MlGaPlatformTestBase):
         operationsId='opId', projectsId=self.Project())
     self.assertEqual(self.operations_client.Cancel(operation_ref), response)
 
-  def testDelete(self):
-    response = self.msgs.GoogleProtobufEmpty()
-    self.client.projects_operations.Delete.Expect(
-        self.msgs.MlProjectsOperationsDeleteRequest(
-            name='projects/{}/operations/opId'.format(self.Project())),
-        response)
-    operation_ref = resources.REGISTRY.Create(
-        'ml.projects.operations',
-        operationsId='opId', projectsId=self.Project())
-    self.assertEqual(self.operations_client.Delete(operation_ref), response)
-
   def testWaitForOperation_Success(self):
     self.client.projects_operations.Get.Expect(
         self.msgs.MlProjectsOperationsGetRequest(

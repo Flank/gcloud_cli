@@ -11,7 +11,7 @@ gcloud compute disks resize \- resize a disk or disks
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute disks resize\fR \fIDISK_NAME\fR [\fIDISK_NAME\fR\ ...] \fB\-\-size\fR=\fISIZE\fR [\fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute disks resize\fR \fIDISK_NAME\fR [\fIDISK_NAME\fR\ ...] \fB\-\-size\fR=\fISIZE\fR [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -53,6 +53,38 @@ produce 10 gigabyte disks. Disk size must be a multiple of 1 GB.
 
 .RS 2m
 .TP 2m
+
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-region\fR=\fIREGION\fR
+Region of the disks to operate on. If not specified, you may be prompted to
+select a region.
+
+To avoid prompting when this flag is omitted, you can set the
+\f5\fIcompute/region\fR\fR property:
+
+.RS 2m
+$ gcloud config set compute/region REGION
+.RE
+
+A list of regions can be fetched by running:
+
+.RS 2m
+$ gcloud compute regions list
+.RE
+
+To unset the property, run:
+
+.RS 2m
+$ gcloud config unset compute/region
+.RE
+
+Alternatively, the region can be stored in the environment variable
+\f5\fICLOUDSDK_COMPUTE_REGION\fR\fR.
+
+.TP 2m
 \fB\-\-zone\fR=\fIZONE\fR
 Zone of the disks to operate on. If not specified and the
 \f5\fIcompute/zone\fR\fR property isn't set, you may be prompted to select a
@@ -82,14 +114,16 @@ Alternatively, the zone can be stored in the environment variable
 
 
 .RE
+.RE
 .sp
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

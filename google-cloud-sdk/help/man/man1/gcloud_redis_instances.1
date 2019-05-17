@@ -17,10 +17,11 @@ gcloud redis instances \- manage Cloud Memorystore Redis instances
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -40,6 +41,11 @@ Delete a Redis instance.
 .TP 2m
 \fBdescribe\fR
 Show metadata for a Memorystore Redis instance.
+
+.TP 2m
+\fBfailover\fR
+Failover a standard tier Cloud Memorystore for Redis instance from the master
+node to its replica.
 
 .TP 2m
 \fBlist\fR

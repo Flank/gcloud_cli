@@ -1085,8 +1085,14 @@ class EndpointsDeployTest(unit_test_base.EV1UnitTestBase, test_case.WithInput):
         exception=http_error.MakeHttpError(code=403)
     )
 
-    self.Run('{0} {1} --validate-only'.format(
-        self.base_cmd, self._swagger_file_path))
+    with self.AssertRaisesExceptionMatches(
+        core_exceptions.Error,
+        'The service {0} must exist in order to '
+        'validate the configuration. To create the service in project '
+        '{1}, rerun the command without the --validate-only flag.'.format(
+            SERVICE_NAME, self.PROJECT_NAME)):
+      self.Run('{0} {1} --validate-only'.format(
+          self.base_cmd, self._swagger_file_path))
 
     # Make sure the uploaded status message does not print out, since this is
     # a validate-only run.

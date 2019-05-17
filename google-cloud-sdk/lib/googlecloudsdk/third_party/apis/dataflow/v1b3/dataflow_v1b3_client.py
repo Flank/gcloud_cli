@@ -43,8 +43,11 @@ class DataflowV1b3(base_api.BaseApiClient):
     self.projects_locations_jobs_messages = self.ProjectsLocationsJobsMessagesService(self)
     self.projects_locations_jobs_workItems = self.ProjectsLocationsJobsWorkItemsService(self)
     self.projects_locations_jobs = self.ProjectsLocationsJobsService(self)
+    self.projects_locations_snapshots = self.ProjectsLocationsSnapshotsService(self)
+    self.projects_locations_sql = self.ProjectsLocationsSqlService(self)
     self.projects_locations_templates = self.ProjectsLocationsTemplatesService(self)
     self.projects_locations = self.ProjectsLocationsService(self)
+    self.projects_snapshots = self.ProjectsSnapshotsService(self)
     self.projects_templates = self.ProjectsTemplatesService(self)
     self.projects = self.ProjectsService(self)
 
@@ -122,6 +125,12 @@ class DataflowV1b3(base_api.BaseApiClient):
 
     def List(self, request, global_params=None):
       r"""Request the job status.
+
+To request the status of a job, we recommend using
+`projects.locations.jobs.messages.list` with a [regional endpoint]
+(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using
+`projects.jobs.messages.list` is not recommended, as you can only request
+the status of jobs that are running in `us-central1`.
 
       Args:
         request: (DataflowProjectsJobsMessagesListRequest) input message
@@ -247,6 +256,12 @@ class DataflowV1b3(base_api.BaseApiClient):
     def Create(self, request, global_params=None):
       r"""Creates a Cloud Dataflow job.
 
+To create a job, we recommend using `projects.locations.jobs.create` with a
+[regional endpoint]
+(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using
+`projects.jobs.create` is not recommended, as your job will always start
+in `us-central1`.
+
       Args:
         request: (DataflowProjectsJobsCreateRequest) input message
         global_params: (StandardQueryParameters, default: None) global arguments
@@ -272,6 +287,12 @@ class DataflowV1b3(base_api.BaseApiClient):
 
     def Get(self, request, global_params=None):
       r"""Gets the state of the specified Cloud Dataflow job.
+
+To get the state of a job, we recommend using `projects.locations.jobs.get`
+with a [regional endpoint]
+(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using
+`projects.jobs.get` is not recommended, as you can only get the state of
+jobs that are running in `us-central1`.
 
       Args:
         request: (DataflowProjectsJobsGetRequest) input message
@@ -299,6 +320,12 @@ class DataflowV1b3(base_api.BaseApiClient):
     def GetMetrics(self, request, global_params=None):
       r"""Request the job status.
 
+To request the status of a job, we recommend using
+`projects.locations.jobs.getMetrics` with a [regional endpoint]
+(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using
+`projects.jobs.getMetrics` is not recommended, as you can only request the
+status of jobs that are running in `us-central1`.
+
       Args:
         request: (DataflowProjectsJobsGetMetricsRequest) input message
         global_params: (StandardQueryParameters, default: None) global arguments
@@ -323,7 +350,14 @@ class DataflowV1b3(base_api.BaseApiClient):
     )
 
     def List(self, request, global_params=None):
-      r"""List the jobs of a project in a given region.
+      r"""List the jobs of a project.
+
+To list the jobs of a project in a region, we recommend using
+`projects.locations.jobs.get` with a [regional endpoint]
+(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). To
+list the all jobs across all regions, use `projects.jobs.aggregated`. Using
+`projects.jobs.list` is not recommended, as you can only get the list of
+jobs that are running in `us-central1`.
 
       Args:
         request: (DataflowProjectsJobsListRequest) input message
@@ -376,6 +410,12 @@ class DataflowV1b3(base_api.BaseApiClient):
 
     def Update(self, request, global_params=None):
       r"""Updates the state of an existing Cloud Dataflow job.
+
+To update the state of an existing job, we recommend using
+`projects.locations.jobs.update` with a [regional endpoint]
+(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using
+`projects.jobs.update` is not recommended, as you can only update the state
+of jobs that are running in `us-central1`.
 
       Args:
         request: (DataflowProjectsJobsUpdateRequest) input message
@@ -475,6 +515,12 @@ class DataflowV1b3(base_api.BaseApiClient):
     def List(self, request, global_params=None):
       r"""Request the job status.
 
+To request the status of a job, we recommend using
+`projects.locations.jobs.messages.list` with a [regional endpoint]
+(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using
+`projects.jobs.messages.list` is not recommended, as you can only request
+the status of jobs that are running in `us-central1`.
+
       Args:
         request: (DataflowProjectsLocationsJobsMessagesListRequest) input message
         global_params: (StandardQueryParameters, default: None) global arguments
@@ -573,6 +619,12 @@ class DataflowV1b3(base_api.BaseApiClient):
     def Create(self, request, global_params=None):
       r"""Creates a Cloud Dataflow job.
 
+To create a job, we recommend using `projects.locations.jobs.create` with a
+[regional endpoint]
+(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using
+`projects.jobs.create` is not recommended, as your job will always start
+in `us-central1`.
+
       Args:
         request: (DataflowProjectsLocationsJobsCreateRequest) input message
         global_params: (StandardQueryParameters, default: None) global arguments
@@ -598,6 +650,12 @@ class DataflowV1b3(base_api.BaseApiClient):
 
     def Get(self, request, global_params=None):
       r"""Gets the state of the specified Cloud Dataflow job.
+
+To get the state of a job, we recommend using `projects.locations.jobs.get`
+with a [regional endpoint]
+(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using
+`projects.jobs.get` is not recommended, as you can only get the state of
+jobs that are running in `us-central1`.
 
       Args:
         request: (DataflowProjectsLocationsJobsGetRequest) input message
@@ -625,6 +683,12 @@ class DataflowV1b3(base_api.BaseApiClient):
     def GetMetrics(self, request, global_params=None):
       r"""Request the job status.
 
+To request the status of a job, we recommend using
+`projects.locations.jobs.getMetrics` with a [regional endpoint]
+(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using
+`projects.jobs.getMetrics` is not recommended, as you can only request the
+status of jobs that are running in `us-central1`.
+
       Args:
         request: (DataflowProjectsLocationsJobsGetMetricsRequest) input message
         global_params: (StandardQueryParameters, default: None) global arguments
@@ -649,7 +713,14 @@ class DataflowV1b3(base_api.BaseApiClient):
     )
 
     def List(self, request, global_params=None):
-      r"""List the jobs of a project in a given region.
+      r"""List the jobs of a project.
+
+To list the jobs of a project in a region, we recommend using
+`projects.locations.jobs.get` with a [regional endpoint]
+(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). To
+list the all jobs across all regions, use `projects.jobs.aggregated`. Using
+`projects.jobs.list` is not recommended, as you can only get the list of
+jobs that are running in `us-central1`.
 
       Args:
         request: (DataflowProjectsLocationsJobsListRequest) input message
@@ -703,6 +774,12 @@ class DataflowV1b3(base_api.BaseApiClient):
     def Update(self, request, global_params=None):
       r"""Updates the state of an existing Cloud Dataflow job.
 
+To update the state of an existing job, we recommend using
+`projects.locations.jobs.update` with a [regional endpoint]
+(https://cloud.google.com/dataflow/docs/concepts/regional-endpoints). Using
+`projects.jobs.update` is not recommended, as you can only update the state
+of jobs that are running in `us-central1`.
+
       Args:
         request: (DataflowProjectsLocationsJobsUpdateRequest) input message
         global_params: (StandardQueryParameters, default: None) global arguments
@@ -723,6 +800,133 @@ class DataflowV1b3(base_api.BaseApiClient):
         request_field=u'job',
         request_type_name=u'DataflowProjectsLocationsJobsUpdateRequest',
         response_type_name=u'Job',
+        supports_download=False,
+    )
+
+  class ProjectsLocationsSnapshotsService(base_api.BaseApiService):
+    """Service class for the projects_locations_snapshots resource."""
+
+    _NAME = u'projects_locations_snapshots'
+
+    def __init__(self, client):
+      super(DataflowV1b3.ProjectsLocationsSnapshotsService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def Delete(self, request, global_params=None):
+      r"""Deletes a snapshot.
+
+      Args:
+        request: (DataflowProjectsLocationsSnapshotsDeleteRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (DeleteSnapshotResponse) The response message.
+      """
+      config = self.GetMethodConfig('Delete')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Delete.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'DELETE',
+        method_id=u'dataflow.projects.locations.snapshots.delete',
+        ordered_params=[u'projectId', u'location', u'snapshotId'],
+        path_params=[u'location', u'projectId', u'snapshotId'],
+        query_params=[],
+        relative_path=u'v1b3/projects/{projectId}/locations/{location}/snapshots/{snapshotId}',
+        request_field='',
+        request_type_name=u'DataflowProjectsLocationsSnapshotsDeleteRequest',
+        response_type_name=u'DeleteSnapshotResponse',
+        supports_download=False,
+    )
+
+    def Get(self, request, global_params=None):
+      r"""Gets information about a snapshot.
+
+      Args:
+        request: (DataflowProjectsLocationsSnapshotsGetRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Snapshot) The response message.
+      """
+      config = self.GetMethodConfig('Get')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'dataflow.projects.locations.snapshots.get',
+        ordered_params=[u'projectId', u'location', u'snapshotId'],
+        path_params=[u'location', u'projectId', u'snapshotId'],
+        query_params=[],
+        relative_path=u'v1b3/projects/{projectId}/locations/{location}/snapshots/{snapshotId}',
+        request_field='',
+        request_type_name=u'DataflowProjectsLocationsSnapshotsGetRequest',
+        response_type_name=u'Snapshot',
+        supports_download=False,
+    )
+
+    def List(self, request, global_params=None):
+      r"""Lists snapshots.
+
+      Args:
+        request: (DataflowProjectsLocationsSnapshotsListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (ListSnapshotsResponse) The response message.
+      """
+      config = self.GetMethodConfig('List')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    List.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'dataflow.projects.locations.snapshots.list',
+        ordered_params=[u'projectId', u'location'],
+        path_params=[u'location', u'projectId'],
+        query_params=[],
+        relative_path=u'v1b3/projects/{projectId}/locations/{location}/snapshots',
+        request_field='',
+        request_type_name=u'DataflowProjectsLocationsSnapshotsListRequest',
+        response_type_name=u'ListSnapshotsResponse',
+        supports_download=False,
+    )
+
+  class ProjectsLocationsSqlService(base_api.BaseApiService):
+    """Service class for the projects_locations_sql resource."""
+
+    _NAME = u'projects_locations_sql'
+
+    def __init__(self, client):
+      super(DataflowV1b3.ProjectsLocationsSqlService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def Validate(self, request, global_params=None):
+      r"""Validates a GoogleSQL query for Cloud Dataflow syntax. Will always.
+confirm the given query parses correctly, and if able to look up
+schema information from DataCatalog, will validate that the query
+analyzes properly as well.
+
+      Args:
+        request: (DataflowProjectsLocationsSqlValidateRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (ValidateResponse) The response message.
+      """
+      config = self.GetMethodConfig('Validate')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Validate.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'dataflow.projects.locations.sql.validate',
+        ordered_params=[u'projectId', u'location'],
+        path_params=[u'location', u'projectId'],
+        query_params=[u'query'],
+        relative_path=u'v1b3/projects/{projectId}/locations/{location}/sql:validate',
+        request_field='',
+        request_type_name=u'DataflowProjectsLocationsSqlValidateRequest',
+        response_type_name=u'ValidateResponse',
         supports_download=False,
     )
 
@@ -850,6 +1054,68 @@ class DataflowV1b3(base_api.BaseApiClient):
         supports_download=False,
     )
 
+  class ProjectsSnapshotsService(base_api.BaseApiService):
+    """Service class for the projects_snapshots resource."""
+
+    _NAME = u'projects_snapshots'
+
+    def __init__(self, client):
+      super(DataflowV1b3.ProjectsSnapshotsService, self).__init__(client)
+      self._upload_configs = {
+          }
+
+    def Get(self, request, global_params=None):
+      r"""Gets information about a snapshot.
+
+      Args:
+        request: (DataflowProjectsSnapshotsGetRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (Snapshot) The response message.
+      """
+      config = self.GetMethodConfig('Get')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    Get.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'dataflow.projects.snapshots.get',
+        ordered_params=[u'projectId', u'snapshotId'],
+        path_params=[u'projectId', u'snapshotId'],
+        query_params=[u'location'],
+        relative_path=u'v1b3/projects/{projectId}/snapshots/{snapshotId}',
+        request_field='',
+        request_type_name=u'DataflowProjectsSnapshotsGetRequest',
+        response_type_name=u'Snapshot',
+        supports_download=False,
+    )
+
+    def List(self, request, global_params=None):
+      r"""Lists snapshots.
+
+      Args:
+        request: (DataflowProjectsSnapshotsListRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (ListSnapshotsResponse) The response message.
+      """
+      config = self.GetMethodConfig('List')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    List.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'GET',
+        method_id=u'dataflow.projects.snapshots.list',
+        ordered_params=[u'projectId'],
+        path_params=[u'projectId'],
+        query_params=[u'location'],
+        relative_path=u'v1b3/projects/{projectId}/snapshots',
+        request_field='',
+        request_type_name=u'DataflowProjectsSnapshotsListRequest',
+        response_type_name=u'ListSnapshotsResponse',
+        supports_download=False,
+    )
+
   class ProjectsTemplatesService(base_api.BaseApiService):
     """Service class for the projects_templates resource."""
 
@@ -947,6 +1213,32 @@ class DataflowV1b3(base_api.BaseApiClient):
       super(DataflowV1b3.ProjectsService, self).__init__(client)
       self._upload_configs = {
           }
+
+    def DeleteSnapshots(self, request, global_params=None):
+      r"""Deletes a snapshot.
+
+      Args:
+        request: (DataflowProjectsDeleteSnapshotsRequest) input message
+        global_params: (StandardQueryParameters, default: None) global arguments
+      Returns:
+        (DeleteSnapshotResponse) The response message.
+      """
+      config = self.GetMethodConfig('DeleteSnapshots')
+      return self._RunMethod(
+          config, request, global_params=global_params)
+
+    DeleteSnapshots.method_config = lambda: base_api.ApiMethodInfo(
+        http_method=u'DELETE',
+        method_id=u'dataflow.projects.deleteSnapshots',
+        ordered_params=[u'projectId'],
+        path_params=[u'projectId'],
+        query_params=[u'location', u'snapshotId'],
+        relative_path=u'v1b3/projects/{projectId}/snapshots',
+        request_field='',
+        request_type_name=u'DataflowProjectsDeleteSnapshotsRequest',
+        response_type_name=u'DeleteSnapshotResponse',
+        supports_download=False,
+    )
 
     def WorkerMessages(self, request, global_params=None):
       r"""Send a worker_message to the service.

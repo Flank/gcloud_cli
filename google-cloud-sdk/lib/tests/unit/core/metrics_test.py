@@ -29,7 +29,9 @@ from googlecloudsdk.core import execution_utils
 from googlecloudsdk.core import metrics
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.util import files
+from tests.lib import cli_test_base
 from tests.lib import test_case
+
 import mock
 
 
@@ -37,7 +39,7 @@ class TestException(Exception):
   __module__ = 'test'
 
 
-class MetricsTests(test_case.Base):
+class MetricsTests(cli_test_base.CliTestBase):
 
   def SetUp(self):
     # Mock out config/properties that enable/disable reporting
@@ -81,7 +83,7 @@ class MetricsTests(test_case.Base):
     metrics._MetricsCollector._instance = None
 
   def testDisabling(self):
-    cid_mock = self.StartObjectPatch(metrics._MetricsCollector, '_GetCID')
+    cid_mock = self.StartObjectPatch(metrics, 'GetCID')
     cid_mock.return_value = '123'
 
     with mock.patch.dict(os.environ, values={'_ARGCOMPLETE': 'something'}):
@@ -92,8 +94,7 @@ class MetricsTests(test_case.Base):
     with mock.patch.dict(os.environ, clear=True):
       self.assertEqual(
           self.collector, metrics._MetricsCollector.GetCollector())
-      self.assertEqual(
-          self.collector._GetCID(), metrics.GetCIDIfMetricsEnabled())
+      self.assertEqual(metrics.GetCID(), metrics.GetCIDIfMetricsEnabled())
     metrics._MetricsCollector._disabled_cache = None
 
     self.prop_mock.return_value = True
@@ -103,10 +104,9 @@ class MetricsTests(test_case.Base):
 
     self.prop_mock.return_value = False
     self.assertEqual(self.collector, metrics._MetricsCollector.GetCollector())
-    self.assertEqual(
-        self.collector._GetCID(), metrics.GetCIDIfMetricsEnabled())
-    self.assertEqual(
-        self.collector._GetUserAgent(), metrics.GetUserAgentIfMetricsEnabled())
+    self.assertEqual(metrics.GetCID(), metrics.GetCIDIfMetricsEnabled())
+    self.assertEqual(metrics.GetUserAgent(),
+                     metrics.GetUserAgentIfMetricsEnabled())
     metrics._MetricsCollector._disabled_cache = None
 
     self.prop_mock.return_value = None
@@ -118,20 +118,20 @@ class MetricsTests(test_case.Base):
 
     self.config_mock.disable_usage_reporting = False
     self.assertEqual(self.collector, metrics._MetricsCollector.GetCollector())
-    self.assertEqual(
-        self.collector._GetCID(), metrics.GetCIDIfMetricsEnabled())
-    self.assertEqual(
-        self.collector._GetUserAgent(), metrics.GetUserAgentIfMetricsEnabled())
+    self.assertEqual(metrics.GetCID(), metrics.GetCIDIfMetricsEnabled())
+    self.assertEqual(metrics.GetUserAgent(),
+                     metrics.GetUserAgentIfMetricsEnabled())
     metrics._MetricsCollector._disabled_cache = None
 
-  def _ClearcutMetricFromEventList(self, clearcut_events, request_time=0):
-    clearcut_request = {
-        'request_time_ms': request_time,
-        'log_event': [
-            {'source_extension_json': json.dumps(event, sort_keys=True)}
-            for event in clearcut_events
-        ]
-    }
+  def _ClearcutMetricFromEventList(self, clearcut_timed_events, request_time=0):
+
+    clearcut_request = {'request_time_ms': request_time, 'log_event': []}
+    for event, event_time in clearcut_timed_events:
+      clearcut_request['log_event'].append({
+          'source_extension_json': json.dumps(event, sort_keys=True),
+          'event_time_ms': event_time
+      })
+
     clearcut_request.update(self.collector._clearcut_request_params)
     clearcut_metric = (
         metrics._CLEARCUT_ENDPOINT,
@@ -140,11 +140,12 @@ class MetricsTests(test_case.Base):
         {'user-agent': self.collector._user_agent})
     return clearcut_metric
 
-  def _ClearcutMetricFromEvent(self, clearcut_event, request_time):
-    return self._ClearcutMetricFromEventList([clearcut_event], request_time)
+  def _ClearcutMetricFromEvent(self, clearcut_timed_event, request_time=0):
+    return self._ClearcutMetricFromEventList([clearcut_timed_event],
+                                             request_time)
 
   def testEventsCollection(self):
-    time_mock = self.StartObjectPatch(metrics, '_GetTimeMillis')
+    time_mock = self.StartObjectPatch(metrics, 'GetTimeMillis')
     time_mock.return_value = 0
     metrics.Started(0)
 
@@ -152,74 +153,95 @@ class MetricsTests(test_case.Base):
     expected_ga_events = []
     self.assertEqual(expected_ga_events, collected_ga_events)
 
-    collected_clearcut_events = self.collector._clearcut_concord_events
-    expected_clearcut_events = []
-    self.assertEqual(expected_clearcut_events, collected_clearcut_events)
+    collected_clearcut_timed_events = self.collector._clearcut_concord_timed_events
+    expected_clearcut_timed_events = []
+    self.assertEqual(expected_clearcut_timed_events,
+                     collected_clearcut_timed_events)
 
     metrics.Installs('cmp1', 'v3')
     expected_ga_events.append('ec=Installs&ea=cmp1&el=v3&ev=0&a=b&c=d')
-    expected_clearcut_events.append({
+    expected_clearcut_timed_events.append(({
         'event_type': 'Installs',
         'event_name': 'cmp1',
-        'event_metadata': [
-            {'c': 'd'},
-            {'key': 'component_version', 'value': 'v3'}
-        ],
+        'event_metadata': [{
+            'c': 'd'
+        }, {
+            'key': 'component_version',
+            'value': 'v3'
+        }],
         'a': 'b',
-    })
+    }, 0))
 
     metrics.Executions('cmd1', 'v7')
     expected_ga_events.append('ec=Executions&ea=cmd1&el=v7&ev=0&a=b&c=d')
-    expected_clearcut_events.append({
+    expected_clearcut_timed_events.append(({
         'event_type': 'Executions',
         'event_name': 'cmd1',
-        'event_metadata': [
-            {'c': 'd'},
-            {'key': 'binary_version', 'value': 'v7'}
-        ],
+        'event_metadata': [{
+            'c': 'd'
+        }, {
+            'key': 'binary_version',
+            'value': 'v7'
+        }],
         'a': 'b',
-    })
+    }, 0))
 
     metrics.Commands('cmd3', 'v13', None)
     expected_ga_events.append('ec=Commands&ea=cmd3&el=v13&ev=0&cd6=&a=b&c=d')
-    expected_clearcut_events.append({
+    expected_clearcut_timed_events.append(({
         'event_type': 'Commands',
         'event_name': 'cmd3',
         'event_metadata': [
-            {'c': 'd'},
-            {'key': 'flag_names', 'value': ''},
+            {
+                'c': 'd'
+            },
+            {
+                'key': 'flag_names',
+                'value': ''
+            },
         ],
         'a': 'b',
-    })
+    }, 0))
 
     metrics.Error('cmd3', TestException, None)
     expected_ga_events.append(
         'ec=Error&ea=cmd3&el=test.TestException&ev=0&cd6=&a=b&c=d')
-    expected_clearcut_events.append({
+    expected_clearcut_timed_events.append(({
         'event_type': 'Error',
         'event_name': 'cmd3',
         'event_metadata': [
-            {'c': 'd'},
-            {'key': 'flag_names', 'value': ''},
-            {'key': 'error_type', 'value': 'test.TestException'},
+            {
+                'c': 'd'
+            },
+            {
+                'key': 'flag_names',
+                'value': ''
+            },
+            {
+                'key': 'error_type',
+                'value': 'test.TestException'
+            },
         ],
         'a': 'b',
-    })
+    }, 0))
 
     metrics.Help('cmd3', '--help')
     expected_ga_events.append('ec=Help&ea=cmd3&el=--help&ev=0&a=b&c=d')
-    expected_clearcut_events.append({
+    expected_clearcut_timed_events.append(({
         'event_type': 'Help',
         'event_name': 'cmd3',
-        'event_metadata': [
-            {'c': 'd'},
-            {'key': 'help_mode', 'value': '--help'}
-        ],
+        'event_metadata': [{
+            'c': 'd'
+        }, {
+            'key': 'help_mode',
+            'value': '--help'
+        }],
         'a': 'b',
-    })
+    }, 0))
 
     self.assertEqual(expected_ga_events, collected_ga_events)
-    self.assertEqual(expected_clearcut_events, collected_clearcut_events)
+    self.assertEqual(expected_clearcut_timed_events,
+                     collected_clearcut_timed_events)
 
     self.StartObjectPatch(metrics._MetricsCollector, 'ReportMetrics')
     metrics.Shutdown()
@@ -241,7 +263,7 @@ class MetricsTests(test_case.Base):
         '\n'.join(expected_ga_events + expected_ga_timings),
         {'user-agent': 'user-agent-007'})
 
-    for event in expected_clearcut_events:
+    for event, _ in expected_clearcut_timed_events:
       event['latency_ms'] = 0
       event['sub_event_latency_ms'] = [
           {'key': 'total', 'latency_ms': 0},
@@ -249,13 +271,13 @@ class MetricsTests(test_case.Base):
           {'key': 'remote', 'latency_ms': 0}
       ]
     clearcut_metric = self._ClearcutMetricFromEventList(
-        expected_clearcut_events)
+        expected_clearcut_timed_events)
 
     self.assertEqual([csi_metric, ga_metric, clearcut_metric],
                      self.collector._metrics)
 
   def testFlagCollection(self):
-    time_mock = self.StartObjectPatch(metrics, '_GetTimeMillis')
+    time_mock = self.StartObjectPatch(metrics, 'GetTimeMillis')
     time_mock.return_value = 0
     metrics.Started(0)
 
@@ -263,68 +285,88 @@ class MetricsTests(test_case.Base):
     expected_ga_events = []
     self.assertEqual(expected_ga_events, collected_ga_events)
 
-    collected_clearcut_events = self.collector._clearcut_concord_events
-    expected_clearcut_events = []
-    self.assertEqual(expected_clearcut_events, collected_clearcut_events)
+    collected_clearcut_timed_events = self.collector._clearcut_concord_timed_events
+    expected_clearcut_timed_events = []
+    self.assertEqual(expected_clearcut_timed_events,
+                     collected_clearcut_timed_events)
 
     metrics.Commands('cmd1', 'v13', [])
     expected_ga_events.append(
         'ec=Commands&ea=cmd1&el=v13&ev=0&cd6=%3D%3DNONE%3D%3D&a=b&c=d')
-    expected_clearcut_events.append({
+    expected_clearcut_timed_events.append(({
         'event_type': 'Commands',
         'event_name': 'cmd1',
         'event_metadata': [
-            {'c': 'd'},
-            {'key': 'flag_names', 'value': '==NONE=='},
+            {
+                'c': 'd'
+            },
+            {
+                'key': 'flag_names',
+                'value': '==NONE=='
+            },
         ],
         'a': 'b',
-    })
+    }, 0))
 
     metrics.Commands('cmd2', 'v13', ['BAZ', '--foo', 'BAR'])
     expected_ga_events.append(
         'ec=Commands&ea=cmd2&el=v13&ev=0&cd6=--foo%2CBAR%2CBAZ&a=b&c=d')
-    expected_clearcut_events.append({
+    expected_clearcut_timed_events.append(({
         'event_type': 'Commands',
         'event_name': 'cmd2',
         'event_metadata': [
-            {'c': 'd'},
-            {'key': 'flag_names', 'value': '--foo,BAR,BAZ'},
+            {
+                'c': 'd'
+            },
+            {
+                'key': 'flag_names',
+                'value': '--foo,BAR,BAZ'
+            },
         ],
         'a': 'b',
-    })
+    }, 0))
 
     metrics.Error('cmd3', TestException, [])
     expected_ga_events.append(
         'ec=Error&ea=cmd3&el=test.TestException&ev=0&cd6=%3D%3DNONE%3D%3D'
         '&a=b&c=d')
-    expected_clearcut_events.append({
+    expected_clearcut_timed_events.append(({
         'event_type': 'Error',
         'event_name': 'cmd3',
-        'event_metadata': [
-            {'c': 'd'},
-            {'key': 'flag_names', 'value': '==NONE=='},
-            {'key': 'error_type', 'value': 'test.TestException'}
-        ],
+        'event_metadata': [{
+            'c': 'd'
+        }, {
+            'key': 'flag_names',
+            'value': '==NONE=='
+        }, {
+            'key': 'error_type',
+            'value': 'test.TestException'
+        }],
         'a': 'b',
-    })
+    }, 0))
 
     metrics.Error('cmd4', TestException, ['BAZ', '--foo', 'BAR'])
     expected_ga_events.append(
         'ec=Error&ea=cmd4&el=test.TestException&ev=0&cd6=--foo%2CBAR%2CBAZ'
         '&a=b&c=d')
-    expected_clearcut_events.append({
+    expected_clearcut_timed_events.append(({
         'event_type': 'Error',
         'event_name': 'cmd4',
-        'event_metadata': [
-            {'c': 'd'},
-            {'key': 'flag_names', 'value': '--foo,BAR,BAZ'},
-            {'key': 'error_type', 'value': 'test.TestException'}
-        ],
+        'event_metadata': [{
+            'c': 'd'
+        }, {
+            'key': 'flag_names',
+            'value': '--foo,BAR,BAZ'
+        }, {
+            'key': 'error_type',
+            'value': 'test.TestException'
+        }],
         'a': 'b',
-    })
+    }, 0))
 
     self.assertEqual(expected_ga_events, collected_ga_events)
-    self.assertEqual(expected_clearcut_events, collected_clearcut_events)
+    self.assertEqual(expected_clearcut_timed_events,
+                     collected_clearcut_timed_events)
 
     self.StartObjectPatch(metrics._MetricsCollector, 'ReportMetrics')
     metrics.Shutdown()
@@ -350,7 +392,8 @@ class MetricsTests(test_case.Base):
 
     # In the event of nested execution, only the top level command should have
     # latencies.
-    for event in expected_clearcut_events[:1] + expected_clearcut_events[2:]:
+    for event, _ in (expected_clearcut_timed_events[:1]
+                     + expected_clearcut_timed_events[2:]):
       event['latency_ms'] = 0
       event['sub_event_latency_ms'] = [
           {'key': 'total', 'latency_ms': 0},
@@ -358,13 +401,13 @@ class MetricsTests(test_case.Base):
           {'key': 'remote', 'latency_ms': 0}
       ]
     clearcut_metric = self._ClearcutMetricFromEventList(
-        expected_clearcut_events)
+        expected_clearcut_timed_events)
 
     self.assertEqual([csi_metric, ga_metric, clearcut_metric],
                      self.collector._metrics)
 
   def testCommandLatencyMetricsCollection(self):
-    time_mock = self.StartObjectPatch(metrics, '_GetTimeMillis')
+    time_mock = self.StartObjectPatch(metrics, 'GetTimeMillis')
     time_mock.return_value = 100
     metrics.Started(0.100)
 
@@ -402,30 +445,55 @@ class MetricsTests(test_case.Base):
         'utv=local&utt=200&utc=Commands&utl=cmd.s-cmd&cd6=&i=j',
         {'user-agent': 'user-agent-007'})
 
-    clearcut_event = {
-        'event_type': 'Commands',
-        'event_name': 'cmd.s-cmd',
+    clearcut_timed_event = ({
+        'event_type':
+            'Commands',
+        'event_name':
+            'cmd.s-cmd',
         'event_metadata': [
-            {'c': 'd'},
-            {'key': 'flag_names', 'value': ''},
+            {
+                'c': 'd'
+            },
+            {
+                'key': 'flag_names',
+                'value': ''
+            },
         ],
-        'a': 'b',
-        'latency_ms': 450,
+        'a':
+            'b',
+        'latency_ms':
+            450,
         'sub_event_latency_ms': [
-            {'key': 'load', 'latency_ms': 50},
-            {'key': 'run', 'latency_ms': 350},
-            {'key': 'total', 'latency_ms': 450},
-            {'key': 'local', 'latency_ms': 200},
-            {'key': 'remote', 'latency_ms': 250},
+            {
+                'key': 'load',
+                'latency_ms': 50
+            },
+            {
+                'key': 'run',
+                'latency_ms': 350
+            },
+            {
+                'key': 'total',
+                'latency_ms': 450
+            },
+            {
+                'key': 'local',
+                'latency_ms': 200
+            },
+            {
+                'key': 'remote',
+                'latency_ms': 250
+            },
         ]
-    }
-    clearcut_metric = self._ClearcutMetricFromEvent(clearcut_event, 550)
+    }, 100)
+    clearcut_metric = self._ClearcutMetricFromEvent(
+        clearcut_timed_event, request_time=550)
 
     self.assertEqual([csi_metric, ga_metric, clearcut_metric],
                      self.collector._metrics)
 
   def testCommandLatencyMetricsCollectionWithError(self):
-    time_mock = self.StartObjectPatch(metrics, '_GetTimeMillis')
+    time_mock = self.StartObjectPatch(metrics, 'GetTimeMillis')
     time_mock.return_value = 100
     metrics.Started(0.100)
 
@@ -480,34 +548,63 @@ class MetricsTests(test_case.Base):
         .format(example_exception_path),
         {'user-agent': 'user-agent-007'})
 
-    clearcut_event = {
-        'event_type': 'Commands',
-        'event_name': 'group1.group2.command',
+    clearcut_timed_event = ({
+        'event_type':
+            'Commands',
+        'event_name':
+            'group1.group2.command',
         'event_metadata': [
-            {'c': 'd'},
-            {'key': 'flag_names', 'value': '--project,--quiet'},
-            {'key': 'error_type', 'value': example_exception_path},
-            {'key': 'extra_error_info',
-             'value': '{"suggestion": "alpha,beta"}'
+            {
+                'c': 'd'
+            },
+            {
+                'key': 'flag_names',
+                'value': '--project,--quiet'
+            },
+            {
+                'key': 'error_type',
+                'value': example_exception_path
+            },
+            {
+                'key': 'extra_error_info',
+                'value': '{"suggestion": "alpha,beta"}'
             },
         ],
-        'a': 'b',
-        'latency_ms': 450,
+        'a':
+            'b',
+        'latency_ms':
+            450,
         'sub_event_latency_ms': [
-            {'key': 'load', 'latency_ms': 50},
-            {'key': 'run', 'latency_ms': 350},
-            {'key': 'total', 'latency_ms': 450},
-            {'key': 'local', 'latency_ms': 250},
-            {'key': 'remote', 'latency_ms': 200},
+            {
+                'key': 'load',
+                'latency_ms': 50
+            },
+            {
+                'key': 'run',
+                'latency_ms': 350
+            },
+            {
+                'key': 'total',
+                'latency_ms': 450
+            },
+            {
+                'key': 'local',
+                'latency_ms': 250
+            },
+            {
+                'key': 'remote',
+                'latency_ms': 200
+            },
         ]
-    }
-    clearcut_metric = self._ClearcutMetricFromEvent(clearcut_event, 550)
+    }, 100)
+    clearcut_metric = self._ClearcutMetricFromEvent(
+        clearcut_timed_event, request_time=550)
 
     self.assertEqual([csi_metric, command_metric, clearcut_metric],
                      self.collector._metrics)
 
   def testCommandLatencyMetricsCollectionWithoutFlags(self):
-    time_mock = self.StartObjectPatch(metrics, '_GetTimeMillis')
+    time_mock = self.StartObjectPatch(metrics, 'GetTimeMillis')
     time_mock.return_value = 100
     metrics.Started(0.100)
 
@@ -540,30 +637,55 @@ class MetricsTests(test_case.Base):
         'utv=local&utt=450&utc=Commands&utl=cmd.s-cmd&cd6=%3D%3DNONE%3D%3D&i=j',
         {'user-agent': 'user-agent-007'})
 
-    clearcut_event = {
-        'event_type': 'Commands',
-        'event_name': 'cmd.s-cmd',
+    clearcut_timed_event = ({
+        'event_type':
+            'Commands',
+        'event_name':
+            'cmd.s-cmd',
         'event_metadata': [
-            {'c': 'd'},
-            {'key': 'flag_names', 'value': '==NONE=='},
+            {
+                'c': 'd'
+            },
+            {
+                'key': 'flag_names',
+                'value': '==NONE=='
+            },
         ],
-        'a': 'b',
-        'latency_ms': 450,
+        'a':
+            'b',
+        'latency_ms':
+            450,
         'sub_event_latency_ms': [
-            {'key': 'load', 'latency_ms': 50},
-            {'key': 'run', 'latency_ms': 350},
-            {'key': 'total', 'latency_ms': 450},
-            {'key': 'local', 'latency_ms': 450},
-            {'key': 'remote', 'latency_ms': 0},
+            {
+                'key': 'load',
+                'latency_ms': 50
+            },
+            {
+                'key': 'run',
+                'latency_ms': 350
+            },
+            {
+                'key': 'total',
+                'latency_ms': 450
+            },
+            {
+                'key': 'local',
+                'latency_ms': 450
+            },
+            {
+                'key': 'remote',
+                'latency_ms': 0
+            },
         ]
-    }
-    clearcut_metric = self._ClearcutMetricFromEvent(clearcut_event, 550)
+    }, 100)
+    clearcut_metric = self._ClearcutMetricFromEvent(
+        clearcut_timed_event, request_time=550)
 
     self.assertEqual([csi_metric, ga_metric, clearcut_metric],
                      self.collector._metrics)
 
   def testCommandLatencyMetricsCollectionWithFlags(self):
-    time_mock = self.StartObjectPatch(metrics, '_GetTimeMillis')
+    time_mock = self.StartObjectPatch(metrics, 'GetTimeMillis')
     time_mock.return_value = 100
     metrics.Started(0.100)
 
@@ -596,30 +718,55 @@ class MetricsTests(test_case.Base):
         'utv=local&utt=450&utc=Commands&utl=cmd.s-cmd&cd6=--foo%2CBAR%2CBAZ&i=j',
         {'user-agent': 'user-agent-007'})
 
-    clearcut_event = {
-        'event_type': 'Commands',
-        'event_name': 'cmd.s-cmd',
+    clearcut_timed_event = ({
+        'event_type':
+            'Commands',
+        'event_name':
+            'cmd.s-cmd',
         'event_metadata': [
-            {'c': 'd'},
-            {'key': 'flag_names', 'value': '--foo,BAR,BAZ'},
+            {
+                'c': 'd'
+            },
+            {
+                'key': 'flag_names',
+                'value': '--foo,BAR,BAZ'
+            },
         ],
-        'a': 'b',
-        'latency_ms': 450,
+        'a':
+            'b',
+        'latency_ms':
+            450,
         'sub_event_latency_ms': [
-            {'key': 'load', 'latency_ms': 50},
-            {'key': 'run', 'latency_ms': 350},
-            {'key': 'total', 'latency_ms': 450},
-            {'key': 'local', 'latency_ms': 450},
-            {'key': 'remote', 'latency_ms': 0},
+            {
+                'key': 'load',
+                'latency_ms': 50
+            },
+            {
+                'key': 'run',
+                'latency_ms': 350
+            },
+            {
+                'key': 'total',
+                'latency_ms': 450
+            },
+            {
+                'key': 'local',
+                'latency_ms': 450
+            },
+            {
+                'key': 'remote',
+                'latency_ms': 0
+            },
         ]
-    }
-    clearcut_metric = self._ClearcutMetricFromEvent(clearcut_event, 550)
+    }, 100)
+    clearcut_metric = self._ClearcutMetricFromEvent(
+        clearcut_timed_event, request_time=550)
 
     self.assertEqual([csi_metric, command_metric, clearcut_metric],
                      self.collector._metrics)
 
   def testErrorLatencyMetricsCollectionWithoutFlags(self):
-    time_mock = self.StartObjectPatch(metrics, '_GetTimeMillis')
+    time_mock = self.StartObjectPatch(metrics, 'GetTimeMillis')
     time_mock.return_value = 100
     metrics.Started(0.100)
 
@@ -653,31 +800,59 @@ class MetricsTests(test_case.Base):
         'utv=local&utt=450&utc=Error&utl=cmd.s-cmd&cd6=%3D%3DNONE%3D%3D&i=j',
         {'user-agent': 'user-agent-007'})
 
-    clearcut_event = {
-        'event_type': 'Error',
-        'event_name': 'cmd.s-cmd',
+    clearcut_timed_event = ({
+        'event_type':
+            'Error',
+        'event_name':
+            'cmd.s-cmd',
         'event_metadata': [
-            {'c': 'd'},
-            {'key': 'flag_names', 'value': '==NONE=='},
-            {'key': 'error_type', 'value': 'test.TestException'},
+            {
+                'c': 'd'
+            },
+            {
+                'key': 'flag_names',
+                'value': '==NONE=='
+            },
+            {
+                'key': 'error_type',
+                'value': 'test.TestException'
+            },
         ],
-        'a': 'b',
-        'latency_ms': 450,
+        'a':
+            'b',
+        'latency_ms':
+            450,
         'sub_event_latency_ms': [
-            {'key': 'load', 'latency_ms': 50},
-            {'key': 'run', 'latency_ms': 350},
-            {'key': 'total', 'latency_ms': 450},
-            {'key': 'local', 'latency_ms': 450},
-            {'key': 'remote', 'latency_ms': 0},
+            {
+                'key': 'load',
+                'latency_ms': 50
+            },
+            {
+                'key': 'run',
+                'latency_ms': 350
+            },
+            {
+                'key': 'total',
+                'latency_ms': 450
+            },
+            {
+                'key': 'local',
+                'latency_ms': 450
+            },
+            {
+                'key': 'remote',
+                'latency_ms': 0
+            },
         ]
-    }
-    clearcut_metric = self._ClearcutMetricFromEvent(clearcut_event, 550)
+    }, 100)
+    clearcut_metric = self._ClearcutMetricFromEvent(
+        clearcut_timed_event, request_time=550)
 
     self.assertEqual([csi_metric, ga_metric, clearcut_metric],
                      self.collector._metrics)
 
   def testErrorLatencyMetricsCollectionWithFlags(self):
-    time_mock = self.StartObjectPatch(metrics, '_GetTimeMillis')
+    time_mock = self.StartObjectPatch(metrics, 'GetTimeMillis')
     time_mock.return_value = 100
     metrics.Started(0.100)
 
@@ -711,60 +886,98 @@ class MetricsTests(test_case.Base):
         'utv=local&utt=450&utc=Error&utl=cmd.s-cmd&cd6=--foo%2CBAR%2CBAZ&i=j',
         {'user-agent': 'user-agent-007'})
 
-    clearcut_event = {
-        'event_type': 'Error',
-        'event_name': 'cmd.s-cmd',
+    clearcut_timed_event = ({
+        'event_type':
+            'Error',
+        'event_name':
+            'cmd.s-cmd',
         'event_metadata': [
-            {'c': 'd'},
-            {'key': 'flag_names', 'value': '--foo,BAR,BAZ'},
-            {'key': 'error_type', 'value': 'test.TestException'},
+            {
+                'c': 'd'
+            },
+            {
+                'key': 'flag_names',
+                'value': '--foo,BAR,BAZ'
+            },
+            {
+                'key': 'error_type',
+                'value': 'test.TestException'
+            },
         ],
-        'a': 'b',
-        'latency_ms': 450,
+        'a':
+            'b',
+        'latency_ms':
+            450,
         'sub_event_latency_ms': [
-            {'key': 'load', 'latency_ms': 50},
-            {'key': 'run', 'latency_ms': 350},
-            {'key': 'total', 'latency_ms': 450},
-            {'key': 'local', 'latency_ms': 450},
-            {'key': 'remote', 'latency_ms': 0},
+            {
+                'key': 'load',
+                'latency_ms': 50
+            },
+            {
+                'key': 'run',
+                'latency_ms': 350
+            },
+            {
+                'key': 'total',
+                'latency_ms': 450
+            },
+            {
+                'key': 'local',
+                'latency_ms': 450
+            },
+            {
+                'key': 'remote',
+                'latency_ms': 0
+            },
         ]
-    }
-    clearcut_metric = self._ClearcutMetricFromEvent(clearcut_event, 550)
+    }, 100)
+    clearcut_metric = self._ClearcutMetricFromEvent(
+        clearcut_timed_event, request_time=550)
 
     self.assertEqual([csi_metric, ga_metric, clearcut_metric],
                      self.collector._metrics)
 
   def testNestedCommandsMetricsCollection(self):
-    time_mock = self.StartObjectPatch(metrics, '_GetTimeMillis')
+    time_mock = self.StartObjectPatch(metrics, 'GetTimeMillis')
     time_mock.return_value = 100
     metrics.Started(0.100)
 
     metrics.Commands('cmd.s-cmd', 'v13', None)
     ga_events = ['ec=Commands&ea=cmd.s-cmd&el=v13&ev=0&cd6=&a=b&c=d']
-    clearcut_events = [{
+    clearcut_timed_events = [({
         'event_type': 'Commands',
         'event_name': 'cmd.s-cmd',
         'event_metadata': [
-            {'c': 'd'},
-            {'key': 'flag_names', 'value': ''},
+            {
+                'c': 'd'
+            },
+            {
+                'key': 'flag_names',
+                'value': ''
+            },
         ],
         'a': 'b',
-    }]
+    }, 100)]
 
     time_mock.return_value = 150
     metrics.Loaded()
 
     metrics.Commands('cmd.inner-cmd', 'v0', None)
     ga_events.append('ec=Commands&ea=cmd.inner-cmd&el=v0&ev=0&cd6=&a=b&c=d')
-    clearcut_events.append({
+    clearcut_timed_events.append(({
         'event_type': 'Commands',
         'event_name': 'cmd.inner-cmd',
         'event_metadata': [
-            {'c': 'd'},
-            {'key': 'flag_names', 'value': ''},
+            {
+                'c': 'd'
+            },
+            {
+                'key': 'flag_names',
+                'value': ''
+            },
         ],
         'a': 'b',
-    })
+    }, 150))
 
     time_mock.return_value = 250
     metrics.Loaded()
@@ -803,23 +1016,40 @@ class MetricsTests(test_case.Base):
         '\n'.join(ga_events + ga_timings),
         {'user-agent': 'user-agent-007'})
 
-    clearcut_events[0].update({
-        'latency_ms': 850,
+    clearcut_timed_events[0][0].update({
+        'latency_ms':
+            850,
         'sub_event_latency_ms': [
-            {'key': 'load', 'latency_ms': 50},
-            {'key': 'run', 'latency_ms': 750},
-            {'key': 'total', 'latency_ms': 850},
-            {'key': 'local', 'latency_ms': 600},
-            {'key': 'remote', 'latency_ms': 250},
+            {
+                'key': 'load',
+                'latency_ms': 50
+            },
+            {
+                'key': 'run',
+                'latency_ms': 750
+            },
+            {
+                'key': 'total',
+                'latency_ms': 850
+            },
+            {
+                'key': 'local',
+                'latency_ms': 600
+            },
+            {
+                'key': 'remote',
+                'latency_ms': 250
+            },
         ]
     })
-    clearcut_metric = self._ClearcutMetricFromEventList(clearcut_events, 950)
+    clearcut_metric = self._ClearcutMetricFromEventList(
+        clearcut_timed_events, request_time=950)
 
     self.assertEqual([csi_metric, ga_commands_metric, clearcut_metric],
                      self.collector._metrics)
 
   def testCustomTimedEventsMetricsCollection(self):
-    time_mock = self.StartObjectPatch(metrics, '_GetTimeMillis')
+    time_mock = self.StartObjectPatch(metrics, 'GetTimeMillis')
     time_mock.return_value = 100
     metrics.Started(0.100)
 
@@ -860,46 +1090,177 @@ class MetricsTests(test_case.Base):
         'utv=local&utt=450&utc=Commands&utl=cmd.s-cmd&cd6=&i=j',
         {'user-agent': 'user-agent-007'})
 
-    clearcut_event = {
-        'event_type': 'Commands',
-        'event_name': 'cmd.s-cmd',
+    clearcut_timed_event = ({
+        'event_type':
+            'Commands',
+        'event_name':
+            'cmd.s-cmd',
         'event_metadata': [
-            {'c': 'd'},
-            {'key': 'flag_names', 'value': ''},
+            {
+                'c': 'd'
+            },
+            {
+                'key': 'flag_names',
+                'value': ''
+            },
         ],
-        'a': 'b',
-        'latency_ms': 450,
+        'a':
+            'b',
+        'latency_ms':
+            450,
         'sub_event_latency_ms': [
-            {'key': 'load', 'latency_ms': 50},
-            {'key': 'run', 'latency_ms': 350},
-            {'key': 'myevent', 'latency_ms': 400},
-            {'key': 'myevent', 'latency_ms': 425},
-            {'key': 'total', 'latency_ms': 450},
-            {'key': 'local', 'latency_ms': 450},
-            {'key': 'remote', 'latency_ms': 0},
+            {
+                'key': 'load',
+                'latency_ms': 50
+            },
+            {
+                'key': 'run',
+                'latency_ms': 350
+            },
+            {
+                'key': 'myevent',
+                'latency_ms': 400
+            },
+            {
+                'key': 'myevent',
+                'latency_ms': 425
+            },
+            {
+                'key': 'total',
+                'latency_ms': 450
+            },
+            {
+                'key': 'local',
+                'latency_ms': 450
+            },
+            {
+                'key': 'remote',
+                'latency_ms': 0
+            },
         ]
-    }
-    clearcut_metric = self._ClearcutMetricFromEvent(clearcut_event, 550)
+    }, 100)
+    clearcut_metric = self._ClearcutMetricFromEvent(
+        clearcut_timed_event, request_time=550)
+
+    self.assertEqual([csi_metric, ga_metric, clearcut_metric],
+                     self.collector._metrics)
+
+  def testRecordDurationMetricsCollection(self):
+    time_mock = self.StartObjectPatch(metrics, 'GetTimeMillis')
+    time_mock.return_value = 100
+    metrics.Started(0.100)
+
+    metrics.Commands('cmd.s-cmd', 'v13', None)
+
+    time_mock.return_value = 150
+    metrics.Loaded()
+
+    time_mock.return_value = 450
+    metrics.Ran()
+
+    time_mock.return_value = 500
+    with metrics.RecordDuration('myevent'):
+      time_mock.return_value = 525
+
+    time_mock.return_value = 550
+    self.StartObjectPatch(metrics._MetricsCollector, 'ReportMetrics')
+    metrics.Shutdown()
+
+    csi_metric = (
+        'endpoint?action=Commands%2Ccmd%2Cs_cmd&flag_names=&rt=load.50%2C'
+        'run.350%2Cmyevent_start.400%2Cmyevent.425%2Ctotal.450'
+        '&it=remote.0%2Clocal.450&e=f&g=h', 'GET', None,
+        {'user-agent': 'user-agent-007'})
+
+    ga_metric = (
+        'http://example.com',
+        'POST',
+        'ec=Commands&ea=cmd.s-cmd&el=v13&ev=0&cd6=&a=b&c=d\n'
+        'utv=load&utt=50&utc=Commands&utl=cmd.s-cmd&cd6=&i=j\n'
+        'utv=run&utt=350&utc=Commands&utl=cmd.s-cmd&cd6=&i=j\n'
+        'utv=myevent_start&utt=400&utc=Commands&utl=cmd.s-cmd&cd6=&i=j\n'
+        'utv=myevent&utt=425&utc=Commands&utl=cmd.s-cmd&cd6=&i=j\n'
+        'utv=total&utt=450&utc=Commands&utl=cmd.s-cmd&cd6=&i=j\n'
+        'utv=remote&utt=0&utc=Commands&utl=cmd.s-cmd&cd6=&i=j\n'
+        'utv=local&utt=450&utc=Commands&utl=cmd.s-cmd&cd6=&i=j',
+        {'user-agent': 'user-agent-007'})
+
+    clearcut_timed_event = ({
+        'event_type':
+            'Commands',
+        'event_name':
+            'cmd.s-cmd',
+        'event_metadata': [
+            {
+                'c': 'd'
+            },
+            {
+                'key': 'flag_names',
+                'value': ''
+            },
+        ],
+        'a':
+            'b',
+        'latency_ms':
+            450,
+        'sub_event_latency_ms': [
+            {
+                'key': 'load',
+                'latency_ms': 50
+            },
+            {
+                'key': 'run',
+                'latency_ms': 350
+            },
+            {
+                'key': 'myevent_start',
+                'latency_ms': 400
+            },
+            {
+                'key': 'myevent',
+                'latency_ms': 425
+            },
+            {
+                'key': 'total',
+                'latency_ms': 450
+            },
+            {
+                'key': 'local',
+                'latency_ms': 450
+            },
+            {
+                'key': 'remote',
+                'latency_ms': 0
+            },
+        ]
+    }, 100)
+    clearcut_metric = self._ClearcutMetricFromEvent(
+        clearcut_timed_event, request_time=550)
 
     self.assertEqual([csi_metric, ga_metric, clearcut_metric],
                      self.collector._metrics)
 
   def testCommandFollowedByErrorMetricsCollection(self):
-    time_mock = self.StartObjectPatch(metrics, '_GetTimeMillis')
+    time_mock = self.StartObjectPatch(metrics, 'GetTimeMillis')
     time_mock.return_value = 100
     metrics.Started(0.100)
 
     metrics.Commands('cmd.s-cmd', 'v13', None)
     ga_events = ['ec=Commands&ea=cmd.s-cmd&el=v13&ev=0&cd6=&a=b&c=d']
-    clearcut_events = [{
+    clearcut_timed_events = [({
         'event_type': 'Commands',
         'event_name': 'cmd.s-cmd',
         'event_metadata': [
-            {'c': 'd'},
-            {'key': 'flag_names', 'value': ''},
+            {
+                'c': 'd'
+            },
+            {
+                'key': 'flag_names',
+                'value': ''
+            },
         ],
         'a': 'b',
-    }]
+    }, 100)]
 
     time_mock.return_value = 150
     metrics.Loaded()
@@ -907,16 +1268,24 @@ class MetricsTests(test_case.Base):
     metrics.Error('cmd.s-cmd', TestException, None)
     ga_events.append(
         'ec=Error&ea=cmd.s-cmd&el=test.TestException&ev=0&cd6=&a=b&c=d')
-    clearcut_events.append({
+    clearcut_timed_events.append(({
         'event_type': 'Error',
         'event_name': 'cmd.s-cmd',
         'event_metadata': [
-            {'c': 'd'},
-            {'key': 'flag_names', 'value': ''},
-            {'key': 'error_type', 'value': 'test.TestException'},
+            {
+                'c': 'd'
+            },
+            {
+                'key': 'flag_names',
+                'value': ''
+            },
+            {
+                'key': 'error_type',
+                'value': 'test.TestException'
+            },
         ],
         'a': 'b',
-    })
+    }, 150))
 
     time_mock.return_value = 550
     self.StartObjectPatch(metrics._MetricsCollector, 'ReportMetrics')
@@ -939,7 +1308,7 @@ class MetricsTests(test_case.Base):
         '\n'.join(ga_events + ga_timings),
         {'user-agent': 'user-agent-007'})
 
-    for event in clearcut_events:
+    for event, _ in clearcut_timed_events:
       event['latency_ms'] = 450
       event['sub_event_latency_ms'] = [
           {'key': 'load', 'latency_ms': 50},
@@ -947,42 +1316,53 @@ class MetricsTests(test_case.Base):
           {'key': 'local', 'latency_ms': 450},
           {'key': 'remote', 'latency_ms': 0}
       ]
-    clearcut_metric = self._ClearcutMetricFromEventList(clearcut_events, 550)
+    clearcut_metric = self._ClearcutMetricFromEventList(
+        clearcut_timed_events, request_time=550)
 
     self.assertEqual([csi_metric, ga_metric, clearcut_metric],
                      self.collector._metrics)
 
   def testNestedCommandsFollowedByErrorMetricsCollection(self):
-    time_mock = self.StartObjectPatch(metrics, '_GetTimeMillis')
+    time_mock = self.StartObjectPatch(metrics, 'GetTimeMillis')
     time_mock.return_value = 100
     metrics.Started(0.100)
 
     metrics.Commands('cmd.s-cmd', 'v13', None)
     ga_events = ['ec=Commands&ea=cmd.s-cmd&el=v13&ev=0&cd6=&a=b&c=d']
-    clearcut_events = [{
+    clearcut_timed_events = [({
         'event_type': 'Commands',
         'event_name': 'cmd.s-cmd',
         'event_metadata': [
-            {'c': 'd'},
-            {'key': 'flag_names', 'value': ''},
+            {
+                'c': 'd'
+            },
+            {
+                'key': 'flag_names',
+                'value': ''
+            },
         ],
         'a': 'b',
-    }]
+    }, 100)]
 
     time_mock.return_value = 150
     metrics.Loaded()
 
     metrics.Commands('cmd.inner-cmd', 'v0', None)
     ga_events.append('ec=Commands&ea=cmd.inner-cmd&el=v0&ev=0&cd6=&a=b&c=d')
-    clearcut_events.append({
+    clearcut_timed_events.append(({
         'event_type': 'Commands',
         'event_name': 'cmd.inner-cmd',
         'event_metadata': [
-            {'c': 'd'},
-            {'key': 'flag_names', 'value': ''},
+            {
+                'c': 'd'
+            },
+            {
+                'key': 'flag_names',
+                'value': ''
+            },
         ],
         'a': 'b',
-    })
+    }, 150))
 
     time_mock.return_value = 250
     metrics.Loaded()
@@ -993,16 +1373,24 @@ class MetricsTests(test_case.Base):
     metrics.Error('cmd.inner-cmd', TestException, None)
     ga_events.append(
         'ec=Error&ea=cmd.inner-cmd&el=test.TestException&ev=0&cd6=&a=b&c=d')
-    clearcut_events.append({
+    clearcut_timed_events.append(({
         'event_type': 'Error',
         'event_name': 'cmd.inner-cmd',
         'event_metadata': [
-            {'c': 'd'},
-            {'key': 'flag_names', 'value': ''},
-            {'key': 'error_type', 'value': 'test.TestException'},
+            {
+                'c': 'd'
+            },
+            {
+                'key': 'flag_names',
+                'value': ''
+            },
+            {
+                'key': 'error_type',
+                'value': 'test.TestException'
+            },
         ],
         'a': 'b',
-    })
+    }, 150))
 
     time_mock.return_value = 550
     self.StartObjectPatch(metrics._MetricsCollector, 'ReportMetrics')
@@ -1027,7 +1415,7 @@ class MetricsTests(test_case.Base):
 
     # In the event of nested execution, only the top level command should have
     # latencies.
-    for event in clearcut_events[:1] + clearcut_events[2:]:
+    for event, _ in clearcut_timed_events[:1] + clearcut_timed_events[2:]:
       event['latency_ms'] = 450
       event['sub_event_latency_ms'] = [
           {'key': 'load', 'latency_ms': 50},
@@ -1035,7 +1423,8 @@ class MetricsTests(test_case.Base):
           {'key': 'local', 'latency_ms': 300},
           {'key': 'remote', 'latency_ms': 150}
       ]
-    clearcut_metric = self._ClearcutMetricFromEventList(clearcut_events, 550)
+    clearcut_metric = self._ClearcutMetricFromEventList(
+        clearcut_timed_events, request_time=550)
 
     self.assertEqual([csi_metric, ga_metric, clearcut_metric],
                      self.collector._metrics)
@@ -1054,7 +1443,7 @@ class MetricsTests(test_case.Base):
       self.collector.ReportMetrics()
       self.assertEqual(0, popen_mock.call_count)
 
-      time_mock = self.StartObjectPatch(metrics, '_GetTimeMillis')
+      time_mock = self.StartObjectPatch(metrics, 'GetTimeMillis')
       time_mock.return_value = 100
       metrics.Started(0.100)
 
@@ -1078,22 +1467,41 @@ class MetricsTests(test_case.Base):
                    'utv=local&utt=450&utc=Commands&utl=cmd3&cd6=&i=j',
                    {'user-agent': 'user-agent-007'})
 
-      clearcut_event = {
-          'event_type': 'Commands',
-          'event_name': 'cmd3',
+      clearcut_timed_event = ({
+          'event_type':
+              'Commands',
+          'event_name':
+              'cmd3',
           'event_metadata': [
-              {'c': 'd'},
-              {'key': 'flag_names', 'value': ''},
+              {
+                  'c': 'd'
+              },
+              {
+                  'key': 'flag_names',
+                  'value': ''
+              },
           ],
-          'a': 'b',
-          'latency_ms': 450,
+          'a':
+              'b',
+          'latency_ms':
+              450,
           'sub_event_latency_ms': [
-              {'key': 'total', 'latency_ms': 450},
-              {'key': 'local', 'latency_ms': 450},
-              {'key': 'remote', 'latency_ms': 0},
+              {
+                  'key': 'total',
+                  'latency_ms': 450
+              },
+              {
+                  'key': 'local',
+                  'latency_ms': 450
+              },
+              {
+                  'key': 'remote',
+                  'latency_ms': 0
+              },
           ]
-      }
-      clearcut_metric = self._ClearcutMetricFromEvent(clearcut_event, 550)
+      }, 100)
+      clearcut_metric = self._ClearcutMetricFromEvent(
+          clearcut_timed_event, request_time=550)
 
       call_list = popen_mock.call_args_list
       self.assertEqual(1, len(call_list))
@@ -1172,6 +1580,35 @@ class MetricsTests(test_case.Base):
 
     metrics.Shutdown()
     self.assertTrue(func_mock.called)
+
+  def PrepareForTestGetCID(self):
+    self.tempdir = self.CreateTempDir()
+    self.cid_filename = 'uuid'
+    self.temp_cid_file = os.path.join(self.tempdir, self.cid_filename)
+    self.StartPatch(
+        'googlecloudsdk.core.config.Paths.analytics_cid_path',
+        new=self.temp_cid_file)
+    self.uuid_mock = mock.Mock()
+    self.StartPatch('uuid.uuid4', return_value=self.uuid_mock)
+    self.uuid_mock.hex = 'my-uuid'
+
+  def testGetCID_CIDFileNotExisting(self):
+    self.PrepareForTestGetCID()
+    self.assertEqual(metrics.GetCID(), 'my-uuid')
+    self.AssertFileExistsWithContents('my-uuid', self.temp_cid_file)
+
+  def testGetCID_CIDFileEmpty(self):
+    self.PrepareForTestGetCID()
+    self.Touch(self.tempdir, self.cid_filename)
+    self.assertEqual(metrics.GetCID(), 'my-uuid')
+    self.AssertFileExistsWithContents('my-uuid', self.temp_cid_file)
+
+  def testGetCID_CIDFileNonEmpty(self):
+    self.PrepareForTestGetCID()
+    self.Touch(self.tempdir, self.cid_filename, contents='your-uuid')
+    self.assertEqual(metrics.GetCID(), 'your-uuid')
+    self.AssertFileExistsWithContents('your-uuid', self.temp_cid_file)
+
 
 if __name__ == '__main__':
   test_case.main()

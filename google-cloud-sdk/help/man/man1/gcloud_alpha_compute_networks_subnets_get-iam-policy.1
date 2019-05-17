@@ -31,11 +31,11 @@ version emitted and allowing detection of concurrent policy updates; see $
 .RS 2m
 .TP 2m
 
-Subnetwork resource \- The network for which to display the IAM policy. The
-arguments in this group can be used to specify the attributes of this resource.
-(NOTE) Some attributes are not given arguments in this group but can be set in
-other ways. To set the [project] attribute: provide the argument [subnetwork] on
-the command line with a fully specified name; set the property [core/project];
+Subnetwork resource \- The network to display the IAM policy for. The arguments
+in this group can be used to specify the attributes of this resource. (NOTE)
+Some attributes are not given arguments in this group but can be set in other
+ways. To set the [project] attribute: provide the argument [subnetwork] on the
+command line with a fully specified name; set the property [core/project];
 provide the argument [\-\-project] on the command line. This must be specified.
 
 .RS 2m
@@ -92,10 +92,11 @@ flag interacts with other flags that are applied in this order:
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -112,8 +113,8 @@ https://developers.google.com/compute/docs/reference/latest/
 To print the IAM policy for a given subnetwork, run:
 
 .RS 2m
-$ gcloud alpha compute networks subnets get\-iam\-policy \e
-    \-\-region=us\-central1 my\-subnet
+$ gcloud alpha compute networks subnets get\-iam\-policy my\-subnet \e
+    \-\-region=REGION
 .RE
 
 
@@ -124,9 +125,10 @@ This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you will have to apply for early access and have your projects registered on the
 API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. This variant is also available:
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
+$ gcloud compute networks subnets get\-iam\-policy
 $ gcloud beta compute networks subnets get\-iam\-policy
 .RE
 

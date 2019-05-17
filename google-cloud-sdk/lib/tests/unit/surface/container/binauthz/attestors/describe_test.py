@@ -22,12 +22,16 @@ from __future__ import unicode_literals
 import datetime
 import textwrap
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core.util import times
 from tests.lib import test_case
 from tests.lib.surface.container.binauthz import base
 
 
-class DescribeTest(base.BinauthzMockedBetaPolicyClientUnitTest):
+class DescribeTest(base.WithMockBetaBinauthz, base.BinauthzTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def testSuccess_WithPublicKey(self):
     ascii_armored_key = textwrap.dedent("""
@@ -56,8 +60,7 @@ class DescribeTest(base.BinauthzMockedBetaPolicyClientUnitTest):
         name='projects/{}/attestors/{}'.format(proj, name),
     )
 
-    self.client.projects_attestors.Get.Expect(
-        req, response=attestor)
+    self.mock_client.projects_attestors.Get.Expect(req, response=attestor)
 
     response = self.RunBinauthz('attestors describe {name}'.format(name=name))
 
@@ -66,6 +69,12 @@ class DescribeTest(base.BinauthzMockedBetaPolicyClientUnitTest):
     # Assert ascii-armored key appears in output.
     self.AssertOutputMatches(
         r'\n[ ]*'.join([''] + ascii_armored_key.splitlines()).rstrip())
+
+
+class DescribeAlphaTest(base.WithMockAlphaBinauthz, DescribeTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

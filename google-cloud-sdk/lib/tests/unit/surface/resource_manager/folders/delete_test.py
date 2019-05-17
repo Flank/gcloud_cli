@@ -18,6 +18,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.api_lib.resource_manager import folders
+from googlecloudsdk.calliope import base as calliope_base
 from tests.lib import test_case
 from tests.lib.surface.resource_manager import testbase
 
@@ -35,6 +36,18 @@ class FoldersDeleteTest(testbase.FoldersUnitTestBase):
   def DoRequest(self):
     return self.RunFolders('delete',
                            folders.FolderNameToId(self.TEST_FOLDER.name))
+
+
+class FoldersDeleteAlphaTest(FoldersDeleteTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+
+class FoldersDeleteBetaTest(FoldersDeleteTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 if __name__ == '__main__':

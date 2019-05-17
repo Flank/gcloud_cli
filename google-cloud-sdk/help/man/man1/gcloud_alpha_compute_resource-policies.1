@@ -17,18 +17,17 @@ gcloud alpha compute resource\-policies \- manage Google Compute Engine Resource
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR Currently Resource Policies are only available for instances.
-Resource policies for instances let you define time windows in which live
-migrations can take place.
+\fB(ALPHA)\fR Manage Google Compute Engine Resource Policies.
 
 
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -38,8 +37,8 @@ gcloud help\fR for details.
 
 .RS 2m
 .TP 2m
-\fBcreate\-backup\-schedule\fR
-\fB(ALPHA)\fR Create a Google Compute Engine Backup Schedule Resource Policy.
+\fBcreate\-snapshot\-schedule\fR
+\fB(ALPHA)\fR Create a Google Compute Engine Snapshot Schedule Resource Policy.
 
 .TP 2m
 \fBcreate\-vm\-maintenance\fR
@@ -47,11 +46,11 @@ gcloud help\fR for details.
 
 .TP 2m
 \fBdelete\fR
-\fB(ALPHA)\fR Deletes a Google Compute Engine resource policy.
+\fB(ALPHA)\fR Delete a Google Compute Engine resource policy.
 
 .TP 2m
 \fBdescribe\fR
-\fB(ALPHA)\fR Describes a Google Compute Engine resource policy.
+\fB(ALPHA)\fR Describe a Google Compute Engine resource policy.
 
 .TP 2m
 \fBlist\fR
@@ -67,5 +66,9 @@ This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you will have to apply for early access and have your projects registered on the
 API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/.
+https://cloud.google.com/support/. This variant is also available:
+
+.RS 2m
+$ gcloud beta compute resource\-policies
+.RE
 

@@ -129,10 +129,10 @@ class Binding(_messages.Message):
   r"""Associates `members` with a `role`.
 
   Fields:
-    condition: Unimplemented. The condition that is associated with this
-      binding. NOTE: an unsatisfied condition will not allow user access via
-      current binding. Different bindings, including their conditions, are
-      examined independently.
+    condition: The condition that is associated with this binding. NOTE: An
+      unsatisfied condition will not allow user access via current binding.
+      Different bindings, including their conditions, are examined
+      independently.
     members: Specifies the identities requesting access for a Cloud Platform
       resource. `members` can have the following values:  * `allUsers`: A
       special identifier that represents anyone who is    on the internet;
@@ -144,8 +144,8 @@ class Binding(_messages.Message):
       service    account. For example, `my-other-
       app@appspot.gserviceaccount.com`.  * `group:{emailid}`: An email address
       that represents a Google group.    For example, `admins@example.com`.
-      * `domain:{domain}`: A Google Apps domain name that represents all the
-      users of that domain. For example, `google.com` or `example.com`.
+      * `domain:{domain}`: The G Suite domain (primary) that represents all
+      the    users of that domain. For example, `google.com` or `example.com`.
     role: Role that is assigned to `members`. For example, `roles/viewer`,
       `roles/editor`, or `roles/owner`.
   """
@@ -1046,7 +1046,9 @@ class Expr(_messages.Message):
 
 
 class KeyOperationAttestation(_messages.Message):
-  r"""Contains an HSM-generated attestation about a key operation.
+  r"""Contains an HSM-generated attestation about a key operation. For more
+  information, see [Verifying attestations] (https://cloud.google.com/kms/docs
+  /attest-key).
 
   Enums:
     FormatValueValuesEnum: Output only. The format of the attestation data.
@@ -1065,9 +1067,12 @@ class KeyOperationAttestation(_messages.Message):
       CAVIUM_V1_COMPRESSED: Cavium HSM attestation compressed with gzip. Note
         that this format is defined by Cavium and subject to change at any
         time.
+      CAVIUM_V2_COMPRESSED: Cavium HSM attestation V2 compressed with gzip.
+        This is a new format introduced in Cavium's version 3.2-08.
     """
     ATTESTATION_FORMAT_UNSPECIFIED = 0
     CAVIUM_V1_COMPRESSED = 1
+    CAVIUM_V2_COMPRESSED = 2
 
   content = _messages.BytesField(1)
   format = _messages.EnumField('FormatValueValuesEnum', 2)

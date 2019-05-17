@@ -47,10 +47,18 @@ class ManagedInstanceGroupsStatefulPolicyZonalTest(
         stateful_disks=['disk1', 'disk3'])
     self.DescribeManagedInstanceGroup(igm_name)
     self.AssertNewOutputContainsAll([
-        igm_name, 'statefulPolicy', 'preservedResources', 'deviceName: disk1',
-        'deviceName: disk3'
-    ])
-    self.AssertOutputNotContains('deviceName: disk2')
+        igm_name,
+        'statefulPolicy',
+        """\
+          preservedState:
+            disks:
+              disk1:
+                autoDelete: NEVER
+              disk3:
+                autoDelete: NEVER
+        """,
+    ], normalize_space=True)
+    self.AssertOutputNotContains('disk2')
 
   def testUpdateManageInstanceGroupAddingStatefulNames(self):
     instance_template_name = self.CreateInstanceTemplate()
@@ -68,10 +76,18 @@ class ManagedInstanceGroupsStatefulPolicyZonalTest(
         name=igm_name, add_stateful_disks=['disk1', 'disk3'])
     self.DescribeManagedInstanceGroup(igm_name)
     self.AssertNewOutputContainsAll([
-        igm_name, 'statefulPolicy', 'preservedResources', 'deviceName: disk1',
-        'deviceName: disk3'
-    ])
-    self.AssertOutputNotContains('deviceName: disk2')
+        igm_name,
+        'statefulPolicy',
+        """\
+          preservedState:
+            disks:
+              disk1:
+                autoDelete: NEVER
+              disk3:
+                autoDelete: NEVER
+        """,
+    ], normalize_space=True)
+    self.AssertOutputNotContains('disk2')
 
   def testUpdateManageInstanceGroupRemovingStatefulNames(self):
     instance_template_name = self.CreateInstanceTemplate()
@@ -93,9 +109,17 @@ class ManagedInstanceGroupsStatefulPolicyZonalTest(
     self.UpdateInstanceGroupManagerStateful(
         name=igm_name, remove_stateful_disks=['disk1'])
     self.DescribeManagedInstanceGroup(igm_name)
-    self.AssertNewOutputContainsAll(
-        [igm_name, 'statefulPolicy', 'preservedResources', 'deviceName: disk3'])
-    self.AssertOutputNotContains('deviceName: disk1')
+    self.AssertNewOutputContainsAll([
+        igm_name,
+        'statefulPolicy',
+        """\
+          preservedState:
+            disks:
+              disk3:
+                autoDelete: NEVER
+        """,
+    ], normalize_space=True)
+    self.AssertOutputNotContains('disk1')
 
   def testUpdateManageInstanceGroupRemovingAllStatefulDisks(self):
     instance_template_name = self.CreateInstanceTemplate(
@@ -109,8 +133,8 @@ class ManagedInstanceGroupsStatefulPolicyZonalTest(
         remove_stateful_disks=['disk1', 'disk3'])
     self.DescribeManagedInstanceGroup(igm_name)
     self.AssertNewOutputContainsAll([igm_name, 'statefulPolicy'])
-    self.AssertOutputNotContains('deviceName: disk1')
-    self.AssertOutputNotContains('deviceName: disk3')
+    self.AssertOutputNotContains('disk1')
+    self.AssertOutputNotContains('disk3')
 
 
 class ManagedInstanceGroupsStatefulPolicyRegionalTest(

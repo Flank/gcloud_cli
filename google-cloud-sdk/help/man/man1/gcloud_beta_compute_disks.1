@@ -23,10 +23,11 @@ gcloud beta compute disks \- read and manipulate Google Compute Engine disks
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -42,6 +43,10 @@ gcloud help\fR for details.
 .TP 2m
 \fBadd\-labels\fR
 \fB(BETA)\fR Add labels to Google Compute Engine persistent disks.
+
+.TP 2m
+\fBadd\-resource\-policies\fR
+\fB(BETA)\fR Add resource policies to a Google Compute Engine disk.
 
 .TP 2m
 \fBcreate\fR
@@ -69,11 +74,15 @@ gcloud help\fR for details.
 
 .TP 2m
 \fBremove\-iam\-policy\-binding\fR
-\fB(BETA)\fR Remove IAM policy binding of a Google Compute Engine disk.
+\fB(BETA)\fR Remove IAM policy binding from a Google Compute Engine disk.
 
 .TP 2m
 \fBremove\-labels\fR
 \fB(BETA)\fR Remove labels from Google Compute Engine persistent disks.
+
+.TP 2m
+\fBremove\-resource\-policies\fR
+\fB(BETA)\fR Remove resource policies from a Google Compute Engine disk.
 
 .TP 2m
 \fBresize\fR
@@ -81,7 +90,7 @@ gcloud help\fR for details.
 
 .TP 2m
 \fBset\-iam\-policy\fR
-\fB(BETA)\fR Set IAM policy for a disk.
+\fB(BETA)\fR Set the IAM policy for a Google Compute Engine disk.
 
 .TP 2m
 \fBsnapshot\fR

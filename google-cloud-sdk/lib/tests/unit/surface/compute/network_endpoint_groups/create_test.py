@@ -26,8 +26,8 @@ from tests.lib.surface.compute import test_base
 class NetworkEndpointGroupsCreateTest(test_base.BaseTest):
 
   def SetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
-    self.SelectApi(self.track.prefix)
+    self.track = calliope_base.ReleaseTrack.GA
+    self.SelectApi('v1')
     self.region = 'us-central1'
     self.zone = 'us-central1-a'
 
@@ -44,7 +44,7 @@ class NetworkEndpointGroupsCreateTest(test_base.BaseTest):
     project = project or self.Project()
     region = region or self.region
 
-    compute_prefix = 'https://www.googleapis.com/compute/beta/'
+    compute_prefix = 'https://www.googleapis.com/compute/v1/'
     network_uri, subnetwork_uri = None, None
     if network:
       network_uri = (
@@ -61,10 +61,9 @@ class NetworkEndpointGroupsCreateTest(test_base.BaseTest):
     network_endpoint_group = self.messages.NetworkEndpointGroup(
         name=name,
         networkEndpointType=endpoint_type_enum.GCE_VM_IP_PORT,
-        loadBalancer=self.messages.NetworkEndpointGroupLbNetworkEndpointGroup(
-            defaultPort=default_port,
-            network=network_uri,
-            subnetwork=subnetwork_uri))
+        defaultPort=default_port,
+        network=network_uri,
+        subnetwork=subnetwork_uri)
 
     return network_endpoint_group
 

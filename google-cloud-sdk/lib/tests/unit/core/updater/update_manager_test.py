@@ -781,7 +781,7 @@ project = cloudsdktest
     installer_path = os.path.realpath(os.path.join(
         install_state._InstallationState__sdk_staging_root,
         'bin', 'bootstrapping', 'install.py'))
-    env = dict(os.environ)
+    env = encoding.EncodeEnv(dict(os.environ))
     encoding.SetEncodedValue(env, 'CLOUDSDK_REINSTALL_COMPONENTS', 'a,b')
     # No assert_called_once_with! console_attr may call tput on some systems.
     popen_mock.assert_any_call([sys.executable, '-S', installer_path], env=env)

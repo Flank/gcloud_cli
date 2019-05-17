@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud beta ml\-engine versions \- cloud ML Engine Versions commands
+gcloud beta ml\-engine versions \- AI Platform Versions commands
 
 
 
@@ -20,18 +20,19 @@ gcloud beta ml\-engine versions \- cloud ML Engine Versions commands
 \fB(BETA)\fR A version is an implementation of a model, represented as a
 serialized TensorFlow graph with trained parameters.
 
-When you communicate with Cloud ML Engine services, you use the combination of
-the model, version, and current project to identify a specific model
-implementation that is deployed in the cloud.
+When you communicate with AI Platform services, you use the combination of the
+model, version, and current project to identify a specific model implementation
+that is deployed in the cloud.
 
 
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -42,28 +43,27 @@ gcloud help\fR for details.
 .RS 2m
 .TP 2m
 \fBcreate\fR
-\fB(BETA)\fR Create a new Cloud ML Engine version.
+\fB(BETA)\fR Create a new AI Platform version.
 
 .TP 2m
 \fBdelete\fR
-\fB(BETA)\fR Delete an existing Cloud ML Engine version.
+\fB(BETA)\fR Delete an existing AI Platform version.
 
 .TP 2m
 \fBdescribe\fR
-\fB(BETA)\fR Describe an existing Cloud ML Engine version.
+\fB(BETA)\fR Describe an existing AI Platform version.
 
 .TP 2m
 \fBlist\fR
-\fB(BETA)\fR List existing Cloud ML Engine versions.
+\fB(BETA)\fR List existing AI Platform versions.
 
 .TP 2m
 \fBset\-default\fR
-\fB(BETA)\fR Sets an existing Cloud ML Engine version as the default for its
-model.
+\fB(BETA)\fR Sets an existing AI Platform version as the default for its model.
 
 .TP 2m
 \fBupdate\fR
-\fB(BETA)\fR Update a Cloud ML Engine version.
+\fB(BETA)\fR Update an AI Platform version.
 
 
 .RE

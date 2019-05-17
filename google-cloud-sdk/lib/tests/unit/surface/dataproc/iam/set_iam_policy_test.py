@@ -34,10 +34,11 @@ class SetIamPolicyTestBeta(parameterized.TestCase,
   """Tests for dataproc * set-iam-policy."""
 
   @parameterized.named_parameters(
-      ('Cluster', 'cluster'),
-      ('Job', 'job'),
-      ('Operation', 'operation'),
-      ('WorkflowTemplate', 'workflow-template')
+      ('Cluster', 'clusters'),
+      ('Job', 'jobs'),
+      ('Operation', 'operations'),
+      ('WorkflowTemplate', 'workflow-templates'),
+      ('AutoscalingPolicy', 'autoscaling-policies'),
   )
   def testSetIAMPolicy(self, collection):
     self.SetIamPolicyNoError(collection)
@@ -51,9 +52,8 @@ class SetIamPolicyTestBeta(parameterized.TestCase,
 
     self.ExpectSetIamPolicy(collection, expected_resource, new_policy)
 
-    policy = self.RunDataproc('{0}s set-iam-policy test-{0} {1}'.format(
-        collection,
-        temp_file))
+    policy = self.RunDataproc('{0} set-iam-policy test-{0} {1}'.format(
+        collection, temp_file))
     self.assertIsNotNone(policy)
     self.AssertMessagesEqual(policy, new_policy)
 
@@ -69,9 +69,8 @@ class SetIamPolicyTestBeta(parameterized.TestCase,
     properties.VALUES.dataproc.region.Set(self.REGION)
     with self.AssertRaisesHttpExceptionMatches(
         'Resource not found API reason: Resource not found.'):
-      self.RunDataproc('{0}s set-iam-policy test-{0} {1}'.format(
-          collection,
-          temp_file))
+      self.RunDataproc('{0} set-iam-policy test-{0} {1}'.format(
+          collection, temp_file))
 
   def GetFileForPolicy(self, policy):
     json = encoding.MessageToJson(policy)
@@ -94,6 +93,10 @@ class SetIamPolicyTestBeta(parameterized.TestCase,
 
 class SetIamPolicyTestGA(SetIamPolicyTestBeta, base.DataprocTestBaseGA):
   """Tests for beta dataproc * set-iam-policy."""
+
+
+class SetIamPolicyTestAlpha(SetIamPolicyTestBeta, base.DataprocTestBaseAlpha):
+  pass
 
 
 if __name__ == '__main__':

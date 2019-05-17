@@ -23,6 +23,7 @@ from googlecloudsdk.api_lib.composer import operations_util as operations_api_ut
 from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
 from googlecloudsdk.command_lib.composer import flags
+from googlecloudsdk.command_lib.composer import image_versions_util
 from googlecloudsdk.command_lib.composer import parsers
 from googlecloudsdk.command_lib.composer import resource_args
 from googlecloudsdk.command_lib.composer import util as command_util
@@ -30,8 +31,9 @@ from googlecloudsdk.command_lib.util.args import labels_util
 from googlecloudsdk.core import log
 
 
-def _ImageVersionFromAirflowVersion(airflow_version):
-  return 'composer-latest-airflow-{}'.format(airflow_version)
+PREREQUISITE_OPTION_ERROR_MSG = """\
+Cannot specify --{opt} without --{prerequisite}.
+"""
 
 
 def _CommonArgs(parser):
@@ -51,7 +53,6 @@ def _CommonArgs(parser):
       help='The Compute Engine machine type '
       '(https://cloud.google.com/compute/docs/machine-types) to use for '
       'nodes. For example `--machine-type=n1-standard-1`.')
-
   parser.add_argument(
       '--disk-size',
       default='100GB',
@@ -125,6 +126,40 @@ information on how to structure KEYs and VALUEs, run
       'Supplied value should represent the desired major Python version. '
       'Cannot be updated.')
 
+  version_group = parser.add_mutually_exclusive_group()
+  airflow_version_type = arg_parsers.RegexpValidator(
+      r'^(\d+\.\d+(?:\.\d+)?)', 'must be in the form X.Y[.Z].')
+  version_group.add_argument(
+      '--airflow-version',
+      type=airflow_version_type,
+      help="""Version of Airflow to run in the environment.
+
+      Must be of the form `X.Y[.Z]`.
+
+      The latest supported Cloud Composer version will be used within
+      the created environment.""")
+
+  image_version_type = arg_parsers.RegexpValidator(
+      r'^composer-(\d+\.\d+.\d+|latest)-airflow-(\d+\.\d+(?:\.\d+)?)',
+      'must be in the form \'composer-A.B.C-airflow-X.Y[.Z]\' or '
+      '\'latest\' can be provided in place of the Cloud Composer version '
+      'string. For example: \'composer-latest-airflow-1.10.0\'.')
+  version_group.add_argument(
+      '--image-version',
+      type=image_version_type,
+      help="""Version of the image to run in the environment.
+
+      The image version encapsulates the versions of both Cloud Composer
+      and Apache Airflow. Must be of the form `composer-A.B.C-airflow-X.Y[.Z]`.
+
+      The Cloud Composer and Airflow versions are semantic versions.
+      `latest` can be provided instead of an explicit Cloud Composer
+      version number indicating that the server will replace `latest`
+      with the current Cloud Composer version. For the Apache Airflow
+      portion, the patch version can be omitted and the current
+      version will be selected. The version numbers that are used will
+      be stored.""")
+
 
 @base.ReleaseTracks(base.ReleaseTrack.GA)
 class Create(base.Command):
@@ -166,6 +201,13 @@ class Create(base.Command):
           args.subnetwork,
           fallback_region=self.env_ref.Parent().Name()).RelativeName()
 
+    self.image_version = None
+    if args.airflow_version:
+      self.image_version = image_versions_util.ImageVersionFromAirflowVersion(
+          args.airflow_version)
+    elif args.image_version:
+      self.image_version = args.image_version
+
     operation = self.GetOperationMessage(args)
 
     details = 'with operation [{0}]'.format(operation.name)
@@ -205,6 +247,7 @@ class Create(base.Command):
         tags=args.tags,
         disk_size_gb=args.disk_size >> 30,
         python_version=args.python_version,
+        image_version=self.image_version,
         release_track=self.ReleaseTrack())
 
 
@@ -221,50 +264,51 @@ class CreateBeta(Create):
   @staticmethod
   def Args(parser):
     Create.Args(parser)
-
-    # Adding beta arguments
-    mutex_group = parser.add_mutually_exclusive_group()
-    airflow_version_type = arg_parsers.RegexpValidator(
-        r'^(\d+\.\d+(?:\.\d+)?)', 'must be in the form X.Y[.Z].')
-    mutex_group.add_argument(
-        '--airflow-version',
-        type=airflow_version_type,
-        help="""Version of Airflow to run in the environment.
-
-          Must be of the form `X.Y[.Z]`.
-
-          Cannot be updated.""")
-
-    image_version_type = arg_parsers.RegexpValidator(
-        r'^composer-(\d+\.\d+.\d+|latest)-airflow-(\d+\.\d+(?:\.\d+)?)',
-        'must be in the form \'composer-A.B.C-airflow-X.Y[.Z]\' or '
-        '\'latest\' can be provided in place of the Cloud Composer version '
-        'string. For example: \'composer-latest-airflow-1.10.0\'.')
-    mutex_group.add_argument(
-        '--image-version',
-        type=image_version_type,
-        help="""Version of the image to run in the environment.
-
-        This encapsulates the versions of both Cloud Composer and Apache
-        Airflow. Must be of the form `composer-A.B.C-airflow-X.Y[.Z]`.
-
-        The Cloud Composer and Airflow versions are semantic versions.
-        `latest` can be provided instead of an explicit Cloud Composer
-        version number indicating that the server will replace `latest`
-        with the current Cloud Composer version. For the Apache Airflow
-        portion, the patch version can be omitted and the current
-        version will be selected. The version numbers that are used will
-        be stored.
-
-        Cannot be updated.""")
+    flags.AddPrivateIpAndIpAliasEnvironmentFlags(parser)
 
   def Run(self, args):
-    self.image_version = None
-    if args.airflow_version:
-      self.image_version = _ImageVersionFromAirflowVersion(args.airflow_version)
-    elif args.image_version:
-      self.image_version = args.image_version
+    self.ParseIpAliasConfigOptions(args)
+    self.ParsePrivateEnvironmentConfigOptions(args)
     return super(CreateBeta, self).Run(args)
+
+  def ParseIpAliasConfigOptions(self, args):
+    """Parses the options for VPC-native configuration."""
+    if args.enable_private_environment and not args.enable_ip_alias:
+      raise command_util.InvalidUserInputError(
+          PREREQUISITE_OPTION_ERROR_MSG.format(
+              prerequisite='enable-ip-alias', opt='enable-private-environment'))
+    if args.cluster_ipv4_cidr and not args.enable_ip_alias:
+      raise command_util.InvalidUserInputError(
+          PREREQUISITE_OPTION_ERROR_MSG.format(
+              prerequisite='enable-ip-alias', opt='cluster-ipv4-cidr'))
+    if args.cluster_secondary_range_name and not args.enable_ip_alias:
+      raise command_util.InvalidUserInputError(
+          PREREQUISITE_OPTION_ERROR_MSG.format(
+              prerequisite='enable-ip-alias',
+              opt='cluster-secondary-range-name'))
+    if args.services_ipv4_cidr and not args.enable_ip_alias:
+      raise command_util.InvalidUserInputError(
+          PREREQUISITE_OPTION_ERROR_MSG.format(
+              prerequisite='enable-ip-alias', opt='services-ipv4-cidr'))
+    if args.services_secondary_range_name and not args.enable_ip_alias:
+      raise command_util.InvalidUserInputError(
+          PREREQUISITE_OPTION_ERROR_MSG.format(
+              prerequisite='enable-ip-alias',
+              opt='services-secondary-range-name'))
+
+  def ParsePrivateEnvironmentConfigOptions(self, args):
+    """Parses the options for Private Environment configuration."""
+    if args.enable_private_endpoint and not args.enable_private_environment:
+      raise command_util.InvalidUserInputError(
+          PREREQUISITE_OPTION_ERROR_MSG.format(
+              prerequisite='enable-private-environment',
+              opt='enable-private-endpoint'))
+
+    if args.master_ipv4_cidr and not args.enable_private_environment:
+      raise command_util.InvalidUserInputError(
+          PREREQUISITE_OPTION_ERROR_MSG.format(
+              prerequisite='enable-private-environment',
+              opt='master-ipv4-cidr'))
 
   def GetOperationMessage(self, args):
     """See base class."""
@@ -284,6 +328,14 @@ class CreateBeta(Create):
         disk_size_gb=args.disk_size >> 30,
         python_version=args.python_version,
         image_version=self.image_version,
+        use_ip_aliases=args.enable_ip_alias,
+        cluster_secondary_range_name=args.cluster_secondary_range_name,
+        services_secondary_range_name=args.services_secondary_range_name,
+        cluster_ipv4_cidr_block=args.cluster_ipv4_cidr,
+        services_ipv4_cidr_block=args.services_ipv4_cidr,
+        private_environment=args.enable_private_environment,
+        private_endpoint=args.enable_private_endpoint,
+        master_ipv4_cidr=args.master_ipv4_cidr,
         release_track=self.ReleaseTrack())
 
 
@@ -332,4 +384,12 @@ class CreateAlpha(CreateBeta):
         python_version=args.python_version,
         image_version=self.image_version,
         airflow_executor_type=args.airflow_executor_type,
+        use_ip_aliases=args.enable_ip_alias,
+        cluster_secondary_range_name=args.cluster_secondary_range_name,
+        services_secondary_range_name=args.services_secondary_range_name,
+        cluster_ipv4_cidr_block=args.cluster_ipv4_cidr,
+        services_ipv4_cidr_block=args.services_ipv4_cidr,
+        private_environment=args.enable_private_environment,
+        private_endpoint=args.enable_private_endpoint,
+        master_ipv4_cidr=args.master_ipv4_cidr,
         release_track=self.ReleaseTrack())

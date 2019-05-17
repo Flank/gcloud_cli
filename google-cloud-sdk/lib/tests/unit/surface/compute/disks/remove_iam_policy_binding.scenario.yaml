@@ -1,14 +1,35 @@
 title: compute disks remove-iam-policy-binding scenario test
-release_tracks: [BETA]
-
+release_tracks: [ALPHA, BETA, GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: compute disks remove-iam-policy-binding my-disk --zone=ZONE --member=user:owner@gmail.com
+      --role=roles/owner
+  - stderr: |
+      Updated IAM policy for disk [my-disk].
+  - stdout: |
+      bindings:
+      - members:
+        - user:newowner@gmail.com
+        role: roles/owner
+      etag: etag
+      version: 1
 actions:
+- define_reference:
+    reference: api-version
+    track_values:
+      GA: v1
+      BETA: beta
+      ALPHA: alpha
+
 # remove binding without condition to a policy without condition
 - execute_command:
-    command: compute disks remove-iam-policy-binding my-disk --zone=ZONE --member=user:owner@gmail.com --role=roles/owner
+    command: compute disks remove-iam-policy-binding my-disk --zone=ZONE --member=user:owner@gmail.com
+      --role=roles/owner
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/beta/projects/fake-project/zones/ZONE/disks/projects%2Ffake-project%2Fzones%2FZONE%2Fdisks%2Fmy-disk/getIamPolicy?alt=json
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/ZONE/disks/my-disk/getIamPolicy?alt=json
           method: GET
           body: null
         return_response:
@@ -30,15 +51,15 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/beta/projects/fake-project/zones/ZONE/disks/projects%2Ffake-project%2Fzones%2FZONE%2Fdisks%2Fmy-disk/setIamPolicy?alt=json
+          uri: https://www.googleapis.com/compute/$$api-version$$/projects/fake-project/zones/ZONE/disks/my-disk/setIamPolicy?alt=json
           method: POST
           body:
             json:
               policy:
                 bindings:
-                - role: 'roles/owner'
-                  members: ['user:newowner@gmail.com']
-                etag: 'etag'
+                - role: roles/owner
+                  members: ["user:newowner@gmail.com"]
+                etag: etag
                 version: 1
         return_response:
           headers:

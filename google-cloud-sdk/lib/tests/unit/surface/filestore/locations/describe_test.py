@@ -27,7 +27,7 @@ from tests.lib.surface.filestore import base
 class CloudFilestoreLocationsDescribeTest(base.CloudFilestoreUnitTestBase):
 
   def SetUp(self):
-    self.SetUpTrack(calliope_base.ReleaseTrack.BETA)
+    self.SetUpTrack(calliope_base.ReleaseTrack.GA)
 
   def RunDescribe(self, *args):
     return self.Run(['filestore', 'locations', 'describe'] + list(args))
@@ -43,6 +43,13 @@ class CloudFilestoreLocationsDescribeTest(base.CloudFilestoreUnitTestBase):
   def testMissingLocationName(self):
     with self.assertRaises(cli_test_base.MockArgumentError):
       self.RunDescribe()
+
+
+class CloudFilestoreLocationsDescribeBetaTest(
+    CloudFilestoreLocationsDescribeTest):
+
+  def SetUp(self):
+    self.SetUpTrack(calliope_base.ReleaseTrack.BETA)
 
 
 class CloudFilestoreLocationsDescribeAlphaTest(

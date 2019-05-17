@@ -1,0 +1,57 @@
+title: test transcribe speech command
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      ml video transcribe-speech gs://do-not-delete-ml-video-test/julia_on_fake_news.mp4
+      --language-code en-US --format "text(name)" --async
+  - stderr: |
+      Check operation [$$operation-name$$] for status.
+  - stdout: |
+      name: $$operation-name$$
+actions:
+- execute_command:
+    command: |
+      ml video transcribe-speech gs://do-not-delete-ml-video-test/julia_on_fake_news.mp4
+      --language-code en-US --format "text(name)" --async
+    events:
+    - api_call:
+        expect_request:
+          uri: https://videointelligence.googleapis.com/v1/videos:annotate?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              features:
+              - SPEECH_TRANSCRIPTION
+              inputUri: gs://do-not-delete-ml-video-test/julia_on_fake_news.mp4
+              videoContext:
+                speechTranscriptionConfig:
+                  enableAutomaticPunctuation: false
+                  enableSpeakerDiarization: false
+                  enableWordConfidence: false
+                  filterProfanity: false
+                  languageCode: en-US
+                  speechContexts:
+                  - {}
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '46'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: us-west1.13286190935228524240
+        expect_response:
+          extract_references:
+          - field: name
+            reference: operation-name
+          body:
+            json: {}
+    - expect_stderr: |
+        Check operation [$$operation-name$$] for status.
+    - expect_stdout: |
+        name: $$operation-name$$
+    - expect_exit:
+        code: 0

@@ -11,7 +11,7 @@ gcloud compute backend\-services create \- create a backend service
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud compute backend\-services create\fR \fIBACKEND_SERVICE_NAME\fR [\fB\-\-affinity\-cookie\-ttl\fR=\fIAFFINITY_COOKIE_TTL\fR] [\fB\-\-no\-cache\-key\-include\-host\fR] [\fB\-\-no\-cache\-key\-include\-protocol\fR] [\fB\-\-no\-cache\-key\-include\-query\-string\fR] [\fB\-\-connection\-draining\-timeout\fR=\fICONNECTION_DRAINING_TIMEOUT\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-cdn\fR] [\fB\-\-health\-checks\fR=\fIHEALTH_CHECK\fR,[...]] [\fB\-\-http\-health\-checks\fR=\fIHTTP_HEALTH_CHECK\fR,[...]] [\fB\-\-https\-health\-checks\fR=\fIHTTPS_HEALTH_CHECK\fR,[...]] [\fB\-\-iap\fR=\fIdisabled\fR|\fIenabled\fR,[\fIoauth2\-client\-id\fR=\fIOAUTH2\-CLIENT\-ID\fR,\fIoauth2\-client\-secret\fR=\fIOAUTH2\-CLIENT\-SECRET\fR]] [\fB\-\-load\-balancing\-scheme\fR=\fILOAD_BALANCING_SCHEME\fR;\ default="EXTERNAL"] [\fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fB\-\-protocol\fR=\fIPROTOCOL\fR] [\fB\-\-session\-affinity\fR=\fISESSION_AFFINITY\fR] [\fB\-\-signed\-url\-cache\-max\-age\fR=\fISIGNED_URL_CACHE_MAX_AGE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="30s"] [\fB\-\-cache\-key\-query\-string\-blacklist\fR=[\fIQUERY_STRING\fR,...]\ |\ \fB\-\-cache\-key\-query\-string\-whitelist\fR=\fIQUERY_STRING\fR,[...]] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud compute backend\-services create\fR \fIBACKEND_SERVICE_NAME\fR [\fB\-\-affinity\-cookie\-ttl\fR=\fIAFFINITY_COOKIE_TTL\fR] [\fB\-\-no\-cache\-key\-include\-host\fR] [\fB\-\-no\-cache\-key\-include\-protocol\fR] [\fB\-\-no\-cache\-key\-include\-query\-string\fR] [\fB\-\-connection\-draining\-timeout\fR=\fICONNECTION_DRAINING_TIMEOUT\fR] [\fB\-\-custom\-request\-header\fR=\fICUSTOM_REQUEST_HEADER\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-enable\-cdn\fR] [\fB\-\-health\-checks\fR=\fIHEALTH_CHECK\fR,[...]] [\fB\-\-http\-health\-checks\fR=\fIHTTP_HEALTH_CHECK\fR,[...]] [\fB\-\-https\-health\-checks\fR=\fIHTTPS_HEALTH_CHECK\fR,[...]] [\fB\-\-iap\fR=\fIdisabled\fR|\fIenabled\fR,[\fIoauth2\-client\-id\fR=\fIOAUTH2\-CLIENT\-ID\fR,\fIoauth2\-client\-secret\fR=\fIOAUTH2\-CLIENT\-SECRET\fR]] [\fB\-\-load\-balancing\-scheme\fR=\fILOAD_BALANCING_SCHEME\fR;\ default="EXTERNAL"] [\fB\-\-port\-name\fR=\fIPORT_NAME\fR] [\fB\-\-protocol\fR=\fIPROTOCOL\fR] [\fB\-\-session\-affinity\fR=\fISESSION_AFFINITY\fR] [\fB\-\-signed\-url\-cache\-max\-age\fR=\fISIGNED_URL_CACHE_MAX_AGE\fR] [\fB\-\-timeout\fR=\fITIMEOUT\fR;\ default="30s"] [\fB\-\-cache\-key\-query\-string\-blacklist\fR=[\fIQUERY_STRING\fR,...]\ |\ \fB\-\-cache\-key\-query\-string\-whitelist\fR=\fIQUERY_STRING\fR,[...]] [\fB\-\-global\fR\ |\ \fB\-\-region\fR=\fIREGION\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -80,6 +80,17 @@ a VM will remain untouched, but no new connections will be accepted. Set timeout
 to zero to disable connection draining. Enable feature by specifying a timeout
 of up to one hour. If the flag is omitted API default value (0s) will be used.
 See $ gcloud topic datetimes for information on duration formats.
+
+.TP 2m
+\fB\-\-custom\-request\-header\fR=\fICUSTOM_REQUEST_HEADER\fR
+Specifies a HTTP Header to be added by your load balancer. This flag can be
+repeated to specify multiple headers. For example:
+
+.RS 2m
+$ gcloud compute backend\-services create NAME             \e
+    \-\-custom\-request\-header "header\-name: value"             \e
+    \-\-custom\-request\-header "another\-header:"
+.RE
 
 .TP 2m
 \fB\-\-description\fR=\fIDESCRIPTION\fR
@@ -259,10 +270,11 @@ Region of the backend service to create. Overrides the default
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

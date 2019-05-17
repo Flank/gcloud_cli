@@ -8,8 +8,9 @@ DESCRIPTION
     (BETA) Read and manipulate Google Compute Engine disks.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -21,6 +22,9 @@ COMMANDS
 
      add-labels
         (BETA) Add labels to Google Compute Engine persistent disks.
+
+     add-resource-policies
+        (BETA) Add resource policies to a Google Compute Engine disk.
 
      create
         (BETA) Create Google Compute Engine persistent disks.
@@ -41,16 +45,19 @@ COMMANDS
         (BETA) Move a disk between zones.
 
      remove-iam-policy-binding
-        (BETA) Remove IAM policy binding of a Google Compute Engine disk.
+        (BETA) Remove IAM policy binding from a Google Compute Engine disk.
 
      remove-labels
         (BETA) Remove labels from Google Compute Engine persistent disks.
+
+     remove-resource-policies
+        (BETA) Remove resource policies from a Google Compute Engine disk.
 
      resize
         (BETA) Resize a disk or disks.
 
      set-iam-policy
-        (BETA) Set IAM policy for a disk.
+        (BETA) Set the IAM policy for a Google Compute Engine disk.
 
      snapshot
         (BETA) Create snapshots of Google Compute Engine persistent disks.

@@ -30,7 +30,7 @@ POSITIONAL ARGUMENTS
           this group are specified.
 
        --region=REGION
-          A Google Compute Engine for VPC Access API.
+          Compute region (e.g. us-central1) for the connector.
 
 FLAGS
      --async
@@ -38,18 +38,18 @@ FLAGS
         for the operation to complete.
 
      --network=NETWORK; default="default"
-        The name of the Google Compute Engine network to which the connector
-        will be connected. If left unspecified, the default network will be
-        used.
+        Name of the Google Compute Engine network to which the connector will
+        be connected. If left unspecified, the default network will be used.
 
      --range=RANGE
-        The CIDR range of internal addresses that are reserved for this
-        connector. For example, 10.132.0.0/28. Range must be unique and
-        non-overlapping with existing ranges in the network.
+        CIDR range of internal addresses that are reserved for this connector.
+        For example, 10.132.0.0/28. Range must be unique and non-overlapping
+        with existing ranges in the network.
 
      --type=TYPE; default="extended"
-        The type of the connector: extended or basic. Extended is the default
-        and provides internal load balancer support. TYPE must be one of:
+        The type of the connector: 'extended' or 'basic'. Extended is the
+        default and provides internal load balancer support. TYPE must be one
+        of:
 
          basic
             Basic support for single VM connectivity
@@ -57,8 +57,9 @@ FLAGS
             Extended with support for internal load balancer
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -67,9 +68,9 @@ API REFERENCE
     this API can be found at: http://cloud.google.com
 
 EXAMPLES
-    The following command creates a VPC Access connector of type extended with
-    name my-vpc-connector in region us-central1 in network my-network with IP
-    CIDR range of 10.132.0.0/28.
+    The following command creates a VPC Access connector with name
+    'my-vpc-connector' in region 'us-central1' in network 'my-network' with IP
+    CIDR range of '10.132.0.0/28'.
 
         $ gcloud alpha compute networks vpc-access connectors create \
             my-vpc-connector --region=us-central1 --network=my-network
@@ -81,5 +82,8 @@ NOTES
     without notice. If this command fails with API permission errors despite
     specifying the right project, you will have to apply for early access and
     have your projects registered on the API whitelist to use it. To do so,
-    contact Support at https://cloud.google.com/support/.
+    contact Support at https://cloud.google.com/support/. This variant is also
+    available:
+
+        $ gcloud beta compute networks vpc-access connectors create
 

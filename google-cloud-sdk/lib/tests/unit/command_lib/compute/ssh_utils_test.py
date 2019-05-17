@@ -24,6 +24,8 @@ from googlecloudsdk.command_lib.compute import ssh_utils
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 
+import mock
+
 
 class GetExternalIPAddressTests(sdk_test_base.SdkBase):
 
@@ -83,6 +85,32 @@ class GetExternalIPAddressTests(sdk_test_base.SdkBase):
         name='Test', zone='Zone-test', networkInterfaces=[nic_no_ip])
     self.assertRaises(ssh_utils.UnallocatedIPAddressError,
                       ssh_utils.GetExternalIPAddress, instance_no_ip)
+
+
+class HostKeysTestsAlpha(sdk_test_base.SdkBase):
+
+  def testWriteHostKeyToKnownHosts(self):
+    known_hosts = mock.Mock()
+    known_hosts.file_path = '/tmp/foo'
+    known_hosts.known_hosts = [
+        'compute.1234 ssh-rsa asdfasdf'
+    ]
+    known_hosts.Write.return_value = None
+    known_hosts.AddMultiple.return_value = True
+
+    host_keys = {'ssh-rsa': 'jkljkljkl',
+                 'ecdsa': 'jkljkljkl'}
+
+    ssh_helper = ssh_utils.BaseSSHHelper()
+
+    ssh_helper.WriteHostKeysToKnownHosts(known_hosts, host_keys, 'compute.3456')
+
+    known_hosts.AddMultiple.assert_called_with('compute.3456',
+                                               [
+                                                   'ecdsa jkljkljkl',
+                                                   'ssh-rsa jkljkljkl',
+                                               ],
+                                               overwrite=False)
 
 
 if __name__ == '__main__':

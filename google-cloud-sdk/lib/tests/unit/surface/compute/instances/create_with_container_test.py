@@ -27,6 +27,12 @@ from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 
 
+def _AcceleratorTypeOf(api_version, name):
+  return ('https://www.googleapis.com/compute/{ver}/projects/my-project/'
+          'zones/central2-a/acceleratorTypes/{name}'.format(
+              ver=api_version, name=name))
+
+
 class InstancesCreateWithContainerTestBase(test_base.BaseTest):
 
   def _SetUp(self):
@@ -143,6 +149,81 @@ class InstancesCreateWithContainerTest(InstancesCreateWithContainerTestBase,
               project='my-project',
               zone='central2-a',
           ))],)
+
+  def testAcceleratorRequest(self):
+    m = self.messages
+    self.Run("""
+        compute instances create-with-container instance-1
+          --zone central2-a
+          --container-image=gcr.io/my-docker/test-image
+          --accelerator type=nvidia-tesla-k80,count=2
+        """)
+    self.CheckRequests(
+        self.zone_get_request,
+        self.cos_images_list_request,
+        [(self.compute.instances, 'Insert', m.ComputeInstancesInsertRequest(
+            instance=m.Instance(
+                canIpForward=False,
+                labels=self.default_labels,
+                disks=[self.default_attached_disk],
+                guestAccelerators=[
+                    m.AcceleratorConfig(
+                        acceleratorType=_AcceleratorTypeOf(self.api,
+                                                           'nvidia-tesla-k80'),
+                        acceleratorCount=2,)
+                ],
+                machineType=self.default_machine_type,
+                metadata=self.default_metadata,
+                name='instance-1',
+                networkInterfaces=[self.default_network_interface],
+                scheduling=m.Scheduling(automaticRestart=True),
+                serviceAccounts=[self.default_service_account],
+                tags=self.default_tags),
+            project='my-project',
+            zone='central2-a',))])
+
+  def testAcceleratorNoType(self):
+    with self.AssertRaisesToolExceptionRegexp(
+        r'Invalid value for \[--accelerator\]: accelerator type must be '
+        r'specified\. e\.g\. --accelerator type=nvidia-tesla-k80,count=2'):
+      self.Run("""
+          compute instances create-with-container instance-1
+            --zone central2-a
+            --container-image=gcr.io/my-docker/test-image
+            --accelerator count=2
+          """)
+
+  def testAcceleratorCountOmittedRequest(self):
+    m = self.messages
+    self.Run("""
+        compute instances create-with-container instance-1
+          --zone central2-a
+          --container-image=gcr.io/my-docker/test-image
+          --accelerator type=nvidia-tesla-k80
+        """)
+    self.CheckRequests(
+        self.zone_get_request,
+        self.cos_images_list_request,
+        [(self.compute.instances, 'Insert', m.ComputeInstancesInsertRequest(
+            instance=m.Instance(
+                canIpForward=False,
+                labels=self.default_labels,
+                disks=[self.default_attached_disk],
+                guestAccelerators=[
+                    m.AcceleratorConfig(
+                        acceleratorType=_AcceleratorTypeOf(self.api,
+                                                           'nvidia-tesla-k80'),
+                        acceleratorCount=1,)
+                ],
+                machineType=self.default_machine_type,
+                metadata=self.default_metadata,
+                name='instance-1',
+                networkInterfaces=[self.default_network_interface],
+                scheduling=m.Scheduling(automaticRestart=True),
+                serviceAccounts=[self.default_service_account],
+                tags=self.default_tags),
+            project='my-project',
+            zone='central2-a',))])
 
   def testMinCpuPlatform(self):
     m = self.messages
@@ -468,6 +549,83 @@ class InstancesCreateWithContainerTest(InstancesCreateWithContainerTestBase,
               project='my-project',
               zone='central2-a',
           ))],)
+
+  def testMultipleNetworkInterfaceCards(self):
+    m = self.messages
+    self.Run("""
+        compute instances create-with-container instance-1
+          --zone central2-a
+          --container-image=gcr.io/my-docker/test-image
+          --network-interface network=default,address=
+          --network-interface network=some-net,private-network-ip=10.0.0.1,address=8.8.8.8
+          --network-interface subnet=some-subnet
+        """)
+
+    self.CheckRequests(
+        self.zone_get_request,
+        self.cos_images_list_request,
+        [(self.compute.instances,
+          'Insert',
+          m.ComputeInstancesInsertRequest(
+              instance=m.Instance(
+                  canIpForward=False,
+                  disks=[self.default_attached_disk],
+                  labels=self.default_labels,
+                  machineType=self.default_machine_type,
+                  metadata=self.default_metadata,
+                  name='instance-1',
+                  networkInterfaces=[
+                      m.NetworkInterface(
+                          accessConfigs=[
+                              m.AccessConfig(
+                                  name='external-nat',
+                                  type=(m.AccessConfig.TypeValueValuesEnum
+                                        .ONE_TO_ONE_NAT))
+                          ],
+                          network='{0}/projects/my-project/global/networks/'
+                                  'default'.format(self.compute_uri)),
+                      m.NetworkInterface(
+                          accessConfigs=[
+                              m.AccessConfig(
+                                  name='external-nat',
+                                  natIP='8.8.8.8',
+                                  type=(m.AccessConfig.TypeValueValuesEnum.
+                                        ONE_TO_ONE_NAT))
+                          ],
+                          network='{0}/projects/my-project/global/networks/'
+                                  'some-net'.format(self.compute_uri),
+                          networkIP='10.0.0.1'),
+                      m.NetworkInterface(
+                          subnetwork='{0}/projects/my-project/regions/central2/'
+                                     'subnetworks/some-subnet'.format(
+                                         self.compute_uri),
+                          accessConfigs=[
+                              m.AccessConfig(
+                                  name='external-nat',
+                                  type=(m.AccessConfig.TypeValueValuesEnum.
+                                        ONE_TO_ONE_NAT))
+                          ])
+                  ],
+                  scheduling=m.Scheduling(automaticRestart=True),
+                  serviceAccounts=[self.default_service_account],
+                  tags=self.default_tags),
+              project='my-project',
+              zone='central2-a',
+          ))],)
+
+  def testMultiNicFlagAndOneNicFlag(self):
+    with self.AssertRaisesToolExceptionRegexp(
+        r'^arguments not allowed simultaneously: --network-interface, all of '
+        r'the following: --address, --network, --private-network-ip$'):
+      self.Run("""
+          compute instances create-with-container instance-1
+            --zone central2-a
+            --container-image=gcr.io/my-docker/test-image
+            --network-interface ''
+            --address 8.8.8.8
+            --network net
+            --private-network-ip 10.0.0.2
+          """)
 
   def testExplicitDefaultScopes(self):
     m = self.messages
@@ -1218,7 +1376,7 @@ class InstancesCreateFromContainerWithNetworkTierTestBeta(
 
 
 class InstancesCreateFromContainerAlphaTest(
-    InstancesCreateWithContainerTestBase):
+    InstancesCreateWithContainerTestBeta):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
@@ -1488,15 +1646,15 @@ class InstancesCreateFromContainerAlphaTest(
         'Please use `--on-host-maintenance` instead')
 
 
-class InstancesCreateFromContainerContainerMountDiskTestBeta(
+class InstancesCreateFromContainerContainerMountDiskTestGA(
     InstancesCreateWithContainerTestBase,
     parameterized.TestCase):
 
   def PreSetUp(self):
-    self.track = calliope_base.ReleaseTrack.BETA
+    self.track = calliope_base.ReleaseTrack.GA
 
   def SetUp(self):
-    self.SelectApi('beta')
+    self.SelectApi('v1')
     self._SetUp()
 
   def GetDiskMessage(self, initialize_params=None, mode=None, source=None,
@@ -1831,8 +1989,19 @@ class InstancesCreateFromContainerContainerMountDiskTestBeta(
           """.format(disk_flag, container_mount_flag))
 
 
+class InstancesCreateFromContainerContainerMountDiskTestBeta(
+    InstancesCreateFromContainerContainerMountDiskTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+  def SetUp(self):
+    self.SelectApi('beta')
+    self._SetUp()
+
+
 class InstancesCreateFromContainerContainerMountDiskTestAlpha(
-    InstancesCreateFromContainerContainerMountDiskTestBeta):
+    InstancesCreateFromContainerContainerMountDiskTestGA):
 
   def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA

@@ -226,15 +226,15 @@ can also be specified.
 
 .TP 2m
 \fB\-\-target\-tags\fR=\fITAG\fR,[\fITAG\fR,...]
-A list of instance tags indicating the set of instances on the network which may
-accept inbound connections that match the firewall rule. If both target tags and
-target service account are omitted, all instances on the network can receive
-inbound connections that match the rule.
+List of instance tags indicating the set of instances on the network which may
+accept connections that match the firewall rule. Note that tags can be assigned
+to instances during instance creation.
 
-Tags can be assigned to instances during instance creation.
-
-If target tags are specified then neither a source nor target service account
+If target tags are specified, then neither a source nor target service account
 can also be specified.
+
+If both target tags and target service account are omitted, all instances on the
+network can receive connections that match the rule.
 
 
 .RE
@@ -242,10 +242,11 @@ can also be specified.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

@@ -35,8 +35,9 @@ POSITIONAL ARGUMENTS
         (https://cloud.google.com/iam/reference/rest/v1/Policy).
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -49,14 +50,16 @@ EXAMPLES
     The following command will read am IAM policy defined in a JSON file
     'policy.json' and set it for the node template my-node-template:
 
-    $ gcloud beta compute sole-tenancy node-templates set-iam-policy \        my-node-template policy.json
+        $ gcloud beta compute sole-tenancy node-templates set-iam-policy \
+            my-node-template --region=REGION policy.json
 
     See https://cloud.google.com/iam/docs/managing-policies for details of the
     policy file format and contents.
 
 NOTES
-    This command is currently in BETA and may change without notice. This
-    variant is also available:
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
 
+        $ gcloud compute sole-tenancy node-templates set-iam-policy
         $ gcloud alpha compute sole-tenancy node-templates set-iam-policy
 

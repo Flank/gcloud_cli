@@ -1,5 +1,5 @@
 title: surface unit tests for asset get-history
-release_tracks: [ALPHA]
+release_tracks: [ALPHA, BETA, GA]
 summary:
 # This summary is generated automatically on update and should not be edited.
 - execute:
@@ -45,7 +45,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudasset.googleapis.com/v1beta1/projects/test-project:batchGetAssetsHistory?assetNames=%2F%2Fcompute.googleapis.com%2Fprojects%2Ftest-project%2Fzones%2Fus-central1-f%2Finstances%2Finstance1&assetNames=%2F%2Fcompute.googleapis.com%2Fprojects%2Ftest-project%2Fzones%2Fus-central1-f%2Finstances%2Finstance2&contentType=RESOURCE&readTimeWindow.endTime=2018-12-05T13%3A01%3A21.045Z&readTimeWindow.startTime=2018-10-02T15%3A01%3A23.045Z
+          uri: https://cloudasset.googleapis.com/v1/projects/test-project:batchGetAssetsHistory?assetNames=%2F%2Fcompute.googleapis.com%2Fprojects%2Ftest-project%2Fzones%2Fus-central1-f%2Finstances%2Finstance1&assetNames=%2F%2Fcompute.googleapis.com%2Fprojects%2Ftest-project%2Fzones%2Fus-central1-f%2Finstances%2Finstance2&contentType=RESOURCE&readTimeWindow.endTime=2018-12-05T13%3A01%3A21.045Z&readTimeWindow.startTime=2018-10-02T15%3A01%3A23.045Z
           method: GET
           headers: {}
           body: null
@@ -102,7 +102,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://cloudasset.googleapis.com/v1beta1/organizations/test-organization:batchGetAssetsHistory?assetNames=%2F%2Fcompute.googleapis.com%2Fprojects%2Ftest-project%2Fzones%2Fus-central1-f%2Finstances%2Finstance1&assetNames=%2F%2Fcompute.googleapis.com%2Fprojects%2Ftest-project%2Fzones%2Fus-central1-f%2Finstances%2Finstance2&contentType=IAM_POLICY&readTimeWindow.endTime=2018-12-05T13%3A01%3A21.045Z&readTimeWindow.startTime=2018-10-02T15%3A01%3A23.045Z
+          uri: https://cloudasset.googleapis.com/v1/organizations/test-organization:batchGetAssetsHistory?assetNames=%2F%2Fcompute.googleapis.com%2Fprojects%2Ftest-project%2Fzones%2Fus-central1-f%2Finstances%2Finstance1&assetNames=%2F%2Fcompute.googleapis.com%2Fprojects%2Ftest-project%2Fzones%2Fus-central1-f%2Finstances%2Finstance2&contentType=IAM_POLICY&readTimeWindow.endTime=2018-12-05T13%3A01%3A21.045Z&readTimeWindow.startTime=2018-10-02T15%3A01%3A23.045Z
           method: GET
           headers: {}
           body: null

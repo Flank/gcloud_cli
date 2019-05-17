@@ -8,7 +8,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/fake-project/regions/us-central1/nodeTemplates/projects%2Ffake-project%2Fregions%2Fus-central1%2FnodeTemplates%2Fmy-node-template/getIamPolicy?alt=json
+          uri: https://www.googleapis.com/compute/alpha/projects/fake-project/regions/us-central1/nodeTemplates/my-node-template/getIamPolicy?alt=json
           method: GET
           body: null
         return_response:
@@ -32,7 +32,7 @@ actions:
             }
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/fake-project/regions/us-central1/nodeTemplates/projects%2Ffake-project%2Fregions%2Fus-central1%2FnodeTemplates%2Fmy-node-template/setIamPolicy?alt=json
+          uri: https://www.googleapis.com/compute/alpha/projects/fake-project/regions/us-central1/nodeTemplates/my-node-template/setIamPolicy?alt=json
           method: POST
           body:
             json:

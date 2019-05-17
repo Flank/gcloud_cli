@@ -755,7 +755,6 @@ class DeployWithApiTests(DeployWithApiTestsBase):
       self.Run(('app deploy --bucket=gs://default-bucket/ --version=1 '
                 '{0}').format(self.FullPath('app.yaml')))
 
-  @test_case.Filters.skip('Failing until yaml_parsing update.', 'b/63629223')
   def testDeploy_ServiceInAppYaml(self):
     """Tests deployment and end hint for non-default service in app.yaml."""
     self.WriteApp('app.yaml', service='fakeservice')

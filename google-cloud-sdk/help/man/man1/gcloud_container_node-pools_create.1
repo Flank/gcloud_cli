@@ -11,7 +11,7 @@ gcloud container node\-pools create \- create a node pool in a running cluster
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud container node\-pools create\fR \fINAME\fR [\fB\-\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]] [\fB\-\-cluster\fR=\fICLUSTER\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-disk\-type\fR=\fIDISK_TYPE\fR] [\fB\-\-enable\-autorepair\fR] [\fB\-\-enable\-autoupgrade\fR] [\fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR] [\fB\-\-local\-ssd\-count\fR=\fILOCAL_SSD_COUNT\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR,\ \fB\-m\fR\ \fIMACHINE_TYPE\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-node\-labels\fR=[\fINODE_LABEL\fR,...]] [\fB\-\-node\-taints\fR=[\fINODE_TAINT\fR,...]] [\fB\-\-node\-version\fR=\fINODE_VERSION\fR] [\fB\-\-num\-nodes\fR=\fINUM_NODES\fR;\ default=3] [\fB\-\-preemptible\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-enable\-autoscaling\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR\ |\ \fB\-\-no\-enable\-cloud\-endpoints\fR\ \fB\-\-scopes\fR=[\fISCOPE\fR,...];\ default="gke\-default"] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud container node\-pools create\fR \fINAME\fR [\fB\-\-accelerator\fR=[\fItype\fR=\fITYPE\fR,[\fIcount\fR=\fICOUNT\fR],...]] [\fB\-\-cluster\fR=\fICLUSTER\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR] [\fB\-\-disk\-type\fR=\fIDISK_TYPE\fR] [\fB\-\-enable\-autorepair\fR] [\fB\-\-enable\-autoupgrade\fR] [\fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR] [\fB\-\-local\-ssd\-count\fR=\fILOCAL_SSD_COUNT\fR] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR,\ \fB\-m\fR\ \fIMACHINE_TYPE\fR] [\fB\-\-max\-pods\-per\-node\fR=\fIMAX_PODS_PER_NODE\fR] [\fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-metadata\-from\-file\fR=\fIKEY\fR=\fILOCAL_FILE_PATH\fR,[...]] [\fB\-\-min\-cpu\-platform\fR=\fIPLATFORM\fR] [\fB\-\-node\-labels\fR=[\fINODE_LABEL\fR,...]] [\fB\-\-node\-taints\fR=[\fINODE_TAINT\fR,...]] [\fB\-\-node\-version\fR=\fINODE_VERSION\fR] [\fB\-\-num\-nodes\fR=\fINUM_NODES\fR;\ default=3] [\fB\-\-preemptible\fR] [\fB\-\-tags\fR=\fITAG\fR,[\fITAG\fR,...]] [\fB\-\-enable\-autoscaling\fR\ \fB\-\-max\-nodes\fR=\fIMAX_NODES\fR\ \fB\-\-min\-nodes\fR=\fIMIN_NODES\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR,\ \fB\-z\fR\ \fIZONE\fR] [\fB\-\-scopes\fR=[\fISCOPE\fR,...];\ default="gke\-default"\ \fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -93,8 +93,8 @@ $ gcloud container node\-pools create node\-pool\-1 \e
     \-\-cluster=example\-cluster \-\-enable\-autoupgrade
 .RE
 
-See https://cloud.google.com/kubernetes\-engine/docs/node\-management for more
-info.
+See https://cloud.google.com/kubernetes\-engine/docs/node\-auto\-upgrades for
+more info.
 
 .TP 2m
 \fB\-\-image\-type\fR=\fIIMAGE_TYPE\fR
@@ -141,6 +141,16 @@ of RAM:
 $ gcloud container node\-pools create high\-mem\-pool \e
     \-\-machine\-type=custom\-2\-12288
 .RE
+
+.TP 2m
+\fB\-\-max\-pods\-per\-node\fR=\fIMAX_PODS_PER_NODE\fR
+The max number of pods per node for this node pool.
+
+This flag sets the maximum number of pods that can be run at the same time on a
+node. This will override the value given with \-\-default\-max\-pods\-per\-node
+flag set at the cluster level.
+
+Must be used in conjunction with '\-\-enable\-ip\-alias'.
 
 .TP 2m
 \fB\-\-metadata\fR=\fIKEY\fR=\fIVALUE\fR,[\fIKEY\fR=\fIVALUE\fR,...]
@@ -340,40 +350,14 @@ Compute zone (e.g. us\-central1\-a) for the cluster. Overrides the default
 .sp
 .TP 2m
 
-Options to specify the node identity. At most one of these may be specified:
+Options to specify the node identity.
 
 .RS 2m
-.TP 2m
-\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR
-The Google Cloud Platform Service Account to be used by the node VMs. If a
-service account is specified, the cloud\-platform and userinfo.email scopes are
-used. If no Service Account is specified, the project default service account is
-used.
-
 .TP 2m
 
 Scopes options.
 
 .RS 2m
-.TP 2m
-\fB\-\-enable\-cloud\-endpoints\fR
-(DEPRECATED) Automatically enable Google Cloud Endpoints to take advantage of
-API management features by adding service\-control and service\-management
-scopes.
-
-If \f5\-\-no\-enable\-cloud\-endpoints\fR is set, remove service\-control and
-service\-management scopes, even if they are implicitly (via default) or
-explicitly set via \f5\-\-scopes\fR.
-
-\f5\-\-[no\-]enable\-cloud\-endpoints\fR is not allowed if
-\f5container/new_scopes_behavior\fR property is set to true.
-
-Flag \-\-[no\-]enable\-cloud\-endpoints is deprecated and will be removed in a
-future release. Scopes necessary for Google Cloud Endpoints are now included in
-the default set and may be excluded using \-\-scopes.
-
-Enabled by default, use \fB\-\-no\-enable\-cloud\-endpoints\fR to disable.
-
 .TP 2m
 \fB\-\-scopes\fR=[\fISCOPE\fR,...]; default="gke\-default"
 Specifies scopes for the node instances. Examples:
@@ -393,10 +377,9 @@ $ gcloud container node\-pools create node\-pool\-1 \e
 Multiple SCOPEs can be specified, separated by commas. \f5logging\-write\fR
 and/or \f5monitoring\fR are added unless Cloud Logging and/or Cloud Monitoring
 are disabled (see \f5\-\-enable\-cloud\-logging\fR and
-\f5\-\-enable\-cloud\-monitoring\fR for more information).
-
-SCOPE can be either the full URI of the scope or an alias. \fBdefault\fR scopes
-are assigned to all instances. Available aliases are:
+\f5\-\-enable\-cloud\-monitoring\fR for more information). SCOPE can be either
+the full URI of the scope or an alias. \fBdefault\fR scopes are assigned to all
+instances. Available aliases are:
 
 
 .TS
@@ -446,18 +429,27 @@ been deprecated. Please, use https://www.googleapis.com/auth/sqlservice.admin or
 \f5sql\-admin\fR to manage your Google SQL Service instances.
 
 
-
 .RE
+.sp
+.TP 2m
+\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR
+The Google Cloud Platform Service Account to be used by the node VMs. If a
+service account is specified, the cloud\-platform and userinfo.email scopes are
+used. If no Service Account is specified, the project default service account is
+used.
+
+
 .RE
 .RE
 .sp
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

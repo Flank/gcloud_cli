@@ -26,32 +26,31 @@ from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.core.resource import resource_projector
 from tests.lib import cli_test_base
 from tests.lib import completer_test_base
-from tests.lib import parameterized
 from tests.lib import sdk_test_base
 from tests.lib import test_case
 from tests.lib.surface.compute import test_base
 from tests.lib.surface.compute import test_resources
 
-messages = core_apis.GetMessagesModule('compute', 'v1')
 
+class DisksDescribeTestGA(
+    sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 
-def SetUpMockClient(api):
-  mock_client = mock.Client(
-      core_apis.GetClientClass('compute', api),
-      real_client=core_apis.GetClientInstance('compute', api, no_http=True))
-  mock_client.Mock()
-  return mock_client
-
-
-class DisksDescribeTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+    self.api_version = 'v1'
 
   def SetUp(self):
-    self.mock_client = SetUpMockClient('v1')
+    self.mock_client = mock.Client(
+        core_apis.GetClientClass('compute', self.api_version),
+        real_client=core_apis.GetClientInstance(
+            'compute', self.api_version, no_http=True))
+    self.mock_client.Mock()
     self.addCleanup(self.mock_client.Unmock)
+    self.messages = core_apis.GetMessagesModule('compute', self.api_version)
 
-  def testSimpleCase(self):
+  def testSimpleCaseZonal(self):
     self.mock_client.disks.Get.Expect(
-        messages.ComputeDisksGetRequest(
+        self.messages.ComputeDisksGetRequest(
             disk='my-disk',
             project='fake-project',
             zone='zone-1'),
@@ -73,35 +72,7 @@ class DisksDescribeTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
             zone: https://www.googleapis.com/compute/v1/projects/my-project/zones/zone-1
             """))
 
-
-class CompletionTest(test_base.BaseTest, completer_test_base.CompleterBase):
-
-  def testDescribeCompletion(self):
-
-    lister_mock = self.StartPatch(
-        'googlecloudsdk.api_lib.compute.lister.GetZonalResourcesDicts',
-        autospec=True)
-    lister_mock.return_value = resource_projector.MakeSerializable(
-        test_resources.DISKS)
-    self.RunCompletion('compute disks describe --zone zone-1 d',
-                       ['disk-1', 'disk-2', 'disk-3'])
-
-
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'),
-                          (calliope_base.ReleaseTrack.BETA, 'beta'))
-class RegionalDisksDescribeTest(sdk_test_base.WithFakeAuth,
-                                cli_test_base.CliTestBase,
-                                parameterized.TestCase):
-
-  def _SetUp(self, track, api_version):
-    self.mock_client = SetUpMockClient(api_version)
-    self.addCleanup(self.mock_client.Unmock)
-    self.messages = core_apis.GetMessagesModule('compute', api_version)
-    self.track = track
-
-  def testSimpleCase(self, track, api_version):
-    self._SetUp(track, api_version)
+  def testSimpleCaseRegional(self):
     self.mock_client.regionDisks.Get.Expect(
         self.messages.ComputeRegionDisksGetRequest(
             disk='my-disk',
@@ -129,6 +100,36 @@ class RegionalDisksDescribeTest(sdk_test_base.WithFakeAuth,
             sizeGb: '10'
             status: READY
             """))
+
+
+class DisksDescribeTestBeta(
+    sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
+
+
+class DisksDescribeTestAlpha(
+    sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
+
+
+class CompletionTest(test_base.BaseTest, completer_test_base.CompleterBase):
+
+  def testDescribeCompletion(self):
+
+    lister_mock = self.StartPatch(
+        'googlecloudsdk.api_lib.compute.lister.MultiScopeLister',
+        autospec=True)
+    lister_mock.return_value.return_value = resource_projector.MakeSerializable(
+        test_resources.DISKS)
+    self.RunCompletion('compute disks describe --zone zone-1 d',
+                       ['disk-1', 'disk-2', 'disk-3'])
+
 
 if __name__ == '__main__':
   test_case.main()

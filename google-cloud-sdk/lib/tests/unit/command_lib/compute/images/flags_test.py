@@ -43,7 +43,7 @@ class ImagesCompleterTest(completer_test_base.CompleterBase):
     completer = self.Completer(flags.ImagesCompleter,
                                command_resources=_COMMAND_RESOURCES)
     self.assertEqual(
-        ['image-1', 'image-2', 'image-3'],
+        ['image-1', 'image-2', 'image-3', 'image-4'],
         completer.Complete('', self.parameter_info))
     self.assertEqual(
         ['image-2'],
@@ -56,7 +56,7 @@ class ImagesCompleterTest(completer_test_base.CompleterBase):
     completer = self.Completer(flags.SearchImagesCompleter,
                                search_resources=_SEARCH_RESOURCES)
     self.assertEqual(
-        ['image-1', 'image-2', 'image-3'],
+        ['image-1', 'image-2', 'image-3', 'image-4'],
         completer.Complete('', self.parameter_info))
     self.assertEqual(
         ['image-2'],
@@ -74,7 +74,7 @@ class ComputeFlagCompleterTest(completer_test_base.FlagCompleterBase):
                                      '--zone': None},
                                command_resources=_COMMAND_RESOURCES)
     self.assertEqual(
-        3,
+        4,
         len(completer.Complete('', self.parameter_info)))
     self.assertEqual(
         ['image-2 --project=my-project'],
@@ -102,7 +102,7 @@ class ComputeFlagCompleterTest(completer_test_base.FlagCompleterBase):
                                      '--zone': None},
                                search_resources=_SEARCH_RESOURCES)
     self.assertEqual(
-        3,
+        4,
         len(completer.Complete('', self.parameter_info)))
     self.assertEqual(
         ['image-2 --project=my-project'],
@@ -131,13 +131,14 @@ class ComputeGRICompleterTest(completer_test_base.GRICompleterBase):
     completer = self.Completer(flags.ImagesCompleter,
                                command_resources=_COMMAND_RESOURCES)
     self.assertEqual(
-        3,
+        4,
         len(completer.Complete('', self.parameter_info)))
     self.assertEqual(
         [
             'image-1:my-project',
             'image-2:my-project',
             'image-3:my-project',
+            'image-4:my-project',
         ],
         completer.Complete('', self.parameter_info))
     self.assertEqual(
@@ -148,13 +149,14 @@ class ComputeGRICompleterTest(completer_test_base.GRICompleterBase):
     completer = self.Completer(flags.SearchImagesCompleter,
                                search_resources=_SEARCH_RESOURCES)
     self.assertEqual(
-        3,
+        4,
         len(completer.Complete('', self.parameter_info)))
     self.assertEqual(
         [
             'image-1:my-project',
             'image-2:my-project',
             'image-3:my-project',
+            'image-4:my-project',
         ],
         completer.Complete('', self.parameter_info))
     self.assertEqual(

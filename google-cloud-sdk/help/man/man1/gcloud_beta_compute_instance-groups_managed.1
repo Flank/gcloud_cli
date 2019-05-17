@@ -23,10 +23,11 @@ gcloud beta compute instance\-groups managed \- read and manipulate Google Compu
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -95,7 +96,8 @@ instance groups.
 
 .TP 2m
 \fBset\-autohealing\fR
-\fB(BETA)\fR Set autohealing policy for managed instance group.
+\fB(BETA)\fR \fB(DEPRECATED)\fR Set autohealing policy for managed instance
+group.
 
 .TP 2m
 \fBset\-autoscaling\fR
@@ -118,8 +120,17 @@ instance groups.
 \fB(BETA)\fR Stop autoscaling a managed instance group.
 
 .TP 2m
+\fBupdate\fR
+\fB(BETA)\fR Update Google Compute Engine managed instance groups.
+
+.TP 2m
+\fBwait\-until\fR
+\fB(BETA)\fR Wait until managed instance group reaches desired state.
+
+.TP 2m
 \fBwait\-until\-stable\fR
-\fB(BETA)\fR Waits until state of managed instance group is stable.
+\fB(BETA)\fR \fB(DEPRECATED)\fR Waits until state of managed instance group is
+stable.
 
 
 .RE

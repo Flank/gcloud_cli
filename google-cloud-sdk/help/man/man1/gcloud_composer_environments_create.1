@@ -11,7 +11,7 @@ gcloud composer environments create \- create and initialize a Cloud Composer en
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud composer environments create\fR (\fIENVIRONMENT\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-airflow\-configs\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-async\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR;\ default="100GB"] [\fB\-\-env\-variables\fR=[\fINAME\fR=\fIVALUE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-node\-count\fR=\fINODE_COUNT\fR] [\fB\-\-oauth\-scopes\fR=[\fISCOPE\fR,...]] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-tags\fR=[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-network\fR=\fINETWORK\fR\ :\ \fB\-\-subnetwork\fR=\fISUBNETWORK\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud composer environments create\fR (\fIENVIRONMENT\fR\ :\ \fB\-\-location\fR=\fILOCATION\fR) [\fB\-\-airflow\-configs\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-async\fR] [\fB\-\-disk\-size\fR=\fIDISK_SIZE\fR;\ default="100GB"] [\fB\-\-env\-variables\fR=[\fINAME\fR=\fIVALUE\fR,...]] [\fB\-\-labels\fR=[\fIKEY\fR=\fIVALUE\fR,...]] [\fB\-\-machine\-type\fR=\fIMACHINE_TYPE\fR] [\fB\-\-node\-count\fR=\fINODE_COUNT\fR] [\fB\-\-oauth\-scopes\fR=[\fISCOPE\fR,...]] [\fB\-\-python\-version\fR=\fIPYTHON_VERSION\fR] [\fB\-\-service\-account\fR=\fISERVICE_ACCOUNT\fR] [\fB\-\-tags\fR=[\fITAG\fR,...]] [\fB\-\-zone\fR=\fIZONE\fR] [\fB\-\-airflow\-version\fR=\fIAIRFLOW_VERSION\fR\ |\ \fB\-\-image\-version\fR=\fIIMAGE_VERSION\fR] [\fB\-\-network\fR=\fINETWORK\fR\ :\ \fB\-\-subnetwork\fR=\fISUBNETWORK\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -144,6 +144,45 @@ The Compute Engine zone in which the environment will be created. For example
 
 .TP 2m
 
+At most one of these may be specified:
+
+.RS 2m
+.TP 2m
+\fB\-\-airflow\-version\fR=\fIAIRFLOW_VERSION\fR
+Version of Airflow to run in the environment.
+
+.RS 2m
+Must be of the form `X.Y[.Z]`.
+.RE
+
+.RS 2m
+The latest supported Cloud Composer version will be used within
+the created environment.
+.RE
+
+.TP 2m
+\fB\-\-image\-version\fR=\fIIMAGE_VERSION\fR
+Version of the image to run in the environment.
+
+.RS 2m
+The image version encapsulates the versions of both Cloud Composer
+and Apache Airflow. Must be of the form `composer\-A.B.C\-airflow\-X.Y[.Z]`.
+.RE
+
+.RS 2m
+The Cloud Composer and Airflow versions are semantic versions.
+`latest` can be provided instead of an explicit Cloud Composer
+version number indicating that the server will replace `latest`
+with the current Cloud Composer version. For the Apache Airflow
+portion, the patch version can be omitted and the current
+version will be selected. The version numbers that are used will
+be stored.
+.RE
+
+.RE
+.sp
+.TP 2m
+
 Virtual Private Cloud networking
 
 .RS 2m
@@ -167,10 +206,11 @@ will be connected.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

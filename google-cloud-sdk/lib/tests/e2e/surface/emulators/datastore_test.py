@@ -49,7 +49,6 @@ def IsCloudDatastoreEmulatorComponentInstalled():
   return True
 
 
-@test_case.Filters.SkipOnWindows('Failing on Windows', 'b/36216325')
 class DatastoreTests(sdk_test_base.BundledBase, cli_test_base.CliTestBase):
 
   def SetUp(self):
@@ -60,6 +59,7 @@ class DatastoreTests(sdk_test_base.BundledBase, cli_test_base.CliTestBase):
   def Project(self):
     return 'fake-project'
 
+  @test_case.Filters.SkipOnWindows('Failing on Windows', 'b/36216325')
   @test_case.Filters.RunOnlyIf(IsGCDComponentInstalled(),
                                'Need GCD')
   def testStartLegacyEmulatorAndPrintEnv(self):
@@ -129,7 +129,6 @@ class DatastoreTests(sdk_test_base.BundledBase, cli_test_base.CliTestBase):
       self.AssertOutputContains('unset DATASTORE_DATASET')
       self.AssertOutputContains('unset DATASTORE_PROJECT_ID')
 
-  @test_case.Filters.skip('Very flaky', 'b/62056917')
   @test_case.Filters.RunOnlyIf(IsCloudDatastoreEmulatorComponentInstalled(),
                                'Need Cloud Datastore Emulator')
   def testDefaultPort(self):

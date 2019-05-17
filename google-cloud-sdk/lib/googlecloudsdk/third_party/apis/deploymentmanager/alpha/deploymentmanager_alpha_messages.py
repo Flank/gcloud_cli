@@ -99,10 +99,10 @@ class Binding(_messages.Message):
   r"""Associates `members` with a `role`.
 
   Fields:
-    condition: Unimplemented. The condition that is associated with this
-      binding. NOTE: an unsatisfied condition will not allow user access via
-      current binding. Different bindings, including their conditions, are
-      examined independently.
+    condition: The condition that is associated with this binding. NOTE: An
+      unsatisfied condition will not allow user access via current binding.
+      Different bindings, including their conditions, are examined
+      independently.
     members: Specifies the identities requesting access for a Cloud Platform
       resource. `members` can have the following values:  * `allUsers`: A
       special identifier that represents anyone who is on the internet; with
@@ -113,9 +113,9 @@ class Binding(_messages.Message):
       * `serviceAccount:{emailid}`: An email address that represents a service
       account. For example, `my-other-app@appspot.gserviceaccount.com`.  *
       `group:{emailid}`: An email address that represents a Google group. For
-      example, `admins@example.com`.    * `domain:{domain}`: A Google Apps
-      domain name that represents all the users of that domain. For example,
-      `google.com` or `example.com`.
+      example, `admins@example.com`.    * `domain:{domain}`: The G Suite
+      domain (primary) that represents all the users of that domain. For
+      example, `google.com` or `example.com`.
     role: Role that is assigned to `members`. For example, `roles/viewer`,
       `roles/editor`, or `roles/owner`.
   """
@@ -211,17 +211,14 @@ class Condition(_messages.Message):
     svc: Trusted attributes discharged by the service.
     sys: Trusted attributes supplied by any service that owns resources and
       uses the IAM system for access control.
-    value: DEPRECATED. Use 'values' instead.
-    values: The objects of the condition. This is mutually exclusive with
-      'value'.
+    values: The objects of the condition.
   """
 
   iam = _messages.StringField(1)
   op = _messages.StringField(2)
   svc = _messages.StringField(3)
   sys = _messages.StringField(4)
-  value = _messages.StringField(5)
-  values = _messages.StringField(6, repeated=True)
+  values = _messages.StringField(5, repeated=True)
 
 
 class ConfigFile(_messages.Message):
@@ -300,7 +297,7 @@ class Deployment(_messages.Message):
       cannot be a dash.
     operation: Output only. The Operation that most recently ran, or is
       currently running, on this deployment.
-    outputs: Output only. Map of outputs from the last manifest that deployed
+    outputs: Output only. List of outputs from the last manifest that deployed
       successfully.
     selfLink: Output only. Server defined URL for the resource.
     target: [Input Only] The parameters that define your deployment, including
@@ -320,7 +317,7 @@ class Deployment(_messages.Message):
   manifest = _messages.StringField(7)
   name = _messages.StringField(8)
   operation = _messages.MessageField('Operation', 9)
-  outputs = _messages.MessageField('DeploymentOutputsEntry', 10, repeated=True)
+  outputs = _messages.MessageField('DeploymentOutputEntry', 10, repeated=True)
   selfLink = _messages.StringField(11)
   target = _messages.MessageField('TargetConfiguration', 12)
   update = _messages.MessageField('DeploymentUpdate', 13)
@@ -339,12 +336,12 @@ class DeploymentLabelEntry(_messages.Message):
   value = _messages.StringField(2)
 
 
-class DeploymentOutputsEntry(_messages.Message):
-  r"""A DeploymentOutputsEntry object.
+class DeploymentOutputEntry(_messages.Message):
+  r"""Output object for Deployments
 
   Fields:
-    key: A string attribute.
-    value: A string attribute.
+    key: Key of the output
+    value: Value of the label
   """
 
   key = _messages.StringField(1)
@@ -1472,11 +1469,6 @@ class LogConfigDataAccessOptions(_messages.Message):
   Fields:
     logMode: Whether Gin logging should happen in a fail-closed manner at the
       caller. This is relevant only in the LocalIAM implementation, for now.
-      NOTE: Logging to Gin in a fail-closed manner is currently unsupported
-      while work is being done to satisfy the requirements of go/345.
-      Currently, setting LOG_FAIL_CLOSED mode will have no effect, but still
-      exists because there is active work being done to support it
-      (b/115874152).
   """
 
   logMode = _messages.StringField(1)
@@ -1546,11 +1538,16 @@ class MethodMap(_messages.Message):
 
 
 class Operation(_messages.Message):
-  r"""An Operation resource, used to manage asynchronous API requests. (==
-  resource_for v1.globalOperations ==) (== resource_for beta.globalOperations
-  ==) (== resource_for v1.regionOperations ==) (== resource_for
-  beta.regionOperations ==) (== resource_for v1.zoneOperations ==) (==
-  resource_for beta.zoneOperations ==)
+  r"""Represents an Operation resource.  You can use an operation resource to
+  manage asynchronous API requests. For more information, read Handling API
+  responses.  Operations can be global, regional or zonal.   - For global
+  operations, use the globalOperations resource.  - For regional operations,
+  use the regionOperations resource.  - For zonal operations, use the
+  zonalOperations resource.    For more information, read  Global, Regional,
+  and Zonal Resources. (== resource_for v1.globalOperations ==) (==
+  resource_for beta.globalOperations ==) (== resource_for v1.regionOperations
+  ==) (== resource_for beta.regionOperations ==) (== resource_for
+  v1.zoneOperations ==) (== resource_for beta.zoneOperations ==)
 
   Messages:
     ErrorValue: [Output Only] If errors are generated during processing of the
@@ -1591,6 +1588,8 @@ class Operation(_messages.Message):
       this field as part of the HTTP request URL. It is not settable as a
       field in the request body.
     selfLink: [Output Only] Server-defined URL for the resource.
+    selfLinkWithId: [Output Only] Server-defined URL for this resource with
+      the resource id.
     startTime: [Output Only] The time that this operation was started by the
       server. This value is in RFC3339 text format.
     status: [Output Only] The status of the operation, which can be one of the
@@ -1692,14 +1691,15 @@ class Operation(_messages.Message):
   progress = _messages.IntegerField(13, variant=_messages.Variant.INT32)
   region = _messages.StringField(14)
   selfLink = _messages.StringField(15)
-  startTime = _messages.StringField(16)
-  status = _messages.StringField(17)
-  statusMessage = _messages.StringField(18)
-  targetId = _messages.IntegerField(19, variant=_messages.Variant.UINT64)
-  targetLink = _messages.StringField(20)
-  user = _messages.StringField(21)
-  warnings = _messages.MessageField('WarningsValueListEntry', 22, repeated=True)
-  zone = _messages.StringField(23)
+  selfLinkWithId = _messages.StringField(16)
+  startTime = _messages.StringField(17)
+  status = _messages.StringField(18)
+  statusMessage = _messages.StringField(19)
+  targetId = _messages.IntegerField(20, variant=_messages.Variant.UINT64)
+  targetLink = _messages.StringField(21)
+  user = _messages.StringField(22)
+  warnings = _messages.MessageField('WarningsValueListEntry', 23, repeated=True)
+  zone = _messages.StringField(24)
 
 
 class OperationsListResponse(_messages.Message):

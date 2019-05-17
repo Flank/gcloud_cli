@@ -1,0 +1,99 @@
+
+.TH "GCLOUD_ALPHA_DATAPROC" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud alpha dataproc \- create and manage Google Cloud Dataproc clusters and jobs
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud alpha dataproc\fR \fIGROUP\fR [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(ALPHA)\fR The gcloud dataproc command group lets you create and manage
+Google Cloud Dataproc clusters and jobs.
+
+Cloud Dataproc is an Apache Hadoop, Apache Spark, Apache Pig, and Apache Hive
+service. It easily processes big datasets at low cost, creating managed clusters
+of any size that scale down once processing is complete.
+
+More information on Cloud Dataproc can be found here:
+https://cloud.google.com/dataproc and detailed documentation can be found here:
+https://cloud.google.com/dataproc/docs/
+
+
+.SH "EXAMPLES"
+
+To see how to create and manage clusters, run:
+
+.RS 2m
+$ gcloud alpha dataproc clusters
+.RE
+
+To see how to submit and manage jobs, run:
+
+.RS 2m
+$ gcloud alpha dataproc jobs
+.RE
+
+
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "GROUPS"
+
+\f5\fIGROUP\fR\fR is one of the following:
+
+.RS 2m
+.TP 2m
+\fBautoscaling\-policies\fR
+\fB(ALPHA)\fR Create and manage Google Cloud Dataproc autoscaling policies.
+
+.TP 2m
+\fBclusters\fR
+\fB(ALPHA)\fR Create and manage Google Cloud Dataproc clusters.
+
+.TP 2m
+\fBjobs\fR
+\fB(ALPHA)\fR Submit and manage Google Cloud Dataproc jobs.
+
+.TP 2m
+\fBoperations\fR
+\fB(ALPHA)\fR View and manage Google Cloud Dataproc operations.
+
+.TP 2m
+\fBworkflow\-templates\fR
+\fB(ALPHA)\fR Create and manage Google Cloud Dataproc workflow templates.
+
+
+.RE
+.sp
+
+.SH "NOTES"
+
+This command is currently in ALPHA and may change without notice. If this
+command fails with API permission errors despite specifying the right project,
+you will have to apply for early access and have your projects registered on the
+API whitelist to use it. To do so, contact Support at
+https://cloud.google.com/support/. These variants are also available:
+
+.RS 2m
+$ gcloud dataproc
+$ gcloud beta dataproc
+.RE
+

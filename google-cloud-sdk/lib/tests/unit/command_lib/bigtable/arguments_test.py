@@ -87,6 +87,50 @@ class CompleterCommandTest(completer_test_base.CompleterBase):
         },
     )
 
+  def testTableCompleterCommand(self):
+    self.RunCompleter(
+        arguments.TableCompleter,
+        command_only=True,
+        expected_command=[
+            'beta',
+            'bigtable',
+            'instances',
+            'tables',
+            'list',
+            '--uri',
+            '--quiet',
+            '--format=disable',
+            '--instances=my-instance',
+        ],
+        args={
+            '--id': 'my-id',
+            '--instances': 'my-instance',
+        },
+    )
+
+  def testTableCompleterCommandWithProject(self):
+    self.RunCompleter(
+        arguments.TableCompleter,
+        command_only=True,
+        expected_command=[
+            'beta',
+            'bigtable',
+            'instances',
+            'tables',
+            'list',
+            '--uri',
+            '--quiet',
+            '--format=disable',
+            '--project=my-project',
+            '--instances=my-instance',
+        ],
+        args={
+            '--id': 'my-id',
+            '--instances': 'my-instance',
+            '--project': 'my-project',
+        },
+    )
+
 
 class InstancesClustersCompletionTest(base.BigtableV2TestBase,
                                       completer_test_base.CompleterBase):

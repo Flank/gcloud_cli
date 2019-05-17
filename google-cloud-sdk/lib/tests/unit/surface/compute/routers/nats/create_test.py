@@ -268,16 +268,6 @@ class BetaCreateTest(CreateTest):
     self.orig = router_test_utils.CreateEmptyRouterMessage(
         self.messages, track='beta')
 
-
-class AlphaCreateTest(BetaCreateTest):
-
-  def SetUp(self):
-    self.version = 'alpha'
-    self.SelectApi(calliope_base.ReleaseTrack.ALPHA, 'alpha')
-
-    self.orig = router_test_utils.CreateEmptyRouterMessage(
-        self.messages, track='alpha')
-
   def testLogging(self):
     expected_router = copy.deepcopy(self.orig)
     expected_router.nats = [
@@ -294,7 +284,7 @@ class AlphaCreateTest(BetaCreateTest):
             tcpTransitoryIdleTimeoutSec=None,
             tcpEstablishedIdleTimeoutSec=None,
             logConfig=self.messages.RouterNatLogConfig(
-                enabled=True,
+                enable=True,
                 filter=self.messages.RouterNatLogConfig.FilterValueValuesEnum
                 .TRANSLATIONS_ONLY))
     ]
@@ -311,6 +301,15 @@ class AlphaCreateTest(BetaCreateTest):
         --log-filter TRANSLATIONS_ONLY
         """)
 
+
+class AlphaCreateTest(BetaCreateTest):
+
+  def SetUp(self):
+    self.version = 'alpha'
+    self.SelectApi(calliope_base.ReleaseTrack.ALPHA, 'alpha')
+
+    self.orig = router_test_utils.CreateEmptyRouterMessage(
+        self.messages, track='alpha')
 
 if __name__ == '__main__':
   test_case.main()

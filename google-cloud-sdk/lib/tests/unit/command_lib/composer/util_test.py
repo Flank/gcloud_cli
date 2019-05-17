@@ -232,6 +232,11 @@ class UtilGATest(base.KubectlShellingUnitTest, parameterized.TestCase):
             'to_update': 'new_val'
         })
 
+  def testConvertImageVersionToNamespacePrefix(self):
+    actual = command_util.ConvertImageVersionToNamespacePrefix(
+        'composer-1.2.3-airflow-4.5.6')
+    self.assertEqual('composer-1-2-3-airflow-4-5-6', actual)
+
   def testExtractGkeClusterLocationIdDefaultsToEnvLocation(self):
     """Tests that the environment config location takes precedence."""
     config_zone = 'configZone'
@@ -288,15 +293,71 @@ class UtilGATest(base.KubectlShellingUnitTest, parameterized.TestCase):
               self.gke_messages.Cluster(name=list_name, location=list_location)
               for list_name, list_location in list_names_locations
           ]))
-    self.assertEquals(expected_location,
-                      command_util.ExtractGkeClusterLocationId(env_obj))
+    self.assertEqual(expected_location,
+                     command_util.ExtractGkeClusterLocationId(env_obj))
+
+  @mock.patch('googlecloudsdk.command_lib.composer.util.TemporaryKubeconfig')
+  @mock.patch('googlecloudsdk.core.execution_utils.Exec')
+  def testFetchKubectlNamespace(self, exec_mock, tmp_kubeconfig_mock):
+    env_image_version = 'composer-1.2.3-airflow-4.5.6'
+
+    fake_exec = kubectl_util.FakeExec()
+    exec_mock.side_effect = fake_exec
+    tmp_kubeconfig_mock.side_effect = self.FakeTemporaryKubeconfig
+
+    # NOTE: FetchKubectlNamespace() results are returned in asc order by
+    #       creation timestamp.
+
+    # Scenario // 2 active namespaces.
+    fake_exec.AddCallback(
+        0,
+        self.MakeFetchKubectlNamespaceCallback(
+            [('default', 'Active'),
+             ('composer-1-2-3-airflow-4-5-6-aabbccdd', 'Active')]))
+
+    # Scenario // 3 active namespaces.
+    fake_exec.AddCallback(
+        1,
+        self.MakeFetchKubectlNamespaceCallback(
+            [('default', 'Active'),
+             ('composer-1-2-3-airflow-4-5-6-aabbccdd', 'Active'),
+             ('composer-1-2-3-airflow-4-5-6-beeffeed', 'Active')]))
+
+    # Scenario // 3 namespaces;
+    # 2 active namespaces, but most recent namespace in 'Terminating' state.
+    fake_exec.AddCallback(
+        2,
+        self.MakeFetchKubectlNamespaceCallback(
+            [('default', 'Active'),
+             ('composer-1-2-3-airflow-4-5-6-aabbccdd', 'Active'),
+             ('composer-1-2-3-airflow-4-5-6-beeffeed', 'Terminating')]))
+
+    # Scenario // 3 namespaces, but none match image-version prefix.
+    fake_exec.AddCallback(
+        3,
+        self.MakeFetchKubectlNamespaceCallback([('foo', 'Active'),
+                                                ('bar', 'Terminating'),
+                                                ('baz', 'Active')]))
+
+    self.assertEqual('composer-1-2-3-airflow-4-5-6-aabbccdd',
+                     command_util.FetchKubectlNamespace(env_image_version))
+    self.assertEqual('composer-1-2-3-airflow-4-5-6-beeffeed',
+                     command_util.FetchKubectlNamespace(env_image_version))
+    self.assertEqual('composer-1-2-3-airflow-4-5-6-aabbccdd',
+                     command_util.FetchKubectlNamespace(env_image_version))
+    self.assertEqual('default',
+                     command_util.FetchKubectlNamespace(env_image_version))
+
+    fake_exec.Verify()
 
   @mock.patch('googlecloudsdk.command_lib.composer.util.TemporaryKubeconfig')
   @mock.patch('googlecloudsdk.core.execution_utils.Exec')
   def testRunKubectlCommand_Success(self, exec_mock,
                                     tmp_kubeconfig_mock):
     kubectl_args = ['exec', '-it', 'airflow-worker12345', 'bash']
-    expected_args = [self.TEST_KUBECTL_PATH] + kubectl_args
+    expected_args = command_util.AddKubectlNamespace(
+        self.TEST_KUBECTL_DEFAULT_NAMESPACE,
+        [self.TEST_KUBECTL_PATH] + kubectl_args)
 
     fake_exec = kubectl_util.FakeExec()
     exec_mock.side_effect = fake_exec
@@ -304,7 +365,8 @@ class UtilGATest(base.KubectlShellingUnitTest, parameterized.TestCase):
 
     fake_exec.AddCallback(
         0, lambda args, **_: self.assertEqual(expected_args, args))
-    command_util.RunKubectlCommand(kubectl_args)
+    command_util.RunKubectlCommand(
+        kubectl_args, namespace=self.TEST_KUBECTL_DEFAULT_NAMESPACE)
     fake_exec.Verify()
 
   @mock.patch('googlecloudsdk.command_lib.composer.util.TemporaryKubeconfig')
@@ -365,7 +427,8 @@ class UtilGATest(base.KubectlShellingUnitTest, parameterized.TestCase):
         self.MakeGetPodsCallback([('airflow-worker12345', 'running'),
                                   ('airflow-scheduler00001', 'running')]))
 
-    pod = command_util.GetGkePod('airflow-worker')
+    pod = command_util.GetGkePod('airflow-worker',
+                                 self.TEST_KUBECTL_DEFAULT_NAMESPACE)
     self.assertEqual('airflow-worker12345', pod)
     fake_exec.Verify()
 
@@ -381,7 +444,7 @@ class UtilGATest(base.KubectlShellingUnitTest, parameterized.TestCase):
 
     with self.AssertRaisesExceptionMatches(command_util.Error,
                                            'Desired GKE pod not found'):
-      command_util.GetGkePod('pod3')
+      command_util.GetGkePod('pod3', self.TEST_KUBECTL_DEFAULT_NAMESPACE)
     fake_exec.Verify()
 
   @mock.patch('googlecloudsdk.command_lib.composer.util.TemporaryKubeconfig')
@@ -397,7 +460,7 @@ class UtilGATest(base.KubectlShellingUnitTest, parameterized.TestCase):
 
     with self.AssertRaisesExceptionMatches(command_util.Error,
                                            'No running GKE pods found.'):
-      command_util.GetGkePod('pod1')
+      command_util.GetGkePod('pod1', self.TEST_KUBECTL_DEFAULT_NAMESPACE)
     fake_exec.Verify()
 
   @mock.patch('googlecloudsdk.command_lib.composer.util.TemporaryKubeconfig')
@@ -412,7 +475,7 @@ class UtilGATest(base.KubectlShellingUnitTest, parameterized.TestCase):
 
     with self.AssertRaisesExceptionMatches(command_util.Error,
                                            'Error retrieving GKE pods'):
-      command_util.GetGkePod('pod1')
+      command_util.GetGkePod('pod1', self.TEST_KUBECTL_DEFAULT_NAMESPACE)
     fake_exec.Verify()
 
   def testParseRequirementsFileNoVersionMatch(self):
@@ -496,6 +559,23 @@ class UtilGATest(base.KubectlShellingUnitTest, parameterized.TestCase):
         'package [ extra1, extra2 ] == 1 ')
     self.assertEqual(('package', '[ extra1, extra2 ] == 1'), actual_entry)
 
+  def testAddKubectlNamespace(self):
+    expected_tmpl = '/fake/kubectl --namespace {} get pods'
+
+    # Checks that namespace args have been added.
+    test_args = ['/fake/kubectl', 'get', 'pods']
+    self.assertEqual(
+        expected_tmpl.format(self.TEST_KUBECTL_DEFAULT_NAMESPACE).split(' '),
+        command_util.AddKubectlNamespace(self.TEST_KUBECTL_DEFAULT_NAMESPACE,
+                                         test_args))
+
+    # Checks that a supplied namespace scope is not overwritten.
+    test_args = ['/fake/kubectl', '--namespace', 'foo', 'get', 'pods']
+    self.assertEqual(
+        expected_tmpl.format('foo').split(' '),
+        command_util.AddKubectlNamespace(self.TEST_KUBECTL_DEFAULT_NAMESPACE,
+                                         test_args))
+
   @staticmethod
   def _FakePatchBuilder(entries):
     return dict((e.key, e.value) for e in entries)
@@ -535,8 +615,8 @@ class UtilGATest(base.KubectlShellingUnitTest, parameterized.TestCase):
         field_mask_prefix=self.field_mask_prefix,
         entry_cls=UtilGATest._FakeEntry,
         env_builder=UtilGATest._FakePatchBuilder)
-    self.assertEquals(expected_field_mask, actual_field_mask)
-    self.assertEquals(expected_patch, actual_patch)
+    self.assertEqual(expected_field_mask, actual_field_mask)
+    self.assertEqual(expected_patch, actual_patch)
 
   def _BuildFullMapUpdateTestHelper(self,
                                     expected_patch,
@@ -570,7 +650,7 @@ class UtilGATest(base.KubectlShellingUnitTest, parameterized.TestCase):
         ],
         entry_cls=UtilGATest._FakeEntry,
         env_builder=UtilGATest._FakePatchBuilder)
-    self.assertEquals(expected_patch, actual_patch)
+    self.assertEqual(expected_patch, actual_patch)
 
 
 class UtilBetaTest(UtilGATest):

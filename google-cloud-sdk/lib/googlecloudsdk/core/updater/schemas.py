@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*- #
-# Copyright 2013 Google Inc. All Rights Reserved.
+# Copyright 2013 Google LLC. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -917,7 +917,7 @@ class SDKDefinition(object):
   def LastUpdatedString(self):
     try:
       last_updated = config.InstallationConfig.ParseRevision(self.revision)
-      return time.strftime('%Y/%m/%d', last_updated)  # pytype: disable=wrong-arg-types
+      return time.strftime('%Y/%m/%d', last_updated)
     except ValueError:
       return 'Unknown'
 

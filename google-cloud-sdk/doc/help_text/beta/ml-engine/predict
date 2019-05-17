@@ -1,5 +1,5 @@
 NAME
-    gcloud beta ml-engine predict - run Cloud ML Engine online prediction
+    gcloud beta ml-engine predict - run AI Platform online prediction
 
 SYNOPSIS
     gcloud beta ml-engine predict --model=MODEL
@@ -8,11 +8,11 @@ SYNOPSIS
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
-    (BETA) gcloud beta ml-engine predict sends a prediction request to Cloud ML
-    Engine for the given instances. This command will read up to 100 instances,
-    though the service itself will accept instances up to the payload limit
-    size (currently, 1.5MB). If you are predicting on more instances, you
-    should use batch prediction via
+    (BETA) gcloud beta ml-engine predict sends a prediction request to AI
+    Platform for the given instances. This command will read up to 100
+    instances, though the service itself will accept instances up to the
+    payload limit size (currently, 1.5MB). If you are predicting on more
+    instances, you should use batch prediction via
 
         $ gcloud beta ml-engine jobs submit prediction.
 
@@ -62,8 +62,9 @@ OPTIONAL FLAGS
             $ gcloud beta ml-engine versions list
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

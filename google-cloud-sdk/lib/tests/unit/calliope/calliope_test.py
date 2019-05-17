@@ -1144,7 +1144,7 @@ class UnicodeSupportedTest(util.WithTestTool,
   def testUnicodeSupportedGroupUnknownUnicodeCommand(self):
     try:
       # py2 argparse invalid use of str() workaround
-      argparse.str = unicode  # pytype: disable=name-error
+      argparse.str = unicode
     except NameError:
       # probably py3
       pass
@@ -1162,8 +1162,6 @@ Maybe you meant:
   gcloud sdk7 sdk supported certainly
   gcloud sdk7 sdk unsupported no
   gcloud sdk7 sdk unsupported yes
-
-Showing 4 out of 7 suggestions.
 
 To search the help text of gcloud commands, run:
   gcloud help -- SEARCH_TERMS
@@ -2476,7 +2474,7 @@ class SuggestTest(util.WithTestTool,
   def SetUp(self):
     try:
       # py2 argparse invalid use of str() workaround
-      argparse.str = unicode  # pytype: disable=name-error
+      argparse.str = unicode
     except NameError:
       # probably py3
       pass
@@ -2525,8 +2523,6 @@ Maybe you meant:
   gcloud newstylegroup subcommand
   gcloud sdk2 nested-groups
 
-Showing 3 out of 5 suggestions.
-
 To search the help text of gcloud commands, run:
   gcloud help -- SEARCH_TERMS
 """)
@@ -2561,8 +2557,6 @@ To search the help text of gcloud commands, run:
 Maybe you meant:
   gcloud sdk7 describers describe
   gcloud sdk7 describers legacy-describe
-
-Showing 2 out of 3 suggestions.
 
 To search the help text of gcloud commands, run:
   gcloud help -- SEARCH_TERMS

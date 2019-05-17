@@ -14,10 +14,10 @@
 - release_tracks: [ALPHA]
   help_text:
     brief: Schedule a risk analysis job for content in a BigQuery table.
-    DESCRIPTION: |
+    description: |
       Schedules a job to compute risk analysis metrics on content in a
       BigQuery table.
-    EXAMPLES: |
+    examples: |
       To create a job `my-bq-analysis` to analyze records in a BigQuery table
       `myproject.myds.mytable`, run:
 
@@ -25,6 +25,7 @@
 
   request:
     collection: dlp.projects.dlpJobs
+    display_resource_type: job
     method: create
     api_version: v2
     modify_request_hooks:

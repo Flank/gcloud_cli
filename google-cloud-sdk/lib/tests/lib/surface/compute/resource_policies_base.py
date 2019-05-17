@@ -26,33 +26,75 @@ from tests.lib.surface.compute import test_base
 class TestBase(test_base.BaseTest):
   """Base class for resource policies tests."""
 
-  def SetUp(self):
-    self.SelectApi('alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
+  def SetUpTrack(self, track):
+    if track == calliope_base.ReleaseTrack.ALPHA:
+      self.api_version = 'alpha'
+    elif track == calliope_base.ReleaseTrack.BETA:
+      self.api_version = 'beta'
+    else:
+      self.api_version = 'v1'
+    self.SelectApi(self.api_version)
+    self.track = track
     self.region = 'us-central1'
     self.reg = resources.REGISTRY.Clone()
-    self.reg.RegisterApiByName('compute', 'alpha')
+    self.reg.RegisterApiByName('compute', self.api_version)
 
-    self.resource_policies = [
-        self.MakeResourcePolicy(
-            'pol1', 2, '04:00',
-            creation_timestamp='2017-10-26T17:54:10.636-07:00'),
-        self.MakeResourcePolicy(
-            'pol2', 3, '08:00', description='desc',
-            creation_timestamp='2017-10-27T17:54:10.636-07:00')
-    ]
+    if track == calliope_base.ReleaseTrack.ALPHA:
+      self.resource_policies = [
+          self.MakeResourcePolicy(
+              'pol1',
+              2,
+              '04:00',
+              creation_timestamp='2017-10-26T17:54:10.636-07:00',
+              support_vm_maintenance_policy=True),
+          self.MakeResourcePolicy(
+              'pol2',
+              3,
+              '08:00',
+              description='desc',
+              creation_timestamp='2017-10-27T17:54:10.636-07:00',
+              support_vm_maintenance_policy=True)
+      ]
+    else:
+      self.resource_policies = [
+          self.MakeResourcePolicy(
+              'pol1',
+              2,
+              '04:00',
+              creation_timestamp='2017-10-26T17:54:10.636-07:00'),
+          self.MakeResourcePolicy(
+              'pol2',
+              3,
+              '08:00',
+              description='desc',
+              creation_timestamp='2017-10-27T17:54:10.636-07:00')
+      ]
 
-  def MakeResourcePolicy(self, name, days_in_cycle, start_time,
-                         description=None, creation_timestamp=None):
+  def SetUp(self):
+    self.SetUpTrack(self.track)
+
+  def MakeResourcePolicy(self,
+                         name,
+                         days_in_cycle,
+                         start_time,
+                         description=None,
+                         creation_timestamp=None,
+                         support_vm_maintenance_policy=False):
     m = self.messages
-    vm_policy = m.ResourcePolicyVmMaintenancePolicy(
-        maintenanceWindow=m.ResourcePolicyVmMaintenancePolicyMaintenanceWindow(
-            dailyMaintenanceWindow=m.ResourcePolicyDailyCycle(
-                daysInCycle=days_in_cycle,
-                startTime=start_time)))
+    if support_vm_maintenance_policy:
+      vm_policy = m.ResourcePolicyVmMaintenancePolicy(
+          maintenanceWindow=m
+          .ResourcePolicyVmMaintenancePolicyMaintenanceWindow(
+              dailyMaintenanceWindow=m.ResourcePolicyDailyCycle(
+                  daysInCycle=days_in_cycle, startTime=start_time)))
+      return m.ResourcePolicy(
+          creationTimestamp=creation_timestamp,
+          name=name,
+          description=description,
+          region=self.region,
+          vmMaintenancePolicy=vm_policy)
     return m.ResourcePolicy(
         creationTimestamp=creation_timestamp,
         name=name,
         description=description,
-        region=self.region,
-        vmMaintenancePolicy=vm_policy)
+        region=self.region)

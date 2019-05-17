@@ -68,21 +68,19 @@ OPTIONAL FLAGS
         information on duration formats.
 
      --log-filter=LOG_FILTER
-        Specify a filter for logs exported to stackdriver. This can be one of
-        the following: ERRORS_ONLY - export logs for connection failures only.
-        TRANSLATIONS_ONLY - export logs for successful connections only.
-        Without a filter, logs (if enabled) will be exported for all
-        connections handled by this NAT.
+        Filter for logs exported to stackdriver.
+
+        The default is ALL.
 
         If logging is not enabled, filter settings will be persisted but will
-        have no effect. Use --[no-]enable-logging to enable and disable
-        logging.
+        have no effect.
 
-        To clear the filter, use $ gcloud alpha compute routers nats update
-        MY-NAT \ --clear-log-filter --router ROUTER --region REGION
+        Use --[no-]enable-logging to enable and disable logging.
 
         LOG_FILTER must be one of:
 
+         ALL
+            Export logs for all connections handled by this NAT.
          ERRORS_ONLY
             Export logs for connection failures only.
          TRANSLATIONS_ONLY
@@ -124,8 +122,9 @@ OPTIONAL FLAGS
         information on duration formats.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

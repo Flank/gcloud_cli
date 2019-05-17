@@ -129,7 +129,7 @@ class ComposerProjectsLocationsEnvironmentsPatchRequest(_messages.Message):
       form and the "labels" mask.</td>  </tr>  <tr>  <td>config.nodeCount</td>
       <td>Horizontally scale the number of nodes in the environment. An
       integer  greater than or equal to 3 must be provided in the
-      `config.nodeCount` field.  </td>  </tr>  <tr>
+      `config.nodeCount`  field.  </td>  </tr>  <tr>
       <td>config.softwareConfig.airflowConfigOverrides</td>  <td>Replace all
       Apache Airflow config overrides. If a replacement config  overrides map
       is not included in `environment`, all config overrides  are cleared.  It
@@ -160,6 +160,22 @@ class ComposerProjectsLocationsEnvironmentsPatchRequest(_messages.Message):
   environment = _messages.MessageField('Environment', 1)
   name = _messages.StringField(2, required=True)
   updateMask = _messages.StringField(3)
+
+
+class ComposerProjectsLocationsImageVersionsListRequest(_messages.Message):
+  r"""A ComposerProjectsLocationsImageVersionsListRequest object.
+
+  Fields:
+    pageSize: The maximum number of image_versions to return.
+    pageToken: The next_page_token value returned from a previous List
+      request, if any.
+    parent: List ImageVersions in the given project and location, in the form:
+      "projects/{projectId}/locations/{locationId}"
+  """
+
+  pageSize = _messages.IntegerField(1, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(2)
+  parent = _messages.StringField(3, required=True)
 
 
 class ComposerProjectsLocationsOperationsDeleteRequest(_messages.Message):
@@ -317,6 +333,8 @@ class EnvironmentConfig(_messages.Message):
     nodeConfig: The configuration used for the Kubernetes Engine cluster.
     nodeCount: The number of nodes in the Kubernetes Engine cluster that will
       be used to run this environment.
+    privateEnvironmentConfig: The configuration used for the Private IP Cloud
+      Composer environment.
     softwareConfig: The configuration settings for software inside the
       environment.
   """
@@ -326,7 +344,67 @@ class EnvironmentConfig(_messages.Message):
   gkeCluster = _messages.StringField(3)
   nodeConfig = _messages.MessageField('NodeConfig', 4)
   nodeCount = _messages.IntegerField(5, variant=_messages.Variant.INT32)
-  softwareConfig = _messages.MessageField('SoftwareConfig', 6)
+  privateEnvironmentConfig = _messages.MessageField('PrivateEnvironmentConfig', 6)
+  softwareConfig = _messages.MessageField('SoftwareConfig', 7)
+
+
+class IPAllocationPolicy(_messages.Message):
+  r"""Configuration for controlling how IPs are allocated in the GKE cluster.
+
+  Fields:
+    clusterIpv4CidrBlock: Optional. The IP address range used to allocate IP
+      addresses to pods in the cluster.  This field is applicable only when
+      `use_ip_aliases` is true.  Set to blank to have GKE choose a range with
+      the default size.  Set to /netmask (e.g. `/14`) to have GKE choose a
+      range with a specific netmask.  Set to a
+      [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
+      notation (e.g. `10.96.0.0/14`) from the RFC-1918 private networks (e.g.
+      `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`) to pick a specific
+      range to use. Specify `cluster_secondary_range_name` or
+      `cluster_ipv4_cidr_block` but not both.
+    clusterSecondaryRangeName: Optional. The name of the cluster's secondary
+      range used to allocate IP addresses to pods. Specify either
+      `cluster_secondary_range_name` or `cluster_ipv4_cidr_block` but not
+      both.  This field is applicable only when `use_ip_aliases` is true.
+    servicesIpv4CidrBlock: Optional. The IP address range of the services IP
+      addresses in this cluster.  This field is applicable only when
+      `use_ip_aliases` is true.  Set to blank to have GKE choose a range with
+      the default size.  Set to /netmask (e.g. `/14`) to have GKE choose a
+      range with a specific netmask.  Set to a
+      [CIDR](http://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing)
+      notation (e.g. `10.96.0.0/14`) from the RFC-1918 private networks (e.g.
+      `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`) to pick a specific
+      range to use. Specify `services_secondary_range_name` or
+      `services_ipv4_cidr_block` but not both.
+    servicesSecondaryRangeName: Optional. The name of the services' secondary
+      range used to allocate IP addresses to the cluster. Specify either
+      `services_secondary_range_name` or `services_ipv4_cidr_block` but not
+      both.  This field is applicable only when `use_ip_aliases` is true.
+    useIpAliases: Optional. Whether or not to enable Alias IPs in the GKE
+      cluster. If `true`, a VPC-native cluster is created.
+  """
+
+  clusterIpv4CidrBlock = _messages.StringField(1)
+  clusterSecondaryRangeName = _messages.StringField(2)
+  servicesIpv4CidrBlock = _messages.StringField(3)
+  servicesSecondaryRangeName = _messages.StringField(4)
+  useIpAliases = _messages.BooleanField(5)
+
+
+class ImageVersion(_messages.Message):
+  r"""Image Version information
+
+  Fields:
+    imageVersionId: The string identifier of the ImageVersion, in the form:
+      "composer-x.y.z-airflow-a.b(.c)"
+    isDefault: Whether this is the default ImageVersion used by Composer
+      during environment creation if no input ImageVersion is specified.
+    supportedPythonVersions: supported python versions
+  """
+
+  imageVersionId = _messages.StringField(1)
+  isDefault = _messages.BooleanField(2)
+  supportedPythonVersions = _messages.StringField(3, repeated=True)
 
 
 class ListEnvironmentsResponse(_messages.Message):
@@ -340,6 +418,19 @@ class ListEnvironmentsResponse(_messages.Message):
   """
 
   environments = _messages.MessageField('Environment', 1, repeated=True)
+  nextPageToken = _messages.StringField(2)
+
+
+class ListImageVersionsResponse(_messages.Message):
+  r"""The ImageVersions in a project and location.
+
+  Fields:
+    imageVersions: The list of supported ImageVersions in a location.
+    nextPageToken: The page token used to query for the next page if one
+      exists.
+  """
+
+  imageVersions = _messages.MessageField('ImageVersion', 1, repeated=True)
   nextPageToken = _messages.StringField(2)
 
 
@@ -363,6 +454,8 @@ class NodeConfig(_messages.Message):
   Fields:
     diskSizeGb: Optional. The disk size in GB used for node VMs. Minimum size
       is 20GB. If unspecified, defaults to 100GB. Cannot be updated.
+    ipAllocationPolicy: Optional. The IPAllocationPolicy fields for the GKE
+      cluster.
     location: Optional. The Compute Engine [zone](/compute/docs/regions-zones)
       in which to deploy the VMs used to run the Apache Airflow software,
       specified as a [relative resource
@@ -400,9 +493,8 @@ class NodeConfig(_messages.Message):
       VPC](/vpc/docs/shared-vpc) subnetwork requirements, see
       `nodeConfig.subnetwork`.
     oauthScopes: Optional. The set of Google API scopes to be made available
-      on all node VMs. Defaults to ["https://www.googleapis.com/auth/cloud-
-      platform"] and must be included in the list of specified scopes. Cannot
-      be updated.
+      on all node VMs. If `oauth_scopes` is empty, defaults to
+      ["https://www.googleapis.com/auth/cloud-platform"]. Cannot be updated.
     serviceAccount: Optional. The Google Cloud Platform Service Account to be
       used by the node VMs. If a service account is not specified, the
       "default" Compute Engine service account is used. Cannot be updated.
@@ -411,10 +503,8 @@ class NodeConfig(_messages.Message):
       name](/apis/design/resource_names#relative_resource_name). For example:
       "projects/{projectId}/regions/{regionId}/subnetworks/{subnetworkId}"  If
       a subnetwork is provided, `nodeConfig.network` must also be provided,
-      and the subnetwork must belong to the same project as the network.  For
-      Shared VPC, you must configure the subnetwork with secondary ranges
-      named <strong>composer-pods</strong> and <strong>composer-
-      services</strong> to support Alias IPs.
+      and the subnetwork must belong to the enclosing environment's project
+      and location.
     tags: Optional. The list of instance tags applied to all node VMs. Tags
       are used to identify valid sources or targets for network firewalls.
       Each tag within the list must comply with
@@ -422,13 +512,14 @@ class NodeConfig(_messages.Message):
   """
 
   diskSizeGb = _messages.IntegerField(1, variant=_messages.Variant.INT32)
-  location = _messages.StringField(2)
-  machineType = _messages.StringField(3)
-  network = _messages.StringField(4)
-  oauthScopes = _messages.StringField(5, repeated=True)
-  serviceAccount = _messages.StringField(6)
-  subnetwork = _messages.StringField(7)
-  tags = _messages.StringField(8, repeated=True)
+  ipAllocationPolicy = _messages.MessageField('IPAllocationPolicy', 2)
+  location = _messages.StringField(3)
+  machineType = _messages.StringField(4)
+  network = _messages.StringField(5)
+  oauthScopes = _messages.StringField(6, repeated=True)
+  serviceAccount = _messages.StringField(7)
+  subnetwork = _messages.StringField(8)
+  tags = _messages.StringField(9, repeated=True)
 
 
 class Operation(_messages.Message):
@@ -462,7 +553,8 @@ class Operation(_messages.Message):
       if any.
     name: The server-assigned name, which is only unique within the same
       service that originally returns it. If you use the default HTTP mapping,
-      the `name` should have the format of `operations/some/unique/name`.
+      the `name` should be a resource name ending with
+      `operations/{unique_id}`.
     response: The normal response of the operation in case of success.  If the
       original method returns no data on success, such as `Delete`, the
       response is `google.protobuf.Empty`.  If the original method is standard
@@ -596,6 +688,41 @@ class OperationMetadata(_messages.Message):
   state = _messages.EnumField('StateValueValuesEnum', 6)
 
 
+class PrivateClusterConfig(_messages.Message):
+  r"""Configuration options for the private GKE cluster in a Cloud Composer
+  environment.
+
+  Fields:
+    enablePrivateEndpoint: Optional. If `true`, access to the public endpoint
+      of the GKE cluster is denied.
+    masterIpv4CidrBlock: The IP range in CIDR notation to use for the hosted
+      master network. This range is used for assigning internal IP addresses
+      to the cluster master or set of masters and to the internal load
+      balancer virtual IP. This range must not overlap with any other ranges
+      in use within the cluster's network. If left blank, the default value of
+      '172.16.0.0/28' is used.
+  """
+
+  enablePrivateEndpoint = _messages.BooleanField(1)
+  masterIpv4CidrBlock = _messages.StringField(2)
+
+
+class PrivateEnvironmentConfig(_messages.Message):
+  r"""The configuration information for configuring a Private IP Cloud
+  Composer environment.
+
+  Fields:
+    enablePrivateEnvironment: Optional. If `true`, a Private IP Cloud Composer
+      environment is created. If this field is true, `use_ip_aliases` must be
+      true.
+    privateClusterConfig: Optional. Configuration for the private GKE cluster
+      for a Private IP Cloud Composer environment.
+  """
+
+  enablePrivateEnvironment = _messages.BooleanField(1)
+  privateClusterConfig = _messages.MessageField('PrivateClusterConfig', 2)
+
+
 class SoftwareConfig(_messages.Message):
   r"""Specifies the selection and configuration of software inside the
   environment.
@@ -660,22 +787,18 @@ class SoftwareConfig(_messages.Message):
       encapsulates both the version of Cloud Composer functionality and the
       version of Apache Airflow. It must match the regular expression `compose
       r-([0-9]+\.[0-9]+\.[0-9]+|latest)-airflow-[0-9]+\.[0-9]+(\.[0-9]+.*)?`.
-      When used as input, the server will also check if the provided version
-      is supported and deny the request for an unsupported version.  The Cloud
+      When used as input, the server also checks if the provided version is
+      supported and denies the request for an unsupported version.  The Cloud
       Composer portion of the version is a [semantic
-      version](https://semver.org) or `latest`. The patch version can be
-      omitted and the current Cloud Composer patch version will be selected.
-      When `latest` is provided instead of an explicit version number, the
-      server will replace `latest` with the current Cloud Composer version and
-      store that version number in the same field.  The portion of the image
-      version that follows <em>airflow-</em> is an official Apache Airflow
-      repository [release name](https://github.com/apache/incubator-
-      airflow/releases).  Supported values for input are: * `composer-latest-
-      airflow-1.10.0` * `composer-latest-airflow-1.9.0` * `composer-latest-
-      airflow-1.10` * `composer-latest-airflow-1.9` *
-      `composer-1.3.0-airflow-1.10.0` * `composer-1.3.0-airflow-1.9.0` *
-      `composer-1.3.0-airflow-1.10` * `composer-1.3.0-airflow-1.9`  See also
-      [Release Notes](/composer/docs/release-notes).
+      version](https://semver.org) or `latest`. When the patch version is
+      omitted, the current Cloud Composer patch version is selected. When
+      `latest` is provided instead of an explicit version number, the server
+      replaces `latest` with the current Cloud Composer version and stores
+      that version number in the same field.  The portion of the image version
+      that follows <em>airflow-</em> is an official Apache Airflow repository
+      [release name](https://github.com/apache/incubator-airflow/releases).
+      See also [Version List](/composer/docs/concepts/versioning/composer-
+      versions).
     pypiPackages: Optional. Custom Python Package Index (PyPI) packages to be
       installed in the environment.  Keys refer to the lowercase package name
       such as "numpy" and values are the lowercase extras and version

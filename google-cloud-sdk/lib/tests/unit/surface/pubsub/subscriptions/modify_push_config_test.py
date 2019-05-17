@@ -65,8 +65,8 @@ class SubscriptionsModifyPushConfigTest(base.CloudPubsubTestBase):
              ' --push-endpoint https://my.appspot.com/push2'
              .format(sub_ref.SelfLink()))
 
-    self.AssertErrContains(
-        'Updated subscription [{}]'.format(sub_ref.RelativeName()))
+    self.AssertErrContains('Updated subscription [{}]'.format(
+        sub_ref.RelativeName()))
 
 
 class SubscriptionsModifyPushConfigBetaTest(SubscriptionsModifyPushConfigTest):
@@ -96,6 +96,56 @@ class SubscriptionsModifyPushConfigBetaTest(SubscriptionsModifyPushConfigTest):
     self.AssertOutputEquals(
         'pushEndpoint: https://my.appspot.com/push2\n'
         'subscriptionId: {}\n'.format(sub_ref.RelativeName()))
+
+  def testSubscriptionsModifyPushAuthServiceAccountAndAudience(self):
+    sub_ref = util.ParseSubscription('subs2', self.Project())
+
+    self.svc.Expect(
+        request=self.msgs.PubsubProjectsSubscriptionsModifyPushConfigRequest(
+            modifyPushConfigRequest=self.msgs.ModifyPushConfigRequest(
+                pushConfig=self.msgs.PushConfig(
+                    pushEndpoint='https://example.com/push',
+                    oidcToken=self.msgs.OidcToken(
+                        serviceAccountEmail='account@example.com',
+                        audience='my-audience'))),
+            subscription=sub_ref.RelativeName()),
+        response='')
+
+    self.Run('pubsub subscriptions modify-push-config subs2 '
+             '--push-endpoint=https://example.com/push '
+             '--push-auth-service-account=account@example.com '
+             '--push-auth-token-audience=my-audience')
+
+    self.AssertErrContains('Updated subscription [{}]'.format(
+        sub_ref.RelativeName()))
+
+  def testSubscriptionsModifyPushAuthServiceAccountNoAudience(self):
+    sub_ref = util.ParseSubscription('subs2', self.Project())
+
+    self.svc.Expect(
+        request=self.msgs.PubsubProjectsSubscriptionsModifyPushConfigRequest(
+            modifyPushConfigRequest=self.msgs.ModifyPushConfigRequest(
+                pushConfig=self.msgs.PushConfig(
+                    pushEndpoint='https://example.com/push',
+                    oidcToken=self.msgs.OidcToken(
+                        serviceAccountEmail='account@example.com'))),
+            subscription=sub_ref.RelativeName()),
+        response='')
+
+    self.Run('pubsub subscriptions modify-push-config subs2 '
+             '--push-endpoint=https://example.com/push '
+             '--push-auth-service-account=account@example.com')
+
+    self.AssertErrContains('Updated subscription [{}]'.format(
+        sub_ref.RelativeName()))
+
+
+class SubscriptionsModifyPushConfigAlphaTest(
+    SubscriptionsModifyPushConfigBetaTest):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.svc = self.client.projects_subscriptions.ModifyPushConfig
 
 
 class SubscriptionsModifyPushConfigGATest(base.CloudPubsubTestBase):

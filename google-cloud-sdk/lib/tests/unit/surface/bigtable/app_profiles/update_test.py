@@ -21,17 +21,16 @@ from __future__ import unicode_literals
 from googlecloudsdk.api_lib.bigtable import app_profiles
 from googlecloudsdk.api_lib.bigtable import util
 from googlecloudsdk.calliope import base as calliope_base
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.api_lib.util import waiter as waiter_test_base
 from tests.lib.surface.bigtable import base
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters(calliope_base.ReleaseTrack.ALPHA,
-                          calliope_base.ReleaseTrack.BETA)
-class AppProfileUpdateTests(base.BigtableV2TestBase,
-                            waiter_test_base.CloudOperationsBase):
+class AppProfileUpdateTestsGA(base.BigtableV2TestBase,
+                              waiter_test_base.CloudOperationsBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
 
   def ExpectOp(self):
     self.ExpectOperation(self.client.operations, 'operations/operation-name',
@@ -46,8 +45,7 @@ class AppProfileUpdateTests(base.BigtableV2TestBase,
     self.app_profile_ref = util.GetAppProfileRef('my-instance',
                                                  'my-app-profile')
 
-  def testUpdateMultiCluster(self, track):
-    self.track = track
+  def testUpdateMultiCluster(self):
     self.ExpectOp()
     self.Run('bigtable app-profiles update my-app-profile '
              '--instance my-instance --description my-description '
@@ -60,8 +58,7 @@ class AppProfileUpdateTests(base.BigtableV2TestBase,
         transactional_writes=False,
         force=False)
 
-  def testUpdateSingleCluster(self, track):
-    self.track = track
+  def testUpdateSingleCluster(self):
     self.ExpectOp()
     self.Run('bigtable app-profiles update my-app-profile '
              '--instance my-instance --description my-description '
@@ -74,8 +71,7 @@ class AppProfileUpdateTests(base.BigtableV2TestBase,
         transactional_writes=False,
         force=False)
 
-  def testUpdateTransactional(self, track):
-    self.track = track
+  def testUpdateTransactional(self):
     self.ExpectOp()
     self.Run('bigtable app-profiles update my-app-profile '
              '--instance my-instance --description my-description '
@@ -88,13 +84,24 @@ class AppProfileUpdateTests(base.BigtableV2TestBase,
         transactional_writes=True,
         force=False)
 
-  def testUpdateHATransactionalInvalid(self, track):
-    self.track = track
+  def testUpdateHATransactionalInvalid(self):
     with self.AssertRaisesArgumentError():
       self.Run('bigtable app-profiles update my-app-profile '
                '--instance my-instance --description my-description '
                '--route-any --transactional-writes')
       self.app_profile_update_mock.assert_not_called()
+
+
+class AppProfileUpdateTestsBeta(AppProfileUpdateTestsGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+
+
+class AppProfileUpdateTestsAlpha(AppProfileUpdateTestsBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

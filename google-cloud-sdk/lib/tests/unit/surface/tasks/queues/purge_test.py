@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 
+from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.tasks import app
 from googlecloudsdk.command_lib.tasks import parsers
@@ -90,6 +91,12 @@ class QueuesPurgeTest(test_base.CloudTasksTestBase, test_case.WithInput):
 
     with self.assertRaises(console_io.OperationCancelledError):
       self.Run('tasks queues delete my-queue')
+
+
+class QueuesPurgeTestBeta(QueuesPurgeTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 if __name__ == '__main__':

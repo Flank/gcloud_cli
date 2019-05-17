@@ -120,3 +120,8 @@ class WorkflowTemplatesJobHadoopUnitTestBeta(WorkflowTemplatesJobHadoopUnitTest,
         '--class {1} -- foo --bar baz'.format(self.WORKFLOW_TEMPLATE,
                                               self.CLASS))
     self.AssertMessagesEqual(expected, result)
+
+
+class WorkflowTemplatesJobHadoopUnitTestAlpha(
+    WorkflowTemplatesJobHadoopUnitTestBeta, base.DataprocTestBaseAlpha):
+  pass

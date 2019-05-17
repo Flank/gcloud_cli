@@ -2039,6 +2039,7 @@ class ResourceTransformRealRegistryTest(test_case.Base):
         'scoped_suffixes',
         'status',
         'type_suffix',
+        'vpn_tunnel_gateway',
         'zone'
     ]
     self.assertEqual(expected, sorted(transforms.keys()))

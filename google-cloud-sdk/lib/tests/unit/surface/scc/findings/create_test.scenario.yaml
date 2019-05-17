@@ -1,0 +1,128 @@
+title: scc findings create scenario test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      scc findings create gcloudcsccfinding1 --organization 345840165995 --source 2948230327750090626 --state ACTIVE
+  - stderr: |
+      Created finding [gcloudcsccfinding1].
+- execute:
+  - command: |
+      scc findings create gcloudcsccfinding1 --organization 345840165995 --source 2948230327750090626
+  - stderr: |
+      Created finding [gcloudcsccfinding1].
+actions:
+- execute_command:
+    # Won't actually create the finding but mimic calling the server as if finding existed.
+    command: |
+      scc findings create gcloudcsccfinding1 --organization 345840165995 --source 2948230327750090626 --state ACTIVE
+    events:
+    - api_call:
+        expect_request:
+          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/sources/2948230327750090626/findings?alt=json&findingId=gcloudcsccfinding1
+          method: POST
+          headers: {}
+          body:
+            json:
+              name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1
+              state: ACTIVE
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "error": {
+                "code": 409,
+                "message": "Requested entity already exists",
+                "status": "ALREADY_EXISTS",
+                "details": [
+                  {
+                    "@type": "type.googleapis.com/google.rpc.DebugInfo",
+                    "detail": "[ORIGINAL ERROR] generic::already_exists: com.google.apps.framework.request.AlreadyExistsException: Finding already exists. Code: ALREADY_EXISTS"
+                  }
+                ]
+              }
+            }
+    - expect_stderr: |
+        Created finding [gcloudcsccfinding1].
+    - expect_exit:
+        code: 0
+- execute_command:
+    # Uses full resource path.
+    command: |
+      scc findings create organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1 --state ACTIVE
+    events:
+    - api_call:
+        expect_request:
+          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/sources/2948230327750090626/findings?alt=json&findingId=gcloudcsccfinding1
+          method: POST
+          headers: {}
+          body:
+            json:
+              name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1
+              state: ACTIVE
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "error": {
+                "code": 409,
+                "message": "Requested entity already exists",
+                "status": "ALREADY_EXISTS",
+                "details": [
+                  {
+                    "@type": "type.googleapis.com/google.rpc.DebugInfo",
+                    "detail": "[ORIGINAL ERROR] generic::already_exists: com.google.apps.framework.request.AlreadyExistsException: Finding already exists. Code: ALREADY_EXISTS"
+                  }
+                ]
+              }
+            }
+    - expect_stderr: |
+        Created finding [gcloudcsccfinding1].
+    - expect_exit:
+        code: 0
+- execute_command:
+    # Missing state
+    command: |
+      scc findings create gcloudcsccfinding1 --organization 345840165995 --source 2948230327750090626
+    events:
+    - api_call:
+        expect_request:
+          uri: https://securitycenter.googleapis.com/v1/organizations/345840165995/sources/2948230327750090626/findings?alt=json&findingId=gcloudcsccfinding1
+          method: POST
+          headers: {}
+          body:
+            json:
+              name: organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "error": {
+                "code": 400,
+                "message": "Invalid State. State must be set to ACTIVE or INACTIVE.",
+                "status": "INVALID_ARGUMENT",
+                "details": [
+                  {
+                    "@type": "type.googleapis.com/google.rpc.DebugInfo",
+                    "detail": "[ORIGINAL ERROR] generic::invalid_argument: com.google.cloud.security.riskdashboard.common.validation.PublicMessageRequestFieldValidator$ExternalBadRequestException: Invalid State. State must be set to ACTIVE or INACTIVE. [google.rpc.error_details_ext] { message: \"Invalid State. State must be set to ACTIVE or INACTIVE.\" }"
+                  }
+                ]
+              }
+            }
+
+    - expect_stderr: |
+        Created finding [gcloudcsccfinding1].
+    - expect_exit:
+        code: 0
+- execute_command:
+    # Provides full resource path and source id.
+    command: |
+      scc findings create organizations/345840165995/sources/2948230327750090626/findings/gcloudcsccfinding1 --source 2948230327750090626
+    events:
+    - expect_exit:
+        code: 1
+        message: Only provide a full resouce name (organizations/123/sources/456/findings/789) or an --organization flag and --sources flag, not both.

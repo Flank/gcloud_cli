@@ -7,6 +7,7 @@ SYNOPSIS
         (--node-requirements=[localSSD=LOCALSSD],[memory=MEMORY],[vCPU=VCPU]
           | --node-type=NODE_TYPE) [--description=DESCRIPTION]
         [--node-affinity-labels=[KEY=VALUE,...]] [--region=REGION]
+        [--server-binding=SERVER_BINDING; default="restart-node-on-any-server"]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -80,9 +81,33 @@ OPTIONAL FLAGS
         Alternatively, the region can be stored in the environment variable
         CLOUDSDK_COMPUTE_REGION.
 
+     --server-binding=SERVER_BINDING; default="restart-node-on-any-server"
+        The server binding policy for nodes using this template, which
+        determines where the nodes should restart following a maintenance
+        event. SERVER_BINDING must be one of:
+
+         restart-node-on-any-server
+            Nodes using this template will restart on any physical server
+            following a maintenance event.
+         restart-node-on-minimal-servers
+            Nodes using this template will restart on the same physical server
+            following a maintenance event, instead of being live migrated to or
+            restarted on a new physical server. This means that VMs on such
+            nodes will experience outages while maintenance is applied. This
+            option may be useful if you are using software licenses tied to the
+            underlying server characteristics such as physical sockets or
+            cores, to avoid the need for additional licenses when maintenance
+            occurs.
+
+            Note that in some cases, Google Compute Engine may need to move
+            your VMs to a new underlying server. During these situations your
+            VMs will be restarted on a new physical server and assigned a new
+            sole tenant physical server ID.
+
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

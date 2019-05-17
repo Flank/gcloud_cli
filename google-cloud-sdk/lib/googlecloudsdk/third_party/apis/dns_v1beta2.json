@@ -4,7 +4,7 @@
  "id": "dns:v1beta2",
  "name": "dns",
  "version": "v1beta2",
- "revision": "20181207",
+ "revision": "20190506",
  "title": "Google Cloud DNS API",
  "description": "Configures and serves authoritative DNS records.",
  "ownerDomain": "google.com",
@@ -87,7 +87,7 @@
   "Change": {
    "id": "Change",
    "type": "object",
-   "description": "An atomic update to a collection of ResourceRecordSets.",
+   "description": "A Change represents a set of ResourceRecordSet additions and deletions applied atomically to a ManagedZone. ResourceRecordSets within a ManagedZone are modified by creating a new Change element in the Changes collection. In turn the Changes collection also records the past modifications to the ResourceRecordSets in a ManagedZone. The current state of the ManagedZone is the sum effect of applying all Change elements in the Changes collection in sequence.",
    "properties": {
     "additions": {
      "type": "array",
@@ -393,6 +393,10 @@
       "type": "string"
      }
     },
+    "peeringConfig": {
+     "$ref": "ManagedZonePeeringConfig",
+     "description": "The presence of this field indicates that DNS Peering is enabled for this zone. The value of this field contains the network to peer with."
+    },
     "privateVisibilityConfig": {
      "$ref": "ManagedZonePrivateVisibilityConfig",
      "description": "For privately visible zones, the set of Virtual Private Cloud resources that the zone is visible from."
@@ -510,6 +514,40 @@
      "items": {
       "$ref": "Operation"
      }
+    }
+   }
+  },
+  "ManagedZonePeeringConfig": {
+   "id": "ManagedZonePeeringConfig",
+   "type": "object",
+   "properties": {
+    "kind": {
+     "type": "string",
+     "description": "Identifies what kind of resource this is. Value: the fixed string \"dns#managedZonePeeringConfig\".",
+     "default": "dns#managedZonePeeringConfig"
+    },
+    "targetNetwork": {
+     "$ref": "ManagedZonePeeringConfigTargetNetwork",
+     "description": "The network with which to peer."
+    }
+   }
+  },
+  "ManagedZonePeeringConfigTargetNetwork": {
+   "id": "ManagedZonePeeringConfigTargetNetwork",
+   "type": "object",
+   "properties": {
+    "deactivateTime": {
+     "type": "string",
+     "description": "If this zone has been deactivated due to a problem with the network it targeted, the time at which it was deactivated. The zone can be deactivated if, for instance, the network it targeted was deleted. If the targeted network is still present, this will be the empty string. This is in RFC3339 text format. Output only."
+    },
+    "kind": {
+     "type": "string",
+     "description": "Identifies what kind of resource this is. Value: the fixed string \"dns#managedZonePeeringConfigTargetNetwork\".",
+     "default": "dns#managedZonePeeringConfigTargetNetwork"
+    },
+    "networkUrl": {
+     "type": "string",
+     "description": "The fully qualified URL of the VPC network to forward queries to. This should be formatted like https://www.googleapis.com/compute/v1/projects/{project}/global/networks/{network}"
     }
    }
   },
@@ -713,6 +751,10 @@
      "type": "boolean",
      "description": "Allows networks bound to this policy to receive DNS queries sent by VMs or applications over VPN connections. When enabled, a virtual IP address will be allocated from each of the sub-networks that are bound to this policy."
     },
+    "enableLogging": {
+     "type": "boolean",
+     "description": "Controls whether logging is enabled for the networks bound to this policy. Defaults to no logging if not set."
+    },
     "id": {
      "type": "string",
      "description": "Unique identifier for the resource; defined by the server (output only).",
@@ -909,7 +951,7 @@
     },
     "rrdatas": {
      "type": "array",
-     "description": "As defined in RFC 1035 (section 5) and RFC 1034 (section 3.6.1).",
+     "description": "As defined in RFC 1035 (section 5) and RFC 1034 (section 3.6.1) -- see examples.",
      "items": {
       "type": "string"
      }
@@ -928,7 +970,7 @@
     },
     "type": {
      "type": "string",
-     "description": "The identifier of a supported record type, for example, A, AAAA, MX, TXT, and so on."
+     "description": "The identifier of a supported record type. See the list of Supported DNS record types."
     }
    }
   },

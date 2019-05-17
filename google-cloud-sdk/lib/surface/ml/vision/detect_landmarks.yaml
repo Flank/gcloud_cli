@@ -2,9 +2,13 @@
 
   help_text:
     brief: Detect popular natural and man-made structures within an image.
-    DESCRIPTION: |
+    description: |
       Google Cloud Vision will recognize landmarks in an image, such as "Palace
       of Fine Arts."
+    examples: |
+      To recognize landmarks in an image 'gs://my_bucket/input_file':
+
+        $ {command} gs://my_bucket/input_file
 
   request:
     _COMMON_: request
@@ -26,9 +30,13 @@
 
   help_text:
     brief: Detect popular natural and man-made structures within an image.
-    DESCRIPTION: |
+    description: |
       Google Cloud Vision will recognize landmarks in an image, such as "Palace
       of Fine Arts."
+    examples: |
+      To recognize landmarks in an image 'gs://my_bucket/input_file':
+
+        $ {command} gs://my_bucket/input_file
 
   request:
     _COMMON_: request

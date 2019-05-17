@@ -258,7 +258,7 @@ Don't wait for the operation to complete.
 
 .TP 2m
 \fB\-\-master\-authorized\-networks\fR=\fINETWORK\fR,[\fINETWORK\fR,...]
-The list of CIDR blocks (up to 20) that are allowed to connect to Kubernetes
+The list of CIDR blocks (up to 50) that are allowed to connect to Kubernetes
 master through HTTPS. Specified in CIDR notation (e.g. 1.2.3.4/30). Can not be
 specified unless \f5\-\-enable\-master\-authorized\-networks\fR is also
 specified.
@@ -311,10 +311,11 @@ Compute zone (e.g. us\-central1\-a) for the cluster. Overrides the default
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

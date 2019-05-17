@@ -5,7 +5,7 @@
 
 .SH "NAME"
 .HP
-gcloud alpha bigtable app\-profiles list \- list Bigtable app\-profiles
+gcloud alpha bigtable app\-profiles list \- list Bigtable app profiles
 
 
 
@@ -17,7 +17,7 @@ gcloud alpha bigtable app\-profiles list \- list Bigtable app\-profiles
 
 .SH "DESCRIPTION"
 
-\fB(ALPHA)\fR List Bigtable app\-profiles.
+\fB(ALPHA)\fR List Bigtable app profiles.
 
 
 
@@ -26,7 +26,7 @@ gcloud alpha bigtable app\-profiles list \- list Bigtable app\-profiles
 .RS 2m
 .TP 2m
 
-Instance resource \- The instance to list app\-profiles for. This represents a
+Instance resource \- The instance to list app profiles for. This represents a
 Cloud resource. (NOTE) Some attributes are not given arguments in this group but
 can be set in other ways. To set the [project] attribute: provide the argument
 [\-\-instance] on the command line with a fully specified name; provide the
@@ -85,10 +85,11 @@ Print a list of resource URIs instead of the default output.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -98,9 +99,10 @@ This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you will have to apply for early access and have your projects registered on the
 API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. This variant is also available:
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
+$ gcloud bigtable app\-profiles list
 $ gcloud beta bigtable app\-profiles list
 .RE
 

@@ -40,6 +40,7 @@ from googlecloudsdk.core import log
 from googlecloudsdk.core import metrics
 from googlecloudsdk.core import properties
 from googlecloudsdk.core.credentials import store as creds_store
+from googlecloudsdk.core.survey import survey_check
 from googlecloudsdk.core.updater import local_state
 from googlecloudsdk.core.updater import update_manager
 from googlecloudsdk.core.util import keyboard_interrupt
@@ -63,6 +64,17 @@ def UpdateCheck(command_path, **unused_kwargs):
   # messages printed should reach the user.
   except Exception:
     log.debug('Failed to perform update check.', exc_info=True)
+
+
+def SurveyPromptCheck(command_path, **unused_kwargs):
+  del command_path
+  try:
+    survey_check.SurveyPrompter().PromptForSurvey()
+  # pylint:disable=broad-except, We never want this to escape, ever. Only
+  # messages printed should reach the user.
+  except Exception:
+    log.debug('Failed to check survey prompt.', exc_info=True)
+  # pylint:enable=broad-except
 
 
 def CreateCLI(surfaces, translator=None):
@@ -102,12 +114,28 @@ def CreateCLI(surfaces, translator=None):
   for dot_path, dir_path in surfaces:
     loader.AddModule(dot_path, dir_path, component=None)
 
+  # TODO(b/128465608): Remove cloned ml-engine commands and PreRunHook after a
+  # suitable deprecation period.
+  # Clone 'ai-platform' surface into 'ml-engine' for backward compatibility.
+  loader.AddModule('ml_engine', os.path.join(pkg_root, 'surface',
+                                             'ai_platform'))
+  loader.RegisterPreRunHook(
+      _IssueAIPlatformAliasWarning, include_commands=r'gcloud\..*ml-engine\..*')
+
   # Check for updates on shutdown but not for any of the updater commands.
   # Skip update checks for 'gcloud version' command as it does that manually.
   exclude_commands = r'gcloud\.components\..*|gcloud\.version'
   loader.RegisterPostRunHook(UpdateCheck, exclude_commands=exclude_commands)
+  loader.RegisterPostRunHook(SurveyPromptCheck)
   generated_cli = loader.Generate()
   return generated_cli
+
+
+def _IssueAIPlatformAliasWarning(command_path=None):
+  del command_path  # Unused in _IssueTestWarning
+  log.warning(
+      'The `gcloud ml-engine` commands have been renamed and will soon be '
+      'removed. Please use `gcloud ai-platform` instead.')
 
 
 def main(gcloud_cli=None, credential_providers=None):

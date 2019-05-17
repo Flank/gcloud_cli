@@ -4,7 +4,7 @@ NAME
 
 SYNOPSIS
     gcloud compute commitments create COMMITMENT --plan=PLAN
-        --resources=[RESOURCE=COMMITMENT,...] [--region=REGION]
+        --resources=[memory=MEMORY],[vcpu=VCPU] [--region=REGION]
         [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
@@ -18,14 +18,15 @@ REQUIRED FLAGS
      --plan=PLAN
         Duration of the commitment. PLAN must be one of: 12-month, 36-month.
 
-     --resources=[RESOURCE=COMMITMENT,...]
-        Resources to be included in the commitment commitment:
-        * MEMORY should include unit (eg. 3072MB or 9GB). If no units are
-          specified, GB is assumed.
-        * VCPU is number of committed cores.
-    Ratio between number of VCPU cores and memory must conform to limits
-    described on:
-    https://cloud.google.com/compute/docs/instances/creating-instance-with-custom-machine-type
+     --resources=[memory=MEMORY],[vcpu=VCPU]
+        Resources to be included in the commitment, the ratio between number of
+        vCPU cores and memory must conform to limits described at:
+        https://cloud.google.com/compute/docs/instances/creating-instance-with-custom-machine-type#specifications.
+         memory
+            The size of the memory, should include units (e.g. 3072MB or 9GB).
+            If no units are specified, GB is assumed.
+         vcpu
+            The number of the vCPU cores.
 
 OPTIONAL FLAGS
      --region=REGION
@@ -49,8 +50,9 @@ OPTIONAL FLAGS
         CLOUDSDK_COMPUTE_REGION.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

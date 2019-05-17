@@ -1,0 +1,115 @@
+
+.TH "GCLOUD_BETA_ML_VISION_PRODUCT\-SEARCH_PRODUCT\-SETS_IMPORT" 1
+
+
+
+.SH "NAME"
+.HP
+gcloud beta ml vision product\-search product\-sets import \- import a list of reference images to specified product sets
+
+
+
+.SH "SYNOPSIS"
+.HP
+\f5gcloud beta ml vision product\-search product\-sets import\fR \fISOURCE\fR \fB\-\-location\fR=\fILOCATION\fR [\fB\-\-async\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+
+
+
+.SH "DESCRIPTION"
+
+\fB(BETA)\fR Import a list of reference images to specified product sets based
+on a list of image information.
+
+
+
+.SH "POSITIONAL ARGUMENTS"
+
+.RS 2m
+.TP 2m
+\fISOURCE\fR
+Google Cloud Storage URI of the input csv file which must start with
+\f5gs://\fR. The format of the input csv file should be one image per line. In
+each line, there are 8 columns \- \f5image\-uri\fR, \f5image\-id\fR,
+\f5product\-set\-id\fR, \f5product\-id\fR, \f5product\-category\fR,
+\f5product\-display\-name\fR, \f5labels\fR, and \f5bounding\-poly\fR. The
+\f5image\-uri\fR, \f5product\-set\-id\fR, \f5product\-id\fR, and
+\f5product\-category\fR columns are required. See
+https://cloud.google.com/vision/product\-search/docs/csv\-format for more
+information on the csv format and the meaning of each column.
+
+
+.RE
+.sp
+
+.SH "REQUIRED FLAGS"
+
+.RS 2m
+.TP 2m
+
+Location resource \- Location to import to. This represents a Cloud resource.
+(NOTE) Some attributes are not given arguments in this group but can be set in
+other ways. To set the [project] attribute: provide the argument [\-\-location]
+on the command line with a fully specified name; set the property
+[core/project]; provide the argument [\-\-project] on the command line. This
+must be specified.
+
+.RS 2m
+.TP 2m
+\fB\-\-location\fR=\fILOCATION\fR
+ID of the location or fully qualified identifier for the location.
+
+
+.RE
+.RE
+.sp
+
+.SH "OPTIONAL FLAGS"
+
+.RS 2m
+.TP 2m
+\fB\-\-async\fR
+Display information about the operation in progress, without waiting for the
+operation to complete.
+
+
+.RE
+.sp
+
+.SH "GCLOUD WIDE FLAGS"
+
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
+
+
+
+.SH "API REFERENCE"
+
+This command uses the \fBvision/v1\fR API. The full documentation for this API
+can be found at: https://cloud.google.com/vision/
+
+
+
+.SH "EXAMPLES"
+
+To import reference images from 'gs://my\-bucket/my\-object.csv' into location
+\'us\-east1', run:
+
+.RS 2m
+$ gcloud beta ml vision product\-search product\-sets import \e
+    \-\-location=us\-east1 gs://my\-bucket/my\-object.csv
+.RE
+
+
+
+.SH "NOTES"
+
+This command is currently in BETA and may change without notice. This variant is
+also available:
+
+.RS 2m
+$ gcloud alpha ml vision product\-search product\-sets import
+.RE
+

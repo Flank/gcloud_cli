@@ -1,0 +1,154 @@
+title: test product creation
+release_tracks: [ALPHA, BETA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: ml vision product-search products create my-product --location=us-east1
+      --category=apparel --description=product-desc --display-name=test-product --product-labels=a=b,a=d,c=g
+  - stderr: |
+      Created product [my-product].
+- execute:
+  - command: ml vision product-search products create my-product --location=us-east1
+      --category=apparel --description=product-desc --display-name=test-product --product-labels=a=b,a=d,c=g
+      --product-labels=a=b,m=n
+  - stderr: |
+      Created product [my-product].
+- execute:
+  - command: ml vision product-search products create my-product --location=us-east1
+      --category=apparel --description=product-desc --display-name=test-product
+  - stderr: |
+      Created product [my-product].
+actions:
+- execute_command:
+    command: ml vision product-search products create my-product --location=us-east1
+      --category=apparel --description=product-desc --display-name=test-product --product-labels=a=b,a=d,c=g
+    events:
+    - api_call:
+        expect_request:
+          uri: https://vision.googleapis.com/v1/projects/fake-project/locations/us-east1/products?alt=json&productId=my-product
+          method: POST
+          headers: {}
+          body:
+            json:
+              description: product-desc
+              displayName: test-product
+              productCategory: apparel
+              productLabels:
+              - key: a
+                value: b
+              - key: a
+                value: d
+              - key: c
+                value: g
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-east1/products/my-product",
+              "displayName": "test-product",
+              "description": "product-desc",
+              "productCategory": "apparel",
+              "productLabels": [
+              {
+                "key": "a",
+                "value": "b"
+              },
+              {
+                "key": "a",
+                "value": "d"
+              },
+              {
+                "key": "c",
+                "value": "g"
+              }
+              ]
+            }
+    - expect_stderr: |
+        Created product [my-product].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: ml vision product-search products create my-product --location=us-east1
+      --category=apparel --description=product-desc --display-name=test-product --product-labels=a=b,a=d,c=g
+      --product-labels=a=b,m=n
+    events:
+    - api_call:
+        expect_request:
+          uri: https://vision.googleapis.com/v1/projects/fake-project/locations/us-east1/products?alt=json&productId=my-product
+          method: POST
+          headers: {}
+          body:
+            json:
+              description: product-desc
+              displayName: test-product
+              productCategory: apparel
+              productLabels:
+              - key: a
+                value: b
+              - key: a
+                value: d
+              - key: c
+                value: g
+              - key: m
+                value: n
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-east1/products/my-product",
+              "displayName": "test-product",
+              "description": "product-desc",
+              "productCategory": "apparel",
+              "productLabels": [
+                {
+                  "key": "a",
+                  "value": "b"
+                },
+                {
+                  "key": "a",
+                  "value": "d"
+                },
+                {
+                  "key": "c",
+                  "value": "g"
+                },
+                {
+                  "key": "m",
+                  "value": "n"
+                }
+              ]
+            }
+    - expect_stderr: |
+        Created product [my-product].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: ml vision product-search products create my-product --location=us-east1
+      --category=apparel --description=product-desc --display-name=test-product
+    events:
+    - api_call:
+        expect_request:
+          uri: https://vision.googleapis.com/v1/projects/fake-project/locations/us-east1/products?alt=json&productId=my-product
+          method: POST
+          headers: {}
+          body:
+            json:
+              description: product-desc
+              displayName: test-product
+              productCategory: apparel
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-east1/products/my-product",
+              "displayName": "test-product",
+              "description": "product-desc",
+              "productCategory": "apparel"
+            }
+    - expect_stderr: |
+        Created product [my-product].
+    - expect_exit:
+        code: 0

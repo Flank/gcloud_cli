@@ -32,10 +32,11 @@ specified to any command to use that account without activation.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -72,6 +73,14 @@ Lists credentialed accounts.
 .TP 2m
 \fBlogin\fR
 Authorize gcloud to access the Cloud Platform with Google user credentials.
+
+.TP 2m
+\fBprint\-access\-token\fR
+Print an access token for the active account.
+
+.TP 2m
+\fBprint\-identity\-token\fR
+Print an identity token for the active account.
 
 .TP 2m
 \fBrevoke\fR

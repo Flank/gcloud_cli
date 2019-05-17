@@ -65,10 +65,11 @@ or YAML file conforming to the structure of a Policy
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -79,15 +80,26 @@ this API can be found at: https://cloud.google.com/tasks/
 
 
 
+.SH "EXAMPLES"
+
+To set the IAM policy for a queue:
+
+.RS 2m
+$ gcloud alpha tasks queues set\-iam\-policy my\-queue policy\-file.json
+.RE
+
+
+
 .SH "NOTES"
 
 This command is currently in ALPHA and may change without notice. If this
 command fails with API permission errors despite specifying the right project,
 you will have to apply for early access and have your projects registered on the
 API whitelist to use it. To do so, contact Support at
-https://cloud.google.com/support/. This variant is also available:
+https://cloud.google.com/support/. These variants are also available:
 
 .RS 2m
+$ gcloud tasks queues set\-iam\-policy
 $ gcloud beta tasks queues set\-iam\-policy
 .RE
 

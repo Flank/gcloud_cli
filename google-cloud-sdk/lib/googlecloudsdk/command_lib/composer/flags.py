@@ -26,8 +26,21 @@ from googlecloudsdk.calliope import arg_parsers
 from googlecloudsdk.calliope import base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.command_lib.composer import parsers
+from googlecloudsdk.command_lib.util.args import labels_util
 from googlecloudsdk.core import properties
+import ipaddress
 
+
+AIRFLOW_VERSION_TYPE = arg_parsers.RegexpValidator(
+    r'^(\d+\.\d+(?:\.\d+)?)', 'must be in the form X.Y[.Z].')
+
+IMAGE_VERSION_TYPE = arg_parsers.RegexpValidator(
+    r'^composer-(\d+\.\d+\.\d+|latest)-airflow-(\d+\.\d+(?:\.\d+)?)',
+    'must be in the form \'composer-A.B.C-airflow-X.Y[.Z]\' or '
+    '\'latest\' can be provided in place of the Cloud Composer version '
+    'string. For example: \'composer-latest-airflow-1.10.0\'.')
+
+# TODO(b/118349075): Refactor global Argument definitions to be factory methods.
 ENVIRONMENT_NAME_ARG = base.Argument(
     'name', metavar='NAME', help='The name of an environment.')
 
@@ -50,11 +63,16 @@ _ENV_VAR_NAME_ERROR = (
     'Only upper and lowercase letters, digits, and underscores are allowed. '
     'Environment variable names may not start with a digit.')
 
+_INVALID_IPV4_CIDR_BLOCK_ERROR = ('Invalid format of IPV4 CIDR block.')
+
+AIRFLOW_CONFIGS_FLAG_GROUP_DESCRIPTION = (
+    'Group of arguments for modifying the Airflow configuration.')
+
 CLEAR_AIRFLOW_CONFIGS_FLAG = base.Argument(
     '--clear-airflow-configs',
     action='store_true',
     help="""\
-    Remove all Airflow config overrides from the environment.
+    Removes all Airflow config overrides from the environment.
     """)
 
 UPDATE_AIRFLOW_CONFIGS_FLAG = base.Argument(
@@ -64,8 +82,8 @@ UPDATE_AIRFLOW_CONFIGS_FLAG = base.Argument(
     action=arg_parsers.UpdateAction,
     help="""\
     A list of Airflow config override KEY=VALUE pairs to set. If a config
-    override already exists, its value is updated; otherwise a new config
-    override is created.
+    override exists, its value is updated; otherwise, a new config override
+    is created.
 
     KEYs should specify the configuration section and property name,
     separated by a hyphen, for example `core-print_stats_interval`. The
@@ -84,6 +102,9 @@ REMOVE_AIRFLOW_CONFIGS_FLAG = base.Argument(
     A list of Airflow config override keys to remove.
     """)
 
+ENV_VARIABLES_FLAG_GROUP_DESCRIPTION = (
+    'Group of arguments for modifying environment variables.')
+
 UPDATE_ENV_VARIABLES_FLAG = base.Argument(
     '--update-env-variables',
     metavar='NAME=VALUE',
@@ -91,8 +112,8 @@ UPDATE_ENV_VARIABLES_FLAG = base.Argument(
     action=arg_parsers.UpdateAction,
     help="""\
     A list of environment variable NAME=VALUE pairs to set and provide to the
-    Aiflow scheduler, worker, and webserver processes. If an environment
-    variable already exists, its value is updated; otherwise a new environment
+    Airflow scheduler, worker, and webserver processes. If an environment
+    variable exists, its value is updated; otherwise, a new environment
     variable is created.
 
     NAMEs are the environment variable names and may contain upper and
@@ -120,11 +141,47 @@ CLEAR_ENV_VARIABLES_FLAG = base.Argument(
     '--clear-env-variables',
     action='store_true',
     help="""\
-    Remove all environment variables from the environment.
+    Removes all environment variables from the environment.
 
     Environment variables that have system-provided defaults cannot be unset
     with the `--remove-env-variables` or `--clear-env-variables` flags; only
     the user-supplied overrides will be removed.
+    """)
+
+ENV_UPGRADE_GROUP_DESCRIPTION = (
+    'Group of arguments for performing in-place environment upgrades.')
+
+UPDATE_AIRFLOW_VERSION_FLAG = base.Argument(
+    '--airflow-version',
+    type=AIRFLOW_VERSION_TYPE,
+    metavar='AIRFLOW_VERSION',
+    help="""\
+    Upgrade the environment to a later Airflow version in-place.
+
+    Must be of the form `X.Y[.Z]`.
+
+    The Airflow version is a semantic version. The patch version can be omitted
+    and the current version will be selected. The version numbers that are used
+    will be stored.
+    """)
+
+UPDATE_IMAGE_VERSION_FLAG = base.Argument(
+    '--image-version',
+    type=IMAGE_VERSION_TYPE,
+    metavar='IMAGE_VERSION',
+    help="""\
+    Upgrade the environment to a later version in-place.
+
+    The image version encapsulates the versions of both Cloud Composer and
+    Apache Airflow. Must be of the form `composer-A.B.C-airflow-X.Y[.Z]`.
+
+    The Cloud Composer and Airflow versions are semantic versions.
+    `latest` can be provided instead of an explicit Cloud Composer
+    version number indicating that the server will replace `latest`
+    with the current Cloud Composer version. For the Apache Airflow
+    portion, the patch version can be omitted and the current
+    version will be selected. The version numbers that are used will
+    be stored.
     """)
 
 UPDATE_PYPI_FROM_FILE_FLAG = base.Argument(
@@ -137,11 +194,19 @@ UPDATE_PYPI_FROM_FILE_FLAG = base.Argument(
     file path (Cloud Storage file path starts with 'gs://').
     """)
 
+LABELS_FLAG_GROUP_DESCRIPTION = (
+    'Group of arguments for modifying environment labels.')
+
+GENERAL_REMOVAL_FLAG_GROUP_DESCRIPTION = 'Arguments available for item removal.'
+
+PYPI_PACKAGES_FLAG_GROUP_DESCRIPTION = (
+    'Group of arguments for modifying the PyPI package configuration.')
+
 CLEAR_PYPI_PACKAGES_FLAG = base.Argument(
     '--clear-pypi-packages',
     action='store_true',
     help="""\
-    Remove all PyPI packages from the environment.
+    Removes all PyPI packages from the environment.
 
     PyPI packages that are required by the environment's core software
     cannot be uninstalled with the `--remove-pypi-packages` or
@@ -154,13 +219,13 @@ UPDATE_PYPI_PACKAGE_FLAG = base.Argument(
     action='append',
     default=[],
     help="""\
-    A PyPI package add to the environment. If a package already exists,
-    its value is updated; otherwise a new package is installed.
+    A PyPI package to add to the environment. If a package exists, its
+    value is updated; otherwise, a new package is installed.
 
     The value takes the form of: `PACKAGE[EXTRAS_LIST]VERSION_SPECIFIER`,
     as one would specify in a pip requirements file.
 
-    PACKAGE is specified as a package name such as `numpy.` EXTRAS_LIST is
+    PACKAGE is specified as a package name, such as `numpy.` EXTRAS_LIST is
     a comma-delimited list of PEP 508 distribution extras that may be
     empty, in which case the enclosing square brackets may be omitted.
     VERSION_SPECIFIER is an optional PEP 440 version specifier. If both
@@ -183,6 +248,125 @@ REMOVE_PYPI_PACKAGES_FLAG = base.Argument(
     PyPI packages that are required by the environment's core software
     cannot be uninstalled with the `--remove-pypi-packages` or
     `--clear-pypi-packages` flags.
+    """)
+
+ENABLE_IP_ALIAS_FLAG = base.Argument(
+    '--enable-ip-alias',
+    default=None,
+    action='store_true',
+    help="""\
+    Enable use of alias IPs (https://cloud.google.com/compute/docs/alias-ip/)
+    for pod IPs within the Environment cluster. This will create two secondary
+    ranges, one for the pod IPs and another to reserve space for the services
+    range.
+    """)
+
+CLUSTER_SECONDARY_RANGE_NAME_FLAG = base.Argument(
+    '--cluster-secondary-range-name',
+    default=None,
+    help="""\
+    Secondary range to be used as the source for pod IPs. Alias ranges will be
+    allocated from this secondary range. NAME must be the name of an existing
+    secondary range in the cluster subnetwork.
+
+    Cannot be specified unless '--enable-ip-alias' is also specified.
+    """)
+
+SERVICES_SECONDARY_RANGE_NAME_FLAG = base.Argument(
+    '--services-secondary-range-name',
+    default=None,
+    help="""\
+    Secondary range to be used for services (e.g. ClusterIPs). NAME must be the
+    name of an existing secondary range in the cluster subnetwork.
+
+    Cannot be specified unless '--enable-ip-alias' is also specified.
+    """)
+
+
+def _IsValidIpv4CidrBlock(ipv4_cidr_block):
+  """Validates that IPV4 CIDR block arg has valid format.
+
+  Intended to be used as an argparse validator.
+
+  Args:
+    ipv4_cidr_block: str, the IPV4 CIDR block string to validate
+
+  Returns:
+    bool, True if and only if the IPV4 CIDR block is valid
+  """
+  return ipaddress.IPv4Network(ipv4_cidr_block) is not None
+
+
+IPV4_CIDR_BLOCK_FORMAT_VALIDATOR = arg_parsers.CustomFunctionValidator(
+    _IsValidIpv4CidrBlock, _INVALID_IPV4_CIDR_BLOCK_ERROR)
+
+CLUSTER_IPV4_CIDR_FLAG = base.Argument(
+    '--cluster-ipv4-cidr',
+    default=None,
+    type=IPV4_CIDR_BLOCK_FORMAT_VALIDATOR,
+    help="""\
+    IP address range for the pods in this cluster in CIDR notation
+    (e.g. 10.0.0.0/14).
+
+    Cannot be specified unless '--enable-ip-alias' is also specified.
+    """)
+
+SERVICES_IPV4_CIDR_FLAG = base.Argument(
+    '--services-ipv4-cidr',
+    default=None,
+    type=IPV4_CIDR_BLOCK_FORMAT_VALIDATOR,
+    help="""\
+    IP range for the services IPs.
+
+    Can be specified as a netmask size (e.g. '/20') or as in CIDR notion
+    (e.g. '10.100.0.0/20'). If given as a netmask size, the IP range will
+    be chosen automatically from the available space in the network.
+
+    If unspecified, the services CIDR range will be chosen with a default
+    mask size.
+
+    Cannot be specified unless '--enable-ip-alias' is also specified.
+    """)
+
+ENABLE_PRIVATE_ENVIRONMENT_FLAG = base.Argument(
+    '--enable-private-environment',
+    default=None,
+    action='store_true',
+    help="""\
+    Environment cluster is created with no public IP addresses on the cluster
+    nodes.
+
+    If not specified, cluster nodes will be assigned public IP addresses.
+
+    Cannot be specified unless '--enable-ip-alias' is also specified.
+    """)
+
+ENABLE_PRIVATE_ENDPOINT_FLAG = base.Argument(
+    '--enable-private-endpoint',
+    default=None,
+    action='store_true',
+    help="""\
+    Environment cluster is managed using the private IP address of the master
+    API endpoint. Therefore access to the master endpoint must be from
+    internal IP addresses.
+
+    If not specified, the master API endpoint will be accessible by its public
+    IP address.
+
+    Cannot be specified unless '--enable-private-environnment' is also
+    specified.
+    """)
+
+MASTER_IPV4_CIDR_FLAG = base.Argument(
+    '--master-ipv4-cidr',
+    default=None,
+    type=IPV4_CIDR_BLOCK_FORMAT_VALIDATOR,
+    help="""\
+    IPv4 CIDR range to use for the master network. This should have a netmask
+    of size /28.
+
+    Cannot be specified unless '--enable-private-environnment' is also
+    specified.
     """)
 
 
@@ -217,11 +401,11 @@ def AddImportDestinationFlag(parser, folder):
       metavar='DESTINATION',
       required=False,
       help="""\
-      An optional subdirectory under the {}/ directory in the environment's Cloud
-      Storage bucket into which to import files. May contain forward slashes to
-      delimit multiple levels of subdirectory nesting, but should not contain
-      leading or trailing slashes. If the DESTINATION does not exist, it will be
-      created.
+      An optional subdirectory under the {}/ directory in the environment's
+      Cloud Storage bucket into which to import files. May contain forward
+      slashes to delimit multiple levels of subdirectory nesting, but should not
+      contain leading or trailing slashes. If the DESTINATION does not exist, it
+      will be created.
       """.format(folder)).AddToParser(parser)
 
 
@@ -333,12 +517,14 @@ def ValidateDiskSize(parameter_name, disk_size):
   gb_mask = (1 << 30) - 1
   if disk_size & gb_mask:
     raise exceptions.InvalidArgumentException(
-        parameter_name,
-        'Must be an integer quantity of GB.')
+        parameter_name, 'Must be an integer quantity of GB.')
 
 
-def _AddPartialDictUpdateFlagsToGroup(update_type_group, clear_flag,
-                                      remove_flag, update_flag):
+def _AddPartialDictUpdateFlagsToGroup(update_type_group,
+                                      clear_flag,
+                                      remove_flag,
+                                      update_flag,
+                                      group_help_text=None):
   """Adds flags related to a partial update of arg represented by a dictionary.
 
   Args:
@@ -346,9 +532,13 @@ def _AddPartialDictUpdateFlagsToGroup(update_type_group, clear_flag,
     clear_flag: flag, the flag to clear dictionary.
     remove_flag: flag, the flag to remove values from dictionary.
     update_flag: flag, the flag to add or update values in dictionary.
+    group_help_text: (optional) str, the help info to apply to the created
+        argument group. If not provided, then no help text will be applied to
+        group.
   """
-  group = update_type_group.add_argument_group()
-  remove_group = group.add_mutually_exclusive_group()
+  group = update_type_group.add_argument_group(help=group_help_text)
+  remove_group = group.add_mutually_exclusive_group(
+      help=GENERAL_REMOVAL_FLAG_GROUP_DESCRIPTION)
   clear_flag.AddToParser(remove_group)
   remove_flag.AddToParser(remove_group)
   update_flag.AddToParser(group)
@@ -364,7 +554,28 @@ def AddNodeCountUpdateFlagToGroup(update_type_group):
       '--node-count',
       metavar='NODE_COUNT',
       type=arg_parsers.BoundedInt(lower_bound=3),
-      help='The new number of nodes running the Environment. Must be >= 3.')
+      help='The new number of nodes running the environment. Must be >= 3.')
+
+
+def AddPrivateIpAndIpAliasEnvironmentFlags(update_type_group):
+  """Adds flags related to private clusters and IP alias to parser.
+
+  Private cluster flags are related to similar flags found within GKE SDK:
+    /third_party/py/googlecloudsdk/command_lib/container/flags.py
+
+  Args:
+    update_type_group: argument group, the group to which flag should be added.
+  """
+  group = update_type_group.add_group(
+      help='Private Clusters and IP Alias (VPC-native)')
+  ENABLE_PRIVATE_ENVIRONMENT_FLAG.AddToParser(group)
+  ENABLE_PRIVATE_ENDPOINT_FLAG.AddToParser(group)
+  MASTER_IPV4_CIDR_FLAG.AddToParser(group)
+  ENABLE_IP_ALIAS_FLAG.AddToParser(group)
+  CLUSTER_IPV4_CIDR_FLAG.AddToParser(group)
+  SERVICES_IPV4_CIDR_FLAG.AddToParser(group)
+  CLUSTER_SECONDARY_RANGE_NAME_FLAG.AddToParser(group)
+  SERVICES_SECONDARY_RANGE_NAME_FLAG.AddToParser(group)
 
 
 def AddPypiUpdateFlagsToGroup(update_type_group):
@@ -373,7 +584,8 @@ def AddPypiUpdateFlagsToGroup(update_type_group):
   Args:
     update_type_group: argument group, the group to which flag should be added.
   """
-  group = update_type_group.add_mutually_exclusive_group()
+  group = update_type_group.add_mutually_exclusive_group(
+      PYPI_PACKAGES_FLAG_GROUP_DESCRIPTION)
   UPDATE_PYPI_FROM_FILE_FLAG.AddToParser(group)
   _AddPartialDictUpdateFlagsToGroup(
       group, CLEAR_PYPI_PACKAGES_FLAG, REMOVE_PYPI_PACKAGES_FLAG,
@@ -386,9 +598,10 @@ def AddEnvVariableUpdateFlagsToGroup(update_type_group):
   Args:
     update_type_group: argument group, the group to which flags should be added.
   """
-  _AddPartialDictUpdateFlagsToGroup(
-      update_type_group, CLEAR_ENV_VARIABLES_FLAG,
-      REMOVE_ENV_VARIABLES_FLAG, UPDATE_ENV_VARIABLES_FLAG)
+  _AddPartialDictUpdateFlagsToGroup(update_type_group, CLEAR_ENV_VARIABLES_FLAG,
+                                    REMOVE_ENV_VARIABLES_FLAG,
+                                    UPDATE_ENV_VARIABLES_FLAG,
+                                    ENV_VARIABLES_FLAG_GROUP_DESCRIPTION)
 
 
 def AddAirflowConfigUpdateFlagsToGroup(update_type_group):
@@ -397,9 +610,34 @@ def AddAirflowConfigUpdateFlagsToGroup(update_type_group):
   Args:
     update_type_group: argument group, the group to which flags should be added.
   """
-  _AddPartialDictUpdateFlagsToGroup(
-      update_type_group, CLEAR_AIRFLOW_CONFIGS_FLAG,
-      REMOVE_AIRFLOW_CONFIGS_FLAG, UPDATE_AIRFLOW_CONFIGS_FLAG)
+  _AddPartialDictUpdateFlagsToGroup(update_type_group,
+                                    CLEAR_AIRFLOW_CONFIGS_FLAG,
+                                    REMOVE_AIRFLOW_CONFIGS_FLAG,
+                                    UPDATE_AIRFLOW_CONFIGS_FLAG,
+                                    AIRFLOW_CONFIGS_FLAG_GROUP_DESCRIPTION)
+
+
+def AddEnvUpgradeFlagsToGroup(update_type_group):
+  """Adds flag group to perform in-place env upgrades.
+
+  Args:
+    update_type_group: argument group, the group to which flags should be added.
+  """
+  upgrade_group = update_type_group.add_argument_group(
+      ENV_UPGRADE_GROUP_DESCRIPTION)
+  UPDATE_AIRFLOW_VERSION_FLAG.AddToParser(upgrade_group)
+  UPDATE_IMAGE_VERSION_FLAG.AddToParser(upgrade_group)
+
+
+def AddLabelsUpdateFlagsToGroup(update_type_group):
+  """Adds flags related to updating environment labels.
+
+  Args:
+    update_type_group: argument group, the group to which flags should be added.
+  """
+  labels_update_group = update_type_group.add_argument_group(
+      LABELS_FLAG_GROUP_DESCRIPTION)
+  labels_util.AddUpdateLabelsFlags(labels_update_group)
 
 
 def FallthroughToLocationProperty(location_refs, flag_name, failure_msg):

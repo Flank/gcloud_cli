@@ -1,0 +1,53 @@
+NAME
+    gcloud alpha dataproc clusters set-iam-policy - set IAM policy for a
+        cluster
+
+SYNOPSIS
+    gcloud alpha dataproc clusters set-iam-policy CLUSTER POLICY_FILE
+        [--region=REGION] [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Sets the IAM policy for a cluster, given a cluster name and the
+    policy.
+
+POSITIONAL ARGUMENTS
+     CLUSTER
+        The ID of the cluster to set the policy on.
+
+     POLICY_FILE
+        Path to a local JSON or YAML formatted file containing a valid policy.
+
+FLAGS
+     --region=REGION
+        Cloud Dataproc region to use. Each Cloud Dataproc region constitutes an
+        independent resource namespace constrained to deploying instances into
+        Compute Engine zones inside the region. The default value of global is
+        a special multi-region namespace which is capable of deploying
+        instances into all Compute Engine zones globally, and is disjoint from
+        other Cloud Dataproc regions. Overrides the default dataproc/region
+        property value for this command invocation.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+EXAMPLES
+    The following command sets the IAM policy for a cluster with the name
+    example-cluster-name-1 using policy.yaml:
+
+        $ gcloud alpha dataproc clusters set-iam-policy \
+            example-cluster-name-1 policy.yaml
+
+NOTES
+    This command is currently in ALPHA and may change without notice. If this
+    command fails with API permission errors despite specifying the right
+    project, you will have to apply for early access and have your projects
+    registered on the API whitelist to use it. To do so, contact Support at
+    https://cloud.google.com/support/. These variants are also available:
+
+        $ gcloud dataproc clusters set-iam-policy
+        $ gcloud beta dataproc clusters set-iam-policy
+

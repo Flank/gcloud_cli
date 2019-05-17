@@ -4,8 +4,8 @@ NAME
 
 SYNOPSIS
     gcloud alpha scheduler jobs create http JOB --schedule=SCHEDULE --uri=URI
-        [--description=DESCRIPTION] [--headers=HEADERS]
-        [--http-method=HTTP_METHOD; default="post"]
+        [--attempt-deadline=ATTEMPT_DEADLINE] [--description=DESCRIPTION]
+        [--headers=HEADERS] [--http-method=HTTP_METHOD; default="post"]
         [--max-backoff=MAX_BACKOFF; default="1h"]
         [--max-doublings=MAX_DOUBLINGS; default=16]
         [--max-retry-attempts=MAX_RETRY_ATTEMPTS]
@@ -14,7 +14,10 @@ SYNOPSIS
         [--time-zone=TIME_ZONE; default="Etc/UTC"]
         [--message-body=MESSAGE_BODY
           | --message-body-from-file=MESSAGE_BODY_FROM_FILE]
-        [GCLOUD_WIDE_FLAG ...]
+        [[--oauth-service-account-email=OAUTH_SERVICE_ACCOUNT_EMAIL
+          : --oauth-token-scope=OAUTH_TOKEN_SCOPE]
+          | [--oidc-service-account-email=OIDC_SERVICE_ACCOUNT_EMAIL
+          : --oidc-token-audience=OIDC_TOKEN_AUDIENCE]] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Create a Cloud Scheduler job that triggers an action via HTTP.
@@ -61,6 +64,11 @@ REQUIRED FLAGS
         is 2083 characters after encoding.
 
 OPTIONAL FLAGS
+     --attempt-deadline=ATTEMPT_DEADLINE
+        The deadline for job attempts. If the request handler doesn't respond
+        by this dealine, the request is cancelled and the attempt is marked as
+        failed. For example, 20s.
+
      --description=DESCRIPTION
         Human-readable description of the job.
 
@@ -117,9 +125,44 @@ OPTIONAL FLAGS
           of the HTTP request. May only be given with compatible HTTP methods
           (PUT or POST).
 
+     How the request sent to the target when executing the job should be
+     authenticated. At most one of these may be specified:
+
+       OAuth2
+
+         --oauth-service-account-email=OAUTH_SERVICE_ACCOUNT_EMAIL
+            The service account email to be used for generating an OAuth2
+            access token to be included in the request sent to the target when
+            executing the job. The service account must be within the same
+            project as the job. The caller must have iam.serviceAccounts.actAs
+            permission for the service account. This flag must be specified if
+            any of the other arguments in this group are specified.
+
+         --oauth-token-scope=OAUTH_TOKEN_SCOPE
+            The scope to be used when generating an OAuth2 access token to be
+            included in the request sent to the target when executing the job.
+            If not specified, "https://www.googleapis.com/auth/cloud-platform"
+            will be used.
+
+       OpenId Connect
+
+         --oidc-service-account-email=OIDC_SERVICE_ACCOUNT_EMAIL
+            The service account email to be used for generating an OpenId
+            Connect token to be included in the request sent to the target when
+            executing the job. The service account must be within the same
+            project as the job. The caller must have iam.serviceAccounts.actAs
+            permission for the service account. This flag must be specified if
+            any of the other arguments in this group are specified.
+
+         --oidc-token-audience=OIDC_TOKEN_AUDIENCE
+            The audience to be used when generating an OpenId Connect token to
+            be included in the request sent to the target when executing the
+            job. If not specified, the URI specified in target will be used.
+
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

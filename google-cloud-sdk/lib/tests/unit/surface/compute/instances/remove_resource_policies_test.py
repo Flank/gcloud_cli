@@ -19,23 +19,15 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from googlecloudsdk.calliope import base as calliope_base
-from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
 from tests.lib import test_case
-from tests.lib.surface.compute import test_base
+from tests.lib.surface.compute import instances_test_base as test_base
 
 
-class InstancesRemoveResourcePoliciesTest(test_base.BaseTest):
+class InstancesRemoveResourcePoliciesTest(test_base.TestBase):
 
-  def SetUp(self):
-    self.SelectApi('alpha')
+  def PreSetUp(self):
     self.track = calliope_base.ReleaseTrack.ALPHA
-    self.instance_name = 'my-instance'
-    self.zone = 'central2-a'
-    self.region = 'central2'
-
-    self.reg = resources.REGISTRY.Clone()
-    self.reg.RegisterApiByName('compute', 'alpha')
 
   def _CheckRemoveRequest(self, policy_names):
     request_cls = self.messages.ComputeInstancesRemoveResourcePoliciesRequest
@@ -51,7 +43,7 @@ class InstancesRemoveResourcePoliciesTest(test_base.BaseTest):
                     self.Project(), self.region, name)
                 for name in policy_names]))
     self.CheckRequests(
-        [(self.compute_alpha.instances,
+        [(self.compute.instances,
           'RemoveResourcePolicies',
           remove_request)],
     )

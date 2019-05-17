@@ -26,7 +26,7 @@ from tests.lib import test_case
 from tests.lib.surface.cloudiot import base
 
 
-class UnBindTestBeta(base.CloudIotBase, parameterized.TestCase):
+class UnBindTestGA(base.CloudIotBase, parameterized.TestCase):
 
   def SetUp(self):
     self.track = calliope_base.ReleaseTrack.BETA
@@ -106,6 +106,12 @@ class UnBindTestBeta(base.CloudIotBase, parameterized.TestCase):
          '    --device-region us-central1'
          '    --gateway {}'
          '    --gateway-region us-central1').format(gateway.id))
+
+
+class UnBindTestBeta(UnBindTestGA):
+
+  def SetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
 
 class UnBindTestAlpha(UnBindTestBeta):

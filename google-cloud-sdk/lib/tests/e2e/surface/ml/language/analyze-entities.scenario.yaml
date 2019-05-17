@@ -1,0 +1,230 @@
+title: Add entities (Date, Address, Phone number, Language) to ml language analyze-entities
+release_tracks: [GA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: ml language analyze-entities --content "2019-04-18"
+  - stdout: .*type.:\s.DATE.*$
+- execute:
+  - command: ml language analyze-entities --content "9999999999"
+  - stdout: .*type.:\s.NUMBER.*$
+- execute:
+  - command: ml language analyze-entities --content "815, 11th Av, Sunnyvale"
+  - stdout: .*type.:\s.ADDRESS.*$
+- execute:
+  - command: ml language analyze-entities --content "cómo estás"
+  - stdout: .*language.:\s.es.*$
+actions:
+
+- execute_command:
+    command: ml language analyze-entities --content "2019-04-18"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://language.googleapis.com/v1/documents:analyzeEntities?alt=json
+          method: POST
+          body:
+            json:
+              document:
+                content: '2019-04-18'
+                type: PLAIN_TEXT
+              encodingType: UTF8
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '1310'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            entities:
+            - name: '2019-04-18'
+              type: DATE
+              metadata:
+                year: '2019'
+                day: '18'
+                month: '4'
+              salience: 0
+              mentions:
+              - text:
+                  content: '2019-04-18'
+                  beginOffset: 0
+                type: TYPE_UNKNOWN
+            - name: '04'
+              type: NUMBER
+              metadata:
+                value: '4'
+              salience: 0
+              mentions:
+              - text:
+                  content: '04'
+                  beginOffset: 5
+                type: TYPE_UNKNOWN
+            - name: '18'
+              type: NUMBER
+              metadata:
+                value: '18'
+              salience: 0
+              mentions:
+              - text:
+                  content: '18'
+                  beginOffset: 8
+                type: TYPE_UNKNOWN
+            - name: '2019'
+              type: NUMBER
+              metadata:
+                value: '2019'
+              salience: 0
+              mentions:
+              - text:
+                  content: '2019'
+                  beginOffset: 0
+                type: TYPE_UNKNOWN
+            language: en
+    - expect_stdout:
+        matches: .*type.:\s.DATE.*
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: ml language analyze-entities --content "9999999999"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://language.googleapis.com/v1/documents:analyzeEntities?alt=json
+          method: POST
+          body:
+            json:
+              document:
+                content: '9999999999'
+                type: PLAIN_TEXT
+              encodingType: UTF8
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '368'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            entities:
+            - name: '9999999999'
+              type: NUMBER
+              metadata:
+                value: '9999999999'
+              salience: 0
+              mentions:
+              - text:
+                  content: '9999999999'
+                  beginOffset: 0
+                type: TYPE_UNKNOWN
+            language: en
+    - expect_stdout:
+        matches: .*type.:\s.NUMBER.*
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: ml language analyze-entities --content "815, 11th Av, Sunnyvale"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://language.googleapis.com/v1/documents:analyzeEntities?alt=json
+          method: POST
+          body:
+            json:
+              document:
+                content: 815, 11th Av, Sunnyvale
+                type: PLAIN_TEXT
+              encodingType: UTF8
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '1905'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            entities:
+            - name: 11th Av
+              type: OTHER
+              metadata:
+                mid: /g/1tcwlt4_
+              salience: 0.5831844
+              mentions:
+              - text:
+                  content: 11th Av
+                  beginOffset: 5
+                type: PROPER
+            - name: Sunnyvale
+              type: LOCATION
+              metadata:
+                mid: /m/0r6ff
+                wikipedia_url: https://en.wikipedia.org/wiki/Sunnyvale,_California
+              salience: 0.4168156
+              mentions:
+              - text:
+                  content: Sunnyvale
+                  beginOffset: 14
+                type: PROPER
+            - name: 815, 11th Av, Sunnyvale
+              type: ADDRESS
+              metadata:
+                locality: Sunnyvale
+                street_name: 11th Avenue
+                broad_region: California
+                narrow_region: Santa Clara County
+                street_number: '815'
+                country: US
+              salience: 0
+              mentions:
+              - text:
+                  content: 815, 11th Av, Sunnyvale
+                  beginOffset: 0
+                type: TYPE_UNKNOWN
+            - name: '815'
+              type: NUMBER
+              metadata:
+                value: '815'
+              salience: 0
+              mentions:
+              - text:
+                  content: '815'
+                  beginOffset: 0
+                type: TYPE_UNKNOWN
+            - name: '11'
+              type: NUMBER
+              metadata:
+                value: '11'
+              salience: 0
+              mentions:
+              - text:
+                  content: '11'
+                  beginOffset: 5
+                type: TYPE_UNKNOWN
+            language: en
+    - expect_stdout:
+        matches: .*type.:\s.ADDRESS.*
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: ml language analyze-entities --content "cómo estás"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://language.googleapis.com/v1/documents:analyzeEntities?alt=json
+          method: POST
+          body:
+            json:
+              document:
+                content: cómo estás
+                type: PLAIN_TEXT
+              encodingType: UTF8
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '41'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            entities: []
+            language: es
+    - expect_stdout:
+        matches: .*language.:\s.es.*
+    - expect_exit:
+        code: 0

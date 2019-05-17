@@ -12,13 +12,17 @@ DESCRIPTION
     https://cloud.google.com/compute/docs/instance-templates
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
 COMMANDS
     COMMAND is one of the following:
+
+     add-iam-policy-binding
+        Add IAM policy binding to a Google Compute Engine instance template.
 
      create
         Create a Compute Engine virtual machine instance template.
@@ -33,8 +37,18 @@ COMMANDS
      describe
         Describe a virtual machine instance template.
 
+     get-iam-policy
+        Get the IAM policy for a Google Compute Engine instance template.
+
      list
         List Google Compute Engine instance templates.
+
+     remove-iam-policy-binding
+        Remove IAM policy binding from a Google Compute Engine instance
+        template.
+
+     set-iam-policy
+        Set the IAM policy for a Google Compute Engine instance template.
 
 NOTES
     These variants are also available:

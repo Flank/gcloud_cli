@@ -29,18 +29,18 @@ specified project.
 .RS 2m
 .TP 2m
 \fB\-\-artifact\-url\fR=\fIARTIFACT_URL\fR
-Container URL. May be in the \f5\fB.gcr.io/repository/image\fR format, or may
+Container URL. May be in the \f5gcr.io/repository/image\fR format, or may
 optionally contain the \f5http\fR or \f5https\fR scheme
 
 .TP 2m
-\fR\-\-pgp\-key\-fingerprint\fB=\fIPGP_KEY_FINGERPRINT\fR
+\fB\-\-pgp\-key\-fingerprint\fR=\fIPGP_KEY_FINGERPRINT\fR
 The cryptographic ID of the key used to generate the signature. For Binary
 Authorization, this must be the version 4, full 160\-bit fingerprint, expressed
-as a 40 character hexidecimal string. See
+as a 40 character hexadecimal string. See
 https://tools.ietf.org/html/rfc4880#section\-12.2 for details.
 
 .TP 2m
-\fR\-\-signature\-file\fB=\fISIGNATURE_FILE\fR
+\fB\-\-signature\-file\fR=\fISIGNATURE_FILE\fR
 Path to file containing the signature to store, or \f5\-\fR to read signature
 from stdin.
 
@@ -57,26 +57,26 @@ used to specify the attributes of this resource. This must be specified.
 
 .RS 2m
 .TP 2m
-\fR\-\-attestor\fB=\fIATTESTOR\fR
+\fB\-\-attestor\fR=\fIATTESTOR\fR
 ID of the attestor or fully qualified identifier for the attestor. This flag
 must be specified if any of the other arguments in this group are specified.
 
 .TP 2m
-\fR\-\-attestor\-project\fB=\fIATTESTOR_PROJECT\fR
+\fB\-\-attestor\-project\fR=\fIATTESTOR_PROJECT\fR
 The Cloud project for the attestor.
 
 
-\fR
 .RE
 .RE
 .sp
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

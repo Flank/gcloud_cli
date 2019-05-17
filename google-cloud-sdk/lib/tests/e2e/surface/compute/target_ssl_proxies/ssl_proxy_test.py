@@ -74,7 +74,6 @@ class SslProxyTest(e2e_test_base.BaseTest):
              '-subj', '/C=US/CN=Alon',
              '-keyout', self.key_fname,
              '-out', self.crt_fname,
-             '-rand', '/dev/zero',  # sounds pretty random
              '-config', self.ssl_config_fname]),
         0)
 

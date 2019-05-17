@@ -140,18 +140,18 @@ class SessionTests(_SessionTestsBase):
     )
     with self.Execute(ce):
       stages = [
-          progress_tracker.Stage('Hello World...'),
-          progress_tracker.Stage('Goodbye cruel world...'),
-          progress_tracker.Stage('this failed'),
+          progress_tracker.Stage('Hello World...', key='a'),
+          progress_tracker.Stage('Goodbye cruel world...', key='b'),
+          progress_tracker.Stage('this failed', key='c'),
       ]
       with progress_tracker.StagedProgressTracker(
           'tracker', stages, autotick=False) as spt:
-        spt.StartStage(stages[0])
-        spt.CompleteStage(stages[0])
-        spt.StartStage(stages[1])
-        spt.CompleteStage(stages[1])
-        spt.StartStage(stages[2])
-        spt.FailStage(stages[2], ValueError)
+        spt.StartStage('a')
+        spt.CompleteStage('a')
+        spt.StartStage('b')
+        spt.CompleteStage('b')
+        spt.StartStage('c')
+        spt.FailStage('c', ValueError)
 
   def testJustFileWriteEvent(self):
     ce = self.CommandExecution(

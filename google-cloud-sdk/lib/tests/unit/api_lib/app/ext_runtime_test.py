@@ -110,7 +110,7 @@ class TestBase(sdk_test_base.SdkBase):
     self.log_print_patch.stop()
 
 
-@test_case.Filters.SkipOnPy3('Deprecated command; no py3 support', 'b/76013940')
+@test_case.Filters.DoNotRunOnPy3('Deprecated command; no py3 support')
 class GetRuntimeDefDirTest(sdk_test_base.SdkBase):
 
   def SetUp(self):
@@ -131,7 +131,7 @@ class GetRuntimeDefDirTest(sdk_test_base.SdkBase):
       ext_runtime_adapter._GetRuntimeDefDir()
 
 
-@test_case.Filters.SkipOnPy3('Deprecated command; no py3 support', 'b/76013940')
+@test_case.Filters.DoNotRunOnPy3('Deprecated command; no py3 support')
 class LowLevelTests(TestBase):
 
   def SetUp(self):
@@ -171,7 +171,7 @@ class LowLevelTests(TestBase):
                        ext_runtime._NO_DEFAULT_ERROR.format('hi user'))])
 
 
-@test_case.Filters.SkipOnPy3('Deprecated command; no py3 support', 'b/76013940')
+@test_case.Filters.DoNotRunOnPy3('Deprecated command; no py3 support')
 class CommunicationTests(TestBase):
 
   # pylint:disable=unused-argument
@@ -210,7 +210,7 @@ class CommunicationTests(TestBase):
                    ext_runtime.Params())
 
 
-@test_case.Filters.SkipOnPy3('Deprecated command; no py3 support', 'b/76013940')
+@test_case.Filters.DoNotRunOnPy3('Deprecated command; no py3 support')
 class PluginTests(TestBase):
 
   def testDetect(self):

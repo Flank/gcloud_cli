@@ -1,6 +1,3 @@
-skip: !!omap
-- reason: Failing
-- bug: b/121099768
 title: Create, describe, then delete an instance.
 release_tracks: [ALPHA]
 summary:

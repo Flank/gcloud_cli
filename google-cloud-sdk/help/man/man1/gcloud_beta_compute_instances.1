@@ -24,10 +24,11 @@ instances.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -114,6 +115,10 @@ interface.
 \fB(BETA)\fR Read output from a virtual machine instance's serial port.
 
 .TP 2m
+\fBget\-shielded\-identity\fR
+\fB(BETA)\fR Get the Shielded identity for a Google Compute Engine instance.
+
+.TP 2m
 \fBlist\fR
 \fB(BETA)\fR List Google Compute Engine instances.
 
@@ -123,7 +128,7 @@ interface.
 
 .TP 2m
 \fBremove\-iam\-policy\-binding\fR
-\fB(BETA)\fR Remove IAM policy binding of a Google Compute Engine instance.
+\fB(BETA)\fR Remove IAM policy binding from a Google Compute Engine instance.
 
 .TP 2m
 \fBremove\-labels\fR
@@ -147,7 +152,7 @@ interface.
 
 .TP 2m
 \fBset\-iam\-policy\fR
-\fB(BETA)\fR Set IAM policy for an instance.
+\fB(BETA)\fR Set IAM policy for a Google Compute Engine instance.
 
 .TP 2m
 \fBset\-machine\-type\fR

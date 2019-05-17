@@ -9,8 +9,9 @@ DESCRIPTION
     (BETA) List, create, and delete Google Compute Engine network peerings.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -25,6 +26,12 @@ COMMANDS
 
      list
         (BETA) List Google Compute Engine peerings.
+
+     list-routes
+        (BETA) List received or advertised routes for a VPC network peering.
+
+     update
+        (BETA) Update a Google Compute Engine network peering.
 
 NOTES
     This command is currently in BETA and may change without notice. These

@@ -25,7 +25,7 @@ class TargetTCPProxies(base.Group):
   """List, create, and delete target TCP proxies."""
 
 
-TargetTCPProxies.category = 'Networking'
+TargetTCPProxies.category = base.NETWORKING_CATEGORY
 
 TargetTCPProxies.detailed_help = {
     'brief': 'List, create, and delete target TCP proxies',

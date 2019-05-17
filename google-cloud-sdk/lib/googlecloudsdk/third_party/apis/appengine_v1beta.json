@@ -136,7 +136,7 @@
       "type": "object",
       "properties": {
         "name": {
-          "description": "The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the name should have the format of operations\/some\/unique\/name.",
+          "description": "The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the name should be a resource name ending with operations\/{unique_id}.",
           "type": "string"
         },
         "metadata": {
@@ -501,7 +501,7 @@
           "$ref": "Network"
         },
         "zones": {
-          "description": "The Google Compute Engine zones that are supported by this version in the App Engine flexible environment.",
+          "description": "The Google Compute Engine zones that are supported by this version in the App Engine flexible environment. Deprecated.",
           "type": "array",
           "items": {
             "type": "string"
@@ -568,6 +568,10 @@
         },
         "runtimeApiVersion": {
           "description": "The version of the API in the given runtime environment. Please see the app.yaml reference for valid values at https:\/\/cloud.google.com\/appengine\/docs\/standard\/<language>\/config\/appref",
+          "type": "string"
+        },
+        "runtimeMainExecutablePath": {
+          "description": "The path or name of the app's main executable.",
           "type": "string"
         },
         "handlers": {
@@ -707,7 +711,7 @@
           "$ref": "NetworkUtilization"
         },
         "customMetrics": {
-          "description": "Target scaling by user-provided metrics.",
+          "description": "Target scaling by user-provided metrics. Only applicable in the App Engine flexible environment.",
           "type": "array",
           "items": {
             "$ref": "CustomMetric"
@@ -917,7 +921,7 @@
           "type": "string"
         },
         "sessionAffinity": {
-          "description": "Enable session affinity.",
+          "description": "Enable session affinity. Only applicable in the App Engine flexible environment.",
           "type": "boolean"
         }
       }
@@ -2016,68 +2020,6 @@
         }
       }
     },
-    "OperationMetadata": {
-      "id": "OperationMetadata",
-      "description": "Metadata for the given google.longrunning.Operation.",
-      "type": "object",
-      "properties": {
-        "operationType": {
-          "description": "Type of this operation. Deprecated, use method field instead. Example: \"create_version\".@OutputOnly",
-          "type": "string"
-        },
-        "insertTime": {
-          "description": "Timestamp that this operation was created.@OutputOnly",
-          "type": "string",
-          "format": "google-datetime"
-        },
-        "endTime": {
-          "description": "Timestamp that this operation completed.@OutputOnly",
-          "type": "string",
-          "format": "google-datetime"
-        },
-        "user": {
-          "description": "User who requested this operation.@OutputOnly",
-          "type": "string"
-        },
-        "target": {
-          "description": "Name of the resource that this operation is acting on. Example: apps\/myapp\/modules\/default.@OutputOnly",
-          "type": "string"
-        },
-        "method": {
-          "description": "API method that initiated this operation. Example: google.appengine.v1beta4.Version.CreateVersion.@OutputOnly",
-          "type": "string"
-        }
-      }
-    },
-    "OperationMetadataV1Beta5": {
-      "id": "OperationMetadataV1Beta5",
-      "description": "Metadata for the given google.longrunning.Operation.",
-      "type": "object",
-      "properties": {
-        "method": {
-          "description": "API method name that initiated this operation. Example: google.appengine.v1beta5.Version.CreateVersion.@OutputOnly",
-          "type": "string"
-        },
-        "insertTime": {
-          "description": "Timestamp that this operation was created.@OutputOnly",
-          "type": "string",
-          "format": "google-datetime"
-        },
-        "endTime": {
-          "description": "Timestamp that this operation completed.@OutputOnly",
-          "type": "string",
-          "format": "google-datetime"
-        },
-        "user": {
-          "description": "User who requested this operation.@OutputOnly",
-          "type": "string"
-        },
-        "target": {
-          "description": "Name of the resource that this operation is acting on. Example: apps\/myapp\/services\/default.@OutputOnly",
-          "type": "string"
-        }
-      }
-    },
     "OperationMetadataV1Alpha": {
       "id": "OperationMetadataV1Alpha",
       "description": "Metadata for the given google.longrunning.Operation.",
@@ -2366,7 +2308,7 @@
           "scopes": [
             "https://www.googleapis.com/auth/cloud-platform"
           ],
-          "description": "Recreates the required App Engine features for the specified App Engine application, for example a Cloud Storage bucket or App Engine service account. Use this method if you receive an error message about a missing feature, for example, Error retrieving the App Engine service account."
+          "description": "Recreates the required App Engine features for the specified App Engine application, for example a Cloud Storage bucket or App Engine service account. Use this method if you receive an error message about a missing feature, for example, Error retrieving the App Engine service account. If you have deleted your App Engine service account, this will not be able to recreate it. Instead, you should attempt to use the IAM undelete API if possible at https:\/\/cloud.google.com\/iam\/reference\/rest\/v1\/projects.serviceAccounts\/undelete?apix_params=%7B\"name\"%3A\"projects%2F-%2FserviceAccounts%2Funique_id\"%2C\"resource\"%3A%7B%7D%7D . If the deletion was recent, the numeric ID can be found in the Cloud Console Activity Log."
         }
       }
       ,

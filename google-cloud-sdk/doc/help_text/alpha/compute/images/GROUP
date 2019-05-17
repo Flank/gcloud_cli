@@ -9,8 +9,9 @@ DESCRIPTION
     (ALPHA) List, create, and delete Google Compute Engine images.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -60,13 +61,13 @@ COMMANDS
         (ALPHA) List Google Compute Engine images.
 
      remove-iam-policy-binding
-        (ALPHA) Remove IAM policy binding of a Google Compute Engine image.
+        (ALPHA) Remove IAM policy binding from a Google Compute Engine image.
 
      remove-labels
         (ALPHA) Remove labels from Google Compute Engine images.
 
      set-iam-policy
-        (ALPHA) Set IAM policy for a disk image.
+        (ALPHA) Set the IAM policy for a Google Compute Engine image.
 
      update
         (ALPHA) Update a Google Compute Engine image.

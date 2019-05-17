@@ -6,7 +6,8 @@ SYNOPSIS
     gcloud beta compute instance-groups managed create NAME --size=SIZE
         --template=TEMPLATE [--base-instance-name=BASE_INSTANCE_NAME]
         [--description=DESCRIPTION] [--initial-delay=INITIAL_DELAY]
-        [--target-pool=[TARGET_POOL,...]] [--zones=ZONE,[ZONE,...]]
+        [--instance-redistribution-type=TYPE] [--target-pool=[TARGET_POOL,...]]
+        [--zones=ZONE,[ZONE,...]]
         [--health-check=HEALTH_CHECK | --http-health-check=HTTP_HEALTH_CHECK
           | --https-health-check=HTTPS_HEALTH_CHECK]
         [--region=REGION | --zone=ZONE] [GCLOUD_WIDE_FLAG ...]
@@ -45,10 +46,31 @@ OPTIONAL FLAGS
         An optional description for this group.
 
      --initial-delay=INITIAL_DELAY
-        Specifies the length of the period during which the instance is known
-        to be initializing and should not be autohealed even if unhealthy. This
-        value cannot be greater than 1 hour. See $ gcloud topic datetimes for
+        Specifies the length of time during which the instance is known to be
+        initializing and should not be autohealed even if unhealthy. This value
+        cannot be greater than 1 hour. See $ gcloud topic datetimes for
         information on duration formats.
+
+     --instance-redistribution-type=TYPE
+        Specify type of instance redistribution policy. Instance redistribution
+        type gives possibility to enable or disable automatic instance
+        redistribution between zones to its target distribution. Target
+        distribution is a state of regional managed instance group where all
+        instances are spread out equally between all target zones.
+
+        Instance redistribution type may be specified for non-autoscaled
+        regional managed instance group only. By default it is set to
+        PROACTIVE.
+
+        The following types are available:
+
+        * NONE - managed instance group will not take any action to bring
+          instances to its target distribution.
+
+        * PROACTIVE - managed instance group will actively converge all
+          instances between zones to its target distribution.
+
+    TYPE must be one of: NONE, PROACTIVE.
 
      --target-pool=[TARGET_POOL,...]
         Specifies any target pools you want the instances of this managed
@@ -70,14 +92,14 @@ OPTIONAL FLAGS
           Name of the health check to operate on.
 
        --http-health-check=HTTP_HEALTH_CHECK
-          (DEPRECATED) Specifies the HTTP health check object used for
-          autohealing instances in this group.
+          (DEPRECATED) HTTP health check object used for autohealing instances
+          in this group.
 
           HttpHealthCheck is deprecated. Use --health-check instead.
 
        --https-health-check=HTTPS_HEALTH_CHECK
-          (DEPRECATED) Specifies the HTTPS health check object used for
-          autohealing instances in this group.
+          (DEPRECATED) HTTPS health check object used for autohealing instances
+          in this group.
 
           HttpsHealthCheck is deprecated. Use --health-check instead.
 
@@ -109,8 +131,9 @@ OPTIONAL FLAGS
             invocation.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

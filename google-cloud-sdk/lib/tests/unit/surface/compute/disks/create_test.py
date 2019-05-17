@@ -25,20 +25,18 @@ from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import exceptions
 from googlecloudsdk.core import resources
 from tests.lib import cli_test_base
-from tests.lib import parameterized
 from tests.lib import test_case
+from tests.lib.surface.compute import disks_test_base
 from tests.lib.surface.compute import test_base
 
 
 def SetUp(test_obj, api_version):
   test_obj.SelectApi(api_version)
 
-  test_obj.make_requests.side_effect = iter([
-      [
+  test_obj.make_requests.side_effect = iter(
+      [[], [
           test_obj.messages.Zone(name='central2-a'),
-      ],
-      []
-  ])
+      ]])
 
   test_obj._image_uri_prefix = (
       test_obj.compute_uri +
@@ -47,12 +45,15 @@ def SetUp(test_obj, api_version):
                              'debian-8-jessie-v20151130')
 
 
-class DisksCreateTest(test_base.BaseTest):
+class DisksCreateTestGA(test_base.BaseTest):
 
   def SetUp(self):
     SetUp(self, 'v1')
+    self.track = calliope_base.ReleaseTrack.GA
+    self.message_version = self.compute_v1
     self.StartPatch('googlecloudsdk.core.console.console_io.CanPrompt',
                     return_value=True)
+    self.SelectApi('v1')
 
   def testDefaultOptionsWithSingleDisk(self):
     self.Run("""
@@ -61,12 +62,9 @@ class DisksCreateTest(test_base.BaseTest):
 
     self.CheckRequests(
         self.zone_get_request,
-        [(self.compute.disks,
-          'Insert',
+        [(self.message_version.disks, 'Insert',
           self.messages.ComputeDisksInsertRequest(
-              disk=self.messages.Disk(
-                  name='disk-1',
-                  sizeGb=500),
+              disk=self.messages.Disk(name='disk-1', sizeGb=500),
               project='my-project',
               zone='central2-a'))],
     )
@@ -84,12 +82,9 @@ class DisksCreateTest(test_base.BaseTest):
 
     self.CheckRequests(
         self.zone_get_request,
-        [(self.compute.disks,
-          'Insert',
+        [(self.message_version.disks, 'Insert',
           self.messages.ComputeDisksInsertRequest(
-              disk=self.messages.Disk(
-                  name='disk-1',
-                  sizeGb=200),
+              disk=self.messages.Disk(name='disk-1', sizeGb=200),
               project='my-project',
               zone='central2-a'))],
     )
@@ -107,12 +102,9 @@ class DisksCreateTest(test_base.BaseTest):
 
     self.CheckRequests(
         self.zone_get_request,
-        [(self.compute.disks,
-          'Insert',
+        [(self.message_version.disks, 'Insert',
           self.messages.ComputeDisksInsertRequest(
-              disk=self.messages.Disk(
-                  name='disk-1',
-                  sizeGb=199),
+              disk=self.messages.Disk(name='disk-1', sizeGb=199),
               project='my-project',
               zone='central2-a'))],
     )
@@ -128,8 +120,7 @@ class DisksCreateTest(test_base.BaseTest):
 
     self.CheckRequests(
         self.zone_get_request,
-        [(self.compute.disks,
-          'Insert',
+        [(self.message_version.disks, 'Insert',
           self.messages.ComputeDisksInsertRequest(
               disk=self.messages.Disk(
                   name='disk-1',
@@ -151,28 +142,19 @@ class DisksCreateTest(test_base.BaseTest):
 
     self.CheckRequests(
         self.zone_get_request,
-        [(self.compute.disks,
-          'Insert',
+        [(self.message_version.disks, 'Insert',
           self.messages.ComputeDisksInsertRequest(
-              disk=self.messages.Disk(
-                  name='disk-1',
-                  sizeGb=500),
+              disk=self.messages.Disk(name='disk-1', sizeGb=500),
               project='my-project',
               zone='central2-a')),
-         (self.compute.disks,
-          'Insert',
+         (self.message_version.disks, 'Insert',
           self.messages.ComputeDisksInsertRequest(
-              disk=self.messages.Disk(
-                  name='disk-2',
-                  sizeGb=500),
+              disk=self.messages.Disk(name='disk-2', sizeGb=500),
               project='my-project',
               zone='central2-a')),
-         (self.compute.disks,
-          'Insert',
+         (self.message_version.disks, 'Insert',
           self.messages.ComputeDisksInsertRequest(
-              disk=self.messages.Disk(
-                  name='disk-3',
-                  sizeGb=500),
+              disk=self.messages.Disk(name='disk-3', sizeGb=500),
               project='my-project',
               zone='central2-a'))],
     )
@@ -184,12 +166,9 @@ class DisksCreateTest(test_base.BaseTest):
 
     self.CheckRequests(
         self.zone_get_request,
-        [(self.compute.disks,
-          'Insert',
+        [(self.message_version.disks, 'Insert',
           self.messages.ComputeDisksInsertRequest(
-              disk=self.messages.Disk(
-                  name='disk-1',
-                  sizeGb=10),
+              disk=self.messages.Disk(name='disk-1', sizeGb=10),
               project='my-project',
               zone='central2-a'))],
     )
@@ -202,12 +181,9 @@ class DisksCreateTest(test_base.BaseTest):
 
     self.CheckRequests(
         self.zone_get_request,
-        [(self.compute.disks,
-          'Insert',
+        [(self.message_version.disks, 'Insert',
           self.messages.ComputeDisksInsertRequest(
-              disk=self.messages.Disk(
-                  name='disk-1',
-                  sizeGb=20),
+              disk=self.messages.Disk(name='disk-1', sizeGb=20),
               project='my-project',
               zone='central2-a'))],
     )
@@ -230,8 +206,7 @@ class DisksCreateTest(test_base.BaseTest):
 
     self.CheckRequests(
         self.zone_get_request,
-        [(self.compute.disks,
-          'Insert',
+        [(self.message_version.disks, 'Insert',
           self.messages.ComputeDisksInsertRequest(
               disk=self.messages.Disk(
                   name='disk-1',
@@ -250,8 +225,7 @@ class DisksCreateTest(test_base.BaseTest):
 
     self.CheckRequests(
         self.zone_get_request,
-        [(self.compute.disks,
-          'Insert',
+        [(self.message_version.disks, 'Insert',
           self.messages.ComputeDisksInsertRequest(
               disk=self.messages.Disk(
                   name='disk-1',
@@ -270,11 +244,9 @@ class DisksCreateTest(test_base.BaseTest):
 
     self.CheckRequests(
         self.zone_get_request,
-        [(self.compute.disks,
-          'Insert',
+        [(self.message_version.disks, 'Insert',
           self.messages.ComputeDisksInsertRequest(
-              disk=self.messages.Disk(
-                  name='disk-1'),
+              disk=self.messages.Disk(name='disk-1'),
               sourceImage=(self.compute_uri + '/projects/'
                            'my-project/global/images/my-image'),
               project='my-project',
@@ -290,11 +262,9 @@ class DisksCreateTest(test_base.BaseTest):
 
     self.CheckRequests(
         self.zone_get_request,
-        [(self.compute.disks,
-          'Insert',
+        [(self.message_version.disks, 'Insert',
           self.messages.ComputeDisksInsertRequest(
-              disk=self.messages.Disk(
-                  name='disk-1'),
+              disk=self.messages.Disk(name='disk-1'),
               sourceImage=(self.compute_uri + '/projects/'
                            'some-other-project/global/images/other-image'),
               project='my-project',
@@ -311,12 +281,9 @@ class DisksCreateTest(test_base.BaseTest):
 
     self.CheckRequests(
         self.zone_get_request,
-        [(self.compute.disks,
-          'Insert',
+        [(self.message_version.disks, 'Insert',
           self.messages.ComputeDisksInsertRequest(
-              disk=self.messages.Disk(
-                  name='disk-1',
-                  sizeGb=100),
+              disk=self.messages.Disk(name='disk-1', sizeGb=100),
               sourceImage=(self.compute_uri + '/projects/'
                            'my-project/global/images/my-image'),
               project='my-project',
@@ -345,12 +312,9 @@ class DisksCreateTest(test_base.BaseTest):
     self.CheckRequests(
         self.zone_get_request,
         self.image_alias_expansion_requests,
-
-        [(self.compute.disks,
-          'Insert',
+        [(self.message_version.disks, 'Insert',
           self.messages.ComputeDisksInsertRequest(
-              disk=self.messages.Disk(
-                  name='disk-1'),
+              disk=self.messages.Disk(name='disk-1'),
               sourceImage=self._default_image,
               project='my-project',
               zone='central2-a'))],
@@ -407,14 +371,11 @@ class DisksCreateTest(test_base.BaseTest):
     self.CheckRequests(
         self.zone_get_request,
         self.image_alias_expansion_requests,
-
-        [(self.compute.disks,
-          'Insert',
+        [(self.message_version.disks, 'Insert',
           self.messages.ComputeDisksInsertRequest(
-              disk=self.messages.Disk(
-                  name='disk-1'),
-              sourceImage=(self._image_uri_prefix +
-                           'backports-debian-v7-sp0-v20150101'),
+              disk=self.messages.Disk(name='disk-1'),
+              sourceImage=(
+                  self._image_uri_prefix + 'backports-debian-v7-sp0-v20150101'),
               project='my-project',
               zone='central2-a'))],
     )
@@ -456,12 +417,9 @@ class DisksCreateTest(test_base.BaseTest):
     self.CheckRequests(
         self.zone_get_request,
         self.image_alias_expansion_requests,
-
-        [(self.compute.disks,
-          'Insert',
+        [(self.message_version.disks, 'Insert',
           self.messages.ComputeDisksInsertRequest(
-              disk=self.messages.Disk(
-                  name='disk-1'),
+              disk=self.messages.Disk(name='disk-1'),
               sourceImage=self._default_image,
               project='my-project',
               zone='central2-a'))],
@@ -495,12 +453,9 @@ class DisksCreateTest(test_base.BaseTest):
     self.CheckRequests(
         self.zone_get_request,
         self.image_alias_expansion_requests,
-
-        [(self.compute.disks,
-          'Insert',
+        [(self.message_version.disks, 'Insert',
           self.messages.ComputeDisksInsertRequest(
-              disk=self.messages.Disk(
-                  name='disk-1'),
+              disk=self.messages.Disk(name='disk-1'),
               sourceImage=self._default_image,
               project='my-project',
               zone='central2-a'))],
@@ -575,8 +530,7 @@ class DisksCreateTest(test_base.BaseTest):
 
     self.CheckRequests(
         self.zone_get_request,
-        [(self.compute.disks,
-          'Insert',
+        [(self.message_version.disks, 'Insert',
           self.messages.ComputeDisksInsertRequest(
               disk=self.messages.Disk(
                   name='disk-1',
@@ -603,8 +557,7 @@ class DisksCreateTest(test_base.BaseTest):
 
     self.CheckRequests(
         self.zone_get_request,
-        [(self.compute.disks,
-          'Insert',
+        [(self.message_version.disks, 'Insert',
           self.messages.ComputeDisksInsertRequest(
               disk=self.messages.Disk(
                   name='disk-1',
@@ -615,45 +568,6 @@ class DisksCreateTest(test_base.BaseTest):
               project='my-project',
               zone='central2-a'))],
     )
-
-  def testZonePrompting(self):
-    self.WriteInput('2\n')
-    self.make_requests.side_effect = iter([
-        [
-            self.messages.Zone(name='central2-a'),
-            self.messages.Zone(name='central2-b'),
-        ],
-        [
-            self.messages.Zone(name='central2-a'),
-        ],
-
-        [],
-    ])
-    self.Run("""
-        compute disks create disk-1
-        """)
-
-    self.CheckRequests(
-        self.zones_list_request,
-
-        [(self.compute.zones,
-          'Get',
-          self.messages.ComputeZonesGetRequest(
-              project='my-project',
-              zone='central2-b'))],
-
-        [(self.compute.disks,
-          'Insert',
-          self.messages.ComputeDisksInsertRequest(
-              disk=self.messages.Disk(
-                  name='disk-1',
-                  sizeGb=500),
-              project='my-project',
-              zone='central2-b'))],
-    )
-    self.AssertErrContains('disk-1')
-    self.AssertErrContains('central2-a')
-    self.AssertErrContains('central2-b')
 
   def testZoneDeprecationWarningWithPromptYes(self):
     self.WriteInput('Y\n')
@@ -675,18 +589,12 @@ class DisksCreateTest(test_base.BaseTest):
         """)
 
     self.CheckRequests(
-        [(self.compute.zones,
-          'Get',
+        [(self.message_version.zones, 'Get',
           self.messages.ComputeZonesGetRequest(
-              project='my-project',
-              zone='central2-b'))],
-
-        [(self.compute.disks,
-          'Insert',
+              project='my-project', zone='central2-b'))],
+        [(self.message_version.disks, 'Insert',
           self.messages.ComputeDisksInsertRequest(
-              disk=self.messages.Disk(
-                  name='disk-1',
-                  sizeGb=500),
+              disk=self.messages.Disk(name='disk-1', sizeGb=500),
               project='my-project',
               zone='central2-b'))],
     )
@@ -707,8 +615,7 @@ class DisksCreateTest(test_base.BaseTest):
 
     self.CheckRequests(
         self.zone_get_request,
-        [(self.compute.disks,
-          'Insert',
+        [(self.message_version.disks, 'Insert',
           self.messages.ComputeDisksInsertRequest(
               disk=self.messages.Disk(
                   name='disk-1',
@@ -731,12 +638,9 @@ class DisksCreateTest(test_base.BaseTest):
 
     self.CheckRequests(
         self.zone_get_request,
-        [(self.compute.disks,
-          'Insert',
+        [(self.message_version.disks, 'Insert',
           msgs.ComputeDisksInsertRequest(
-              disk=msgs.Disk(
-                  name='hamlet',
-              ),
+              disk=msgs.Disk(name='hamlet',),
               sourceImage=(self.compute_uri +
                            '/projects/my-project/global/images/family/yorik'),
               project='my-project',
@@ -754,12 +658,9 @@ class DisksCreateTest(test_base.BaseTest):
 
     self.CheckRequests(
         self.zone_get_request,
-        [(self.compute.disks,
-          'Insert',
+        [(self.message_version.disks, 'Insert',
           msgs.ComputeDisksInsertRequest(
-              disk=msgs.Disk(
-                  name='hamlet',
-                  ),
+              disk=msgs.Disk(name='hamlet',),
               sourceImage=(self.compute_uri +
                            '/projects/my-project/global/images/family/yorik'),
               project='my-project',
@@ -775,16 +676,51 @@ class DisksCreateTest(test_base.BaseTest):
 
     self.CheckRequests(
         self.zone_get_request,
-        [(self.compute.disks,
-          'Insert',
+        [(self.message_version.disks, 'Insert',
           msgs.ComputeDisksInsertRequest(
-              disk=msgs.Disk(
-                  name='hamlet',
-                  ),
+              disk=msgs.Disk(name='hamlet',),
               sourceImage=(self.compute_uri +
                            '/projects/my-project/global/images/family/yorik'),
               project='my-project',
               zone='central2-a'))])
+
+
+class DisksCreateTestBeta(DisksCreateTestGA):
+
+  def SetUp(self):
+    SetUp(self, 'beta')
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.SelectApi('beta')
+    self.message_version = self.compute_beta
+    self.StartPatch(
+        'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
+
+  def testCreateZonalDiskWithPhysicalBlockSize(self):
+    self.Run("""
+        compute disks create disk-1 --zone central2-a
+          --physical-block-size 4096
+        """)
+
+    self.CheckRequests(
+        self.zone_get_request,
+        [(self.message_version.disks, 'Insert',
+          self.messages.ComputeDisksInsertRequest(
+              disk=self.messages.Disk(
+                  name='disk-1', physicalBlockSizeBytes=4096, sizeGb=500),
+              project='my-project',
+              zone='central2-a'))],
+    )
+
+
+class DisksCreateTestAlpha(DisksCreateTestBeta):
+
+  def SetUp(self):
+    SetUp(self, 'alpha')
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.SelectApi('alpha')
+    self.message_version = self.compute_alpha
+    self.StartPatch(
+        'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
 
 
 class DisksCreateTestWithCsekKeys(test_base.BaseTest):
@@ -1170,15 +1106,16 @@ class DisksCreateTestWithKmsKeysAlpha(DisksCreateTestWithKmsKeysBeta):
     self.track = calliope_base.ReleaseTrack.ALPHA
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'),
-                          (calliope_base.ReleaseTrack.BETA, 'beta'))
-class RegionalDisksCreateTest(test_base.BaseTest, parameterized.TestCase):
+class RegionalDisksCreateTestGA(test_base.BaseTest):
 
-  def testDefaultOptionsWithSingleDisk(self, track, api_version):
-    SetUp(self, api_version)
-    self.track = track
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+    self.api_version = 'v1'
 
+  def SetUp(self):
+    SetUp(self, self.api_version)
+
+  def testDefaultOptionsWithSingleDisk(self):
     self.make_requests.side_effect = iter([
         [],
         [
@@ -1220,9 +1157,7 @@ class RegionalDisksCreateTest(test_base.BaseTest, parameterized.TestCase):
         https://cloud.google.com/compute/docs/disks/add-persistent-disk#formatting""",
                            normalize_space=True)
 
-  def testRegionalDiskType(self, track, api_version):
-    SetUp(self, api_version)
-    self.track = track
+  def testRegionalDiskType(self):
 
     self.make_requests.side_effect = iter([
         [],
@@ -1270,9 +1205,7 @@ class RegionalDisksCreateTest(test_base.BaseTest, parameterized.TestCase):
         https://cloud.google.com/compute/docs/disks/add-persistent-disk#formatting""",
                            normalize_space=True)
 
-  def testRegionDeprecated(self, track, api_version):
-    SetUp(self, api_version)
-    self.track = track
+  def testRegionDeprecated(self):
 
     self.make_requests.side_effect = iter([
         [],
@@ -1321,16 +1254,12 @@ class RegionalDisksCreateTest(test_base.BaseTest, parameterized.TestCase):
         r' - [central2] 2015-03-29T00:00.000-07:00')
     self.AssertErrContains('PROMPT_CONTINUE')
 
-  def testRegionButNoReplicaZones(self, track, api_version):
-    SetUp(self, api_version)
-    self.track = track
+  def testRegionButNoReplicaZones(self):
 
     with self.assertRaises(exceptions.RequiredArgumentException):
       self.Run('compute disks create disk-1 --region central2')
 
-  def testReplicaZonesButNoRegion(self, track, api_version):
-    SetUp(self, api_version)
-    self.track = track
+  def testReplicaZonesButNoRegion(self):
 
     self.make_requests.side_effect = iter([
         [],
@@ -1358,9 +1287,7 @@ class RegionalDisksCreateTest(test_base.BaseTest, parameterized.TestCase):
               project='my-project',
               region='central2'))],)
 
-  def testWrongNumberOfReplicaZones(self, track, api_version):
-    SetUp(self, api_version)
-    self.track = track
+  def testWrongNumberOfReplicaZones(self):
 
     with self.AssertRaisesArgumentError():
       self.Run(
@@ -1368,9 +1295,7 @@ class RegionalDisksCreateTest(test_base.BaseTest, parameterized.TestCase):
           '--region central2 '
           '--replica-zones central2-b')
 
-  def testCreateInDifferentProjects(self, track, api_version):
-    SetUp(self, api_version)
-    self.track = track
+  def testCreateInDifferentProjects(self):
 
     self.make_requests.side_effect = iter([
         [],
@@ -1392,7 +1317,7 @@ class RegionalDisksCreateTest(test_base.BaseTest, parameterized.TestCase):
         https://www.googleapis.com/compute/{version}/projects/project-2/regions/central2/disks/disk-1
         --region central2
         --replica-zones central2-b,central2-c
-        """.format(version=api_version))
+        """.format(version=self.api_version))
 
     self.CheckRequests(
         [],
@@ -1433,17 +1358,61 @@ class RegionalDisksCreateTest(test_base.BaseTest, parameterized.TestCase):
     )
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'),
-                          (calliope_base.ReleaseTrack.BETA, 'beta'))
-class RegionalDisksCreateTestStandardTemplate(test_base.BaseTest,
-                                              parameterized.TestCase):
+class RegionalDisksCreateTestBeta(RegionalDisksCreateTestGA):
 
-  def _SetUp(self, track, api_version):
-    SetUp(self, api_version)
-    self.track = track
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
+
+  def testCreateWithPhysicalBlockSize(self):
+    self.make_requests.side_effect = iter([
+        [],
+        [
+            self.messages.Region(name='central2',),
+        ],
+        [],
+    ])
+    self.Run('compute disks create disk-1 '
+             '--replica-zones central2-b,central2-c '
+             '--physical-block-size 16384')
+    self.CheckRequests(
+        [],
+        [(self.compute.regions, 'Get',
+          self.messages.ComputeRegionsGetRequest(
+              project='my-project', region='central2'))],
+        [(self.compute.regionDisks, 'Insert',
+          self.messages.ComputeRegionDisksInsertRequest(
+              disk=self.messages.Disk(
+                  name='disk-1',
+                  sizeGb=500,
+                  physicalBlockSizeBytes=16384,
+                  replicaZones=[
+                      self.compute_uri +
+                      '/projects/my-project/zones/central2-b',
+                      self.compute_uri + '/projects/my-project/zones/central2-c'
+                  ]),
+              project='my-project',
+              region='central2'))],
+    )
+
+
+class RegionalDisksCreateTestAlpha(RegionalDisksCreateTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
+
+
+class RegionalDisksCreateTestStandardTemplateGA(test_base.BaseTest):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+    self.api_version = 'v1'
+
+  def SetUp(self):
+    SetUp(self, self.api_version)
     self.resources = resources.REGISTRY.Clone()
-    self.resources.RegisterApiByName('compute', api_version)
+    self.resources.RegisterApiByName('compute', self.api_version)
 
     self.make_requests.side_effect = iter([
         [],
@@ -1454,9 +1423,7 @@ class RegionalDisksCreateTestStandardTemplate(test_base.BaseTest,
         [],
     ])
 
-  def testZonalDiskCreate(self, track, api_version):
-    self._SetUp(track, api_version)
-
+  def testZonalDiskCreate(self):
     self.Run("""
         compute disks create disk-1 --zone central2-a
         """)
@@ -1468,9 +1435,7 @@ class RegionalDisksCreateTestStandardTemplate(test_base.BaseTest,
             project='my-project',
             zone='central2-a'))],)
 
-  def testProjectFromRegion(self, track, api_version):
-    self._SetUp(track, api_version)
-
+  def testProjectFromRegion(self):
     self.Run('compute disks create disk-1 '
              '--replica-zones central2-b,central2-c '
              '--region {}'.format(
@@ -1493,9 +1458,7 @@ class RegionalDisksCreateTestStandardTemplate(test_base.BaseTest,
               project='project-1',
               region='central2'))],)
 
-  def testProjectsCache(self, track, api_version):
-    self._SetUp(track, api_version)
-
+  def testProjectsCache(self):
     self.Run('compute disks create disk-1 disk-2 '
              '--replica-zones central2-b,central2-c '
              '--region {}'.format(
@@ -1528,9 +1491,7 @@ class RegionalDisksCreateTestStandardTemplate(test_base.BaseTest,
              project='project-1',
              region='central2'))])
 
-  def testZoneInDifferentProjectThanDisk(self, track, api_version):
-    self._SetUp(track, api_version)
-
+  def testZoneInDifferentProjectThanDisk(self):
     with self.AssertRaisesExceptionMatches(
         exceptions.InvalidArgumentException,
         ('Invalid value for [--zone]: Zone [{compute_uri}/'
@@ -1552,8 +1513,7 @@ class RegionalDisksCreateTestStandardTemplate(test_base.BaseTest,
                        'compute.zones', project='project-2', zone='central2-c')
                    .SelfLink()))
 
-  def testReplicaZonesInDifferentRegions(self, track, api_version):
-    self._SetUp(track, api_version)
+  def testReplicaZonesInDifferentRegions(self):
 
     with self.AssertRaisesExceptionMatches(
         exceptions.InvalidArgumentException,
@@ -1574,8 +1534,7 @@ class RegionalDisksCreateTestStandardTemplate(test_base.BaseTest,
                        'compute.zones', project='project-1',
                        zone='central2-c').SelfLink()))
 
-  def testReplicaZonesInconsistentWithExplicitRegion(self, track, api_version):
-    self._SetUp(track, api_version)
+  def testReplicaZonesInconsistentWithExplicitRegion(self):
 
     with self.AssertRaisesExceptionMatches(
         exceptions.InvalidArgumentException,
@@ -1596,8 +1555,7 @@ class RegionalDisksCreateTestStandardTemplate(test_base.BaseTest,
                        'compute.zones', project='project-1',
                        zone='central2-c').SelfLink()))
 
-  def testRegionFromDiskDifferentFromReplicaZones(self, track, api_version):
-    self._SetUp(track, api_version)
+  def testRegionFromDiskDifferentFromReplicaZones(self):
 
     with self.AssertRaisesExceptionMatches(
         exceptions.InvalidArgumentException,
@@ -1619,8 +1577,7 @@ class RegionalDisksCreateTestStandardTemplate(test_base.BaseTest,
                        'compute.zones', project='project-1',
                        zone='central2-c').SelfLink()))
 
-  def testRegionPromptingMissingReplicaZones(self, track, api_version):
-    self._SetUp(track, api_version)
+  def testRegionPromptingMissingReplicaZones(self):
 
     self.StartPatch(
         'googlecloudsdk.core.console.console_io.CanPrompt', return_value=True)
@@ -1636,6 +1593,22 @@ class RegionalDisksCreateTestStandardTemplate(test_base.BaseTest,
     ])
     with self.assertRaises(exceptions.RequiredArgumentException):
       self.Run('compute disks create disk-1')
+
+
+class RegionalDisksCreateTestStandardTemplateBeta(
+    RegionalDisksCreateTestStandardTemplateGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
+
+
+class RegionalDisksCreateTestStandardTemplateAlpha(
+    RegionalDisksCreateTestStandardTemplateBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
 
 
 class DisksCreateWithLabelsTest(test_base.BaseTest):
@@ -1803,11 +1776,16 @@ class DisksCreateWithLicensesTest(test_base.BaseTest):
     )
 
 
-class DisksCreateTestWithResourcePoliciesAlpha(test_base.BaseTest):
+class DisksCreateTestWithResourcePoliciesBeta(disks_test_base.TestBase):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
-    SetUp(self, 'alpha')
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.make_requests.side_effect = iter(
+        [[], [
+            self.messages.Zone(name='central2-a'),
+        ]])
 
   def testCreate_ZonalWithResourcePolicy(self):
     self.Run("""
@@ -1817,16 +1795,16 @@ class DisksCreateTestWithResourcePoliciesAlpha(test_base.BaseTest):
 
     self.CheckRequests(
         self.zone_get_request,
-        [(self.compute.disks,
-          'Insert',
+        [(self.compute.disks, 'Insert',
           self.messages.ComputeDisksInsertRequest(
               disk=self.messages.Disk(
                   name='disk-with-backup',
                   sizeGb=500,
                   resourcePolicies=[
-                      'https://www.googleapis.com/compute/alpha/projects/'
-                      '{}/regions/central2/resourcePolicies/my-policy'
-                      .format(self.Project())]),
+                      'https://www.googleapis.com/compute/{0}/projects/'
+                      '{1}/regions/central2/resourcePolicies/my-policy'.format(
+                          self.api_version, self.Project())
+                  ]),
               project='my-project',
               zone='central2-a'))])
 
@@ -1838,19 +1816,19 @@ class DisksCreateTestWithResourcePoliciesAlpha(test_base.BaseTest):
 
     self.CheckRequests(
         self.zone_get_request,
-        [(self.compute.disks,
-          'Insert',
+        [(self.compute.disks, 'Insert',
           self.messages.ComputeDisksInsertRequest(
               disk=self.messages.Disk(
                   name='disk-with-backup',
                   sizeGb=500,
                   resourcePolicies=[
-                      'https://www.googleapis.com/compute/alpha/projects/'
-                      '{}/regions/central2/resourcePolicies/pol1'
-                      .format(self.Project()),
-                      'https://www.googleapis.com/compute/alpha/projects/'
-                      '{}/regions/central2/resourcePolicies/pol2'
-                      .format(self.Project())]),
+                      'https://www.googleapis.com/compute/{0}/projects/'
+                      '{1}/regions/central2/resourcePolicies/pol1'.format(
+                          self.api_version, self.Project()),
+                      'https://www.googleapis.com/compute/{0}/projects/'
+                      '{1}/regions/central2/resourcePolicies/pol2'.format(
+                          self.api_version, self.Project())
+                  ]),
               project='my-project',
               zone='central2-a'))])
 
@@ -1866,25 +1844,47 @@ class DisksCreateTestWithResourcePoliciesAlpha(test_base.BaseTest):
     self.Run('compute disks create disk-1 --region central2 '
              '--replica-zones central2-b,central2-c '
              '--resource-policies pol1')
-    self.CheckRequests(
-        [],
-        [(self.compute.regions, 'Get', self.messages.ComputeRegionsGetRequest(
-            project='my-project', region='central2'))],
-        [(self.compute.regionDisks, 'Insert',
-          self.messages.ComputeRegionDisksInsertRequest(
-              disk=self.messages.Disk(
-                  name='disk-1',
-                  sizeGb=500,
-                  resourcePolicies=[
-                      'https://www.googleapis.com/compute/alpha/projects/'
-                      'my-project/regions/central2/resourcePolicies/pol1'],
-                  replicaZones=[
-                      self.compute_uri+'/projects/my-project/zones/central2-b',
-                      self.compute_uri+'/projects/my-project/zones/central2-c'
-                  ]),
-              project='my-project',
-              region='central2'))])
+    self.CheckRequests([], [
+        (self.compute.regions, 'Get',
+         self.messages.ComputeRegionsGetRequest(
+             project='my-project', region='central2'))
+    ], [(self.compute.regionDisks, 'Insert',
+         self.messages.ComputeRegionDisksInsertRequest(
+             disk=self.messages.Disk(
+                 name='disk-1',
+                 sizeGb=500,
+                 resourcePolicies=[
+                     'https://www.googleapis.com/compute/{}/projects/'
+                     'my-project/regions/central2/resourcePolicies/pol1'.format(
+                         self.api_version)
+                 ],
+                 replicaZones=[
+                     self.compute_uri + '/projects/my-project/zones/central2-b',
+                     self.compute_uri + '/projects/my-project/zones/central2-c'
+                 ]),
+             project='my-project',
+             region='central2'))])
 
+
+class DisksCreateTestWithResourcePoliciesAlpha(
+    DisksCreateTestWithResourcePoliciesBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+
+  def testCreateSharedZonalPD(self):
+    self.Run('compute disks create sharedZonalDisk --zone central2-a '
+             '--multi-writer ')
+
+    self.CheckRequests(
+        self.zone_get_request,
+        [(self.compute.disks, 'Insert',
+          self.messages.ComputeDisksInsertRequest(
+              disk=self.messages.Disk(
+                  name='sharedZonalDisk', sizeGb=500, multiWriter=True),
+              project='my-project',
+              zone='central2-a'))],
+    )
 
 if __name__ == '__main__':
   test_case.main()

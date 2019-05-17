@@ -247,13 +247,18 @@ class Node(_messages.Message):
       HEALTH_UNSPECIFIED: Health status is unknown: not initialized or failed
         to retrieve.
       HEALTHY: The resource is healthy.
-      UNHEALTHY: The resource is unhealthy.
+      DEPRECATED_UNHEALTHY: The resource is unhealthy.
       TIMEOUT: The resource is unresponsive.
+      UNHEALTHY_TENSORFLOW: The in-guest ML stack is unhealthy.
+      UNHEALTHY_MAINTENANCE: The node is under maintenance/priority boost
+        caused rescheduling and will resume running once rescheduled.
     """
     HEALTH_UNSPECIFIED = 0
     HEALTHY = 1
-    UNHEALTHY = 2
+    DEPRECATED_UNHEALTHY = 2
     TIMEOUT = 3
+    UNHEALTHY_TENSORFLOW = 4
+    UNHEALTHY_MAINTENANCE = 5
 
   class StateValueValuesEnum(_messages.Enum):
     r"""Output only. The current state for the TPU Node.
@@ -267,13 +272,16 @@ class Node(_messages.Message):
       DELETING: TPU node is being deleted.
       REPAIRING: TPU node is being repaired and may be unusable. Details can
         be found in the `help_description` field.
-      STOPPED: 7 - Reserved. Was SUSPENDED. TPU node is stopped.
+      STOPPED: TPU node is stopped.
       STOPPING: TPU node is currently stopping.
       STARTING: TPU node is currently starting.
       PREEMPTED: TPU node has been preempted. Only applies to Preemptible TPU
         Nodes.
       TERMINATED: TPU node has been terminated due to maintenance or has
         reached the end of its life cycle (for preemptible nodes).
+      HIDING: TPU node is currently hiding.
+      HIDDEN: TPU node has been hidden.
+      UNHIDING: TPU node is currently unhiding.
     """
     STATE_UNSPECIFIED = 0
     CREATING = 1
@@ -287,6 +295,9 @@ class Node(_messages.Message):
     STARTING = 9
     PREEMPTED = 10
     TERMINATED = 11
+    HIDING = 12
+    HIDDEN = 13
+    UNHIDING = 14
 
   @encoding.MapUnrecognizedFields('additionalProperties')
   class LabelsValue(_messages.Message):
@@ -361,7 +372,8 @@ class Operation(_messages.Message):
       if any.
     name: The server-assigned name, which is only unique within the same
       service that originally returns it. If you use the default HTTP mapping,
-      the `name` should have the format of `operations/some/unique/name`.
+      the `name` should be a resource name ending with
+      `operations/{unique_id}`.
     response: The normal response of the operation in case of success.  If the
       original method returns no data on success, such as `Delete`, the
       response is `google.protobuf.Empty`.  If the original method is standard
@@ -479,9 +491,11 @@ class SchedulingConfig(_messages.Message):
 
   Fields:
     preemptible: A boolean attribute.
+    reserved: Whether the node is created under a reservation.
   """
 
   preemptible = _messages.BooleanField(1)
+  reserved = _messages.BooleanField(2)
 
 
 class StandardQueryParameters(_messages.Message):

@@ -1,0 +1,90 @@
+title: Edge device state describe test
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - label: Base Case
+  - command: iot edge topic-bridge describe my-device --registry my-registry --region
+      us-central1
+  - stdout: |
+      NAME       VERSION
+      my-device  1
+          +---------------------------------------------------------------------------------------------+
+          |                                            RULES                                            |
+          +---------------+-----------+-----------------------+--------------------+--------------------+
+          | SOURCE_DOMAIN | OPERATION |     SOURCE_FILTER     | DESTINATION_DOMAIN | REWRITE_TOPIC_NAME |
+          +---------------+-----------+-----------------------+--------------------+--------------------+
+          | EDGE          | FORWARD   | /devices/+/state      | CLOUD              |                    |
+          | EDGE          | FORWARD   | /devices/+/events/#   | CLOUD              |                    |
+          | CLOUD         | FORWARD   | /devices/+/userconfig | EDGE               |                    |
+          | CLOUD         | FORWARD   | /devices/+/config     | EDGE               |                    |
+          | CLOUD         | FORWARD   | /devices/+/commands/# | EDGE               |                    |
+          +---------------+-----------+-----------------------+--------------------+--------------------+
+actions:
+- execute_command:
+    label: Base Case
+    command: iot edge topic-bridge describe my-device --registry my-registry --region
+      us-central1
+    events:
+    - api_call:
+        expect_request:
+          uri: https://edge.googleapis.com/v1alpha1/projects/fake-project/locations/us-central1/registries/my-registry/devices/my-device/topicBridgingTable?alt=json
+          method: GET
+          headers: {}
+          body: None
+        return_response:
+          headers:
+            status: '200'
+          body: |
+            {
+              "name": "projects/fake-project/locations/us-central1/registries/my-registry/devices/my-device",
+              "rules": [
+                {
+                  "sourceDomain": "EDGE",
+                  "sourceFilter": "/devices/+/state",
+                  "operation": "FORWARD",
+                  "destinationDomain": "CLOUD"
+                },
+                {
+                  "sourceDomain": "EDGE",
+                  "sourceFilter": "/devices/+/events/#",
+                  "operation": "FORWARD",
+                  "destinationDomain": "CLOUD"
+                },
+                {
+                  "sourceDomain": "CLOUD",
+                  "sourceFilter": "/devices/+/userconfig",
+                  "operation": "FORWARD",
+                  "destinationDomain": "EDGE"
+                },
+                {
+                  "sourceDomain": "CLOUD",
+                  "sourceFilter": "/devices/+/config",
+                  "operation": "FORWARD",
+                  "destinationDomain": "EDGE"
+                },
+                {
+                  "sourceDomain": "CLOUD",
+                  "sourceFilter": "/devices/+/commands/#",
+                  "operation": "FORWARD",
+                  "destinationDomain": "EDGE"
+                }
+              ],
+              "version": "1"
+            }
+    - expect_stdout: |
+        NAME       VERSION
+        my-device  1
+            +---------------------------------------------------------------------------------------------+
+            |                                            RULES                                            |
+            +---------------+-----------+-----------------------+--------------------+--------------------+
+            | SOURCE_DOMAIN | OPERATION |     SOURCE_FILTER     | DESTINATION_DOMAIN | REWRITE_TOPIC_NAME |
+            +---------------+-----------+-----------------------+--------------------+--------------------+
+            | EDGE          | FORWARD   | /devices/+/state      | CLOUD              |                    |
+            | EDGE          | FORWARD   | /devices/+/events/#   | CLOUD              |                    |
+            | CLOUD         | FORWARD   | /devices/+/userconfig | EDGE               |                    |
+            | CLOUD         | FORWARD   | /devices/+/config     | EDGE               |                    |
+            | CLOUD         | FORWARD   | /devices/+/commands/# | EDGE               |                    |
+            +---------------+-----------+-----------------------+--------------------+--------------------+
+    - expect_exit:
+        code: 0

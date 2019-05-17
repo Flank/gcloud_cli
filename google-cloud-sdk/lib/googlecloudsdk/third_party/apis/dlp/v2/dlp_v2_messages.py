@@ -596,6 +596,21 @@ class DlpProjectsInspectTemplatesPatchRequest(_messages.Message):
   name = _messages.StringField(2, required=True)
 
 
+class DlpProjectsJobTriggersActivateRequest(_messages.Message):
+  r"""A DlpProjectsJobTriggersActivateRequest object.
+
+  Fields:
+    googlePrivacyDlpV2ActivateJobTriggerRequest: A
+      GooglePrivacyDlpV2ActivateJobTriggerRequest resource to be passed as the
+      request body.
+    name: Resource name of the trigger to activate, for example `projects/dlp-
+      test-project/jobTriggers/53234423`.
+  """
+
+  googlePrivacyDlpV2ActivateJobTriggerRequest = _messages.MessageField('GooglePrivacyDlpV2ActivateJobTriggerRequest', 1)
+  name = _messages.StringField(2, required=True)
+
+
 class DlpProjectsJobTriggersCreateRequest(_messages.Message):
   r"""A DlpProjectsJobTriggersCreateRequest object.
 
@@ -636,14 +651,31 @@ class DlpProjectsJobTriggersListRequest(_messages.Message):
   r"""A DlpProjectsJobTriggersListRequest object.
 
   Fields:
+    filter: Optional. Allows filtering.  Supported syntax:  * Filter
+      expressions are made up of one or more restrictions. * Restrictions can
+      be combined by `AND` or `OR` logical operators. A sequence of
+      restrictions implicitly uses `AND`. * A restriction has the form of
+      `<field> <operator> <value>`. * Supported fields/values for inspect
+      jobs:     - `status` - HEALTHY|PAUSED|CANCELLED     -
+      `inspected_storage` - DATASTORE|CLOUD_STORAGE|BIGQUERY     -
+      'last_run_time` - RFC 3339 formatted timestamp, surrounded by
+      quotation marks. Nanoseconds are ignored.     - 'error_count' - Number
+      of errors that have occurred while running. * The operator must be `=`
+      or `!=` for status and inspected_storage.  Examples:  *
+      inspected_storage = cloud_storage AND status = HEALTHY *
+      inspected_storage = cloud_storage OR inspected_storage = bigquery *
+      inspected_storage = cloud_storage AND (state = PAUSED OR state =
+      HEALTHY) * last_run_time > \"2017-12-12T00:00:00+00:00\"  The length of
+      this field should be no more than 500 characters.
     orderBy: Optional comma separated list of triggeredJob fields to order by,
       followed by `asc` or `desc` postfix. This list is case-insensitive,
       default sorting order is ascending, redundant space characters are
       insignificant.  Example: `name asc,update_time, create_time desc`
       Supported fields are:  - `create_time`: corresponds to time the
       JobTrigger was created. - `update_time`: corresponds to time the
-      JobTrigger was last updated. - `name`: corresponds to JobTrigger's name.
-      - `display_name`: corresponds to JobTrigger's display name. - `status`:
+      JobTrigger was last updated. - `last_run_time`: corresponds to the last
+      time the JobTrigger ran. - `name`: corresponds to JobTrigger's name. -
+      `display_name`: corresponds to JobTrigger's display name. - `status`:
       corresponds to JobTrigger's status.
     pageSize: Optional size of the page, can be limited by a server.
     pageToken: Optional page token to continue retrieval. Comes from previous
@@ -652,10 +684,11 @@ class DlpProjectsJobTriggersListRequest(_messages.Message):
     parent: The parent resource name, for example `projects/my-project-id`.
   """
 
-  orderBy = _messages.StringField(1)
-  pageSize = _messages.IntegerField(2, variant=_messages.Variant.INT32)
-  pageToken = _messages.StringField(3)
-  parent = _messages.StringField(4, required=True)
+  filter = _messages.StringField(1)
+  orderBy = _messages.StringField(2)
+  pageSize = _messages.IntegerField(3, variant=_messages.Variant.INT32)
+  pageToken = _messages.StringField(4)
+  parent = _messages.StringField(5, required=True)
 
 
 class DlpProjectsJobTriggersPatchRequest(_messages.Message):
@@ -759,15 +792,22 @@ class GooglePrivacyDlpV2Action(_messages.Message):
   https://cloud.google.com/dlp/docs/concepts-actions to learn more.
 
   Fields:
+    jobNotificationEmails: Enable email notification to project owners and
+      editors on job's completion/failure.
     pubSub: Publish a notification to a pubsub topic.
     publishSummaryToCscc: Publish summary to Cloud Security Command Center
       (Alpha).
     saveFindings: Save resulting findings in a provided location.
   """
 
-  pubSub = _messages.MessageField('GooglePrivacyDlpV2PublishToPubSub', 1)
-  publishSummaryToCscc = _messages.MessageField('GooglePrivacyDlpV2PublishSummaryToCscc', 2)
-  saveFindings = _messages.MessageField('GooglePrivacyDlpV2SaveFindings', 3)
+  jobNotificationEmails = _messages.MessageField('GooglePrivacyDlpV2JobNotificationEmails', 1)
+  pubSub = _messages.MessageField('GooglePrivacyDlpV2PublishToPubSub', 2)
+  publishSummaryToCscc = _messages.MessageField('GooglePrivacyDlpV2PublishSummaryToCscc', 3)
+  saveFindings = _messages.MessageField('GooglePrivacyDlpV2SaveFindings', 4)
+
+
+class GooglePrivacyDlpV2ActivateJobTriggerRequest(_messages.Message):
+  r"""Request message for ActivateJobTrigger."""
 
 
 class GooglePrivacyDlpV2AnalyzeDataSourceRiskDetails(_messages.Message):
@@ -1161,10 +1201,12 @@ class GooglePrivacyDlpV2CloudStorageOptions(_messages.Message):
       FILE_TYPE_UNSPECIFIED: <no description>
       BINARY_FILE: <no description>
       TEXT_FILE: <no description>
+      IMAGE: <no description>
     """
     FILE_TYPE_UNSPECIFIED = 0
     BINARY_FILE = 1
     TEXT_FILE = 2
+    IMAGE = 3
 
   class SampleMethodValueValuesEnum(_messages.Enum):
     r"""SampleMethodValueValuesEnum enum type.
@@ -1258,8 +1300,10 @@ class GooglePrivacyDlpV2Color(_messages.Message):
 
 class GooglePrivacyDlpV2Condition(_messages.Message):
   r"""The field type of `value` and `field` do not need to match to be
-  considered equal, but not all comparisons are possible.  A `value` of type:
-  - `string` can be compared against all other types - `boolean` can only be
+  considered equal, but not all comparisons are possible. EQUAL_TO and
+  NOT_EQUAL_TO attempt to compare even with incompatible types, but all other
+  comparisons are invalid with incompatible types. A `value` of type:  -
+  `string` can be compared against all other types - `boolean` can only be
   compared against other booleans - `integer` can be compared against doubles
   or a string if the string value can be parsed as an integer. - `double` can
   be compared against integers or a string if the string can be parsed as a
@@ -1286,8 +1330,9 @@ class GooglePrivacyDlpV2Condition(_messages.Message):
 
     Values:
       RELATIONAL_OPERATOR_UNSPECIFIED: <no description>
-      EQUAL_TO: Equal.
-      NOT_EQUAL_TO: Not equal to.
+      EQUAL_TO: Equal. Attempts to match even with incompatible types.
+      NOT_EQUAL_TO: Not equal to. Attempts to match even with incompatible
+        types.
       GREATER_THAN: Greater than.
       LESS_THAN: Less than.
       GREATER_THAN_OR_EQUALS: Greater than or equals.
@@ -1371,7 +1416,7 @@ class GooglePrivacyDlpV2CreateDeidentifyTemplateRequest(_messages.Message):
     deidentifyTemplate: The DeidentifyTemplate to create.
     templateId: The template id can contain uppercase and lowercase letters,
       numbers, and hyphens; that is, it must match the regular expression:
-      `[a-zA-Z\\d-]+`. The maximum length is 100 characters. Can be empty to
+      `[a-zA-Z\\d-_]+`. The maximum length is 100 characters. Can be empty to
       allow the system to generate one.
   """
 
@@ -1387,7 +1432,7 @@ class GooglePrivacyDlpV2CreateDlpJobRequest(_messages.Message):
     inspectJob: A GooglePrivacyDlpV2InspectJobConfig attribute.
     jobId: The job id can contain uppercase and lowercase letters, numbers,
       and hyphens; that is, it must match the regular expression:
-      `[a-zA-Z\\d-]+`. The maximum length is 100 characters. Can be empty to
+      `[a-zA-Z\\d-_]+`. The maximum length is 100 characters. Can be empty to
       allow the system to generate one.
     riskJob: A GooglePrivacyDlpV2RiskAnalysisJobConfig attribute.
   """
@@ -1404,7 +1449,7 @@ class GooglePrivacyDlpV2CreateInspectTemplateRequest(_messages.Message):
     inspectTemplate: The InspectTemplate to create.
     templateId: The template id can contain uppercase and lowercase letters,
       numbers, and hyphens; that is, it must match the regular expression:
-      `[a-zA-Z\\d-]+`. The maximum length is 100 characters. Can be empty to
+      `[a-zA-Z\\d-_]+`. The maximum length is 100 characters. Can be empty to
       allow the system to generate one.
   """
 
@@ -1419,7 +1464,7 @@ class GooglePrivacyDlpV2CreateJobTriggerRequest(_messages.Message):
     jobTrigger: The JobTrigger to create.
     triggerId: The trigger id can contain uppercase and lowercase letters,
       numbers, and hyphens; that is, it must match the regular expression:
-      `[a-zA-Z\\d-]+`. The maximum length is 100 characters. Can be empty to
+      `[a-zA-Z\\d-_]+`. The maximum length is 100 characters. Can be empty to
       allow the system to generate one.
   """
 
@@ -1434,7 +1479,7 @@ class GooglePrivacyDlpV2CreateStoredInfoTypeRequest(_messages.Message):
     config: Configuration of the storedInfoType to create.
     storedInfoTypeId: The storedInfoType ID can contain uppercase and
       lowercase letters, numbers, and hyphens; that is, it must match the
-      regular expression: `[a-zA-Z\\d-]+`. The maximum length is 100
+      regular expression: `[a-zA-Z\\d-_]+`. The maximum length is 100
       characters. Can be empty to allow the system to generate one.
   """
 
@@ -1442,12 +1487,60 @@ class GooglePrivacyDlpV2CreateStoredInfoTypeRequest(_messages.Message):
   storedInfoTypeId = _messages.StringField(2)
 
 
+class GooglePrivacyDlpV2CryptoDeterministicConfig(_messages.Message):
+  r"""Pseudonymization method that generates deterministic encryption for the
+  given input. Outputs a base64 encoded representation of the encrypted
+  output. Uses AES-SIV based on the RFC https://tools.ietf.org/html/rfc5297.
+
+  Fields:
+    context: Optional. A context may be used for higher security and
+      maintaining referential integrity such that the same identifier in two
+      different contexts will be given a distinct surrogate. The context is
+      appended to plaintext value being encrypted. On decryption the provided
+      context is validated against the value used during encryption. If a
+      context was provided during encryption, same context must be provided
+      during decryption as well.  If the context is not set, plaintext would
+      be used as is for encryption. If the context is set but:  1. there is no
+      record present when transforming a given value or 2. the field is not
+      present when transforming a given value,  plaintext would be used as is
+      for encryption.  Note that case (1) is expected when an
+      `InfoTypeTransformation` is applied to both structured and non-
+      structured `ContentItem`s.
+    cryptoKey: The key used by the encryption function.
+    surrogateInfoType: The custom info type to annotate the surrogate with.
+      This annotation will be applied to the surrogate by prefixing it with
+      the name of the custom info type followed by the number of characters
+      comprising the surrogate. The following scheme defines the format: <info
+      type name>(<surrogate character count>):<surrogate>  For example, if the
+      name of custom info type is 'MY_TOKEN_INFO_TYPE' and the surrogate is
+      'abc', the full replacement value will be: 'MY_TOKEN_INFO_TYPE(3):abc'
+      This annotation identifies the surrogate when inspecting content using
+      the custom info type 'Surrogate'. This facilitates reversal of the
+      surrogate when it occurs in free text.  In order for inspection to work
+      properly, the name of this info type must not occur naturally anywhere
+      in your data; otherwise, inspection may either  - reverse a surrogate
+      that does not correspond to an actual identifier - be unable to parse
+      the surrogate and result in an error  Therefore, choose your custom info
+      type name carefully after considering what your data looks like. One way
+      to select a name that has a high chance of yielding reliable detection
+      is to include one or more unicode characters that are highly improbable
+      to exist in your data. For example, assuming your data is entered from a
+      regular ASCII keyboard, the symbol with the hex code point 29DD might be
+      used like so: \u29ddMY_TOKEN_TYPE
+  """
+
+  context = _messages.MessageField('GooglePrivacyDlpV2FieldId', 1)
+  cryptoKey = _messages.MessageField('GooglePrivacyDlpV2CryptoKey', 2)
+  surrogateInfoType = _messages.MessageField('GooglePrivacyDlpV2InfoType', 3)
+
+
 class GooglePrivacyDlpV2CryptoHashConfig(_messages.Message):
   r"""Pseudonymization method that generates surrogates via cryptographic
   hashing. Uses SHA-256. The key size must be either 32 or 64 bytes. Outputs a
   base64 encoded representation of the hashed output (for example,
   L7k0BHmF1ha5U3NfGykjro4xWi1MPVQPjhMAZbSV9mM=). Currently, only string and
-  integer values can be hashed.
+  integer values can be hashed. See
+  https://cloud.google.com/dlp/docs/pseudonymization to learn more.
 
   Fields:
     cryptoKey: The key used by the hash function.
@@ -1474,14 +1567,17 @@ class GooglePrivacyDlpV2CryptoKey(_messages.Message):
 
 
 class GooglePrivacyDlpV2CryptoReplaceFfxFpeConfig(_messages.Message):
-  r"""Replaces an identifier with a surrogate using FPE with the FFX mode of
-  operation; however when used in the `ReidentifyContent` API method, it
-  serves the opposite function by reversing the surrogate back into the
-  original identifier. The identifier must be encoded as ASCII. For a given
-  crypto key and context, the same identifier will be replaced with the same
-  surrogate. Identifiers must be at least two characters long. In the case
-  that the identifier is the empty string, it will be skipped. See
-  https://cloud.google.com/dlp/docs/pseudonymization to learn more.
+  r"""Replaces an identifier with a surrogate using Format Preserving
+  Encryption (FPE) with the FFX mode of operation; however when used in the
+  `ReidentifyContent` API method, it serves the opposite function by reversing
+  the surrogate back into the original identifier. The identifier must be
+  encoded as ASCII. For a given crypto key and context, the same identifier
+  will be replaced with the same surrogate. Identifiers must be at least two
+  characters long. In the case that the identifier is the empty string, it
+  will be skipped. See https://cloud.google.com/dlp/docs/pseudonymization to
+  learn more.  Note: We recommend using  CryptoDeterministicConfig for all use
+  cases which do not require preserving the input alphabet space and size,
+  plus warrant referential integrity.
 
   Enums:
     CommonAlphabetValueValuesEnum:
@@ -2241,11 +2337,11 @@ class GooglePrivacyDlpV2FindingLimits(_messages.Message):
       specified infoTypes.
     maxFindingsPerItem: Max number of findings that will be returned for each
       item scanned. When set within `InspectDataSourceRequest`, the maximum
-      returned is 1000 regardless if this is set higher. When set within
+      returned is 2000 regardless if this is set higher. When set within
       `InspectContentRequest`, this field is ignored.
     maxFindingsPerRequest: Max number of findings that will be returned per
       request/job. When set within `InspectContentRequest`, the maximum
-      returned is 1000 regardless if this is set higher.
+      returned is 2000 regardless if this is set higher.
   """
 
   maxFindingsPerInfoType = _messages.MessageField('GooglePrivacyDlpV2InfoTypeLimit', 1, repeated=True)
@@ -2362,6 +2458,8 @@ class GooglePrivacyDlpV2InfoTypeDescription(_messages.Message):
     SupportedByValueListEntryValuesEnum:
 
   Fields:
+    description: Description of the infotype. Translated when language is
+      provided in the request.
     displayName: Human readable form of the infoType name.
     name: Internal name of the infoType.
     supportedBy: Which parts of the API supports this InfoType.
@@ -2379,9 +2477,10 @@ class GooglePrivacyDlpV2InfoTypeDescription(_messages.Message):
     INSPECT = 1
     RISK_ANALYSIS = 2
 
-  displayName = _messages.StringField(1)
-  name = _messages.StringField(2)
-  supportedBy = _messages.EnumField('SupportedByValueListEntryValuesEnum', 3, repeated=True)
+  description = _messages.StringField(1)
+  displayName = _messages.StringField(2)
+  name = _messages.StringField(3)
+  supportedBy = _messages.EnumField('SupportedByValueListEntryValuesEnum', 4, repeated=True)
 
 
 class GooglePrivacyDlpV2InfoTypeLimit(_messages.Message):
@@ -2565,8 +2664,7 @@ class GooglePrivacyDlpV2InspectJobConfig(_messages.Message):
   r"""A GooglePrivacyDlpV2InspectJobConfig object.
 
   Fields:
-    actions: Actions to execute at the completion of the job. Are executed in
-      the order provided.
+    actions: Actions to execute at the completion of the job.
     inspectConfig: How and what to scan for.
     inspectTemplateName: If provided, will be used as the default for all
       values in InspectConfig. `inspect_config` will be merged into the values
@@ -2651,6 +2749,13 @@ class GooglePrivacyDlpV2InspectionRuleSet(_messages.Message):
 
   infoTypes = _messages.MessageField('GooglePrivacyDlpV2InfoType', 1, repeated=True)
   rules = _messages.MessageField('GooglePrivacyDlpV2InspectionRule', 2, repeated=True)
+
+
+class GooglePrivacyDlpV2JobNotificationEmails(_messages.Message):
+  r"""Enable email notification to project owners and editors on jobs's
+  completion/failure.
+  """
+
 
 
 class GooglePrivacyDlpV2JobTrigger(_messages.Message):
@@ -2895,9 +3000,10 @@ class GooglePrivacyDlpV2KindExpression(_messages.Message):
 
 
 class GooglePrivacyDlpV2KmsWrappedCryptoKey(_messages.Message):
-  r"""Include to use an existing data crypto key wrapped by KMS. Authorization
-  requires the following IAM permissions when sending a request to perform a
-  crypto transformation using a kms-wrapped crypto key: dlp.kms.encrypt
+  r"""Include to use an existing data crypto key wrapped by KMS. The wrapped
+  key must be a 128/192/256 bit key. Authorization requires the following IAM
+  permissions when sending a request to perform a crypto transformation using
+  a kms-wrapped crypto key: dlp.kms.encrypt
 
   Fields:
     cryptoKeyName: The resource name of the KMS CryptoKey to use for
@@ -3277,6 +3383,8 @@ class GooglePrivacyDlpV2PrimitiveTransformation(_messages.Message):
   Fields:
     bucketingConfig: A GooglePrivacyDlpV2BucketingConfig attribute.
     characterMaskConfig: A GooglePrivacyDlpV2CharacterMaskConfig attribute.
+    cryptoDeterministicConfig: A GooglePrivacyDlpV2CryptoDeterministicConfig
+      attribute.
     cryptoHashConfig: A GooglePrivacyDlpV2CryptoHashConfig attribute.
     cryptoReplaceFfxFpeConfig: A GooglePrivacyDlpV2CryptoReplaceFfxFpeConfig
       attribute.
@@ -3292,14 +3400,15 @@ class GooglePrivacyDlpV2PrimitiveTransformation(_messages.Message):
 
   bucketingConfig = _messages.MessageField('GooglePrivacyDlpV2BucketingConfig', 1)
   characterMaskConfig = _messages.MessageField('GooglePrivacyDlpV2CharacterMaskConfig', 2)
-  cryptoHashConfig = _messages.MessageField('GooglePrivacyDlpV2CryptoHashConfig', 3)
-  cryptoReplaceFfxFpeConfig = _messages.MessageField('GooglePrivacyDlpV2CryptoReplaceFfxFpeConfig', 4)
-  dateShiftConfig = _messages.MessageField('GooglePrivacyDlpV2DateShiftConfig', 5)
-  fixedSizeBucketingConfig = _messages.MessageField('GooglePrivacyDlpV2FixedSizeBucketingConfig', 6)
-  redactConfig = _messages.MessageField('GooglePrivacyDlpV2RedactConfig', 7)
-  replaceConfig = _messages.MessageField('GooglePrivacyDlpV2ReplaceValueConfig', 8)
-  replaceWithInfoTypeConfig = _messages.MessageField('GooglePrivacyDlpV2ReplaceWithInfoTypeConfig', 9)
-  timePartConfig = _messages.MessageField('GooglePrivacyDlpV2TimePartConfig', 10)
+  cryptoDeterministicConfig = _messages.MessageField('GooglePrivacyDlpV2CryptoDeterministicConfig', 3)
+  cryptoHashConfig = _messages.MessageField('GooglePrivacyDlpV2CryptoHashConfig', 4)
+  cryptoReplaceFfxFpeConfig = _messages.MessageField('GooglePrivacyDlpV2CryptoReplaceFfxFpeConfig', 5)
+  dateShiftConfig = _messages.MessageField('GooglePrivacyDlpV2DateShiftConfig', 6)
+  fixedSizeBucketingConfig = _messages.MessageField('GooglePrivacyDlpV2FixedSizeBucketingConfig', 7)
+  redactConfig = _messages.MessageField('GooglePrivacyDlpV2RedactConfig', 8)
+  replaceConfig = _messages.MessageField('GooglePrivacyDlpV2ReplaceValueConfig', 9)
+  replaceWithInfoTypeConfig = _messages.MessageField('GooglePrivacyDlpV2ReplaceWithInfoTypeConfig', 10)
+  timePartConfig = _messages.MessageField('GooglePrivacyDlpV2TimePartConfig', 11)
 
 
 class GooglePrivacyDlpV2PrivacyMetric(_messages.Message):
@@ -3452,10 +3561,14 @@ class GooglePrivacyDlpV2RecordKey(_messages.Message):
   Fields:
     bigQueryKey: A GooglePrivacyDlpV2BigQueryKey attribute.
     datastoreKey: A GooglePrivacyDlpV2DatastoreKey attribute.
+    idValues: Values of identifying columns in the given row. Order of values
+      matches the order of field identifiers specified in the scanning
+      request.
   """
 
   bigQueryKey = _messages.MessageField('GooglePrivacyDlpV2BigQueryKey', 1)
   datastoreKey = _messages.MessageField('GooglePrivacyDlpV2DatastoreKey', 2)
+  idValues = _messages.StringField(3, repeated=True)
 
 
 class GooglePrivacyDlpV2RecordLocation(_messages.Message):
@@ -3549,12 +3662,15 @@ class GooglePrivacyDlpV2Regex(_messages.Message):
   r"""Message defining a custom regular expression.
 
   Fields:
+    groupIndexes: The index of the submatch to extract as findings. When not
+      specified, the entire match is returned. No more than 3 may be included.
     pattern: Pattern defining the regular expression. Its syntax
       (https://github.com/google/re2/wiki/Syntax) can be found under the
       google/re2 repository on GitHub.
   """
 
-  pattern = _messages.StringField(1)
+  groupIndexes = _messages.IntegerField(1, repeated=True, variant=_messages.Variant.INT32)
+  pattern = _messages.StringField(2)
 
 
 class GooglePrivacyDlpV2ReidentifyContentRequest(_messages.Message):
@@ -3631,7 +3747,8 @@ class GooglePrivacyDlpV2RequestedOptions(_messages.Message):
 
 
 class GooglePrivacyDlpV2Result(_messages.Message):
-  r"""A GooglePrivacyDlpV2Result object.
+  r"""All result fields mentioned below are updated while the job is
+  processing.
 
   Fields:
     infoTypeStats: Statistics of how many instances of each info type were
@@ -4010,7 +4127,7 @@ class GooglePrivacyDlpV2TransformationOverview(_messages.Message):
 
 
 class GooglePrivacyDlpV2TransformationSummary(_messages.Message):
-  r"""Summary of a single tranformation. Only one of 'transformation',
+  r"""Summary of a single transformation. Only one of 'transformation',
   'field_transformation', or 'record_suppress' will be set.
 
   Fields:
@@ -4065,7 +4182,7 @@ class GooglePrivacyDlpV2UnwrappedCryptoKey(_messages.Message):
   the key. Choose another type of key if possible.
 
   Fields:
-    key: The AES 128/192/256 bit key. [required]
+    key: A 128/192/256 bit key. [required]
   """
 
   key = _messages.BytesField(1)

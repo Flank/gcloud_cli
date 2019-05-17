@@ -44,8 +44,8 @@ $ gcloud ml vision detect\-document \-\-language\-hints ja,ko
 .RS 2m
 .TP 2m
 \fIIMAGE_PATH\fR
-The path to the image to be analyzed. This can be either a local path or a URL.
-If you provide a local file, the contents will be sent directly to Google Cloud
+Path to the image to be analyzed. This can be either a local path or a URL. If
+you provide a local file, the contents will be sent directly to Google Cloud
 Vision. If you provide a URL, it must be in Google Cloud Storage format
 (gs://bucket/object) or an HTTP URL (http://... or https://...)
 
@@ -66,10 +66,11 @@ List of languages to use for text detection.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 
@@ -77,6 +78,16 @@ gcloud help\fR for details.
 
 This command uses the \fBvision/v1\fR API. The full documentation for this API
 can be found at: https://cloud.google.com/vision/
+
+
+
+.SH "EXAMPLES"
+
+To detect dense text in image 'gs://my_bucket/input_file':
+
+.RS 2m
+$ gcloud ml vision detect\-document gs://my_bucket/input_file
+.RE
 
 
 

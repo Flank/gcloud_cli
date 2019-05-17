@@ -1,0 +1,65 @@
+NAME
+    gcloud resource-manager folders remove-iam-policy-binding - remove IAM
+        policy binding for a folder
+
+SYNOPSIS
+    gcloud resource-manager folders remove-iam-policy-binding FOLDER
+        --member=MEMBER --role=ROLE [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    Removes a policy binding from the IAM policy of a folder, given a folder ID
+    and the binding.
+
+POSITIONAL ARGUMENTS
+     Folder resource - The ID of the folder to remove the IAM binding. This
+     represents a Cloud resource. This must be specified.
+
+       FOLDER
+          ID of the folder or fully qualified identifier for the folder.
+
+REQUIRED FLAGS
+     --member=MEMBER
+        The member to remove the binding for. Should be of the form
+        user|group|serviceAccount:email or domain:domain.
+
+        Examples: user:test-user@gmail.com, group:admins@example.com,
+        serviceAccount:test123@example.domain.com, or
+        domain:example.domain.com.
+
+        Can also be one of the following special values:
+        * allUsers - Special identifier that represents anyone who is on the
+          internet, with or without a Google account.
+        * allAuthenticatedUsers - Special identifier that represents anyone
+          who is authenticated with a Google account or a service account.
+
+     --role=ROLE
+        The role to remove the member from.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+API REFERENCE
+    This command uses the cloudresourcemanager/v2 API. The full documentation
+    for this API can be found at: https://cloud.google.com/resource-manager
+
+EXAMPLES
+    To remove an IAM policy binding for the role of 'roles/editor' for the user
+    'test-user@gmail.com' on the folder 'folder-id', run:
+
+        $ gcloud resource-manager folders remove-iam-policy-binding \
+             folder-id --member='user:test-user@gmail.com' \
+             --role='roles/editor'
+
+    See https://cloud.google.com/iam/docs/managing-policies for details of
+    policy role and member types.
+
+NOTES
+    These variants are also available:
+
+        $ gcloud alpha resource-manager folders remove-iam-policy-binding
+        $ gcloud beta resource-manager folders remove-iam-policy-binding
+

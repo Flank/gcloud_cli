@@ -117,7 +117,9 @@ summary:
   - stderr: |
       Deleted [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/global/healthChecks/$$hc$$].
 actions:
-
+- define_reference:
+    reference: compute-uri
+    value: www.googleapis.com/compute
 
 - define_reference:
     reference: api-version
@@ -177,7 +179,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices?alt=json
           method: POST
           headers: {}
           body:
@@ -212,7 +214,7 @@ actions:
         Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -255,7 +257,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/aggregated/backendServices?alt=json&maxResults=500
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/aggregated/backendServices?alt=json&maxResults=500
           method: GET
           headers: {}
           body: null
@@ -445,7 +447,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -499,7 +501,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -529,7 +531,7 @@ actions:
               drainingTimeoutSec: 0
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
           method: PUT
           headers: {}
           body:
@@ -574,7 +576,7 @@ actions:
         Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -622,7 +624,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -656,7 +658,7 @@ actions:
               drainingTimeoutSec: 0
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
           method: PUT
           headers: {}
           body:
@@ -702,7 +704,7 @@ actions:
         Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -749,7 +751,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -783,7 +785,7 @@ actions:
               drainingTimeoutSec: 0
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
           method: PUT
           headers: {}
           body:
@@ -825,7 +827,7 @@ actions:
         Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -866,7 +868,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -896,7 +898,7 @@ actions:
               drainingTimeoutSec: 0
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
           method: PATCH
           headers: {}
           body:
@@ -938,7 +940,7 @@ actions:
         Updated [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -985,7 +987,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules?alt=json
           method: POST
           headers: {}
           body:
@@ -1023,7 +1025,7 @@ actions:
         Created [https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$fr$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$fr$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/forwardingRules/$$fr$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -1079,7 +1081,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
+          uri: https://$$compute-uri$$/$$api-version$$/projects/cloud-sdk-integration-testing/regions/us-central1/backendServices/$$bs$$?alt=json
           method: DELETE
           headers: {}
           body: null

@@ -70,7 +70,7 @@ class QueuesTest(e2e_base.WithServiceAuth):
         'alpha tasks queues update-pull-queue {} --clear-max-retry-duration'.
         format(self.queue_id))
 
-  def testUseAppengineQueue(self):
+  def testUseBetaAppengineQueue(self):
     self.queue_id = next(e2e_utils.GetResourceNameGenerator('queue'))
     expected_queue = self.Run(
         'beta tasks queues create-app-engine-queue {}'.format(self.queue_id))
@@ -89,22 +89,59 @@ class QueuesTest(e2e_base.WithServiceAuth):
     self.AssertOutputContains('state: RUNNING')
     self.Run('beta tasks queues purge {}'.format(self.queue_id))
     self.Run(
-        'beta tasks queues update-app-engine-queue {} --max-attempts=6'.format(
+        'beta tasks queues update {} --max-attempts=6'.format(
             self.queue_id))
     self.Run('beta tasks queues describe {}'.format(self.queue_id))
     self.AssertOutputContains('maxAttempts: 6')
     self.Run(
-        'beta tasks queues update-app-engine-queue {} --clear-max-attempts'.
+        'beta tasks queues update {} --clear-max-attempts'.
         format(self.queue_id))
     self.Run('beta tasks queues describe {}'.format(self.queue_id))
     self.AssertOutputContains('maxAttempts: 100')
     self.Run(
-        'beta tasks queues update-app-engine-queue {} --max-retry-duration=66s'.
+        'beta tasks queues update {} --max-retry-duration=66s'.
         format(self.queue_id))
     self.Run('beta tasks queues describe {}'.format(self.queue_id))
     self.AssertOutputContains('maxRetryDuration: 66s')
     self.Run(
-        ('beta tasks queues update-app-engine-queue {}' +
+        ('beta tasks queues update {}' +
+         ' --clear-max-retry-duration').format(self.queue_id))
+
+  def testUsePushQueue(self):
+    self.queue_id = next(e2e_utils.GetResourceNameGenerator('queue'))
+    expected_queue = self.Run(
+        'tasks queues create {}'.format(self.queue_id))
+    actual_queue = self.retryer.RetryOnException(  # Creation can take 1 minute
+        self.Run,
+        args=['tasks queues describe {}'.format(self.queue_id)])
+    self.assertEqual(actual_queue, expected_queue)
+    self.Run(
+        'tasks queues get-iam-policy {} --location us-central1'.format(
+            self.queue_id))
+    self.Run('tasks queues pause {}'.format(self.queue_id))
+    self.Run('tasks queues describe {}'.format(self.queue_id))
+    self.AssertOutputContains('state: PAUSED')
+    self.Run('tasks queues resume {}'.format(self.queue_id))
+    self.Run('tasks queues describe {}'.format(self.queue_id))
+    self.AssertOutputContains('state: RUNNING')
+    self.Run('tasks queues purge {}'.format(self.queue_id))
+    self.Run(
+        'tasks queues update {} --max-attempts=6'.format(
+            self.queue_id))
+    self.Run('tasks queues describe {}'.format(self.queue_id))
+    self.AssertOutputContains('maxAttempts: 6')
+    self.Run(
+        'tasks queues update {} --clear-max-attempts'.
+        format(self.queue_id))
+    self.Run('tasks queues describe {}'.format(self.queue_id))
+    self.AssertOutputContains('maxAttempts: 100')
+    self.Run(
+        'tasks queues update {} --max-retry-duration=66s'.
+        format(self.queue_id))
+    self.Run('tasks queues describe {}'.format(self.queue_id))
+    self.AssertOutputContains('maxRetryDuration: 66s')
+    self.Run(
+        ('tasks queues update {}' +
          ' --clear-max-retry-duration').format(self.queue_id))
 
 if __name__ == '__main__':

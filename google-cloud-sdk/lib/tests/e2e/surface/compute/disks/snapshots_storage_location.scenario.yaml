@@ -1,5 +1,5 @@
 title: Test that a snapshot can be created with a specific storage location
-release_tracks: [ALPHA]
+release_tracks: [GA]
 
 summary:
 # This summary is generated automatically on update and should not be edited.
@@ -7,12 +7,12 @@ summary:
   - command: compute disks create $$disk$$ --image-family=debian-9 --image-project=debian-cloud
       --zone us-central1-f --format 'yaml(name,zone,status)'
   - stderr: |
-      Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$].
+      Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$].
   - stdout: |
       ---
       name: $$disk$$
       status: READY
-      zone: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f
+      zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
 - execute:
   - command: compute disks snapshot $$disk$$ --zone us-central1-f --snapshot-names
       $$snapshot$$ --storage-location us-west1
@@ -29,13 +29,15 @@ summary:
 - execute:
   - command: compute snapshots delete $$snapshot$$ -q
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$].
+      Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$].
 - execute:
   - command: compute disks delete $$disk$$ --zone us-central1-f -q
   - stderr: |
-      Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$].
+      Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$].
 actions:
-
+- define_reference:
+    reference: compute-uri
+    value: www.googleapis.com/compute
 - generate_resource_id:
     reference: disk
     prefix: gcloud-compute-test-snapshot-labels
@@ -46,7 +48,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f?alt=json
           method: GET
           headers: {}
           body: null
@@ -61,8 +63,8 @@ actions:
             name: us-central1-f
             description: us-central1-f
             status: UP
-            region: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/regions/us-central1
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            region: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/regions/us-central1
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
             availableCpuPlatforms:
             - Intel Skylake
             - Intel Broadwell
@@ -72,7 +74,7 @@ actions:
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks?alt=json&sourceImage=https%3A%2F%2Fwww.googleapis.com%2Fcompute%2Falpha%2Fprojects%2Fdebian-cloud%2Fglobal%2Fimages%2Ffamily%2Fdebian-9
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks?alt=json&sourceImage=https%3A%2F%2Fwww.googleapis.com%2Fcompute%2Fv1%2Fprojects%2Fdebian-cloud%2Fglobal%2Fimages%2Ffamily%2Fdebian-9
           method: POST
           headers: {}
           body:
@@ -85,21 +87,21 @@ actions:
           body:
             id: '2606463526434417891'
             name: operation-1536102923959-57513d51efbc7-b0ad8cbf-b16f1aa7
-            zone: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
             operationType: insert
-            targetLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$
+            targetLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$
             targetId: '3421755727757356259'
             status: PENDING
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
             insertTime: '2018-09-04T16:15:24.696-07:00'
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1536102923959-57513d51efbc7-b0ad8cbf-b16f1aa7
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1536102923959-57513d51efbc7-b0ad8cbf-b16f1aa7
             kind: compute#operation
     - expect_stderr: |
-        Created [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$].
+        Created [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$].
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -113,14 +115,14 @@ actions:
             creationTimestamp: '2018-09-04T16:15:24.660-07:00'
             name: $$disk$$
             sizeGb: '10'
-            zone: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
             status: READY
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$
-            sourceImage: https://www.googleapis.com/compute/alpha/projects/debian-cloud/global/images/debian-9-stretch-v20180820
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$
+            sourceImage: https://www.googleapis.com/compute/v1/projects/debian-cloud/global/images/debian-9-stretch-v20180820
             sourceImageId: '1810947815570337941'
-            type: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/diskTypes/pd-standard
+            type: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/diskTypes/pd-standard
             licenses:
-            - https://www.googleapis.com/compute/alpha/projects/debian-cloud/global/licenses/debian-9-stretch
+            - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
             guestOsFeatures:
             - type: VIRTIO_SCSI_MULTIQUEUE
             labelFingerprint: 42WmSpB8rSM=
@@ -132,7 +134,7 @@ actions:
         ---
         name: $$disk$$
         status: READY
-        zone: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f
+        zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
     - expect_exit:
         code: 0
 
@@ -147,7 +149,7 @@ actions:
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$/createSnapshot?alt=json&guestFlush=False
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$/createSnapshot?alt=json&guestFlush=False
           method: POST
           headers: {}
           body:
@@ -160,22 +162,22 @@ actions:
           body:
             id: '7551077834641550590'
             name: operation-1536102928728-57513d567c206-545037fd-23ed763d
-            zone: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
             operationType: createSnapshot
-            targetLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$
+            targetLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$
             targetId: '3421755727757356259'
             status: PENDING
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
             insertTime: '2018-09-04T16:15:29.149-07:00'
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1536102928728-57513d567c206-545037fd-23ed763d
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1536102928728-57513d567c206-545037fd-23ed763d
             kind: compute#operation
     - expect_progress_tracker:
         message: Creating snapshot(s) $$snapshot$$
         status: SUCCESS
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -189,14 +191,14 @@ actions:
             creationTimestamp: '2018-09-04T16:15:29.549-07:00'
             name: $$snapshot$$
             status: READY
-            sourceDisk: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$
+            sourceDisk: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$
             sourceDiskId: '3421755727757356259'
             diskSizeGb: '10'
             storageBytes: '557533248'
             storageBytesStatus: UP_TO_DATE
             licenses:
-            - https://www.googleapis.com/compute/alpha/projects/debian-cloud/global/licenses/debian-9-stretch
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$
+            - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$
             labelFingerprint: 42WmSpB8rSM=
             licenseCodes:
             - '1000205'
@@ -213,7 +215,7 @@ actions:
     events:
     - api_call:
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
           method: GET
           headers: {}
           body: null
@@ -227,14 +229,14 @@ actions:
             creationTimestamp: '2018-09-04T16:15:29.549-07:00'
             name: $$snapshot$$
             status: READY
-            sourceDisk: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$
+            sourceDisk: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$
             sourceDiskId: '3421755727757356259'
             diskSizeGb: '10'
             storageBytes: '557533248'
             storageBytesStatus: UP_TO_DATE
             licenses:
-            - https://www.googleapis.com/compute/alpha/projects/debian-cloud/global/licenses/debian-9-stretch
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$
+            - https://www.googleapis.com/compute/v1/projects/debian-cloud/global/licenses/debian-9-stretch
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$
             labelFingerprint: 42WmSpB8rSM=
             licenseCodes:
             - '1000205'
@@ -257,7 +259,7 @@ actions:
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -269,16 +271,16 @@ actions:
             id: '5357327342935125187'
             name: operation-1536102956516-57513d70fc5d1-015cb966-f8afc312
             operationType: delete
-            targetLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$
+            targetLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$
             targetId: '6072941281827532031'
             status: PENDING
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
             insertTime: '2018-09-04T16:15:57.081-07:00'
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/operations/operation-1536102956516-57513d70fc5d1-015cb966-f8afc312
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/operations/operation-1536102956516-57513d70fc5d1-015cb966-f8afc312
             kind: compute#operation
     - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$].
+        Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/global/snapshots/$$snapshot$$].
     - expect_exit:
         code: 0
 
@@ -289,7 +291,7 @@ actions:
     - api_call:
         poll_operation: true
         expect_request:
-          uri: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$?alt=json
+          uri: https://$$compute-uri$$/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$?alt=json
           method: DELETE
           headers: {}
           body: null
@@ -300,17 +302,17 @@ actions:
           body:
             id: '3786785182927989979'
             name: operation-1536102964022-57513d7824e2a-b34cf3d8-3c9ae3ea
-            zone: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f
+            zone: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f
             operationType: delete
-            targetLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$
+            targetLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$
             targetId: '3421755727757356259'
             status: PENDING
             user: 462803083913-lak0k1ette3muh3o3kb3pp2im3urj3e9@developer.gserviceaccount.com
             progress: 0
             insertTime: '2018-09-04T16:16:04.387-07:00'
-            selfLink: https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1536102964022-57513d7824e2a-b34cf3d8-3c9ae3ea
+            selfLink: https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/operations/operation-1536102964022-57513d7824e2a-b34cf3d8-3c9ae3ea
             kind: compute#operation
     - expect_stderr: |
-        Deleted [https://www.googleapis.com/compute/alpha/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$].
+        Deleted [https://www.googleapis.com/compute/v1/projects/cloud-sdk-integration-testing/zones/us-central1-f/disks/$$disk$$].
     - expect_exit:
         code: 0

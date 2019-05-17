@@ -26,12 +26,12 @@ from tests.lib import sdk_test_base
 from tests.lib import test_case
 
 
-class ListRoutesAlphaTest(sdk_test_base.WithFakeAuth,
-                          cli_test_base.CliTestBase):
+# This test can be deleted once list_test.scenario.yaml covers all cases.
+class ListRoutesBetaTest(sdk_test_base.WithFakeAuth, cli_test_base.CliTestBase):
 
   def PreSetUp(self):
-    self.api_version = 'alpha'
-    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'beta'
+    self.track = calliope_base.ReleaseTrack.BETA
 
   def SetUp(self):
     self.client = mock.Client(
@@ -119,6 +119,13 @@ class ListRoutesAlphaTest(sdk_test_base.WithFakeAuth,
           compute networks peerings list-routes peering1
           --network test-network --region dev-central1 --direction NORTH
           """)
+
+
+class ListRoutesAlphaTest(ListRoutesBetaTest):
+
+  def PreSetUp(self):
+    self.api_version = 'alpha'
+    self.track = calliope_base.ReleaseTrack.ALPHA
 
 
 if __name__ == '__main__':

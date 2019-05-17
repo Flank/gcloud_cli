@@ -1,11 +1,29 @@
 title: ml-engine models remove-iam-policy-binding scenario test
 release_tracks: [ALPHA, BETA, GA]
-
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: ml-engine models remove-iam-policy-binding my_model --member=user:owner@gmail.com
+      --role=roles/owner
+  - stderr: |
+      WARNING: The `gcloud ml-engine` commands have been renamed and will soon be removed. Please use `gcloud ai-platform` instead.
+  - stderr: |
+      Updated IAM policy for model [my_model].
+  - stdout: |
+      bindings:
+      - members:
+        - user:newowner@gmail.com
+        role: roles/owner
+      etag: etag
+      version: 1
 actions:
 # remove binding without condition to a policy without condition
 - execute_command:
-    command: ml-engine models remove-iam-policy-binding my_model --member=user:owner@gmail.com --role=roles/owner
+    command: ml-engine models remove-iam-policy-binding my_model --member=user:owner@gmail.com
+      --role=roles/owner
     events:
+    - expect_stderr: |
+        WARNING: The `gcloud ml-engine` commands have been renamed and will soon be removed. Please use `gcloud ai-platform` instead.
     - api_call:
         expect_request:
           uri: https://ml.googleapis.com/v1/projects/fake-project/models/my_model:getIamPolicy?alt=json
@@ -36,9 +54,9 @@ actions:
             json:
               policy:
                 bindings:
-                - role: 'roles/owner'
+                - role: roles/owner
                   members: ['user:newowner@gmail.com']
-                etag: 'etag'
+                etag: etag
                 version: 1
         return_response:
           headers:

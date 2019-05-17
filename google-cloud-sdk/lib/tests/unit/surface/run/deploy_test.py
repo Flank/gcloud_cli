@@ -21,6 +21,7 @@ from __future__ import unicode_literals
 import os
 from googlecloudsdk.calliope.concepts import handlers
 from googlecloudsdk.command_lib.run import config_changes
+from googlecloudsdk.command_lib.run import exceptions as serverless_exceptions
 from googlecloudsdk.command_lib.run import flags
 from googlecloudsdk.command_lib.run import source_ref
 from googlecloudsdk.core import properties
@@ -63,7 +64,9 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase, parameterized.TestCase):
         self.namespace, self.other_dir, None)
     self.operations.Upload.assert_called_once_with(self.app)
     self.operations.ReleaseService.assert_called_once_with(
-        self._ServiceRef('thing'), [self.app], asyn=False)
+        self._ServiceRef('thing'), [self.app], mock.ANY,
+        asyn=False, private_endpoint=None,
+        allow_unauthenticated=False)
     self._AssertSuccessMessage('thing')
 
   def testDeployWithService(self):
@@ -72,7 +75,9 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase, parameterized.TestCase):
         self.namespace, self.source_dir, None)
     self.operations.Upload.assert_called_once_with(self.app)
     self.operations.ReleaseService.assert_called_once_with(
-        self._ServiceRef('my-service'), [self.app], asyn=False)
+        self._ServiceRef('my-service'), [self.app], mock.ANY,
+        asyn=False, private_endpoint=None,
+        allow_unauthenticated=False)
     self._AssertSuccessMessage('my-service')
 
   def testDeployMissingServiceCantPrompt(self):
@@ -101,7 +106,9 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase, parameterized.TestCase):
         self._NamespaceRef(region='se-arboga'), self.source_dir, None)
     self.operations.Upload.assert_called_once_with(self.app)
     self.operations.ReleaseService.assert_called_once_with(
-        self._ServiceRef('dir', 'se-arboga'), [self.app], asyn=False)
+        self._ServiceRef('dir', 'se-arboga'), [self.app], mock.ANY,
+        asyn=False, private_endpoint=None,
+        allow_unauthenticated=False)
     self._AssertSuccessMessage('dir')
 
   def testDeployWithFunction(self):
@@ -112,7 +119,9 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase, parameterized.TestCase):
         self.namespace, self.source_dir, 'tsp_in_constant_time')
     self.operations.Upload.assert_called_once_with(self.app)
     self.operations.ReleaseService.assert_called_once_with(
-        self._ServiceRef('dir'), [self.app], asyn=False)
+        self._ServiceRef('dir'), [self.app], mock.ANY,
+        asyn=False, private_endpoint=None,
+        allow_unauthenticated=False)
     self._AssertSuccessMessage('dir')
 
   def testDeployWithImage(self):
@@ -123,9 +132,25 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase, parameterized.TestCase):
         self.namespace, img_ref, None)
     self.operations.Upload.assert_called_once_with(self.app)
     self.operations.ReleaseService.assert_called_once_with(
-        self._ServiceRef('image'), [self.app], asyn=False)
+        self._ServiceRef('image'), [self.app], mock.ANY,
+        asyn=False, private_endpoint=None,
+        allow_unauthenticated=False)
     self.AssertErrContains('Deploying container')
     self._AssertSuccessMessage('image')
+
+  def testDeployAsync(self):
+    self.WriteInput('\n')
+    img_ref = source_ref.SourceRef.MakeImageRef('gcr.io/image')
+    self.Run('run deploy --image gcr.io/image --async')
+    self.operations.Detect.assert_called_once_with(
+        self.namespace, img_ref, None)
+    self.operations.Upload.assert_called_once_with(self.app)
+    self.operations.ReleaseService.assert_called_once_with(
+        self._ServiceRef('image'), [self.app], mock.ANY,
+        asyn=True, private_endpoint=None,
+        allow_unauthenticated=False)
+    self.AssertErrContains('Deploying container')
+    self.AssertErrContains('Service [image] is deploying asynchronously')
 
   def testDeployWithEnvVars(self):
     self.WriteInput('\n')
@@ -138,7 +163,8 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase, parameterized.TestCase):
         env_vars_to_update={'k1 with spaces': 'v1'})
     self.operations.ReleaseService.assert_called_once_with(
         self._ServiceRef('dir'), [self.app, self.env_changes],
-        asyn=False)
+        mock.ANY, asyn=False, private_endpoint=None,
+        allow_unauthenticated=False)
     self._AssertSuccessMessage('dir')
 
   def testDeployWithSetEnvVars(self):
@@ -152,7 +178,8 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase, parameterized.TestCase):
         clear_others=True)
     self.operations.ReleaseService.assert_called_once_with(
         self._ServiceRef('dir'), [self.app, self.env_changes],
-        asyn=False)
+        mock.ANY, asyn=False, private_endpoint=None,
+        allow_unauthenticated=False)
     self._AssertSuccessMessage('dir')
 
   def testDeployWithRemoveEnvVars(self):
@@ -163,7 +190,8 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase, parameterized.TestCase):
     self.env_mock.assert_called_once_with(env_vars_to_remove=['k 1', 'k2'])
     self.operations.ReleaseService.assert_called_once_with(
         self._ServiceRef('dir'), [self.app, self.env_changes],
-        asyn=False)
+        mock.ANY, asyn=False, private_endpoint=None,
+        allow_unauthenticated=False)
     self._AssertSuccessMessage('dir')
 
   def testDeployWithClearEnvVars(self):
@@ -174,7 +202,8 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase, parameterized.TestCase):
     self.env_mock.assert_called_once_with(clear_others=True)
     self.operations.ReleaseService.assert_called_once_with(
         self._ServiceRef('dir'), [self.app, self.env_changes],
-        asyn=False)
+        mock.ANY, asyn=False, private_endpoint=None,
+        allow_unauthenticated=False)
     self._AssertSuccessMessage('dir')
 
   def testDeployWithUpdateRemoveEnvVars(self):
@@ -188,7 +217,8 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase, parameterized.TestCase):
         env_vars_to_remove=['k 1', 'k2'])
     self.operations.ReleaseService.assert_called_once_with(
         self._ServiceRef('dir'), [self.app, self.env_changes],
-        asyn=False)
+        mock.ANY, asyn=False, private_endpoint=None,
+        allow_unauthenticated=False)
     self._AssertSuccessMessage('dir')
 
   def testDeployToCluster(self):
@@ -217,7 +247,7 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase, parameterized.TestCase):
 
     self.Run('run deploy my-service --source /other/place '
              '--region se-arboga --function tsp_in_constant_time '
-             '--update-env-vars=k1=v1 --concurrency OneTrillion')
+             '--update-env-vars=k1=v1 --concurrency OneTrillion ')
     positional, _ = self.operations.ReleaseService.call_args
     mutators = positional[1]
     self.assertIn(self.app, mutators)
@@ -225,3 +255,58 @@ class ServerlessDeployTest(base.ServerlessSurfaceBase, parameterized.TestCase):
     self.assertTrue(any(
         isinstance(x, config_changes.ConcurrencyChanges)
         and x._concurrency == 'OneTrillion' for x in mutators))
+
+  @parameterized.named_parameters(
+      ('private', '--connectivity=internal'),
+      ('public', '--connectivity=external'))
+  def testDeployConnectivityVisibility(self, visibility_flag):
+    """Test the connectivity visibility flags succeed when deploying to a cluster."""
+    self.Run('run deploy --image gcr.io/image --namespace mynamespace '
+             '--cluster=mycluster --cluster-location=mylocation {}'.format(
+                 visibility_flag))
+    self.AssertErrContains('Deploying container')
+    self.AssertErrContains('in namespace [mynamespace] of cluster [mycluster]')
+    self._AssertSuccessMessage('image')
+
+  @parameterized.named_parameters(
+      ('private', '--connectivity=internal'),
+      ('public', '--connectivity=external'))
+  def testDeployConnectivityVisibilityNoCluster(self, visibility_flag):
+    """Test that the connectivity visibility flags raises if not using a cluster."""
+    with self.assertRaises(serverless_exceptions.ConfigurationError):
+      self.Run('run deploy --image gcr.io/image {}'.format(visibility_flag))
+
+  def testDeployConnectivityOtherValue(self):
+    """Test that --connectivity must take the value internal or external."""
+    with self.assertRaises(cli_test_base.MockArgumentError):
+      self.Run('run deploy --image gcr.io/image '
+               '--connectivity semivisible')
+
+  def testDeployWithAllowUnauthenticated(self):
+    """Test the --allow-unauthenticated flag."""
+    self.Run('run deploy --image gcr.io/image --allow-unauthenticated')
+    self.operations.ReleaseService.assert_called_once_with(
+        self._ServiceRef('image'), [self.app], mock.ANY,
+        asyn=False, private_endpoint=None,
+        allow_unauthenticated=True)
+
+  def testAllowUnauthenticatedFailsWithCluster(self):
+    """Test that --allow-unauthenticated fails when operating on GKE."""
+    with self.assertRaises(serverless_exceptions.ConfigurationError):
+      self.Run('run deploy --image gcr.io/image --namespace mynamespace '
+               '--cluster=mycluster --cluster-location=mylocation '
+               '--allow-unauthenticated')
+
+  def testPromptAllowUnauth(self):
+    """Test that user is prompted to allow unauthenticated access."""
+    self.StartPatch('googlecloudsdk.core.console.console_io.CanPrompt',
+                    return_value=True)
+    self.operations.GetService.return_value = None
+    self.WriteInput('\ny\n')
+    self.Run('run deploy --image gcr.io/image')
+    self.operations.ReleaseService.assert_called_once_with(
+        self._ServiceRef('image'), [self.app], mock.ANY,
+        asyn=False, private_endpoint=None,
+        allow_unauthenticated=True)
+    self.AssertErrContains(
+        'Allow unauthenticated invocations to new service [image]?')

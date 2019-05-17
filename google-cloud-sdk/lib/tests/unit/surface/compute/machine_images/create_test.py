@@ -94,6 +94,146 @@ class MachineImagesCreateTest(test_base.BaseTest):
                       compute_uri=self.compute_uri)),
               project='my-project'))],)
 
+  def testStorageLocation(self):
+
+    self.Run('compute machine-images create machine-image-1 '
+             '--storage-location us-central1 '
+             '--source-instance '
+             '{compute_uri}/projects/my-project/zones/us-central3-a/'
+             'instances/instance-2'.format(compute_uri=self.compute_uri))
+
+    self.CheckRequests(
+        [(self.compute.machineImages, 'Insert',
+          self.messages.ComputeMachineImagesInsertRequest(
+              machineImage=self.messages.MachineImage(
+                  name='machine-image-1',
+                  storageLocations=['us-central1'],
+                  sourceInstance='{compute_uri}/projects/my-project/zones/'
+                                 'us-central3-a/instances/instance-2'.format(
+                                     compute_uri=self.compute_uri)),
+              project='my-project'
+          ))],)
+
+  def testGuestFlush(self):
+
+    self.Run('compute machine-images create machine-image-1 '
+             '--guest-flush '
+             '--source-instance '
+             '{compute_uri}/projects/my-project/zones/us-central3-a/'
+             'instances/instance-2'.format(compute_uri=self.compute_uri))
+
+    self.CheckRequests(
+        [(self.compute.machineImages, 'Insert',
+          self.messages.ComputeMachineImagesInsertRequest(
+              machineImage=self.messages.MachineImage(
+                  name='machine-image-1',
+                  guestFlush=True,
+                  sourceInstance='{compute_uri}/projects/my-project/zones/'
+                                 'us-central3-a/instances/instance-2'.format(
+                                     compute_uri=self.compute_uri)),
+              project='my-project'
+          ))],)
+
+  def testCsekKey(self):
+    private_key_fname = self.WriteKeyFile(machine_image=True)
+
+    self.Run('compute machine-images create machine-image-1 '
+             '--csek-key-file={key} '
+             '--source-instance '
+             '{compute_uri}/projects/my-project/zones/us-central3-a/'
+             'instances/instance-2'.format(key=private_key_fname,
+                                           compute_uri=self.compute_uri))
+    self.CheckRequests(
+        [(self.compute.machineImages, 'Insert',
+          self.messages.ComputeMachineImagesInsertRequest(
+              machineImage=self.messages.MachineImage(
+                  name='machine-image-1',
+                  machineImageEncryptionKey=self.messages.CustomerEncryptionKey(
+                      rawKey='aFellowOfInfiniteJestOfMostExcellentFancy01='),
+                  sourceInstance='{compute_uri}/projects/my-project/zones/'
+                                 'us-central3-a/instances/instance-2'.format(
+                                     compute_uri=self.compute_uri)),
+              project='my-project'
+          ))],)
+
+  def testKmsKey(self):
+    self.Run('compute machine-images create machine-image-1 '
+             '--kms-key=disk-key --kms-location=global'
+             ' --kms-project=key-project'
+             ' --kms-keyring=disk-ring  --require-csek-key-create '
+             '--source-instance '
+             '{compute_uri}/projects/my-project/zones/us-central3-a/'
+             'instances/instance-2'.format(compute_uri=self.compute_uri))
+    self.CheckRequests(
+        [(self.compute.machineImages, 'Insert',
+          self.messages.ComputeMachineImagesInsertRequest(
+              machineImage=self.messages.MachineImage(
+                  name='machine-image-1',
+                  machineImageEncryptionKey=self.messages.CustomerEncryptionKey(
+                      kmsKeyName='projects/key-project/locations/global/'
+                                 'keyRings/disk-ring/cryptoKeys/disk-key'),
+                  sourceInstance='{compute_uri}/projects/my-project/zones/'
+                                 'us-central3-a/instances/instance-2'.format(
+                                     compute_uri=self.compute_uri)),
+              project='my-project'
+          ))],)
+
+  def testKmsSourceDiskKey(self):
+    self.Run('compute machine-images create machine-image-1 '
+             '--source-disk-kms-key kms-key=projects/key-project/locations/'
+             'global/keyRings/disk-ring/cryptoKeys/disk-key,disk=https:'
+             '//www.googleapis.com/compute/alpha/projects/my-project/'
+             'zones/central2-a/disks/hamlet '
+             '--source-instance '
+             '{compute_uri}/projects/my-project/zones/us-central3-a/'
+             'instances/instance-2'.format(compute_uri=self.compute_uri))
+    self.CheckRequests(
+        [(self.compute.machineImages, 'Insert',
+          self.messages.ComputeMachineImagesInsertRequest(
+              machineImage=self.messages.MachineImage(
+                  name='machine-image-1',
+                  sourceDiskEncryptionKeys=
+                  [self.messages.SourceDiskEncryptionKey(
+                      diskEncryptionKey=self.messages.CustomerEncryptionKey(
+                          kmsKeyName='projects/key-project/locations/global/'
+                                     'keyRings/disk-ring/cryptoKeys/disk-key'),
+                      sourceDisk='https://www.googleapis.com/compute/'
+                                 'alpha/projects/my-project/'
+                                 'zones/central2-a/disks/hamlet')],
+                  sourceInstance='{compute_uri}/projects/my-project/zones/'
+                                 'us-central3-a/instances/instance-2'.format(
+                                     compute_uri=self.compute_uri)),
+              project='my-project'
+          ))],)
+
+  def testCsekSourceDiskKey(self):
+    private_key_fname = self.WriteKeyFile(machine_image=True)
+
+    self.Run('compute machine-images create machine-image-1 '
+             '--source-disk-csek-key csek-key-file={key},disk=https:'
+             '//www.googleapis.com/compute/alpha/projects/my-project/'
+             'zones/central2-a/disks/hamlet '
+             '--source-instance '
+             '{compute_uri}/projects/my-project/zones/us-central3-a/'
+             'instances/instance-2'.format(key=private_key_fname,
+                                           compute_uri=self.compute_uri))
+    self.CheckRequests(
+        [(self.compute.machineImages, 'Insert',
+          self.messages.ComputeMachineImagesInsertRequest(
+              machineImage=self.messages.MachineImage(
+                  name='machine-image-1',
+                  sourceDiskEncryptionKeys=
+                  [self.messages.SourceDiskEncryptionKey(
+                      diskEncryptionKey=self.messages.CustomerEncryptionKey(
+                          rawKey='abcdefghijklmnopqrstuvwxyz1234567890AAAAAAA='),
+                      sourceDisk='https://www.googleapis.com/compute/'
+                                 'alpha/projects/my-project/'
+                                 'zones/central2-a/disks/hamlet')],
+                  sourceInstance='{compute_uri}/projects/my-project/zones/'
+                                 'us-central3-a/instances/instance-2'.format(
+                                     compute_uri=self.compute_uri)),
+              project='my-project'
+          ))],)
 
 if __name__ == '__main__':
   test_case.main()

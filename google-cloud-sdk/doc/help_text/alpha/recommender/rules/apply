@@ -1,0 +1,44 @@
+NAME
+    gcloud alpha recommender rules apply - apply a rule, which will set the
+        specified state on all matching recommendations
+
+SYNOPSIS
+    gcloud alpha recommender rules apply RULE [GCLOUD_WIDE_FLAG ...]
+
+DESCRIPTION
+    (ALPHA) Apply a rule, which will set the specified state on all matching
+    recommendations.
+
+POSITIONAL ARGUMENTS
+     Rule resource - The rule to apply. This represents a Cloud resource.
+     (NOTE) Some attributes are not given arguments in this group but can be
+     set in other ways. To set the [project] attribute: provide the argument
+     [rule] on the command line with a fully specified name; provide the
+     argument [--project] on the command line; set the property [core/project].
+     This must be specified.
+
+       RULE
+          ID of the rule or fully qualified identifier for the rule.
+
+GCLOUD WIDE FLAGS
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
+    details.
+
+API REFERENCE
+    This command uses the recommender/v1alpha1 API. The full documentation for
+    this API can be found at: https://cloud.google.com/recommender/docs/
+
+EXAMPLES
+    $ gcloud alpha recommender rules apply abcd-1234 \        --project=concord-api-testing
+
+NOTES
+    This command is an internal implementation detail and may change or
+    disappear without notice. This command is currently in ALPHA and may change
+    without notice. If this command fails with API permission errors despite
+    specifying the right project, you will have to apply for early access and
+    have your projects registered on the API whitelist to use it. To do so,
+    contact Support at https://cloud.google.com/support/.
+

@@ -5,7 +5,10 @@ SYNOPSIS
     gcloud alpha compute tpus create (TPU : --zone=ZONE) --network=NETWORK
         --version=VERSION (--range=RANGE | --use-service-networking)
         [--accelerator-type=ACCELERATOR_TYPE; default="v2-8"] [--async]
-        [--description=DESCRIPTION] [--preemptible] [GCLOUD_WIDE_FLAG ...]
+        [--description=DESCRIPTION] [--preemptible] [--reserved]
+        [--model-base-path=MODEL_BASE_PATH --model-name=MODEL_NAME
+          | --model-config-file=MODEL_CONFIG_FILE
+          --platform-config-file=PLATFORM_CONFIG_FILE] [GCLOUD_WIDE_FLAG ...]
 
 DESCRIPTION
     (ALPHA) Create a new Cloud TPU.
@@ -80,9 +83,58 @@ OPTIONAL FLAGS
 
         Preemptible TPUs cannot be restarted.
 
+     --reserved
+        When specified, will attempt to create the TPU node under reservations
+        made in the current project. The reservations can be made separately
+        but used in aggregated form. i.e., the user can make a reservation of
+        128 V2 TPUs and later on make another reservation of 128 V2 TPUs then
+        creates a v2-256 TPU instance. If there exists no reservation or not
+        sufficient amount of reserved cores under the project, the request will
+        fail due to lack of capacity.
+
+     At most one of these may be specified:
+
+       --model-base-path=MODEL_BASE_PATH
+          Base path to exported saved model. This flag can be used instead of
+          '--model-config-file' directly to specify the exported saved model's
+          base path (excluding timestamp), whereas '--model-config-file' points
+          to a Google Cloud Storage path to a ModelServerConfig proto.
+
+       --model-name=MODEL_NAME
+          Model name for tensorflow serving to serve to incoming requests. If
+          not provided, 'serving_default' will be used.
+
+       --model-config-file=MODEL_CONFIG_FILE
+          Google Cloud Storage URI of the configuration file for models to
+          serve. For example: 'gs://my_bucket/path/to/config.pbtxt'.
+
+          The contents of the model configuration file should look something
+          like the following:
+
+          model_config_list: { config: { name: "Model1", base_path:
+          "gs://my_bucket/path/to/model1", model_platform: "tensorflow" },
+          config: { name: "Model2", base_path:
+          "gs://my_other_bucket/path/to/model2", model_platform: "tensorflow"
+          }, }
+
+       --platform-config-file=PLATFORM_CONFIG_FILE
+          Google Cloud Storage URI of configuration file for platform
+          requirements. For example: 'gs://my_bucket/path/to/platform.pbtxt'.
+
+          The contents of the platform configuration file should look something
+          like the following:
+
+          platform_configs { key: "tensorflow" value { source_adapter_config {
+          [type.googleapis.com/tensorflow.serving.SavedModelBundleSourceAdapterConfig]
+          { legacy_config { saved_model_tags: "tpu" saved_model_tags: "serve"
+          batching_parameters { max_batch_size { value: 8 }
+          batch_timeout_micros { value: 50000 } max_enqueued_batches { value:
+          10000 } num_batch_threads { value: 8 } } } } } } }
+
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

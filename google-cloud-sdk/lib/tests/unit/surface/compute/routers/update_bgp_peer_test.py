@@ -24,22 +24,21 @@ from googlecloudsdk.calliope import base as calliope_base
 from googlecloudsdk.calliope import parser_errors
 from googlecloudsdk.command_lib.compute.routers import router_utils
 from googlecloudsdk.core.console import console_io
-from tests.lib import parameterized
 from tests.lib import test_case
 from tests.lib.surface.compute import router_test_base
 from tests.lib.surface.compute import router_test_utils
 
 
-# TODO(b/117336602) Stop using parameterized for track parameterization.
-@parameterized.parameters((calliope_base.ReleaseTrack.ALPHA, 'alpha'),
-                          (calliope_base.ReleaseTrack.BETA, 'beta'),
-                          (calliope_base.ReleaseTrack.GA, 'v1'))
-class UpdateBgpPeerTest(router_test_base.RouterTestBase):
+class UpdateBgpPeerTestGA(router_test_base.RouterTestBase):
 
-  def testUpdate_noop(self, track, api_version):
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.GA
+    self.api_version = 'v1'
+
+  def testUpdate_noop(self):
     """Sanity test to verify no changes when no flags are specified."""
 
-    self.SelectApi(track, api_version)
+    self.SelectApi(self.track, self.api_version)
 
     orig = router_test_utils.CreateBaseRouterMessage(self.messages)
     updated = copy.deepcopy(orig)
@@ -56,10 +55,10 @@ class UpdateBgpPeerTest(router_test_base.RouterTestBase):
     self.AssertOutputEquals('')
     self.AssertErrContains('Updating peer [my-peer] in router [my-router]')
 
-  def testUpdate_async(self, track, api_version):
+  def testUpdate_async(self):
     """Test command with --async flag."""
 
-    self.SelectApi(track, api_version)
+    self.SelectApi(self.track, self.api_version)
 
     orig = router_test_utils.CreateBaseRouterMessage(self.messages)
     updated = copy.deepcopy(orig)
@@ -80,8 +79,8 @@ class UpdateBgpPeerTest(router_test_base.RouterTestBase):
         'Run the [gcloud compute operations describe] command to check the '
         'status of this operation.\n')
 
-  def testUpdate_base(self, track, api_version):
-    self.SelectApi(track, api_version)
+  def testUpdate_base(self):
+    self.SelectApi(self.track, self.api_version)
 
     orig = router_test_utils.CreateBaseRouterMessage(self.messages)
     updated = copy.deepcopy(orig)
@@ -111,8 +110,8 @@ class UpdateBgpPeerTest(router_test_base.RouterTestBase):
     self.AssertOutputEquals('')
     self.AssertErrContains('Updating peer [my-peer] in router [my-router]')
 
-  def testUpdateAdvertisements_default(self, track, api_version):
-    self.SelectApi(track, api_version)
+  def testUpdateAdvertisements_default(self):
+    self.SelectApi(self.track, self.api_version)
 
     orig = router_test_utils.CreateBaseRouterMessage(self.messages)
     updated = copy.deepcopy(orig)
@@ -133,8 +132,8 @@ class UpdateBgpPeerTest(router_test_base.RouterTestBase):
     self.AssertOutputEquals('')
     self.AssertErrContains('Updating peer [my-peer] in router [my-router]')
 
-  def testUpdateAdvertisements_custom(self, track, api_version):
-    self.SelectApi(track, api_version)
+  def testUpdateAdvertisements_custom(self):
+    self.SelectApi(self.track, self.api_version)
 
     orig = router_test_utils.CreateDefaultRouterMessage(self.messages)
     updated = copy.deepcopy(orig)
@@ -167,9 +166,8 @@ class UpdateBgpPeerTest(router_test_base.RouterTestBase):
     self.AssertOutputEquals('')
     self.AssertErrContains('Updating peer [my-peer] in router [my-router]')
 
-  def testUpdateAdvertisements_incompatibleIncrementalFlagsError(
-      self, track, api_version):
-    self.SelectApi(track, api_version)
+  def testUpdateAdvertisements_incompatibleIncrementalFlagsError(self):
+    self.SelectApi(self.track, self.api_version)
 
     error_msg = ('--add/remove-advertisement flags are not compatible with '
                  '--set-advertisement flags.')
@@ -188,8 +186,8 @@ class UpdateBgpPeerTest(router_test_base.RouterTestBase):
           --add-advertisement-ranges=10.10.10.10/30
           """)
 
-  def testUpdateAdvertisements_peerNotFoundError(self, track, api_version):
-    self.SelectApi(track, api_version)
+  def testUpdateAdvertisements_peerNotFoundError(self):
+    self.SelectApi(self.track, self.api_version)
 
     orig = router_test_utils.CreateEmptyCustomRouterMessage(self.messages)
 
@@ -204,8 +202,8 @@ class UpdateBgpPeerTest(router_test_base.RouterTestBase):
           --set-advertisement-groups=ALL_SUBNETS
           """)
 
-  def testUpdateAdvertisements_customWithDefaultError(self, track, api_version):
-    self.SelectApi(track, api_version)
+  def testUpdateAdvertisements_customWithDefaultError(self):
+    self.SelectApi(self.track, self.api_version)
 
     orig = router_test_utils.CreateEmptyCustomRouterMessage(self.messages)
 
@@ -223,8 +221,8 @@ class UpdateBgpPeerTest(router_test_base.RouterTestBase):
           --set-advertisement-ranges=10.10.10.10/30=custom-range,10.10.10.20/30
           """)
 
-  def testSwitchAdvertiseMode_yes(self, track, api_version):
-    self.SelectApi(track, api_version)
+  def testSwitchAdvertiseMode_yes(self):
+    self.SelectApi(self.track, self.api_version)
 
     self.WriteInput('y\n')
     orig = router_test_utils.CreateFullCustomRouterMessage(self.messages)
@@ -250,8 +248,8 @@ class UpdateBgpPeerTest(router_test_base.RouterTestBase):
                   'groups/ranges from this peer.')
     self.AssertErrContains(prompt_msg)
 
-  def testSwitchAdvertiseMode_no(self, track, api_version):
-    self.SelectApi(track, api_version)
+  def testSwitchAdvertiseMode_no(self):
+    self.SelectApi(self.track, self.api_version)
 
     self.WriteInput('n\n')
     orig = router_test_utils.CreateFullCustomRouterMessage(self.messages)
@@ -266,6 +264,68 @@ class UpdateBgpPeerTest(router_test_base.RouterTestBase):
           --peer-name my-peer
           --advertisement-mode=DEFAULT
           """)
+
+
+class UpdateBgpPeerTestBeta(UpdateBgpPeerTestGA):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.BETA
+    self.api_version = 'beta'
+
+
+class UpdateBgpPeerTestAlpha(UpdateBgpPeerTestBeta):
+
+  def PreSetUp(self):
+    self.track = calliope_base.ReleaseTrack.ALPHA
+    self.api_version = 'alpha'
+
+  def testUpdateBfdFields(self):
+    self.SelectApi(self.track, self.api_version)
+
+    orig = router_test_utils.CreateDefaultRouterMessage(self.messages)
+    orig.bgpPeers[
+        0].enable = self.messages.RouterBgpPeer.EnableValueValuesEnum.FALSE
+    orig.bgpPeers[0].bfd = self.messages.RouterBgpPeerBfd(
+        mode=self.messages.RouterBgpPeerBfd.ModeValueValuesEnum.PASSIVE,
+        minReceiveInterval=400,
+        minTransmitInterval=500,
+        multiplier=5,
+        packetMode=(self.messages.RouterBgpPeerBfd.PacketModeValueValuesEnum
+                    .CONTROL_ONLY),
+        slowTimerInterval=6000,
+    )
+
+    updated = copy.deepcopy(orig)
+
+    updated.bgpPeers[
+        0].enable = self.messages.RouterBgpPeer.EnableValueValuesEnum.TRUE
+    updated.bgpPeers[0].bfd.mode = (
+        self.messages.RouterBgpPeerBfd.ModeValueValuesEnum.PASSIVE)
+    updated.bgpPeers[0].bfd.minReceiveInterval = 700
+    updated.bgpPeers[0].bfd.minTransmitInterval = 800
+    updated.bgpPeers[0].bfd.multiplier = 4
+    updated.bgpPeers[0].bfd.packetMode = (
+        self.messages.RouterBgpPeerBfd.PacketModeValueValuesEnum
+        .CONTROL_AND_ECHO)
+    updated.bgpPeers[0].bfd.slowTimerInterval = 7000
+    self.ExpectGet(orig)
+    self.ExpectPatch(updated)
+    self.ExpectOperationsGet()
+    self.ExpectGet(updated)
+
+    self.Run("""
+        compute routers update-bgp-peer my-router --region us-central1
+        --peer-name my-peer
+        --enabled
+        --bfd-session-initialization-mode PASSIVE
+        --bfd-min-receive-interval 700
+        --bfd-min-transmit-interval 800
+        --bfd-multiplier 4
+        --bfd-packet-mode CONTROL_AND_ECHO
+        --bfd-slow-timer-interval 7000
+        """)
+    self.AssertOutputEquals('')
+    self.AssertErrContains('Updating peer [my-peer] in router [my-router]')
 
 
 if __name__ == '__main__':

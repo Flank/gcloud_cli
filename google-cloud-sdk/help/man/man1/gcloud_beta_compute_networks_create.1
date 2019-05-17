@@ -73,7 +73,7 @@ http://en.wikipedia.org/wiki/Classless_Inter\-Domain_Routing
 This flag only works if mode is legacy
 (https://cloud.google.com/compute/docs/vpc/legacy).
 
-Using legacy networks is **not recommended**, given that many newer Google Cloud
+Using legacy networks is **DEPRECATED**, given that many newer Google Cloud
 Platform features are not supported on legacy networks. Please be advised that
 legacy networks may not be supported in the future.
 
@@ -92,8 +92,8 @@ Subnets are created automatically. This is the recommended selection.
 Create subnets manually.
 .TP 2m
 \fBlegacy\fR
-Create an old style network that has a range and cannot have subnets. This is
-not recommended for new networks.
+[Deprecated] Create an old style network that has a range and cannot have
+subnets. This is not recommended for new networks.
 .RE
 .sp
 
@@ -104,10 +104,11 @@ not recommended for new networks.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

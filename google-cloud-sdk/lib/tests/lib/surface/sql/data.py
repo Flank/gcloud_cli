@@ -704,7 +704,7 @@ def GetBackupDeleteRequest(project, backup):
 # Factory functions to generate sample Operation instances.
 
 
-def GetOperation(project, instance, op_type, op_status):
+def GetOperation(project, instance, op_type, op_status, error=None):
   """Returns a sample Operation of op_type and op_status acting on instance."""
   return sqladmin_v1beta4.Operation(
       # pylint:disable=line-too-long
@@ -735,7 +735,7 @@ def GetOperation(project, instance, op_type, op_status):
           26,
           601000,
           tzinfo=protorpc_util.TimeZoneOffset(datetime.timedelta(0))),
-      error=None,
+      error=error,
       exportContext=None,
       importContext=None,
       targetId=instance.name,
@@ -744,9 +744,8 @@ def GetOperation(project, instance, op_type, op_status):
       targetProject=project,
       kind='sql#operation',
       name='344acb84-0000-1111-2222-1e71c6077b34',
-      selfLink=
-      'https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/sample'.
-      format(project),
+      selfLink='https://www.googleapis.com/sql/v1beta4/projects/{0}/operations/sample'
+      .format(project),
       operationType=op_type,
       status=op_status,
       user='test@sample.gserviceaccount.com',

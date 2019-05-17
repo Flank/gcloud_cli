@@ -22,6 +22,10 @@ from googlecloudsdk.api_lib.run import configuration
 from googlecloudsdk.api_lib.run import k8s_object
 
 
+ENDPOINT_VISIBILITY = 'serving.knative.dev/visibility'
+CLUSTER_LOCAL = 'cluster-local'
+
+
 class Service(k8s_object.KubernetesObject):
   """Wraps a Serverless Service message, making fields more convenient.
 
@@ -30,9 +34,23 @@ class Service(k8s_object.KubernetesObject):
   """
   API_CATEGORY = 'serving.knative.dev'
   KIND = 'Service'
+  # Field names that are present in Cloud Run messages, but should not be
+  # initialized because they aren't supported by the control plane yet.
+  FIELD_BLACKLIST = ['manual', 'release', 'template']
 
   @classmethod
-  def New(cls, client, namespace):
+  def New(cls, client, namespace, private_endpoint=None):
+    """Produces a new Service object.
+
+    Args:
+      client: The Cloud Run API client.
+      namespace: str, The serving namespace.
+      private_endpoint: bool, True if the new Service should only be accessible
+          from within the cluster.
+
+    Returns:
+      A new Service object to be deployed.
+    """
     ret = super(Service, cls).New(client, namespace)
     # We're in oneOf territory, set the other to None for now.
     ret.spec.pinned = None
@@ -40,6 +58,10 @@ class Service(k8s_object.KubernetesObject):
     # TODO(b/112662240): Remove conditional once this field is public
     if hasattr(ret.configuration.spec, 'build'):
       ret.configuration.spec.build = None
+
+    if private_endpoint:
+      ret.labels[ENDPOINT_VISIBILITY] = CLUSTER_LOCAL
+
     # Unset a pile of unused things on the container.
     ret.configuration.container.lifecycle = None
     ret.configuration.container.livenessProbe = None
@@ -79,4 +101,12 @@ class Service(k8s_object.KubernetesObject):
       return '!'
     return super(Service, self).ready_symbol
 
+  @property
+  def last_modifier(self):
+    return self.annotations.get(u'serving.knative.dev/lastModifier')
 
+  @property
+  def last_transition_time(self):
+    return next((c.lastTransitionTime
+                 for c in self.status.conditions
+                 if c.type == u'Ready'), None)

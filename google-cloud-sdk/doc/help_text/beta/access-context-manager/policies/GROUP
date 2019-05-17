@@ -9,8 +9,9 @@ DESCRIPTION
     (BETA) An access policy is a container for access levels and access zones.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
@@ -30,8 +31,12 @@ COMMANDS
         (BETA) List access policies.
 
      update
-        (BETA) Update an existing access policy.
+        (BETA)
 
 NOTES
-    This command is currently in BETA and may change without notice.
+    This command is currently in BETA and may change without notice. These
+    variants are also available:
+
+        $ gcloud access-context-manager policies
+        $ gcloud alpha access-context-manager policies
 

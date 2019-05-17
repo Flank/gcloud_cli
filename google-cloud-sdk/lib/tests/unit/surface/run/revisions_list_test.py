@@ -33,6 +33,8 @@ class RevisionsListTest(base.ServerlessSurfaceBase):
     for i, r in enumerate(self.revisions):
       r.name = 'revision{}'.format(i)
       r.metadata.creationTimestamp = '2018/01/01 00:{}0:00Z'.format(i)
+      r.metadata.selfLink = '/apis/serving.knative.dev/v1alpha1/namespaces/{}/revisions/{}'.format(
+          self.namespace.Name(), r.name)
       r.labels['serving.knative.dev/service'] = 'foo'
       r.labels['serving.knative.dev/configuration'] = 'foo'
       r.annotations[revision.AUTHOR_ANNOTATION] = 'some{}@google.com'.format(i)
@@ -41,6 +43,7 @@ class RevisionsListTest(base.ServerlessSurfaceBase):
           status='Unknown' if i%2 else 'True')]
 
     self.operations.ListRevisions.return_value = self.revisions
+    self._MockConnectionContext()
 
   def testNoArg(self):
     """Two revisions are listable using the Serverless API format."""
@@ -67,3 +70,15 @@ class RevisionsListTest(base.ServerlessSurfaceBase):
         + revision0 foo some0@google.com 2018-01-01 00:00:00 UTC
         . revision1 foo some1@google.com 2018-01-01 00:10:00 UTC
         """, normalize_space=True)
+
+  def testNoArgUri(self):
+    """Two routes are listable using the Serverless API format."""
+    self.Run('run revisions list --uri')
+
+    self.operations.ListRevisions.assert_called_once_with(self.namespace,
+                                                          None)
+    self.AssertOutputEquals(
+        """https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/revisions/revision0
+        https://us-central1-run.googleapis.com/apis/serving.knative.dev/v1alpha1/namespaces/fake-project/revisions/revision1
+        """,
+        normalize_space=True)

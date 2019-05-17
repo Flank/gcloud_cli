@@ -11,7 +11,7 @@ gcloud alpha compute instance\-groups managed create \- create a Compute Engine 
 
 .SH "SYNOPSIS"
 .HP
-\f5gcloud alpha compute instance\-groups managed create\fR \fINAME\fR \fB\-\-size\fR=\fISIZE\fR \fB\-\-template\fR=\fITEMPLATE\fR [\fB\-\-base\-instance\-name\fR=\fIBASE_INSTANCE_NAME\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-initial\-delay\fR=\fIINITIAL_DELAY\fR] [\fB\-\-instance\-redistribution\-type\fR=\fITYPE\fR] [\fB\-\-stateful\-disks\fR=\fIDEVICE_NAME\fR,[\fIDEVICE_NAME\fR,...]] [\fB\-\-stateful\-names\fR] [\fB\-\-target\-pool\fR=[\fITARGET_POOL\fR,...]] [\fB\-\-zones\fR=\fIZONE\fR,[\fIZONE\fR,...]] [\fB\-\-health\-check\fR=\fIHEALTH_CHECK\fR\ |\ \fB\-\-http\-health\-check\fR=\fIHTTP_HEALTH_CHECK\fR\ |\ \fB\-\-https\-health\-check\fR=\fIHTTPS_HEALTH_CHECK\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
+\f5gcloud alpha compute instance\-groups managed create\fR \fINAME\fR \fB\-\-size\fR=\fISIZE\fR \fB\-\-template\fR=\fITEMPLATE\fR [\fB\-\-base\-instance\-name\fR=\fIBASE_INSTANCE_NAME\fR] [\fB\-\-description\fR=\fIDESCRIPTION\fR] [\fB\-\-initial\-delay\fR=\fIINITIAL_DELAY\fR] [\fB\-\-instance\-redistribution\-type\fR=\fITYPE\fR] [\fB\-\-stateful\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR]] [\fB\-\-stateful\-names\fR] [\fB\-\-target\-pool\fR=[\fITARGET_POOL\fR,...]] [\fB\-\-zones\fR=\fIZONE\fR,[\fIZONE\fR,...]] [\fB\-\-health\-check\fR=\fIHEALTH_CHECK\fR\ |\ \fB\-\-http\-health\-check\fR=\fIHTTP_HEALTH_CHECK\fR\ |\ \fB\-\-https\-health\-check\fR=\fIHTTPS_HEALTH_CHECK\fR] [\fB\-\-region\fR=\fIREGION\fR\ |\ \fB\-\-zone\fR=\fIZONE\fR] [\fIGCLOUD_WIDE_FLAG\ ...\fR]
 
 
 
@@ -74,7 +74,7 @@ An optional description for this group.
 
 .TP 2m
 \fB\-\-initial\-delay\fR=\fIINITIAL_DELAY\fR
-Specifies the length of the period during which the instance is known to be
+Specifies the length of time during which the instance is known to be
 initializing and should not be autohealed even if unhealthy. This value cannot
 be greater than 1 hour. See $ gcloud topic datetimes for information on duration
 formats.
@@ -108,12 +108,29 @@ zones to its target distribution.
 
 .RS 2m
 .TP 2m
-\fB\-\-stateful\-disks\fR=\fIDEVICE_NAME\fR,[\fIDEVICE_NAME\fR,...]
+\fB\-\-stateful\-disk\fR=[\fIauto\-delete\fR=\fIAUTO\-DELETE\fR],[\fIdevice\-name\fR=\fIDEVICE\-NAME\fR]
 Disks considered stateful by the instance group. Usually, the managed instance
 group deletes disks when deleting instances; however, in the case of stateful
 disks, these disks are detached from the deleted instance and attached to new
 instances the managed instance group creates.
 
+Use this argument multiple times to attach more disks.
+
+.RS 2m
+.TP 2m
+\fBdevice\-name\fR
+(Requied) Device name of the disk to mark stateful.
+
+.TP 2m
+\fBauto\-delete\fR
+(Optional) Specifies the auto deletion policy of the stateful disk. Supported
+values are 'never' (never delete this disk) and
+\'on\-permanent\-instance\-deletion' (delete the stateful disk when the given
+instance is permanently deleted from the instance group; for example when the
+group is resized down). If omitted, 'never' is used as the default.
+
+.RE
+.sp
 .TP 2m
 \fB\-\-stateful\-names\fR
 Enable stateful names of instances. Whenever instances with those names are
@@ -146,15 +163,15 @@ Name of the health check to operate on.
 
 .TP 2m
 \fB\-\-http\-health\-check\fR=\fIHTTP_HEALTH_CHECK\fR
-(DEPRECATED) Specifies the HTTP health check object used for autohealing
-instances in this group.
+(DEPRECATED) HTTP health check object used for autohealing instances in this
+group.
 
 HttpHealthCheck is deprecated. Use \-\-health\-check instead.
 
 .TP 2m
 \fB\-\-https\-health\-check\fR=\fIHTTPS_HEALTH_CHECK\fR
-(DEPRECATED) Specifies the HTTPS health check object used for autohealing
-instances in this group.
+(DEPRECATED) HTTPS health check object used for autohealing instances in this
+group.
 
 HttpsHealthCheck is deprecated. Use \-\-health\-check instead.
 
@@ -207,10 +224,11 @@ invocation.
 
 .SH "GCLOUD WIDE FLAGS"
 
-These flags are available to all commands: \-\-account, \-\-configuration,
-\-\-flags\-file, \-\-flatten, \-\-format, \-\-help, \-\-log\-http, \-\-project,
-\-\-quiet, \-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$
-gcloud help\fR for details.
+These flags are available to all commands: \-\-account, \-\-billing\-project,
+\-\-configuration, \-\-flags\-file, \-\-flatten, \-\-format, \-\-help,
+\-\-impersonate\-service\-account, \-\-log\-http, \-\-project, \-\-quiet,
+\-\-trace\-token, \-\-user\-output\-enabled, \-\-verbosity. Run \fB$ gcloud
+help\fR for details.
 
 
 

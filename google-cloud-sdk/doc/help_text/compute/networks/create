@@ -45,10 +45,9 @@ FLAGS
         This flag only works if mode is legacy
         (https://cloud.google.com/compute/docs/vpc/legacy).
 
-        Using legacy networks is **not recommended**, given that many newer
-        Google Cloud Platform features are not supported on legacy networks.
-        Please be advised that legacy networks may not be supported in the
-        future.
+        Using legacy networks is **DEPRECATED**, given that many newer Google
+        Cloud Platform features are not supported on legacy networks. Please be
+        advised that legacy networks may not be supported in the future.
 
      --subnet-mode=MODE
         The subnet mode of the network. If not specified, defaults to AUTO.
@@ -61,12 +60,13 @@ FLAGS
          custom
             Create subnets manually.
          legacy
-            Create an old style network that has a range and cannot have
-            subnets. This is not recommended for new networks.
+            [Deprecated] Create an old style network that has a range and
+            cannot have subnets. This is not recommended for new networks.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 

@@ -3,11 +3,12 @@ NAME
 
 SYNOPSIS
     gcloud alpha GROUP | COMMAND [--account=ACCOUNT]
-        [--configuration=CONFIGURATION] [--flags-file=YAML_FILE]
-        [--flatten=[KEY,...]] [--format=FORMAT] [--help] [--project=PROJECT_ID]
-        [--quiet, -q] [--verbosity=VERBOSITY; default="warning"]
-        [--version, -v] [-h] [--log-http] [--trace-token=TRACE_TOKEN]
-        [--no-user-output-enabled]
+        [--billing-project=BILLING_PROJECT] [--configuration=CONFIGURATION]
+        [--flags-file=YAML_FILE] [--flatten=[KEY,...]] [--format=FORMAT]
+        [--help] [--project=PROJECT_ID] [--quiet, -q]
+        [--verbosity=VERBOSITY; default="warning"] [--version, -v] [-h]
+        [--impersonate-service-account=SERVICE_ACCOUNT_EMAIL] [--log-http]
+        [--trace-token=TRACE_TOKEN] [--no-user-output-enabled]
 
 DESCRIPTION
     (ALPHA) Alpha versions of gcloud commands.
@@ -16,6 +17,15 @@ GLOBAL FLAGS
      --account=ACCOUNT
         Google Cloud Platform user account to use for invocation. Overrides the
         default core/account property value for this command invocation.
+
+     --billing-project=BILLING_PROJECT
+        The Google Cloud Platform project that will be charged quota for
+        operations performed in gcloud. If you need to operate on one project,
+        but need quota against a different project, you can use this flag to
+        specify the billing project. If both billing/quota_project and
+        --billing-project are specified, --billing-project takes precedence.
+        Run $ gcloud config set --help to see more information about
+        billing/quota_project.
 
      --configuration=CONFIGURATION
         The configuration to use for this command invocation. For more
@@ -80,6 +90,18 @@ GLOBAL FLAGS
         Print a summary help and exit.
 
 OTHER FLAGS
+     --impersonate-service-account=SERVICE_ACCOUNT_EMAIL
+        For this gcloud invocation, all API requests will be made as the given
+        service account instead of the currently selected account. This is done
+        without needing to create, download, and activate a key for the
+        account. In order to perform operations as the service account, your
+        currently selected account must have an IAM role that includes the
+        iam.serviceAccounts.getAccessToken permission for the service account.
+        The roles/iam.serviceAccountTokenCreator role has this permission or
+        you may create a custom role. Overrides the default
+        auth/impersonate_service_account property value for this command
+        invocation.
+
      --log-http
         Log all HTTP server requests and responses to stderr. Overrides the
         default core/log_http property value for this command invocation.
@@ -97,11 +119,17 @@ OTHER FLAGS
 GROUPS
     GROUP is one of the following:
 
+     access-context-manager
+        (ALPHA) Manage Access Context Manager resources.
+
+     ai-platform
+        (ALPHA) Manage AI Platform jobs and models.
+
      app
         (ALPHA) Manage your App Engine deployments.
 
      asset
-        (ALPHA) Manage CloudAsset.
+        (ALPHA) Manage the Cloud Asset Inventory.
 
      auth
         (ALPHA) Manage oauth2 credentials for the Google Cloud SDK.
@@ -133,8 +161,14 @@ GROUPS
      container
         (ALPHA) Deploy and manage clusters of machines for running containers.
 
+     data-catalog
+        (ALPHA) Manage Cloud Data Catalog resources.
+
      dataflow
         (ALPHA) Read and manipulate Google Dataflow resources.
+
+     dataproc
+        (ALPHA) Create and manage Google Cloud Dataproc clusters and jobs.
 
      datastore
         (ALPHA) Manage your Cloud Datastore indexes.
@@ -142,8 +176,15 @@ GROUPS
      deployment-manager
         (ALPHA) Manage deployments of cloud resources.
 
+     dialogflow
+        (ALPHA) Interact with and manage Dialogflow agents, entities, and
+        intents.
+
      dlp
         (ALPHA) Manage sensitive data with Cloud Data Loss Prevention.
+
+     domains
+        (ALPHA) Manage domains for your Google Cloud projects.
 
      emulators
         (ALPHA) Set up your local development environment using emulators.
@@ -164,10 +205,16 @@ GROUPS
         (ALPHA) Manage Google Cloud Functions.
 
      genomics
-        (ALPHA) Manage Genomics resources using version 1 of the API.
+        (ALPHA) Manage Genomics resources.
+
+     healthcare
+        (ALPHA) Manage Cloud Healthcare resources.
 
      iam
         (ALPHA) Manage IAM service accounts and keys.
+
+     iap
+        (ALPHA) Manage IAP policies.
 
      iot
         (ALPHA) Manage Cloud IoT resources.
@@ -175,11 +222,14 @@ GROUPS
      kms
         (ALPHA) Manage cryptographic keys in the cloud.
 
+     logging
+        (ALPHA) Manage Stackdriver Logging.
+
      ml
         (ALPHA) Use Google Cloud machine learning capabilities.
 
      ml-engine
-        (ALPHA) Manage Cloud ML Engine jobs and models.
+        (ALPHA) Manage AI Platform jobs and models.
 
      monitoring
         (ALPHA) Manage Stackdriver Monitoring alerting policies and
@@ -192,7 +242,7 @@ GROUPS
         (ALPHA) Create and manage project access policies.
 
      pubsub
-        (ALPHA) Manage Cloud Pub/Sub topics and subscriptions.
+        (ALPHA) Manage Cloud Pub/Sub topics, subscriptions, and snapshots.
 
      redis
         (ALPHA) Manage Cloud Memorystore Redis resources.
@@ -208,6 +258,9 @@ GROUPS
 
      run
         (ALPHA) Manage your Cloud Run applications.
+
+     scc
+        (ALPHA) Manage Cloud SCC resources.
 
      scheduler
         (ALPHA) Manage Cloud Scheduler jobs and schedules.
@@ -227,6 +280,9 @@ GROUPS
      tasks
         (ALPHA) Manage Cloud Tasks queues and tasks.
 
+     web-security-scanner
+        (ALPHA) Manage Cloud Web Security Scanner resources.
+
 COMMANDS
     COMMAND is one of the following:
 
@@ -241,6 +297,9 @@ COMMANDS
 
      search-help
         (ALPHA) (DEPRECATED) Search the help text of gcloud commands.
+
+     survey
+        (ALPHA) Invoke a customer satisfaction survey for Cloud SDK.
 
 NOTES
     This command is currently in ALPHA and may change without notice. If this

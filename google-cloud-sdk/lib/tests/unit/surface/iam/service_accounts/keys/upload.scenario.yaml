@@ -1,0 +1,95 @@
+title: Upload a public key for service account
+release_tracks: [ALPHA]
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: iam service-accounts keys upload
+  - stderr: |
+      ERROR: (gcloud.alpha.iam.service-accounts.keys.upload) argument PUBLIC_KEY_FILE --iam-account: Must be specified.
+      Usage: gcloud alpha iam service-accounts keys upload PUBLIC_KEY_FILE --iam-account=IAM_ACCOUNT [optional flags]
+        optional flags may be  --help
+
+      For detailed information on this command and its flags, run:
+        gcloud alpha iam service-accounts keys upload --help
+  - error: '1: argument PUBLIC_KEY_FILE --iam-account: Must be specified.'
+- execute:
+  - command: iam service-accounts keys upload test_data/missing_file.cert --iam-account
+      test-account@fake-project.iam.gsserviceaccount.com
+  - error: "1: Unable to read file [test_data/missing_file.cert]: [Errno 2] No such\
+      \ file or directory: 'test_data/missing_file.cert'"
+- execute:
+  - command: iam service-accounts keys upload test_data/public_key.cert
+  - stderr: |
+      ERROR: (gcloud.alpha.iam.service-accounts.keys.upload) argument --iam-account: Must be specified.
+      Usage: gcloud alpha iam service-accounts keys upload PUBLIC_KEY_FILE --iam-account=IAM_ACCOUNT [optional flags]
+        optional flags may be  --help
+
+      For detailed information on this command and its flags, run:
+        gcloud alpha iam service-accounts keys upload --help
+  - error: '1: argument --iam-account: Must be specified.'
+- execute:
+  - command: iam service-accounts keys upload test_data/public_key.cert --iam-account
+      test-account@fake-project.iam.gserviceaccount.com
+  - stdout: |
+      name: projects/fake-project/serviceAccounts/test-account@fake-project.iam.gserviceaccount.com/keys/ba708b556b50d4f3b081164aca2c56a8ee232069
+actions:
+- write_file:
+    path: test_data/public_key.cert
+    contents: |
+      -----BEGIN CERTIFICATE-----
+      MIIFazCCA1OgAwIBAgIUONCtumxwgtKm+rQUTTC0bjVxRwowDQYJKoZIhvcNAQEL
+      BQAwRTELMAkGA1UEBhMCQVUxEzARBgNVBAgMClNvbWUtU3RhdGUxITAfBgNVBAoM
+      GEludGVybmV0IFdpZGdpdHMgUHR5IEx0ZDAeFw0xOTA0MjMwMDIyNDRaFw0yMDA0
+      MjIwMDIyNDRaMEUxCzAJBgNVBAYTAkFVMRMwEQYDVQQIDApTb21lLVN0YXRlMSEw
+      HwYDVQQKDBhJbnRlcm5ldCBXaWRnaXRzIFB0eSBMdGQwggIiMA0GCSqGSIb3DQEB
+      AQUAA4ICDwAwggIKAoICAQDjsgk0gT/frgW+YFDLx38gVFfE1EiqOD5qb7T0G7ww
+      IUATd2+n5fwNmnMDr5O3djcZvrp26wnqnoGZ+xdRmwqwrMTPqWv4TTdmWXfABbAn
+      XW4uibgw7RxVtryi62VBUIucUveuthDzdpMd8vIJfNIpeVQA2Aq6FVSkmrQhuGOR
+      pekjZmK+UURF+HUM/iBNlnx3wIGEsgmGCsImS5BeD1yo+YvCGxpb7/TqCcNdisb4
+      5CUsAQw1HVTbRzbsKTK7Jq/hafarS8TJn7Z1RGMejMSDJJrmADZVtl+WvvvbrKi+
+      SdvbyWEgMJ/yDenZmdzqIDri+eiXwsGXFWgnhwx+P0IVahpg9wcrohV28Ey+E73v
+      wweNCdwllPPNFofm9CN7IrDg6M8+j5OOH8bEacN+sBUoI/3Mwhcbo39Mnm2B8081
+      toEXJM3mpD36w5lXVsCQmVgrEP76lslLBO8e6OMD9s4vK5nUUNf0PhbcmcBHQkBe
+      3d11mHcrJkwShqfxDfesWkQjhfO9mPWrXJVbDijke8+CPWSpF++oUoh1kx/e24JM
+      gcfrdam4Ew0ej1re0mf3abbgj0bJwuTH0WIxCqsUdhQk8WJoFb+WvSyQXc+rATns
+      fqahrkNlNnx/dGD0ey2HT5YcjFT71fNylx8PHkwrprL3bDPjou1chBe+QdDN8M78
+      UwIDAQABo1MwUTAdBgNVHQ4EFgQUiQExKoMFUYDbfCx08pnkP/EKDP0wHwYDVR0j
+      BBgwFoAUiQExKoMFUYDbfCx08pnkP/EKDP0wDwYDVR0TAQH/BAUwAwEB/zANBgkq
+      hkiG9w0BAQsFAAOCAgEABk34k4tRZ73C1zABd2XDO5w5hht0oTpJGaNZaOveLrSn
+      TGiVUzh+tVWZWpd4qHkGDYqoILSR1odii+MvhTtLJNBevvYexg3eknXW1cgmWPcd
+      PIfQDhzdMt+VGnNLaJ6bhkBacvZlk+YxutDV+AzZpvTsvNc7PwkpQM1/Sbi7YrP0
+      m60ADazn4yP2ansa9XQ6+1AeLczkNLCv2mHf9jBeGryVlqtLf55lT00PfYqatKOP
+      gBRwFjvsbtUsY5XzoBUEhnbUQ0k9vWWxSo+QIPixy2+vNe684Yre3Ec6bfgjS8w/
+      7tEVAoj7HB7QyUPMVwCjeLb6W1nA76cKqlNxuLvoa0nA5oL7Z/ML7R41gmDXvKVl
+      NKWMzlqMkYf7KOTzLeZoJAzYXzmo1dN8eYeEmaak7unqDfTTFuOrlnsnXhIXrBTd
+      hkeT3B4nMUt4CbBrVRKs4NlqqXliUBk7c4Qi/NTw+2OBFIUJLlM8NhDBDIYpyZmT
+      8T6Q3BLGyTWxWh5O1PmCrUudS0zYWYgHkp46kI0/tq5HG76BBt/QQBbnyLtEWa0o
+      Hia8dqWlh+Wi/HnDxmWp92o4fy2le4be7/eP2Iy8OhvgAHnoVd9gqX7wfv2jsGWL
+      HvXuehLMGQAItqKfZfdSjPeoy53hS527vfDhn+ycHJLj0O4eM/3BHKbkmkQsBT8=
+      -----END CERTIFICATE-----
+- execute_command:
+    command: iam service-accounts keys upload test_data/missing_file.cert --iam-account
+      test-account@fake-project.iam.gsserviceaccount.com
+    events:
+    - expect_exit:
+        code: 1
+        message:
+          matches: ".*No such file or directory.*"
+- execute_command:
+    command: iam service-accounts keys upload test_data/public_key.cert --iam-account
+      test-account@fake-project.iam.gserviceaccount.com
+    events:
+    - api_call:
+        expect_request:
+          uri: https://iam.googleapis.com/v1/projects/fake-project/serviceAccounts/test-account@fake-project.iam.gserviceaccount.com/keys:upload?alt=json
+          method: POST
+          body:
+            json:
+              publicKeyData: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUZhekNDQTFPZ0F3SUJBZ0lVT05DdHVteHdndEttK3JRVVRUQzBialZ4Undvd0RRWUpLb1pJaHZjTkFRRUwKQlFBd1JURUxNQWtHQTFVRUJoTUNRVlV4RXpBUkJnTlZCQWdNQ2xOdmJXVXRVM1JoZEdVeElUQWZCZ05WQkFvTQpHRWx1ZEdWeWJtVjBJRmRwWkdkcGRITWdVSFI1SUV4MFpEQWVGdzB4T1RBME1qTXdNREl5TkRSYUZ3MHlNREEwCk1qSXdNREl5TkRSYU1FVXhDekFKQmdOVkJBWVRBa0ZWTVJNd0VRWURWUVFJREFwVGIyMWxMVk4wWVhSbE1TRXcKSHdZRFZRUUtEQmhKYm5SbGNtNWxkQ0JYYVdSbmFYUnpJRkIwZVNCTWRHUXdnZ0lpTUEwR0NTcUdTSWIzRFFFQgpBUVVBQTRJQ0R3QXdnZ0lLQW9JQ0FRRGpzZ2swZ1QvZnJnVytZRkRMeDM4Z1ZGZkUxRWlxT0Q1cWI3VDBHN3d3CklVQVRkMituNWZ3Tm1uTURyNU8zZGpjWnZycDI2d25xbm9HWit4ZFJtd3F3ck1UUHFXdjRUVGRtV1hmQUJiQW4KWFc0dWliZ3c3UnhWdHJ5aTYyVkJVSXVjVXZldXRoRHpkcE1kOHZJSmZOSXBlVlFBMkFxNkZWU2ttclFodUdPUgpwZWtqWm1LK1VVUkYrSFVNL2lCTmxueDN3SUdFc2dtR0NzSW1TNUJlRDF5bytZdkNHeHBiNy9UcUNjTmRpc2I0CjVDVXNBUXcxSFZUYlJ6YnNLVEs3SnEvaGFmYXJTOFRKbjdaMVJHTWVqTVNESkpybUFEWlZ0bCtXdnZ2YnJLaSsKU2R2YnlXRWdNSi95RGVuWm1kenFJRHJpK2VpWHdzR1hGV2duaHd4K1AwSVZhaHBnOXdjcm9oVjI4RXkrRTczdgp3d2VOQ2R3bGxQUE5Gb2ZtOUNON0lyRGc2TTgrajVPT0g4YkVhY04rc0JVb0kvM013aGNibzM5TW5tMkI4MDgxCnRvRVhKTTNtcEQzNnc1bFhWc0NRbVZnckVQNzZsc2xMQk84ZTZPTUQ5czR2SzVuVVVOZjBQaGJjbWNCSFFrQmUKM2QxMW1IY3JKa3dTaHFmeERmZXNXa1FqaGZPOW1QV3JYSlZiRGlqa2U4K0NQV1NwRisrb1VvaDFreC9lMjRKTQpnY2ZyZGFtNEV3MGVqMXJlMG1mM2FiYmdqMGJKd3VUSDBXSXhDcXNVZGhRazhXSm9GYitXdlN5UVhjK3JBVG5zCmZxYWhya05sTm54L2RHRDBleTJIVDVZY2pGVDcxZk55bHg4UEhrd3JwckwzYkRQam91MWNoQmUrUWRETjhNNzgKVXdJREFRQUJvMU13VVRBZEJnTlZIUTRFRmdRVWlRRXhLb01GVVlEYmZDeDA4cG5rUC9FS0RQMHdId1lEVlIwagpCQmd3Rm9BVWlRRXhLb01GVVlEYmZDeDA4cG5rUC9FS0RQMHdEd1lEVlIwVEFRSC9CQVV3QXdFQi96QU5CZ2txCmhraUc5dzBCQVFzRkFBT0NBZ0VBQmszNGs0dFJaNzNDMXpBQmQyWERPNXc1aGh0MG9UcEpHYU5aYU92ZUxyU24KVEdpVlV6aCt0VldaV3BkNHFIa0dEWXFvSUxTUjFvZGlpK012aFR0TEpOQmV2dllleGczZWtuWFcxY2dtV1BjZApQSWZRRGh6ZE10K1ZHbk5MYUo2YmhrQmFjdlpsaytZeHV0RFYrQXpacHZUc3ZOYzdQd2twUU0xL1NiaTdZclAwCm02MEFEYXpuNHlQMmFuc2E5WFE2KzFBZUxjemtOTEN2Mm1IZjlqQmVHcnlWbHF0TGY1NWxUMDBQZllxYXRLT1AKZ0JSd0ZqdnNidFVzWTVYem9CVUVobmJVUTBrOXZXV3hTbytRSVBpeHkyK3ZOZTY4NFlyZTNFYzZiZmdqUzh3Lwo3dEVWQW9qN0hCN1F5VVBNVndDamVMYjZXMW5BNzZjS3FsTnh1THZvYTBuQTVvTDdaL01MN1I0MWdtRFh2S1ZsCk5LV016bHFNa1lmN0tPVHpMZVpvSkF6WVh6bW8xZE44ZVllRW1hYWs3dW5xRGZUVEZ1T3JsbnNuWGhJWHJCVGQKaGtlVDNCNG5NVXQ0Q2JCclZSS3M0TmxxcVhsaVVCazdjNFFpL05UdysyT0JGSVVKTGxNOE5oREJESVlweVptVAo4VDZRM0JMR3lUV3hXaDVPMVBtQ3JVdWRTMHpZV1lnSGtwNDZrSTAvdHE1SEc3NkJCdC9RUUJibnlMdEVXYTBvCkhpYThkcVdsaCtXaS9IbkR4bVdwOTJvNGZ5MmxlNGJlNy9lUDJJeThPaHZnQUhub1ZkOWdxWDd3ZnYyanNHV0wKSHZYdWVoTE1HUUFJdHFLZlpmZFNqUGVveTUzaFM1Mjd2ZkRobit5Y0hKTGowTzRlTS8zQkhLYmtta1FzQlQ4PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0t
+        return_response:
+          body:
+            name: projects/fake-project/serviceAccounts/test-account@fake-project.iam.gserviceaccount.com/keys/ba708b556b50d4f3b081164aca2c56a8ee232069
+    - expect_stdout: |
+        name: projects/fake-project/serviceAccounts/test-account@fake-project.iam.gserviceaccount.com/keys/ba708b556b50d4f3b081164aca2c56a8ee232069
+    - expect_exit:
+        code: 0

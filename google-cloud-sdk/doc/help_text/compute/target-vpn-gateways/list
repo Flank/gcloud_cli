@@ -1,6 +1,6 @@
 NAME
-    gcloud compute target-vpn-gateways list - list Google Compute Engine target
-        VPN gateways
+    gcloud compute target-vpn-gateways list - list Google Compute Engine Cloud
+        VPN Classic Target VPN Gateways
 
 SYNOPSIS
     gcloud compute target-vpn-gateways list [NAME ...]
@@ -10,10 +10,11 @@ SYNOPSIS
 
 DESCRIPTION
     gcloud compute target-vpn-gateways list displays all Google Compute Engine
-    target VPN gateways in a project.
+    Cloud VPN Classic Target VPN Gateways in a project.
 
-    By default, target VPN gateways from all regions are listed. The results
-    can be narrowed down using a filter: --filter="region:( REGION ... )".
+    By default, Cloud VPN Classic Target VPN Gateways from all regions are
+    listed. The results can be narrowed down using a filter: --filter="region:(
+    REGION ... )".
 
 POSITIONAL ARGUMENTS
      [NAME ...]
@@ -68,22 +69,25 @@ LIST COMMAND FLAGS
         Print a list of resource URIs instead of the default output.
 
 GCLOUD WIDE FLAGS
-    These flags are available to all commands: --account, --configuration,
-    --flags-file, --flatten, --format, --help, --log-http, --project, --quiet,
+    These flags are available to all commands: --account, --billing-project,
+    --configuration, --flags-file, --flatten, --format, --help,
+    --impersonate-service-account, --log-http, --project, --quiet,
     --trace-token, --user-output-enabled, --verbosity. Run $ gcloud help for
     details.
 
 EXAMPLES
-    To list all target VPN gateways in a project in table form, run:
+    To list all Cloud VPN Classic Target VPN Gateways in a project in table
+    form, run:
 
         $ gcloud compute target-vpn-gateways list
 
-    To list the URIs of all target VPN gateways in a project, run:
+    To list the URIs of all Cloud VPN Classic Target VPN Gateways in a project,
+    run:
 
         $ gcloud compute target-vpn-gateways list --uri
 
-    To list all target VPN gateways in the us-central1 and europe-west1
-    regions, run:
+    To list all Cloud VPN Classic Target VPN Gateways in the us-central1 and
+    europe-west1 regions, run:
 
         $ gcloud compute target-vpn-gateways list \
             --filter="region:( us-central1 europe-west1 )"

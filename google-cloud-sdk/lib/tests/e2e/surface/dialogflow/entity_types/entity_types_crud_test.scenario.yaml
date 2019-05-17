@@ -1,0 +1,518 @@
+title: dialogflow entity-types CRUD test
+release_tracks:
+- ALPHA
+
+summary:
+# This summary is generated automatically on update and should not be edited.
+- execute:
+  - command: |
+      dialogflow entity-types create
+        --display-name="$$entity-type-display-name$$"
+        --entities="red,blue,green"
+        --auto-expand
+  - stderr: |
+      Created entity type [$$entity-type-basename$$].
+- execute:
+  - command: |
+      dialogflow entity-types describe $$entity-type$$
+  - stdout: |
+      autoExpansionMode: AUTO_EXPANSION_MODE_DEFAULT
+      displayName: $$entity-type-display-name$$
+      entities:
+      - synonyms:
+        - red
+        value: red
+      - synonyms:
+        - blue
+        value: blue
+      - synonyms:
+        - green
+        value: green
+      kind: KIND_LIST
+      name: $$entity-type$$
+- execute:
+  - command: |
+      dialogflow entity-types update $$entity-type$$
+        --remove-entities="green"
+        --no-auto-expand
+        --display-name="$$entity-type-display-name$$-2"
+  - stderr: |
+      Updated entityType [$$entity-type-basename$$].
+  - stdout: |
+      displayName: $$entity-type-display-name$$-2
+      entities:
+      - synonyms:
+        - red
+        value: red
+      - synonyms:
+        - blue
+        value: blue
+      kind: KIND_LIST
+      name: $$entity-type$$
+- execute:
+  - command: |
+      dialogflow entity-types update $$entity-type$$
+        --clear-entities
+        --add-entities="yellow"
+  - stderr: |
+      Updated entityType [$$entity-type-basename$$].
+  - stdout: |
+      displayName: $$entity-type-display-name$$-2
+      entities:
+      - synonyms:
+        - yellow
+        value: yellow
+      kind: KIND_LIST
+      name: $$entity-type$$
+- execute:
+  - command: |
+      dialogflow entity-types update $$entity-type$$
+        --clear-entities
+        --flags-file flags_file.yaml
+  - stderr: |
+      Updated entityType [$$entity-type-basename$$].
+  - stdout: |
+      displayName: $$entity-type-display-name$$-2
+      entities:
+      - synonyms:
+        - red
+        - maroon
+        value: red
+      kind: KIND_MAP
+      name: $$entity-type$$
+- execute:
+  - command: |
+      dialogflow entity-types list --filter="name=$$entity-type$$"
+        --format="text(name.basename(), displayName, kind)"
+  - stdout: |
+      ---
+      displayName: $$entity-type-display-name$$-2
+      kind:        KIND_MAP
+      name:        $$entity-type-basename$$
+- execute:
+  - command: |
+      dialogflow entity-types delete $$entity-type$$
+  - prompt:
+    - message: You are about to delete entityType [$$entity-type-basename$$]
+    - input: y
+  - stderr: |
+      Deleted entityType [$$entity-type-basename$$].
+actions:
+- generate_resource_id:
+    reference: entity-type-display-name
+    prefix: test-et
+- execute_command:
+    command: |
+      dialogflow entity-types create
+        --display-name="$$entity-type-display-name$$"
+        --entities="red,blue,green"
+        --auto-expand
+    events:
+    - api_call:
+        expect_request:
+          uri: https://dialogflow.googleapis.com/v2/projects/cloud-sdk-integration-testing/agent/entityTypes?alt=json
+          method: POST
+          headers: {}
+          body:
+            json:
+              autoExpansionMode: AUTO_EXPANSION_MODE_DEFAULT
+              displayName: $$entity-type-display-name$$
+              entities:
+              - synonyms:
+                - red
+                value: red
+              - synonyms:
+                - blue
+                value: blue
+              - synonyms:
+                - green
+                value: green
+              kind: KIND_LIST
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '493'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/agent/entityTypes/c153c4ea-3eb0-4e17-9560-5326e03d5ca2
+            displayName: $$entity-type-display-name$$
+            kind: KIND_LIST
+            autoExpansionMode: AUTO_EXPANSION_MODE_DEFAULT
+            entities:
+            - value: red
+              synonyms:
+              - red
+            - value: blue
+              synonyms:
+              - blue
+            - value: green
+              synonyms:
+              - green
+        expect_response:
+          extract_references:
+          - field: name
+            reference: entity-type
+          - field: name
+            reference: entity-type-basename
+            modifiers:
+              basename: true
+          body:
+            json: {}
+    - expect_stderr: |
+        Created entity type [$$entity-type-basename$$].
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      dialogflow entity-types describe $$entity-type$$
+    events:
+    - api_call:
+        expect_request:
+          uri: https://dialogflow.googleapis.com/v2/$$entity-type$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '493'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/agent/entityTypes/c153c4ea-3eb0-4e17-9560-5326e03d5ca2
+            displayName: $$entity-type-display-name$$
+            kind: KIND_LIST
+            autoExpansionMode: AUTO_EXPANSION_MODE_DEFAULT
+            entities:
+            - value: red
+              synonyms:
+              - red
+            - value: blue
+              synonyms:
+              - blue
+            - value: green
+              synonyms:
+              - green
+    - expect_stdout: |
+        autoExpansionMode: AUTO_EXPANSION_MODE_DEFAULT
+        displayName: $$entity-type-display-name$$
+        entities:
+        - synonyms:
+          - red
+          value: red
+        - synonyms:
+          - blue
+          value: blue
+        - synonyms:
+          - green
+          value: green
+        kind: KIND_LIST
+        name: $$entity-type$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      dialogflow entity-types update $$entity-type$$
+        --remove-entities="green"
+        --no-auto-expand
+        --display-name="$$entity-type-display-name$$-2"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://dialogflow.googleapis.com/v2/$$entity-type$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '493'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/agent/entityTypes/c153c4ea-3eb0-4e17-9560-5326e03d5ca2
+            displayName: $$entity-type-display-name$$
+            kind: KIND_LIST
+            autoExpansionMode: AUTO_EXPANSION_MODE_DEFAULT
+            entities:
+            - value: red
+              synonyms:
+              - red
+            - value: blue
+              synonyms:
+              - blue
+            - value: green
+              synonyms:
+              - green
+    - api_call:
+        expect_request:
+          uri: https://dialogflow.googleapis.com/v2/$$entity-type$$?alt=json&updateMask=entities%2CdisplayName%2CautoExpansionMode
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              autoExpansionMode: AUTO_EXPANSION_MODE_UNSPECIFIED
+              displayName: $$entity-type-display-name$$-2
+              entities:
+              - synonyms:
+                - red
+                value: red
+              - synonyms:
+                - blue
+                value: blue
+              kind: KIND_LIST
+              name: $$entity-type$$
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '360'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/agent/entityTypes/c153c4ea-3eb0-4e17-9560-5326e03d5ca2
+            displayName: $$entity-type-display-name$$-2
+            kind: KIND_LIST
+            entities:
+            - value: red
+              synonyms:
+              - red
+            - value: blue
+              synonyms:
+              - blue
+    - expect_stderr: |
+        Updated entityType [$$entity-type-basename$$].
+    - expect_stdout: |
+        displayName: $$entity-type-display-name$$-2
+        entities:
+        - synonyms:
+          - red
+          value: red
+        - synonyms:
+          - blue
+          value: blue
+        kind: KIND_LIST
+        name: $$entity-type$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      dialogflow entity-types update $$entity-type$$
+        --clear-entities
+        --add-entities="yellow"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://dialogflow.googleapis.com/v2/$$entity-type$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '360'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/agent/entityTypes/c153c4ea-3eb0-4e17-9560-5326e03d5ca2
+            displayName: $$entity-type-display-name$$-2
+            kind: KIND_LIST
+            entities:
+            - value: red
+              synonyms:
+              - red
+            - value: blue
+              synonyms:
+              - blue
+    - api_call:
+        expect_request:
+          uri: https://dialogflow.googleapis.com/v2/$$entity-type$$?alt=json&updateMask=entities%2Ckind
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              autoExpansionMode: AUTO_EXPANSION_MODE_UNSPECIFIED
+              displayName: $$entity-type-display-name$$-2
+              entities:
+              - synonyms:
+                - yellow
+                value: yellow
+              kind: KIND_LIST
+              name: $$entity-type$$
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '287'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/agent/entityTypes/c153c4ea-3eb0-4e17-9560-5326e03d5ca2
+            displayName: $$entity-type-display-name$$-2
+            kind: KIND_LIST
+            entities:
+            - value: yellow
+              synonyms:
+              - yellow
+    - expect_stderr: |
+        Updated entityType [$$entity-type-basename$$].
+    - expect_stdout: |
+        displayName: $$entity-type-display-name$$-2
+        entities:
+        - synonyms:
+          - yellow
+          value: yellow
+        kind: KIND_LIST
+        name: $$entity-type$$
+    - expect_exit:
+        code: 0
+- write_file:
+    path: flags_file.yaml
+    contents: |
+      --add-entities:
+        red:
+        - red
+        - maroon
+- execute_command:
+    command: |
+      dialogflow entity-types update $$entity-type$$
+        --clear-entities
+        --flags-file flags_file.yaml
+    events:
+    - api_call:
+        expect_request:
+          uri: https://dialogflow.googleapis.com/v2/$$entity-type$$?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '287'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/agent/entityTypes/c153c4ea-3eb0-4e17-9560-5326e03d5ca2
+            displayName: $$entity-type-display-name$$-2
+            kind: KIND_LIST
+            entities:
+            - value: yellow
+              synonyms:
+              - yellow
+    - api_call:
+        expect_request:
+          uri: https://dialogflow.googleapis.com/v2/$$entity-type$$?alt=json&updateMask=entities%2Ckind
+          method: PATCH
+          headers: {}
+          body:
+            json:
+              autoExpansionMode: AUTO_EXPANSION_MODE_UNSPECIFIED
+              displayName: $$entity-type-display-name$$-2
+              entities:
+              - synonyms:
+                - red
+                - maroon
+                value: red
+              kind: KIND_MAP
+              name: $$entity-type$$
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '298'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            name: projects/cloud-sdk-integration-testing/agent/entityTypes/c153c4ea-3eb0-4e17-9560-5326e03d5ca2
+            displayName: $$entity-type-display-name$$-2
+            kind: KIND_MAP
+            entities:
+            - value: red
+              synonyms:
+              - red
+              - maroon
+    - expect_stderr: |
+        Updated entityType [$$entity-type-basename$$].
+    - expect_stdout: |
+        displayName: $$entity-type-display-name$$-2
+        entities:
+        - synonyms:
+          - red
+          - maroon
+          value: red
+        kind: KIND_MAP
+        name: $$entity-type$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      dialogflow entity-types list --filter="name=$$entity-type$$"
+        --format="text(name.basename(), displayName, kind)"
+    events:
+    - api_call:
+        expect_request:
+          uri: https://dialogflow.googleapis.com/v2/projects/cloud-sdk-integration-testing/agent/entityTypes?alt=json
+          method: GET
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '978'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body:
+            entityTypes:
+            - name: projects/cloud-sdk-integration-testing/agent/entityTypes/c153c4ea-3eb0-4e17-9560-5326e03d5ca2
+              displayName: $$entity-type-display-name$$-2
+              kind: KIND_MAP
+              entities:
+              - value: red
+                synonyms:
+                - red
+                - maroon
+            - name: projects/cloud-sdk-integration-testing/agent/entityTypes/44153f0c-139a-4b11-9ea7-4ef3ff7a29f5
+              displayName: test-et-20190301-164552-5s2f
+              kind: KIND_MAP
+              autoExpansionMode: AUTO_EXPANSION_MODE_DEFAULT
+              entities:
+              - value: red
+                synonyms:
+                - red
+              - value: blue
+                synonyms:
+                - blue
+              - value: green
+                synonyms:
+                - green
+    - expect_stdout: |
+        ---
+        displayName: $$entity-type-display-name$$-2
+        kind:        KIND_MAP
+        name:        $$entity-type-basename$$
+    - expect_exit:
+        code: 0
+- execute_command:
+    command: |
+      dialogflow entity-types delete $$entity-type$$
+    cleanup_for: entity-type-display-name
+    events:
+    - expect_prompt_continue:
+        message: You are about to delete entityType [$$entity-type-basename$$]
+        user_input: y
+    - api_call:
+        expect_request:
+          uri: https://dialogflow.googleapis.com/v2/$$entity-type$$?alt=json
+          method: DELETE
+          headers: {}
+          body: null
+        return_response:
+          headers:
+            cache-control: private
+            content-length: '3'
+            content-type: application/json; charset=UTF-8
+            status: '200'
+          body: |
+            {}
+    - expect_stderr: |
+        Deleted entityType [$$entity-type-basename$$].
+    - expect_exit:
+        code: 0

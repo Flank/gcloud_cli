@@ -138,5 +138,10 @@ class OperationsListUnitTestBeta(OperationsListUnitTest,
     self.assertEqual(self.track, calliope_base.ReleaseTrack.BETA)
 
 
+class OperationsListUnitTestAlpha(OperationsListUnitTestBeta,
+                                  base.DataprocTestBaseAlpha):
+  pass
+
+
 if __name__ == '__main__':
   sdk_test_base.main()

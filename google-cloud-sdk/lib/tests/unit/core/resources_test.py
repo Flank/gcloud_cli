@@ -272,10 +272,10 @@ class ResourcePathingTest(sdk_test_base.SdkBase):
   def testStorageAlternativeUri_Fails(self):
     # Note that this url has no api version.
     url = 'https://storage.googleapis.com/my_bucket/my_folder/my_file.txt'
-    with self.assertRaisesRegex(resources.InvalidResourceException,
-                                r'could not parse resource \[{0}\]: '
-                                r'unknown api version my_bucket'
-                                .format(url)):
+    with self.assertRaisesRegex(
+        resources.InvalidResourceException,
+        r'could not parse resource \[{0}\]: '
+        r'unknown api version None'.format(url)):
       self.registry.ParseURL(url)
 
   def testStorageAlternativeUri(self):
